@@ -1,0 +1,6 @@
+<resources>
+    <!-- Matches the JS SplashScreen's navy background (src/modules/Splash/constants.ts
+         SPLASH_BG), so the brief native cold-start frame before JS loads is brand-navy
+         instead of a stark white flash. -->
+    <color name="splash_background">#0e1a33</color>
+</resources>
