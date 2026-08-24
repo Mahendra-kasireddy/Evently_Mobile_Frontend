@@ -10,13 +10,18 @@ import { styles } from './styles';
 
 type JoinNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-/** Web's /join role picker (organizer vs sub-vendor business signup) — mobile only
- * surfaces the entry point + a "coming soon" placeholder for each role. Uses the
- * shared AppHeader for the back arrow, same as every other screen in the app. */
+/** Web's /join role picker (organizer vs sub-vendor business signup). Organizer
+ * routes into the full native onboarding wizard; sub-vendor is still a "coming
+ * soon" placeholder. Uses the shared AppHeader for the back arrow, same as
+ * every other screen in the app. */
 export function JoinScreen() {
   const navigation = useNavigation<JoinNavigationProp>();
 
   const handleSelectRole = (role: JoinRole) => {
+    if (role === 'organizer') {
+      navigation.navigate('OrganizerOnboarding');
+      return;
+    }
     navigation.navigate('ComingSoon', { role });
   };
 

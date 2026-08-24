@@ -1386,6 +1386,27 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
+  - react-native-image-picker (8.2.1):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - react-native-safe-area-context (5.8.1):
     - hermes-engine
     - RCTRequired
@@ -1993,6 +2014,7 @@ DEPENDENCIES:
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - React-mutationobservernativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/mutationobserver`)
   - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
+  - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-networking (from `../node_modules/react-native/ReactCommon/react/networking`)
@@ -2117,6 +2139,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/mutationobserver"
   react-native-geolocation:
     :path: "../node_modules/@react-native-community/geolocation"
+  react-native-image-picker:
+    :path: "../node_modules/react-native-image-picker"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   React-NativeModulesApple:
@@ -2241,6 +2265,7 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: fbca042172e65219501e792c0d088c17338a7bb2
   React-mutationobservernativemodule: c8a615cc141822983b343e6f1982d214b706246e
   react-native-geolocation: 0e918f1db21d82fe8ce5ccae2ba747f1621a85c4
+  react-native-image-picker: 7ce01fe1fab4b9efa4f983366c5057511c968bb9
   react-native-safe-area-context: d289621fa4cf205248a6327f3225f203cb9b0ba3
   React-NativeModulesApple: 93f0f19a59fe7cc5d929536f0112f3124ff81b56
   React-networking: 9c369ed78ccb79e063292f8260e0ac461e00272c

@@ -16,8 +16,9 @@ import { styles } from './styles';
 type ComingSoonNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 type ComingSoonRouteProp = RouteProp<RootStackParamList, 'ComingSoon'>;
 
-/** Placeholder shown after picking a role on the Join screen — the real organizer/
- * sub-vendor onboarding wizards are web-only for now. A single "Back to log in"
+/** Placeholder shown after picking the sub-vendor role on the Join screen — the
+ * real sub-vendor onboarding wizard is web-only for now (organizer onboarding
+ * has its own native wizard, see modules/OrganizerOnboarding). A single "Back to log in"
  * button is the only way out — no separate header back arrow, to avoid two
  * different-but-similar-looking ways back on the same screen. */
 export function ComingSoonScreen() {

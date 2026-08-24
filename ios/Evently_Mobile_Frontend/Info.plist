@@ -35,6 +35,10 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Evently uses your location to show your current location and match you with organizers near you.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Evently needs access to your photos so you can upload your profile photo, documents and portfolio images.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Evently needs camera access so you can take a photo to upload for your organizer profile or documents.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UIAppFonts</key>

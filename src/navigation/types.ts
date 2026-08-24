@@ -12,6 +12,7 @@ export type RootStackParamList = {
   Login: undefined;
   Join: undefined;
   ComingSoon: { role: JoinRole };
+  OrganizerOnboarding: undefined;
   Main: undefined;
   Location: undefined;
   Notification: undefined;

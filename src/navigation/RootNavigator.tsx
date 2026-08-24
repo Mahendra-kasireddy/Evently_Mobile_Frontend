@@ -8,6 +8,7 @@ import { LocationScreen } from '../modules/Location';
 import { LoginScreen } from '../modules/Login';
 import { NotificationScreen } from '../modules/Notification';
 import { OnboardingScreen } from '../modules/Onboarding';
+import { OrganizerOnboardingScreen } from '../modules/OrganizerOnboarding';
 import { SettingsScreen } from '../modules/Settings';
 import { SplashScreen } from '../modules/Splash';
 import { selectAuthToken, selectIsAuthHydrated } from '../store/authSlice';
@@ -39,6 +40,8 @@ export function RootNavigator() {
           <Stack.Screen name="Invitations" component={InvitationScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen name="LegalSupport" component={LegalSupportScreen} />
+          {/* Also present here (see below) so verifying OTP mid-onboarding doesn't unmount the wizard. */}
+          <Stack.Screen name="OrganizerOnboarding" component={OrganizerOnboardingScreen} />
         </>
       ) : (
         <>
@@ -46,6 +49,11 @@ export function RootNavigator() {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Join" component={JoinScreen} />
           <Stack.Screen name="ComingSoon" component={ComingSoonScreen} />
+          {/* Organizer onboarding is OTP-first and starts unauthenticated; the same
+              screen name is registered in the authenticated branch above too, so
+              React Navigation preserves this route's state when the in-flow OTP
+              verify flips `token` and swaps which branch renders. */}
+          <Stack.Screen name="OrganizerOnboarding" component={OrganizerOnboardingScreen} />
         </>
       )}
     </Stack.Navigator>

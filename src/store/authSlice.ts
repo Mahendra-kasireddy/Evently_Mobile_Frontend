@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { decodeJwtRoles } from '../services/jwt';
 
 interface AuthState {
   token: string | null;
@@ -24,4 +25,7 @@ const authSlice = createSlice({
 export const { setToken, setAuthHydrated } = authSlice.actions;
 export const selectAuthToken = (state: { auth: AuthState }): string | null => state.auth.token;
 export const selectIsAuthHydrated = (state: { auth: AuthState }): boolean => state.auth.isHydrated;
+/** Derived from the token itself (not separately persisted) — always reflects whatever token is currently active. */
+export const selectAuthRoles = (state: { auth: AuthState }): string[] =>
+  state.auth.token ? decodeJwtRoles(state.auth.token) : [];
 export default authSlice.reducer;
