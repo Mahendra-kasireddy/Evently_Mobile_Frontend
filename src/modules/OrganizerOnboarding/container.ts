@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { selectAuthToken, setToken } from '../../store/authSlice';
+import { selectAuthToken, setActiveView, setToken } from '../../store/authSlice';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
   EMPTY_FILES,
@@ -144,6 +144,8 @@ export function useOrganizerOnboarding(): OrganizerOnboardingResult {
     registerOrganizer()
       .then((res) => {
         if (res.token) dispatch(setToken(res.token));
+        // Registering as an organizer is an explicit request for that view.
+        dispatch(setActiveView('organizer'));
         hydrate(res.profile);
         setReady(true);
       })

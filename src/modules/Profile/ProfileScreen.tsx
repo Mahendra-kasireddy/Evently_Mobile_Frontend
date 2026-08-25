@@ -13,9 +13,30 @@ import { styles } from './styles';
 
 export function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { profile, isLoading, isError, errorMessage, isLoggingOut, logout } = useProfileContainer();
+  const {
+    profile,
+    isLoading,
+    isError,
+    errorMessage,
+    isLoggingOut,
+    logout,
+    canUseOrganizerView,
+    isOrganizerView,
+    toggleView,
+  } = useProfileContainer();
 
   const menuItems: ProfileMenuItem[] = [
+    // Offered only to accounts that actually hold the organizer role.
+    ...(canUseOrganizerView
+      ? [
+          {
+            key: 'view',
+            icon: isOrganizerView ? 'home-outline' : 'briefcase-outline',
+            label: isOrganizerView ? 'Switch to customer app' : 'Switch to organizer dashboard',
+            onPress: toggleView,
+          },
+        ]
+      : []),
     { key: 'bookings', icon: 'calendar-check', label: 'My Bookings', onPress: () => navigation.navigate('Bookings') },
     { key: 'invitations', icon: 'email-fast-outline', label: 'My Invitation', onPress: () => navigation.navigate('Invitations') },
     { key: 'settings', icon: 'cog-outline', label: 'Settings', onPress: () => navigation.navigate('Settings') },

@@ -88,7 +88,11 @@ export function PlanScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.fixedHeader}>
-        <AppHeader title={`Plan your ${occasionLabel}`} onBackPress={container.goBack} compact />
+        {/*
+          No back arrow: Plan is a bottom-tab root, so there is nothing behind it
+          to go back to. Moving between steps is the Stepper right below.
+        */}
+        <AppHeader title={`Plan your ${occasionLabel}`} showBackButton={false} compact />
         <Stepper steps={container.steps} current={stepIndex} onSelect={container.goToStep} />
       </View>
 

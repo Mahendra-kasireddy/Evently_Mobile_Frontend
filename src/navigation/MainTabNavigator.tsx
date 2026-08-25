@@ -5,7 +5,7 @@ import { HomeScreen } from '../modules/Home';
 import { OrganizerHomeScreen } from '../modules/OrganizerHome';
 import { PlanScreen } from '../modules/Plan';
 import { ProfileScreen } from '../modules/Profile';
-import { selectAuthRoles } from '../store/authSlice';
+import { selectIsOrganizerView } from '../store/authSlice';
 import { useAppSelector } from '../store/hooks';
 import { colors } from '../theme';
 import type { MainTabParamList } from './types';
@@ -30,8 +30,12 @@ function TabIcon({ routeName, color, size }: TabIconProps) {
 }
 
 export function MainTabNavigator() {
-  const roles = useAppSelector(selectAuthRoles);
-  const isOrganizer = roles.includes('organizer');
+  /*
+   * The chosen view, not the role list. An account that holds both roles —
+   * anyone who registered as an organizer keeps the customer role too — used to be
+   * forced into the organizer dashboard on every login.
+   */
+  const isOrganizer = useAppSelector(selectIsOrganizerView);
 
   return (
     <Tab.Navigator
@@ -42,8 +46,9 @@ export function MainTabNavigator() {
         tabBarIcon: ({ color, size }) => <TabIcon routeName={route.name} color={color} size={size} />,
       })}
     >
-      {/* Organizers get their business dashboard here instead of the customer
-          home feed — Plan/Chat/Profile stay shared for now. */}
+      {/* The organizer dashboard replaces the customer feed only while the
+          organizer view is active — switched from Profile. Plan/Chat/Profile
+          stay shared for now. */}
       <Tab.Screen name="Home" component={isOrganizer ? OrganizerHomeScreen : HomeScreen} />
       <Tab.Screen name="Plan" component={PlanScreen} />
       <Tab.Screen name="Chat" component={ChatScreen} />

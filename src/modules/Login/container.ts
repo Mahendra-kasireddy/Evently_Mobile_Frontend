@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { setToken } from '../../store/authSlice';
+import { setActiveView, setToken } from '../../store/authSlice';
 import { useAppDispatch } from '../../store/hooks';
 import { setHasSeenOnboarding } from '../../store/onboardingSlice';
 import { RESEND_COOLDOWN_SECONDS } from './constants';
@@ -91,6 +91,10 @@ export function useLoginContainer(): LoginContainerResult {
       .execute(requestId, code)
       .then((response) => {
         dispatch(setToken(response.token));
+        // This screen is the customer entry point, so land in the customer app
+        // even for an account that also holds the organizer role. Organizers
+        // switch from Profile.
+        dispatch(setActiveView('customer'));
         dispatch(setHasSeenOnboarding());
       })
       .catch(() => {
