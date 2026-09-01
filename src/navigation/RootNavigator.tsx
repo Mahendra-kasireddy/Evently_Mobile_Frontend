@@ -3,7 +3,7 @@ import { BookingScreen } from '../modules/Booking';
 import { ComingSoonScreen } from '../modules/ComingSoon';
 import { InvitationScreen } from '../modules/Invitation';
 import { JoinScreen } from '../modules/Join';
-import { LegalSupportScreen } from '../modules/LegalSupport';
+import { ContactScreen, LegalSupportScreen } from '../modules/LegalSupport';
 import { LocationScreen } from '../modules/Location';
 import { LoginScreen } from '../modules/Login';
 import { NotificationScreen } from '../modules/Notification';
@@ -11,6 +11,7 @@ import { OnboardingScreen } from '../modules/Onboarding';
 import { OrganizerOnboardingScreen } from '../modules/OrganizerOnboarding';
 import { SettingsScreen } from '../modules/Settings';
 import { SplashScreen } from '../modules/Splash';
+import { IdeaBoardScreen, WorkspaceScreen } from '../modules/Workspace';
 import { selectAuthToken, selectIsAuthHydrated } from '../store/authSlice';
 import { selectHasSeenOnboarding, selectIsOnboardingHydrated } from '../store/onboardingSlice';
 import { useAppSelector } from '../store/hooks';
@@ -37,9 +38,12 @@ export function RootNavigator() {
           <Stack.Screen name="Location" component={LocationScreen} />
           <Stack.Screen name="Notification" component={NotificationScreen} />
           <Stack.Screen name="Bookings" component={BookingScreen} />
+          <Stack.Screen name="Workspace" component={WorkspaceScreen} />
+          <Stack.Screen name="IdeaBoard" component={IdeaBoardScreen} />
           <Stack.Screen name="Invitations" component={InvitationScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen name="LegalSupport" component={LegalSupportScreen} />
+          <Stack.Screen name="Contact" component={ContactScreen} />
           {/* Also present here (see below) so verifying OTP mid-onboarding doesn't unmount the wizard. */}
           <Stack.Screen name="OrganizerOnboarding" component={OrganizerOnboardingScreen} />
         </>

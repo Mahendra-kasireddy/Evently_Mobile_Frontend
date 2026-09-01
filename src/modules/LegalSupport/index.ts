@@ -1,1 +1,2 @@
-export { LegalSupportScreen, default } from './LegalSupportScreen';
+export { LegalSupportScreen } from './LegalSupportScreen';
+export { ContactScreen } from './ContactScreen';

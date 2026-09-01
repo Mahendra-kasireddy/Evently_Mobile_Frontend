@@ -1,6 +1,8 @@
 import { colors } from '../../theme';
 import type {
+  BookedEventStatus,
   CurrentEventStage,
+  EventSource,
   HeroDraft,
   HowStepIcon,
   OccasionArtKey,
@@ -12,6 +14,7 @@ import type {
 
 export const HOME_FEED_ENDPOINT = '/home/getHomeFeed';
 export const REQUEST_QUOTES_ENDPOINT = '/quote/requestQuotes';
+export const ORGANIZER_BY_ID_ENDPOINT = '/organizer/getOrganizerById';
 
 // Field order/icons for the hero "your event so far" draft bar — mirrors
 // web's FIELD_DEFS (occasion/when/where/guests, in that order).
@@ -136,3 +139,135 @@ export const CURRENT_EVENT_STAGE_COLOR: Record<CurrentEventStage, string> = {
   in_progress: colors.success,
   completed: colors.success,
 };
+
+// ---------------------------------------------------------------------------
+// Home hero — the "your event" card that floats at the foot of the banner.
+//
+// Every value in that card comes from the signed-in customer: either their own
+// record via GET /home/getHomeFeed's `currentEvent`, or the planner draft they
+// are assembling right now. Nothing below is a sample value — these constants
+// are labels, empty-state copy and per-field "not set yet" text, so a fact the
+// customer's record genuinely does not carry reads as blank instead of showing
+// a plausible-looking date, city or headcount.
+// ---------------------------------------------------------------------------
+
+/**
+ * Header above the card once there is a real event. In draft mode the card
+ * uses the backend's own `hero.draftLabel` instead, so that copy stays
+ * editable without a release.
+ */
+export const EVENT_SUMMARY_LABEL = 'Your event · tap to open';
+
+/** Draft mode's action — the existing "request quotes" flow, unchanged. */
+export const EVENT_SUMMARY_DRAFT_CTA = 'Get quotes';
+
+/**
+ * Shown in place of a value the customer's record does not hold. Worded per
+ * field so the row still reads as a sentence, and never as a real answer.
+ */
+export const EVENT_SUMMARY_FIELD_EMPTY: Record<keyof HeroDraft, string> = {
+  occasion: 'Not chosen yet',
+  when: 'Date not set',
+  where: 'Place not set',
+  guests: 'Guest count not set',
+};
+
+/**
+ * The footer action names the destination it actually opens, which differs by
+ * which record the event resolved from. A quote request has no screen of its
+ * own in the app yet, so it opens the plan it came from and says so, rather
+ * than promising a request view that does not exist.
+ */
+export const EVENT_SUMMARY_OPEN_CTA: Record<EventSource, string> = {
+  plan: 'Continue planning',
+  quote: 'Review your plan',
+  booking: 'View booking',
+};
+
+/** Neither a real event nor a draft — only reachable if hero content is empty. */
+export const EVENT_SUMMARY_EMPTY = {
+  title: 'No event yet',
+  body: 'Tell us the occasion, the date, where it is and how many are coming — organizers take it from there.',
+};
+
+export const EVENT_SUMMARY_ERROR = {
+  title: "Couldn't load your event",
+  cta: 'Try again',
+};
+
+// ---------------------------------------------------------------------------
+// Home's "BOOKED" card — the ongoing booking, shown in place of the compact
+// current-event widget once the customer actually has one.
+// ---------------------------------------------------------------------------
+
+/**
+ * A booking awaiting the organizer's acceptance still reads "BOOKED": the
+ * customer has chosen an organizer and paid, so from their side the event is
+ * booked. What is outstanding is the organizer's confirmation, which the
+ * card's sub-line (composed by the backend) states outright rather than hiding
+ * behind a vaguer badge.
+ */
+export const BOOKED_STATUS_LABEL: Record<BookedEventStatus, string> = {
+  pending: 'BOOKED',
+  awaiting_organizer: 'BOOKED',
+  confirmed: 'BOOKED',
+  in_progress: 'IN PROGRESS',
+};
+
+export const BOOKED_CTA = 'Open workspace';
+
+// Web's --color-green, used for a completed milestone's tick. Scoped to this
+// card, like the other ported hero tokens above.
+export const BOOKED_STEP_DONE_COLOR = '#1d9e75';
+export const BOOKED_STEP_PENDING_COLOR = '#e6e9f0';
+export const BOOKED_RING_TRACK_COLOR = '#eef0f4';
+
+/**
+ * Ring geometry, matching the reference design's phone breakpoint: a 76px ring
+ * inside an 84px wash disc.
+ */
+export const BOOKED_RING_SIZE = 76;
+export const BOOKED_RING_STROKE = 9;
+export const BOOKED_RING_RADIUS = (BOOKED_RING_SIZE - BOOKED_RING_STROKE - 2) / 2;
+export const BOOKED_RING_CIRCUMFERENCE = 2 * Math.PI * BOOKED_RING_RADIUS;
+export const BOOKED_RING_DISC = 84;
+
+// ---------------------------------------------------------------------------
+// "Top organizers near you".
+// ---------------------------------------------------------------------------
+
+/**
+ * Stars are drawn from the organizer's actual rating: `rating` filled, the
+ * rest outlined. The web card draws five filled stars unconditionally, which
+ * shows a brand-new organizer with no reviews as a five-star business — see
+ * TopOrganizers.tsx.
+ */
+export const ORGANIZER_STAR_COUNT = 5;
+
+export const ORGANIZER_TIER_ICON = 'medal-outline';
+
+export const ORGANIZER_COPY = {
+  viewProfile: 'View Profile',
+  getQuote: 'Get quote',
+  requestSent: 'Request sent',
+  noRating: 'No reviews yet',
+  scopeWithCity: (city: string) =>
+    `No organizers in ${city} yet — showing highly-rated organizers from other areas.`,
+  scopeNoCity: 'Set your location to see organizers near you. Showing highly-rated organizers for now.',
+  emptyTitle: 'Looking for organizers in your area?',
+  emptyWithCity: (city: string) =>
+    `We couldn't find organizers in ${city} yet. You can change your city any time.`,
+  emptyNoCity: "We couldn't find organizers nearby yet. Setting your city helps us match you.",
+  emptyCta: 'Change city',
+};
+
+// ---------------------------------------------------------------------------
+// "Curated packages by budget".
+// ---------------------------------------------------------------------------
+
+/**
+ * The card's action. It opens the planner pre-set to this package's occasion —
+ * the app has no package detail screen, and a button reading "Explore package"
+ * has to land somewhere that is actually about that package.
+ */
+export const PACKAGE_EXPLORE_CTA = 'Explore package';

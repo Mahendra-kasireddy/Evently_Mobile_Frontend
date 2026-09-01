@@ -108,6 +108,8 @@ export interface PackageItemDTO {
   guests: string;
   budget: string;
   tags: string[];
+  /** Which illustration and gradient the card's banner uses. */
+  art: OccasionArtKey;
 }
 
 export type OrganizerTier = 'Gold' | 'Silver' | 'Platinum';
@@ -120,8 +122,47 @@ export interface OrganizerDTO {
   tier: OrganizerTier;
   rating: number;
   reviews: number;
+  /** Events this organizer has run — 0 for one who has not run any yet. */
+  events: number;
   tags: string[];
+  location: string;
 }
+
+/**
+ * Whether `topOrganizers` really are in the customer's city ('city'), or come
+ * from further afield because nothing local existed ('all'). The section says
+ * which, rather than letting a "near you" heading imply the first.
+ */
+export type OrganizerScope = 'city' | 'all';
+
+/**
+ * GET /organizer/getOrganizerById/:id — the sanitized public profile. Only the
+ * fields the detail sheet shows are declared; the endpoint returns more.
+ */
+export interface OrganizerProfileDTO {
+  id: string;
+  name: string;
+  initials: string;
+  avatarColor: string;
+  tier: OrganizerTier;
+  rating: number;
+  reviews: number;
+  events: number;
+  tags: string[];
+  location: string;
+  city: string;
+  occasions: string[];
+  capacityMin: number;
+  capacityMax: number;
+  estRange: string;
+  responseRate: number;
+  responseHours: number;
+  businessName: string;
+  displayName: string;
+}
+
+/** Which real record the Home event resolved from — decides where tapping it goes. */
+export type EventSource = 'plan' | 'quote' | 'booking';
 
 export type CurrentEventStage =
   | 'draft'
@@ -136,9 +177,50 @@ export type CurrentEventStage =
 export interface CurrentEventDTO {
   stage: CurrentEventStage;
   title: string;
+  /**
+   * The four facts the Home card shows. Each comes from the underlying record
+   * — a booking's fixed date and venue, or the brief's own words — and is ''
+   * when that record doesn't carry it, never a placeholder.
+   */
   occasion: string;
+  when: string;
+  where: string;
+  guests: string;
+  /** Which record this resolved from — decides where tapping it goes. */
+  source: EventSource;
   progress: number;
   daysToGo: number | null;
+}
+
+/**
+ * Statuses a live booking can be in behind the Home "BOOKED" card. Mirrors the
+ * backend's LIVE_BOOKING_STATUSES — terminal states never reach this card.
+ */
+export type BookedEventStatus = 'pending' | 'awaiting_organizer' | 'confirmed' | 'in_progress';
+
+export interface BookedStepDTO {
+  label: string;
+  done: boolean;
+}
+
+/**
+ * The customer's ongoing booking, already composed by the backend
+ * (BookingService.getActiveForUser): a derived title, status-aware copy, and
+ * milestones whose done-count is what `progress` is calculated from. Nothing
+ * here is re-derived on the client.
+ */
+export interface BookedEventDTO {
+  id: string;
+  ref: string;
+  title: string;
+  description: string;
+  progress: number;
+  daysToGo: number;
+  status: BookedEventStatus;
+  /** False while the booking is paid for but not yet accepted by the organizer. */
+  organizerConfirmed: boolean;
+  organizerName: string;
+  steps: BookedStepDTO[];
 }
 
 export interface HomeFeedDTO {
@@ -146,6 +228,13 @@ export interface HomeFeedDTO {
   content: HomeContentDTO;
   packages: PackageItemDTO[];
   topOrganizers: OrganizerDTO[];
+  topOrganizersScope: OrganizerScope;
+  /**
+   * The ongoing booking behind Home's rich "BOOKED" card. Null at every other
+   * stage, where the compact `currentEvent` widget shows instead — the two are
+   * mutually exclusive, as they are on web.
+   */
+  booking: BookedEventDTO | null;
   currentEvent: CurrentEventDTO | null;
   unreadCount: number;
 }
@@ -158,9 +247,37 @@ export interface HomeFeedDTO {
 
 export interface CurrentEventViewModel {
   title: string;
+  occasion: string;
+  when: string;
+  where: string;
+  guests: string;
+  source: EventSource;
   progress: number;
   daysToGo: number | null;
   stage: CurrentEventStage;
+}
+
+export interface BookedStep {
+  label: string;
+  done: boolean;
+}
+
+export interface BookedEventViewModel {
+  id: string;
+  ref: string;
+  title: string;
+  description: string;
+  progress: number;
+  daysToGo: number;
+  status: BookedEventStatus;
+  organizerConfirmed: boolean;
+  organizerName: string;
+  steps: BookedStep[];
+}
+
+export interface TrustItem {
+  icon: TrustIcon;
+  label: string;
 }
 
 export interface BannerViewModel {
@@ -172,6 +289,7 @@ export interface BannerViewModel {
   draftLabel: string;
   defaultDraft: HeroDraft;
   options: HeroOptions;
+  trust: TrustItem[];
 }
 
 export interface CategoryItem {
@@ -188,23 +306,25 @@ export interface CategoriesViewModel {
   items: CategoryItem[];
 }
 
-export interface FeaturedEventItem {
+export interface PackageItem {
   id: string;
   badge: string;
   title: string;
   guests: string;
   budget: string;
   tags: string[];
+  art: OccasionArtKey;
 }
 
-export interface FeaturedEventsViewModel {
+export interface PackagesViewModel {
   title: string;
   subtitle: string;
+  /** "Build your own" — omitted when the backend supplies no label. */
   buildLabel: string | null;
-  items: FeaturedEventItem[];
+  items: PackageItem[];
 }
 
-export interface RecommendedEventItem {
+export interface OrganizerItem {
   id: string;
   name: string;
   initials: string;
@@ -212,13 +332,17 @@ export interface RecommendedEventItem {
   tier: OrganizerTier;
   rating: number;
   reviews: number;
+  events: number;
   tags: string[];
 }
 
-export interface RecommendedEventsViewModel {
+export interface TopOrganizersViewModel {
   title: string;
-  seeAllLabel: string;
-  items: RecommendedEventItem[];
+  items: OrganizerItem[];
+  /** Where these organizers came from, so the section can caveat itself. */
+  scope: OrganizerScope;
+  /** The customer's city, for that caveat. '' when none is set. */
+  city: string;
 }
 
 export interface HowStepItem {
@@ -249,10 +373,11 @@ export interface ToolsViewModel {
 
 export interface HomeViewModel {
   banner: BannerViewModel | null;
+  bookedEvent: BookedEventViewModel | null;
   currentEvent: CurrentEventViewModel | null;
   categories: CategoriesViewModel | null;
-  featuredEvents: FeaturedEventsViewModel | null;
-  recommendedEvents: RecommendedEventsViewModel | null;
+  packages: PackagesViewModel | null;
+  topOrganizers: TopOrganizersViewModel | null;
   howItWorks: HowItWorksViewModel | null;
   tools: ToolsViewModel | null;
 }

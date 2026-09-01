@@ -1,16 +1,27 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ScrollView } from 'react-native';
+import { ActivityIndicator, RefreshControl, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EventlyText } from '../../Components';
+import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
+import { colors } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
+import { PROFILE_ACCENT, PROFILE_COPY as COPY } from './constants';
 import { useProfileContainer } from './container';
 import { ProfileHeader } from './sections/ProfileHeader';
 import { ProfileInfoList } from './sections/ProfileInfoList';
 import { ProfileMenuList, type ProfileMenuItem } from './sections/ProfileMenuList';
 import { SignOutRow } from './sections/SignOutRow';
+import { ViewSwitch } from './sections/ViewSwitch';
 import { styles } from './styles';
 
+/**
+ * The customer's account.
+ *
+ * Destinations are grouped by what they are for — the customer's events, and
+ * the account itself — rather than listed as one undifferentiated column, and
+ * the role switch is kept out of that list because it changes what the app is
+ * rather than navigating within it.
+ */
 export function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const {
@@ -20,30 +31,42 @@ export function ProfileScreen() {
     errorMessage,
     isLoggingOut,
     logout,
+    refetch,
     canUseOrganizerView,
     isOrganizerView,
     toggleView,
   } = useProfileContainer();
 
-  const menuItems: ProfileMenuItem[] = [
-    // Offered only to accounts that actually hold the organizer role.
-    ...(canUseOrganizerView
-      ? [
-          {
-            key: 'view',
-            icon: isOrganizerView ? 'home-outline' : 'briefcase-outline',
-            label: isOrganizerView ? 'Switch to customer app' : 'Switch to organizer dashboard',
-            onPress: toggleView,
-          },
-        ]
-      : []),
-    { key: 'bookings', icon: 'calendar-check', label: 'My Bookings', onPress: () => navigation.navigate('Bookings') },
-    { key: 'invitations', icon: 'email-fast-outline', label: 'My Invitation', onPress: () => navigation.navigate('Invitations') },
-    { key: 'settings', icon: 'cog-outline', label: 'Settings', onPress: () => navigation.navigate('Settings') },
+  const eventItems: ProfileMenuItem[] = [
+    {
+      key: 'bookings',
+      icon: 'calendar-check-outline',
+      label: COPY.bookings,
+      hint: COPY.bookingsHint,
+      onPress: () => navigation.navigate('Bookings'),
+    },
+    {
+      key: 'invitations',
+      icon: 'email-heart-outline',
+      label: COPY.invitations,
+      hint: COPY.invitationsHint,
+      onPress: () => navigation.navigate('Invitations'),
+    },
+  ];
+
+  const accountItems: ProfileMenuItem[] = [
+    {
+      key: 'settings',
+      icon: 'cog-outline',
+      label: COPY.settings,
+      hint: COPY.settingsHint,
+      onPress: () => navigation.navigate('Settings'),
+    },
     {
       key: 'legal',
       icon: 'shield-check-outline',
-      label: 'Legal & Support',
+      label: COPY.legal,
+      hint: COPY.legalHint,
       onPress: () => navigation.navigate('LegalSupport'),
     },
   ];
@@ -51,8 +74,9 @@ export function ProfileScreen() {
   if (isLoading && !profile) {
     return (
       <SafeAreaView style={styles.centered} edges={['top']}>
+        <ActivityIndicator size="large" color={colors.primary} />
         <EventlyText variant="body" style={styles.loadingText}>
-          Loading your profile…
+          {COPY.loading}
         </EventlyText>
       </SafeAreaView>
     );
@@ -61,24 +85,44 @@ export function ProfileScreen() {
   if (isError && !profile) {
     return (
       <SafeAreaView style={styles.centered} edges={['top']}>
+        <EventlyText variant="h2" style={styles.errorTitle}>
+          {COPY.errorTitle}
+        </EventlyText>
         <EventlyText variant="body" style={styles.errorText}>
           {errorMessage ?? 'Something went wrong.'}
         </EventlyText>
+        <TouchableOpacity style={styles.retryButton} activeOpacity={0.8} onPress={refetch} accessibilityRole="button">
+          <EventlyIcon name="refresh" size={16} color={PROFILE_ACCENT} />
+          <EventlyText variant="caption" style={styles.retryText}>
+            {COPY.retry}
+          </EventlyText>
+        </TouchableOpacity>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
-        {profile && (
+      <AppHeader title={COPY.title} showBackButton={false} compact />
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
+      >
+        {profile ? (
           <>
             <ProfileHeader data={profile} />
             <ProfileInfoList data={profile} />
           </>
-        )}
+        ) : null}
 
-        <ProfileMenuList items={menuItems} />
+        {/* Only for accounts that actually hold the organizer role. */}
+        {canUseOrganizerView ? (
+          <ViewSwitch isOrganizerView={isOrganizerView} onPress={toggleView} />
+        ) : null}
+
+        <ProfileMenuList title={COPY.sectionEvents} items={eventItems} />
+        <ProfileMenuList title={COPY.sectionAccount} items={accountItems} />
 
         <SignOutRow onPress={logout} loading={isLoggingOut} />
       </ScrollView>

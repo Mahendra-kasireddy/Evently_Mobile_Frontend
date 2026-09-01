@@ -1,13 +1,27 @@
 import { useEffect, useState } from 'react';
 import { Modal, Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
-import { Confetti, EventlyButton, EventlyIcon, EventlyText, OccasionArt } from '../../../Components';
-import { HERO_ACCENT_COLOR, HERO_FIELD_ICON_NAME, HERO_FIELD_LABEL, HERO_FIELD_ORDER } from '../constants';
-import { bannerStyles } from '../styles';
+import { Confetti, EventlyIcon, EventlyText, OccasionArt } from '../../../Components';
+import {
+  EVENT_SUMMARY_LABEL,
+  HERO_ACCENT_COLOR,
+  HERO_FIELD_ICON_NAME,
+  HERO_FIELD_LABEL,
+  HERO_FIELD_ORDER,
+  TRUST_ICON_NAME,
+} from '../constants';
+import { bannerStyles, heroTrustStyles } from '../styles';
 import { colors } from '../../../theme';
-import type { BannerViewModel, HeroDraft } from '../types';
+import type { BannerViewModel, CurrentEventViewModel, HeroDraft } from '../types';
+import { EventSummaryCard } from './EventSummaryCard';
 
 interface BannerProps {
   data: BannerViewModel;
+  /** The customer's real event. When set, it replaces the draft in the card. */
+  currentEvent: CurrentEventViewModel | null;
+  isFeedLoading: boolean;
+  feedErrorMessage: string | null;
+  onRetryFeed: () => void;
+  onPressCurrentEvent: () => void;
   heroDraft: HeroDraft | null;
   onChangeField: (field: keyof HeroDraft, value: string) => void;
   onSubmit: () => void;
@@ -19,6 +33,11 @@ interface BannerProps {
 
 export function Banner({
   data,
+  currentEvent,
+  isFeedLoading,
+  feedErrorMessage,
+  onRetryFeed,
+  onPressCurrentEvent,
   heroDraft,
   onChangeField,
   onSubmit,
@@ -27,13 +46,11 @@ export function Banner({
   quotesErrorMessage,
   onEditAgain,
 }: BannerProps) {
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetField, setSheetField] = useState<keyof HeroDraft | null>(null);
 
   useEffect(() => {
-    if (quotesRequested) setSheetOpen(false);
+    if (quotesRequested) setSheetField(null);
   }, [quotesRequested]);
-
-  const summary = heroDraft ? `${heroDraft.occasion} · ${heroDraft.when} · ${heroDraft.where} · ${heroDraft.guests} guests` : '';
 
   return (
     <View style={bannerStyles.container}>
@@ -73,42 +90,57 @@ export function Banner({
             </TouchableOpacity>
           </View>
         ) : (
-          <TouchableOpacity
-            style={bannerStyles.searchTrigger}
-            activeOpacity={0.85}
-            onPress={() => setSheetOpen(true)}
-            accessibilityLabel="Plan your event"
-          >
-            <View style={bannerStyles.searchIconChip}>
-              <EventlyIcon name="magnify" size={20} color={HERO_ACCENT_COLOR} />
-            </View>
-            <View style={bannerStyles.searchTextWrap}>
-              <EventlyText variant="caption" style={bannerStyles.searchLabel} numberOfLines={1}>
-                {data.draftLabel}
-              </EventlyText>
-              <EventlyText variant="subtitle" style={bannerStyles.searchSummary} numberOfLines={1}>
-                {summary}
-              </EventlyText>
-            </View>
-            <View style={bannerStyles.searchArrowButton}>
-              <EventlyIcon name="arrow-right" size={18} color={colors.onPrimary} />
-            </View>
-          </TouchableOpacity>
+          <EventSummaryCard
+            event={currentEvent}
+            draft={heroDraft}
+            label={currentEvent ? EVENT_SUMMARY_LABEL : data.draftLabel}
+            isLoading={isFeedLoading}
+            errorMessage={feedErrorMessage}
+            isSubmitting={isSubmitting}
+            onPressEvent={onPressCurrentEvent}
+            onEditDraft={setSheetField}
+            onSubmitDraft={onSubmit}
+            onRetry={onRetryFeed}
+          />
         )}
+
+        {quotesErrorMessage ? (
+          <EventlyText variant="caption" style={bannerStyles.formErrorText}>
+            {quotesErrorMessage}
+          </EventlyText>
+        ) : null}
+
+        {data.trust.length > 0 ? (
+          <View style={heroTrustStyles.wrap}>
+            {data.trust.map((item) => (
+              <View key={item.label} style={heroTrustStyles.item}>
+                <EventlyIcon name={TRUST_ICON_NAME[item.icon]} size={16} color={HERO_ACCENT_COLOR} />
+                <EventlyText variant="body" style={heroTrustStyles.label}>
+                  {item.label}
+                </EventlyText>
+              </View>
+            ))}
+          </View>
+        ) : null}
       </View>
 
-      <Modal visible={sheetOpen} transparent animationType="slide" onRequestClose={() => setSheetOpen(false)}>
-        <Pressable style={bannerStyles.sheetBackdrop} onPress={() => setSheetOpen(false)}>
+      {/*
+        One field at a time: the row the customer tapped is the field they want
+        to change, so the sheet opens on it instead of making them scroll a
+        four-section form to reach it.
+      */}
+      <Modal visible={sheetField !== null} transparent animationType="slide" onRequestClose={() => setSheetField(null)}>
+        <Pressable style={bannerStyles.sheetBackdrop} onPress={() => setSheetField(null)}>
           <Pressable style={bannerStyles.sheetContainer} onPress={() => {}}>
             <ScrollView showsVerticalScrollIndicator={false}>
               <EventlyText variant="h2" style={bannerStyles.sheetTitle}>
-                Plan your event
+                {sheetField ? HERO_FIELD_LABEL[sheetField] : ''}
               </EventlyText>
               <EventlyText variant="body" style={bannerStyles.sheetSubtitle}>
                 Pick what fits — you can change this anytime.
               </EventlyText>
 
-              {HERO_FIELD_ORDER.map((field) => (
+              {HERO_FIELD_ORDER.filter((field) => field === sheetField).map((field) => (
                 <View key={field} style={bannerStyles.chipGroup}>
                   <View style={bannerStyles.chipGroupHeader}>
                     <View style={bannerStyles.chipGroupIconChip}>
@@ -118,18 +150,17 @@ export function Banner({
                       {HERO_FIELD_LABEL[field]}
                     </EventlyText>
                   </View>
-                  <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={bannerStyles.chipRow}
-                  >
+                  <View style={bannerStyles.chipRow}>
                     {data.options[field].map((option) => {
                       const isActive = heroDraft?.[field] === option;
                       return (
                         <TouchableOpacity
                           key={option}
                           style={[bannerStyles.chip, isActive && bannerStyles.chipActive]}
-                          onPress={() => onChangeField(field, option)}
+                          onPress={() => {
+                            onChangeField(field, option);
+                            setSheetField(null);
+                          }}
                         >
                           <EventlyText
                             variant="body"
@@ -140,22 +171,9 @@ export function Banner({
                         </TouchableOpacity>
                       );
                     })}
-                  </ScrollView>
+                  </View>
                 </View>
               ))}
-
-              <EventlyButton
-                title="Get quotes"
-                onPress={onSubmit}
-                loading={isSubmitting}
-                disabled={!heroDraft}
-                style={[bannerStyles.getQuotesButton, { backgroundColor: HERO_ACCENT_COLOR }]}
-              />
-              {quotesErrorMessage ? (
-                <EventlyText variant="caption" style={bannerStyles.formErrorText}>
-                  {quotesErrorMessage}
-                </EventlyText>
-              ) : null}
             </ScrollView>
           </Pressable>
         </Pressable>

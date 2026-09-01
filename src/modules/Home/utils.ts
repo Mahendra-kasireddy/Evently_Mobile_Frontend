@@ -1,13 +1,16 @@
 import { isNonEmptyArray } from '../../utils/guards';
 import type {
   BannerViewModel,
+  BookedEventStatus,
+  BookedEventViewModel,
   CategoriesViewModel,
   CurrentEventViewModel,
-  FeaturedEventsViewModel,
+  OccasionArtKey,
+  PackagesViewModel,
   HomeFeedDTO,
   HomeViewModel,
   HowItWorksViewModel,
-  RecommendedEventsViewModel,
+  TopOrganizersViewModel,
   ToolsViewModel,
 } from './types';
 
@@ -27,18 +30,72 @@ export function mapBanner(feed: HomeFeedDTO): BannerViewModel | null {
     draftLabel: hero.draftLabel,
     defaultDraft: hero.defaultDraft,
     options: hero.options,
+    trust: isNonEmptyArray(hero.trust) ? hero.trust.map((t) => ({ icon: t.icon, label: t.label })) : [],
   };
+}
+
+const BOOKED_STATUSES: BookedEventStatus[] = [
+  'pending',
+  'awaiting_organizer',
+  'confirmed',
+  'in_progress',
+];
+
+/**
+ * The ongoing booking behind Home's "BOOKED" card.
+ *
+ * Everything shown — title, copy, milestones, the ring's percentage — is
+ * composed by the backend, so this only hardens the payload: a record with no
+ * reference or title cannot be drawn as a booking, and a milestone with no
+ * label would render as a blank chip, so it is dropped rather than shown.
+ */
+export function mapBookedEvent(feed: HomeFeedDTO): BookedEventViewModel | null {
+  const b = feed.booking;
+  // The card's whole action is opening this booking's workspace, so a record
+  // with no id cannot be drawn as one — nor can one with no reference or
+  // title be drawn as a booking at all.
+  if (!b || !b.id || !b.ref || !b.title) return null;
+
+  return {
+    id: b.id,
+    ref: b.ref,
+    title: b.title,
+    description: b.description ?? '',
+    progress: clampPercent(b.progress),
+    daysToGo: Number.isFinite(b.daysToGo) ? Math.max(0, Math.trunc(b.daysToGo)) : 0,
+    status: BOOKED_STATUSES.includes(b.status) ? b.status : 'confirmed',
+    // A record predating the field is treated as confirmed rather than as
+    // "awaiting confirmation", which would be a scarier claim than the truth.
+    organizerConfirmed: b.organizerConfirmed !== false,
+    organizerName: b.organizerName || 'Your organizer',
+    steps: isNonEmptyArray(b.steps)
+      ? b.steps.filter((s) => !!s?.label).map((s) => ({ label: s.label, done: s.done === true }))
+      : [],
+  };
+}
+
+function clampPercent(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(100, Math.max(0, Math.round(value)));
 }
 
 /** the customer's in-progress event, shown as its own section. Hidden if there is none. */
 export function mapCurrentEvent(feed: HomeFeedDTO): CurrentEventViewModel | null {
   if (!feed.currentEvent) return null;
 
+  const e = feed.currentEvent;
   return {
-    title: feed.currentEvent.title,
-    progress: feed.currentEvent.progress,
-    daysToGo: feed.currentEvent.daysToGo,
-    stage: feed.currentEvent.stage,
+    title: e.title,
+    // Each of these is passed through untouched: a value the backend left
+    // blank stays blank, so the card can say "not set" instead of guessing.
+    occasion: e.occasion ?? '',
+    when: e.when ?? '',
+    where: e.where ?? '',
+    guests: e.guests ?? '',
+    source: e.source ?? 'plan',
+    progress: e.progress,
+    daysToGo: e.daysToGo,
+    stage: e.stage,
   };
 }
 
@@ -55,11 +112,20 @@ export function mapCategories(feed: HomeFeedDTO): CategoriesViewModel | null {
 }
 
 /** active packages -> featured events. Hidden if there are none. */
-export function mapFeaturedEvents(feed: HomeFeedDTO): FeaturedEventsViewModel | null {
+const PACKAGE_ART_KEYS: OccasionArtKey[] = [
+  'wedding',
+  'birthday',
+  'housewarming',
+  'naming',
+  'anniversary',
+  'corporate',
+];
+
+export function mapPackages(feed: HomeFeedDTO): PackagesViewModel | null {
   if (!isNonEmptyArray(feed.packages)) return null;
 
   return {
-    title: feed.content?.packages?.title ?? 'Featured for you',
+    title: feed.content?.packages?.title ?? 'Curated packages by budget',
     subtitle: feed.content?.packages?.subtitle ?? '',
     buildLabel: feed.content?.packages?.buildLabel ?? null,
     items: feed.packages.map((p) => ({
@@ -68,27 +134,38 @@ export function mapFeaturedEvents(feed: HomeFeedDTO): FeaturedEventsViewModel | 
       title: p.title,
       guests: p.guests,
       budget: p.budget,
-      tags: p.tags,
+      tags: isNonEmptyArray(p.tags) ? p.tags : [],
+      // An unknown art key would index the gradient map to undefined and crash
+      // the banner; 'wedding' is the neutral navy the app already uses as its
+      // default card treatment.
+      art: PACKAGE_ART_KEYS.includes(p.art) ? p.art : 'wedding',
     })),
   };
 }
 
 /** top organizers -> recommended events. Hidden if there are none. */
-export function mapRecommendedEvents(feed: HomeFeedDTO): RecommendedEventsViewModel | null {
+export function mapTopOrganizers(feed: HomeFeedDTO): TopOrganizersViewModel | null {
   if (!isNonEmptyArray(feed.topOrganizers)) return null;
 
   return {
-    title: feed.content?.topOrganizers?.title ?? 'Recommended for you',
-    seeAllLabel: feed.content?.topOrganizers?.seeAllLabel ?? 'See all',
+    title: feed.content?.topOrganizers?.title ?? 'Top organizers near you',
+    // 'all' means nothing local matched and these come from further afield.
+    // Defaulted to 'all' so an older payload caveats itself rather than
+    // claiming a locality it never asserted.
+    scope: feed.topOrganizersScope === 'city' ? 'city' : 'all',
+    city: feed.user?.location ?? '',
     items: feed.topOrganizers.map((o) => ({
       id: o.id,
       name: o.name,
       initials: o.initials,
       avatarColor: o.avatarColor,
       tier: o.tier,
-      rating: o.rating,
-      reviews: o.reviews,
-      tags: o.tags,
+      // Passed through as stored: an organizer with no reviews shows 0, and
+      // the card draws no stars for it.
+      rating: Number.isFinite(o.rating) ? o.rating : 0,
+      reviews: Number.isFinite(o.reviews) ? o.reviews : 0,
+      events: Number.isFinite(o.events) ? o.events : 0,
+      tags: isNonEmptyArray(o.tags) ? o.tags : [],
     })),
   };
 }
@@ -120,10 +197,11 @@ export function mapTools(feed: HomeFeedDTO): ToolsViewModel | null {
 export function mapHomeFeed(feed: HomeFeedDTO): HomeViewModel {
   return {
     banner: mapBanner(feed),
+    bookedEvent: mapBookedEvent(feed),
     currentEvent: mapCurrentEvent(feed),
     categories: mapCategories(feed),
-    featuredEvents: mapFeaturedEvents(feed),
-    recommendedEvents: mapRecommendedEvents(feed),
+    packages: mapPackages(feed),
+    topOrganizers: mapTopOrganizers(feed),
     howItWorks: mapHowItWorks(feed),
     tools: mapTools(feed),
   };

@@ -1,0 +1,22 @@
+import React from 'react';
+import ReactTestRenderer from 'react-test-renderer';
+jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
+  const { Text } = require('react-native');
+  return function I({ name }: any) { return <Text>{` icon:${name}`}</Text>; };
+});
+import { Packages } from '../src/modules/Home/sections/Packages';
+it('probe', () => {
+  let t!: any;
+  ReactTestRenderer.act(() => { t = ReactTestRenderer.create(
+    <Packages data={{title:'T',subtitle:'s',buildLabel:'b',items:[{id:'p1',badge:'B',title:'X',guests:'g',budget:'₹1',tags:[],art:'birthday'}]}} onPressPackage={()=>{}} onPressBuildYourOwn={()=>{}} />
+  ); });
+  const out: string[] = [];
+  const walk = (n: any) => {
+    if (!n || typeof n === 'string') return;
+    if (Array.isArray(n)) return n.forEach(walk);
+    if (String(n.type).match(/Gradient|Rect|SvgView|Defs|Stop/)) out.push(n.type + ' ' + JSON.stringify(n.props).slice(0, 260));
+    walk(n.children);
+  };
+  walk(t.toJSON());
+  console.log(out.slice(0, 5).join('\n---\n'));
+});
