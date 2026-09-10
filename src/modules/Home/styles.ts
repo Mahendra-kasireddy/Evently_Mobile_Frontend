@@ -10,10 +10,17 @@ import {
   HERO_BACKGROUND_COLOR,
   HERO_DECOR_CIRCLE_COLOR,
   HERO_FIELD_ICON_BG,
+  HOME_CANVAS,
+  HOME_GREEN,
+  HOME_HAIRLINE,
+  HOME_NAVY,
+  HOME_NAVY_DEEP,
+  HOME_NAVY_PANEL,
+  HOME_TRACK,
 } from './constants';
 
 export const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  container: { flex: 1, backgroundColor: HOME_CANVAS },
   scroll: { flex: 1 },
   content: { paddingBottom: spacing.xl },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
@@ -22,28 +29,48 @@ export const styles = StyleSheet.create({
 });
 
 export const homeHeaderStyles = StyleSheet.create({
-  container: {
-    ...globalStyles.row,
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-  },
-  locationButton: { ...globalStyles.row, flexShrink: 1, marginRight: spacing.md },
-  locationLabel: { color: colors.text, marginLeft: spacing.xs, flexShrink: 1 },
-  bellButton: { padding: spacing.xs },
+  container: { paddingHorizontal: spacing.md, paddingTop: spacing.xs, paddingBottom: spacing.sm },
+  topRow: { ...globalStyles.row, justifyContent: 'space-between', gap: spacing.sm },
+  locationButton: { ...globalStyles.row, flexShrink: 1, gap: 6 },
+  locationLabel: { color: HOME_NAVY, fontSize: 17, fontWeight: '700', flexShrink: 1 },
+  actions: { ...globalStyles.row, gap: spacing.md },
+  iconButton: { padding: 2 },
   badge: {
     position: 'absolute',
-    top: -2,
-    right: -2,
-    minWidth: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: colors.danger,
+    top: -6,
+    right: -8,
+    minWidth: 17,
+    height: 17,
+    borderRadius: 999,
+    backgroundColor: HERO_ACCENT_COLOR,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 3,
+    paddingHorizontal: 4,
   },
-  badgeText: { color: colors.onPrimary, fontSize: 10, lineHeight: 12 },
+  badgeText: { color: colors.onPrimary, fontSize: 10, fontWeight: '700', lineHeight: 13 },
+
+  searchRow: { ...globalStyles.row, gap: 10, marginTop: 14 },
+  /** A button that looks like a field: tapping it opens the search screen. */
+  searchField: {
+    ...globalStyles.row,
+    flex: 1,
+    gap: 10,
+    minHeight: 50,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: HOME_HAIRLINE,
+    backgroundColor: colors.background,
+    paddingHorizontal: 14,
+  },
+  searchPlaceholder: { color: colors.textMuted, fontSize: 15, flex: 1 },
+  filterButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 14,
+    backgroundColor: HOME_NAVY_DEEP,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
 
 export const bannerStyles = StyleSheet.create({
@@ -500,6 +527,18 @@ export const PACKAGE_CARD_SPACING = spacing.md;
 export const PACKAGE_SNAP_INTERVAL = PACKAGE_CARD_WIDTH + PACKAGE_CARD_SPACING;
 
 export const packagesStyles = StyleSheet.create({
+  /** Sits over the banner's top-right, clear of the badge on the left. */
+  heart: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 34,
+    height: 34,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(14,26,51,0.35)',
+  },
   section: { marginTop: spacing.lg },
   header: {
     ...globalStyles.row,
@@ -747,6 +786,28 @@ export const organizerSheetStyles = StyleSheet.create({
     marginTop: spacing.lg,
   },
   closeText: { color: CATEGORY_ICON_BADGE_COLOR, fontWeight: '700' },
+  /** Asking this organizer for a quote — the action moved off the list row. */
+  quoteButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 52,
+    borderRadius: 14,
+    backgroundColor: HERO_ACCENT_COLOR,
+    marginTop: spacing.lg,
+  },
+  quoteButtonBusy: { opacity: 0.6 },
+  quoteText: { color: colors.onPrimary, fontSize: 16, fontWeight: '600' },
+  requestedRow: {
+    ...globalStyles.row,
+    justifyContent: 'center',
+    gap: spacing.xs,
+    minHeight: 52,
+    borderRadius: 14,
+    backgroundColor: '#e8f6ef',
+    marginTop: spacing.lg,
+  },
+  requestedText: { color: HOME_GREEN, fontWeight: '600' },
+  requestError: { color: colors.danger, textAlign: 'center', marginTop: spacing.sm },
 });
 
 export const howItWorksStyles = StyleSheet.create({
@@ -813,4 +874,270 @@ export const planSmarterStyles = StyleSheet.create({
   },
   cardTitle: { color: colors.text, marginBottom: spacing.xs },
   cardDesc: { color: colors.textMuted },
+});
+
+// ---------------------------------------------------------------------------
+// The redesigned home sections.
+// ---------------------------------------------------------------------------
+
+export const sectionStyles = StyleSheet.create({
+  block: { marginTop: spacing.lg },
+  headRow: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+  },
+  title: { color: HOME_NAVY, fontSize: 21, fontWeight: '700', letterSpacing: -0.3, flexShrink: 1 },
+  action: { color: HERO_ACCENT_COLOR, fontSize: 15, fontWeight: '600' },
+  subtitle: {
+    color: colors.textMuted,
+    fontSize: 14,
+    lineHeight: 20,
+    marginTop: 4,
+    paddingHorizontal: spacing.md,
+  },
+  greeting: { color: colors.textMuted, fontSize: 15, paddingHorizontal: spacing.md, marginTop: 4 },
+});
+
+export const eventHeroStyles = StyleSheet.create({
+  card: {
+    backgroundColor: HOME_NAVY_DEEP,
+    borderRadius: 22,
+    margin: spacing.md,
+    marginBottom: 0,
+    padding: spacing.md + 2,
+    overflow: 'hidden',
+  },
+  /** The soft disc the confetti sits in, top-right. */
+  decor: {
+    position: 'absolute',
+    top: -46,
+    right: -34,
+    width: 190,
+    height: 190,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+  },
+  decorArt: { position: 'absolute', top: -18, right: -4, width: 150, height: 130 },
+
+  stageRow: { ...globalStyles.row, gap: 7 },
+  stageDot: { width: 8, height: 8, borderRadius: 999, backgroundColor: HOME_GREEN },
+  stageText: {
+    color: 'rgba(255,255,255,0.62)',
+    fontSize: 11.5,
+    fontWeight: '700',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  title: {
+    color: colors.onPrimary,
+    fontSize: 27,
+    fontWeight: '700',
+    lineHeight: 34,
+    letterSpacing: -0.5,
+    marginTop: 10,
+  },
+  facts: { color: 'rgba(255,255,255,0.66)', fontSize: 14.5, marginTop: 6, lineHeight: 20 },
+
+  progressRow: { ...globalStyles.row, gap: 14, marginTop: 18 },
+  track: {
+    flex: 1,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    overflow: 'hidden',
+  },
+  fill: { height: '100%', borderRadius: 3, backgroundColor: HERO_ACCENT_COLOR },
+  progressLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 13.5, fontWeight: '500' },
+
+  /** The quote-spread panel, a step lighter than the card it sits on. */
+  panel: {
+    ...globalStyles.row,
+    gap: 12,
+    backgroundColor: HOME_NAVY_PANEL,
+    borderRadius: 16,
+    padding: 14,
+    marginTop: 16,
+  },
+  panelIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 13,
+    backgroundColor: HERO_ACCENT_COLOR,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  panelText: { flex: 1 },
+  panelTitle: { color: colors.onPrimary, fontSize: 15.5, fontWeight: '600', lineHeight: 21 },
+  panelBody: { color: 'rgba(255,255,255,0.62)', fontSize: 13.5, marginTop: 2, lineHeight: 19 },
+
+  cta: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 54,
+    borderRadius: 14,
+    backgroundColor: HERO_ACCENT_COLOR,
+    marginTop: 16,
+  },
+  ctaText: { color: colors.onPrimary, fontSize: 16.5, fontWeight: '600' },
+  link: { alignItems: 'center', paddingVertical: 14 },
+  linkText: { color: 'rgba(255,255,255,0.72)', fontSize: 14.5 },
+});
+
+export const offersStyles = StyleSheet.create({
+  list: { paddingHorizontal: spacing.md, paddingTop: 12, gap: 12 },
+  card: { width: 268, borderRadius: 18, padding: spacing.md, minHeight: 168 },
+  cardAccent: { backgroundColor: '#c9542c' },
+  cardNavy: { backgroundColor: HOME_NAVY },
+  eyebrow: {
+    color: 'rgba(255,255,255,0.72)',
+    fontSize: 11.5,
+    fontWeight: '700',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  title: { color: colors.onPrimary, fontSize: 21, fontWeight: '700', marginTop: 8, lineHeight: 27 },
+  terms: { color: 'rgba(255,255,255,0.75)', fontSize: 13.5, marginTop: 8, lineHeight: 19 },
+  ctaRow: { ...globalStyles.row, gap: 5, marginTop: 'auto', paddingTop: 14 },
+  ctaText: { color: colors.onPrimary, fontSize: 14.5, fontWeight: '600' },
+});
+
+export const occasionGridStyles = StyleSheet.create({
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    paddingHorizontal: spacing.md,
+    marginTop: 14,
+  },
+  // No flexGrow: an odd number of occasions would otherwise leave the last
+  // tile spanning the full row, twice the width of every other one.
+  tile: { width: '48%', height: 148, borderRadius: 18, overflow: 'hidden' },
+  tileBody: { flex: 1, padding: 14, justifyContent: 'space-between' },
+  iconChip: {
+    width: 44,
+    height: 44,
+    borderRadius: 13,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  label: { color: colors.onPrimary, fontSize: 18, fontWeight: '700', letterSpacing: -0.2 },
+  note: { color: 'rgba(255,255,255,0.7)', fontSize: 13, marginTop: 2 },
+});
+
+export const packageCardStyles = StyleSheet.create({
+  card: {
+    width: 268,
+    borderRadius: 18,
+    backgroundColor: colors.background,
+    borderWidth: 1,
+    borderColor: HOME_HAIRLINE,
+    overflow: 'hidden',
+  },
+  banner: { height: 148, justifyContent: 'flex-end' },
+  bannerLayer: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
+  bannerArt: { position: 'absolute', top: 8, right: 8, width: 118, height: 100, opacity: 0.85 },
+  bannerScrim: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 74 },
+  bannerNote: {
+    color: 'rgba(255,255,255,0.88)',
+    fontSize: 12.5,
+    fontWeight: '500',
+    padding: 12,
+  },
+  badge: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    borderRadius: 999,
+    backgroundColor: colors.background,
+    paddingHorizontal: 11,
+    paddingVertical: 5,
+  },
+  badgeText: {
+    color: HERO_ACCENT_COLOR,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+  },
+  heart: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 34,
+    height: 34,
+    borderRadius: 999,
+    backgroundColor: colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  body: { padding: 14 },
+  title: { color: HOME_NAVY, fontSize: 16, fontWeight: '700', lineHeight: 22 },
+  organizer: { color: colors.textMuted, fontSize: 13, marginTop: 2 },
+  ratingRow: { ...globalStyles.row, gap: 5, marginTop: 8 },
+  rating: { color: HOME_NAVY, fontSize: 13.5, fontWeight: '600' },
+  reviews: { color: colors.textMuted, fontSize: 13 },
+  priceRow: { ...globalStyles.row, gap: 8, marginTop: 8 },
+  price: { color: HOME_NAVY, fontSize: 20, fontWeight: '700', letterSpacing: -0.3 },
+  listPrice: { color: colors.textMuted, fontSize: 13.5, textDecorationLine: 'line-through' },
+  booked: { color: HERO_ACCENT_COLOR, fontSize: 13, marginTop: 8 },
+  tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10 },
+  tag: { borderRadius: 999, backgroundColor: HOME_TRACK, paddingHorizontal: 9, paddingVertical: 3 },
+  tagText: { color: '#5b6470', fontSize: 11.5 },
+});
+
+export const organizerRowStyles = StyleSheet.create({
+  card: {
+    ...globalStyles.row,
+    gap: 12,
+    backgroundColor: colors.background,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: HOME_HAIRLINE,
+    padding: 12,
+    marginHorizontal: spacing.md,
+    marginTop: 12,
+  },
+  avatar: {
+    width: 54,
+    height: 54,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarText: { color: colors.onPrimary, fontSize: 16, fontWeight: '700' },
+  text: { flex: 1 },
+  name: { color: HOME_NAVY, fontSize: 15.5, fontWeight: '700', letterSpacing: 0.2 },
+  metaRow: { ...globalStyles.row, gap: 5, marginTop: 3 },
+  rating: { color: HOME_NAVY, fontSize: 13.5, fontWeight: '600' },
+  reviews: { color: colors.textMuted, fontSize: 13 },
+  dot: { color: colors.textMuted, fontSize: 13 },
+  tier: { fontSize: 13, fontWeight: '600' },
+  booked: { color: HERO_ACCENT_COLOR, fontSize: 13, marginTop: 3 },
+  right: { alignItems: 'flex-end', flexShrink: 0 },
+  fromLabel: {
+    color: colors.textMuted,
+    fontSize: 10.5,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+  },
+  fromValue: { color: HOME_NAVY, fontSize: 18, fontWeight: '700', marginTop: 1 },
+  replies: { color: HOME_GREEN, fontSize: 12.5, marginTop: 3 },
+  emptyText: { color: colors.textMuted, paddingHorizontal: spacing.md, marginTop: 12, lineHeight: 20 },
+});
+
+export const trustStripStyles = StyleSheet.create({
+  row: { flexDirection: 'row', gap: 10, paddingHorizontal: spacing.md, marginTop: spacing.lg },
+  card: {
+    flex: 1,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: HOME_HAIRLINE,
+    backgroundColor: colors.background,
+    padding: 12,
+  },
+  label: { color: '#414b5c', fontSize: 12.5, marginTop: 10, lineHeight: 17 },
 });

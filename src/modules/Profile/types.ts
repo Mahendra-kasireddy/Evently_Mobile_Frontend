@@ -10,23 +10,57 @@ export interface UserDetailsDTO {
   createdAt: string;
 }
 
-/** One fact about the account, and whether it is missing. */
-export interface ProfileFact {
-  key: string;
+/** Which group a row belongs to. */
+export type ProfileGroupKey = 'events' | 'account' | 'more';
+
+/** Where a row goes. Kept as a key so the screen owns navigation, not the data. */
+export type ProfileAction =
+  | 'bookings'
+  | 'savedPackages'
+  | 'invitations'
+  | 'payments'
+  | 'location'
+  | 'notifications'
+  | 'settings'
+  | 'listBusiness'
+  | 'help'
+  | 'signOut';
+
+export interface ProfileRowSpec {
+  action: ProfileAction;
   icon: string;
   label: string;
-  value: string;
-  /** Shown in place of a value the account does not hold. */
-  emptyHint?: string;
-  /** True once the phone has been verified — the only fact that carries a badge. */
-  verified?: boolean;
+}
+
+export interface ProfileGroupSpec {
+  key: ProfileGroupKey;
+  title: string;
+  rows: ProfileRowSpec[];
+}
+
+/**
+ * The counts that ride on a row as a pill.
+ *
+ * Each is optional by nature rather than by failure — an account with nothing
+ * saved and nothing to approve is the normal early state — and a zero shows no
+ * pill at all rather than a badge reading "0".
+ */
+export interface ProfileBadges {
+  savedPackages: number;
+  invitationsToApprove: number;
 }
 
 export interface ProfileViewModel {
   /** '' when the account has no name yet, so the screen can prompt for one. */
   displayName: string;
   initials: string;
+  /**
+   * The phone with its middle digits masked — what the screen prints. The
+   * unmasked number is not carried here because nothing on this screen shows it.
+   */
+  maskedPhone: string;
   /** Every role the account holds, not just the first. */
   roles: string[];
-  facts: ProfileFact[];
+  /** True when the account already runs a business, so it is not asked to list one. */
+  isOrganizer: boolean;
 }

@@ -1,48 +1,83 @@
-import { useMemo, useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ActivityIndicator, FlatList, RefreshControl, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
+import { EventlyIcon, EventlyText } from '../../Components';
 import { colors } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
-import { BOOKING_ACCENT, BOOKING_COPY as COPY, BOOKING_TAB_LABEL } from './constants';
+import { BOOKING_ACCENT, BOOKING_COPY as COPY } from './constants';
 import { useBookingContainer } from './container';
-import { BookingRow } from './sections/BookingRow';
+import { EventCard } from './sections/EventCard';
+import { EventsHeader } from './sections/EventsHeader';
+import { EventTabs } from './sections/EventTabs';
+import { JumpToGrid } from './sections/JumpToGrid';
 import { styles } from './styles';
-import type { BookingTab } from './types';
+import type { BookingItem, JumpKey } from './types';
 
-type BookingNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Bookings'>;
+type EventsNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 /**
- * The customer's bookings.
+ * The customer's events.
  *
- * Split into what is still happening and what is already history, because the
- * two are read for different reasons — one is a to-do list, the other a
- * record. The tabs appear only when there is something in both; a customer
- * with a single booking should not have to choose a tab to see it.
+ * Two lives, one screen. As the Events tab it is a destination — no back
+ * arrow, because there is nothing behind it. Pushed onto the stack as
+ * `Bookings` — from Home's booked card, from Profile, and from the workspace's
+ * back button — it needs one. The route's own name is the honest signal for
+ * which of the two is rendering; a bottom-tab navigator keeps its own history,
+ * so `canGoBack()` would claim a back arrow the moment someone had visited
+ * another tab first.
+ *
+ * Active and Past are split because the two are read for different reasons —
+ * one is a to-do list, the other a record — and both pills are always shown so
+ * that a customer whose only event has finished can find out where it went.
  */
 export function BookingScreen() {
-  const navigation = useNavigation<BookingNavigationProp>();
-  const { items, isLoading, isError, errorMessage, refetch } = useBookingContainer();
-  const [tab, setTab] = useState<BookingTab>('active');
+  const navigation = useNavigation<EventsNavigationProp>();
+  const route = useRoute();
+  const isPushed = route.name === 'Bookings';
 
-  const active = useMemo(() => items.filter((i) => i.tab === 'active'), [items]);
-  const past = useMemo(() => items.filter((i) => i.tab === 'past'), [items]);
-  const showTabs = active.length > 0 && past.length > 0;
-  const visible = showTabs ? (tab === 'active' ? active : past) : items;
+  const {
+    active,
+    past,
+    tab,
+    setTab,
+    visible,
+    focus,
+    tiles,
+    items,
+    isLoading,
+    isError,
+    errorMessage,
+    refetch,
+  } = useBookingContainer();
 
-  const openWorkspace = (id: string, title: string) =>
-    navigation.navigate('Workspace', { bookingId: id, workspaceName: title });
+  const openWorkspace = (item: BookingItem) =>
+    navigation.navigate('Workspace', { bookingId: item.id, workspaceName: item.title });
 
-  const header = <AppHeader title={COPY.title} compact />;
+  /** Each tile goes to the screen that owns the thing it counts. */
+  const jump = (key: JumpKey) => {
+    if (!focus) return;
+    const organizerName = focus.organizerName ?? undefined;
+    if (key === 'payments') {
+      navigation.navigate('Workspace', { bookingId: focus.id, workspaceName: focus.title });
+    } else if (key === 'invitation') {
+      navigation.navigate('Invitations', { bookingId: focus.id, organizerName });
+    } else if (key === 'ideas') {
+      navigation.navigate('IdeaBoard', { bookingId: focus.id, organizerName });
+    } else {
+      // The plan wizard's budget step — the only budget guidance that exists.
+      navigation.navigate('Main', { screen: 'Plan' });
+    }
+  };
+
+  const header = <EventsHeader showBack={isPushed} onBack={() => navigation.goBack()} />;
 
   if (isLoading && items.length === 0) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         {header}
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={BOOKING_ACCENT} />
           <EventlyText variant="body" style={styles.loadingText}>
             {COPY.loading}
           </EventlyText>
@@ -62,7 +97,12 @@ export function BookingScreen() {
           <EventlyText variant="body" style={styles.errorText}>
             {errorMessage ?? 'Something went wrong.'}
           </EventlyText>
-          <TouchableOpacity style={styles.retryButton} activeOpacity={0.8} onPress={refetch} accessibilityRole="button">
+          <TouchableOpacity
+            style={styles.retryButton}
+            activeOpacity={0.8}
+            onPress={refetch}
+            accessibilityRole="button"
+          >
             <EventlyIcon name="refresh" size={16} color={BOOKING_ACCENT} />
             <EventlyText variant="caption" style={styles.retryText}>
               {COPY.retry}
@@ -73,6 +113,7 @@ export function BookingScreen() {
     );
   }
 
+  // No events at all: one thing to say, and one thing to do about it.
   if (items.length === 0) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
@@ -90,7 +131,7 @@ export function BookingScreen() {
           <TouchableOpacity
             style={styles.emptyCta}
             activeOpacity={0.85}
-            onPress={() => navigation.navigate('Main')}
+            onPress={() => navigation.navigate('Main', { screen: 'Plan' })}
             accessibilityRole="button"
             accessibilityLabel={COPY.emptyCta}
           >
@@ -104,42 +145,37 @@ export function BookingScreen() {
     );
   }
 
+  const emptyForTab = tab === 'active' ? 'emptyActive' : 'emptyPast';
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {header}
-
-      {showTabs ? (
-        <View style={styles.tabs} accessibilityRole="tablist">
-          {(['active', 'past'] as BookingTab[]).map((value) => {
-            const on = tab === value;
-            const count = value === 'active' ? active.length : past.length;
-            return (
-              <TouchableOpacity
-                key={value}
-                style={[styles.tab, on && styles.tabOn]}
-                activeOpacity={0.8}
-                onPress={() => setTab(value)}
-                accessibilityRole="tab"
-                accessibilityState={{ selected: on }}
-                accessibilityLabel={`${BOOKING_TAB_LABEL[value]}, ${count}`}
-              >
-                <EventlyText variant="caption" style={[styles.tabText, on && styles.tabTextOn]}>
-                  {BOOKING_TAB_LABEL[value]} · {count}
-                </EventlyText>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      ) : null}
+      <EventTabs value={tab} onChange={setTab} counts={{ active: active.length, past: past.length }} />
 
       <FlatList
         data={visible}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
+        showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
         renderItem={({ item }) => (
-          <BookingRow item={item} onPress={() => openWorkspace(item.id, item.title)} />
+          <EventCard item={item} focused={focus?.id === item.id} onPress={() => openWorkspace(item)} />
         )}
+        ListEmptyComponent={
+          <View style={styles.emptyPanel}>
+            <EventlyText variant="h2" style={styles.emptyTitle}>
+              {emptyForTab === 'emptyActive' ? COPY.emptyActiveTitle : COPY.emptyPastTitle}
+            </EventlyText>
+            <EventlyText variant="body" style={styles.emptySubtitle}>
+              {emptyForTab === 'emptyActive' ? COPY.emptyActiveBody : COPY.emptyPastBody}
+            </EventlyText>
+          </View>
+        }
+        /* The tiles act on one event — the soonest active one — so they belong
+           with the list that contains it, not over a page of finished events. */
+        ListFooterComponent={
+          tab === 'active' && focus ? <JumpToGrid tiles={tiles} onPress={jump} /> : null
+        }
       />
     </SafeAreaView>
   );

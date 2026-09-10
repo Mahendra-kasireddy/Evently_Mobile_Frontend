@@ -1,5 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { EventlyIcon } from '../Components';
+import { BookingScreen } from '../modules/Booking';
+import { BOOKING_ACCENT } from '../modules/Booking/constants';
 import { ChatScreen } from '../modules/Chat';
 import { HomeScreen } from '../modules/Home';
 import { OrganizerHomeScreen } from '../modules/OrganizerHome';
@@ -13,6 +15,7 @@ import type { MainTabParamList } from './types';
 const TAB_ICON_NAME: Record<keyof MainTabParamList, string> = {
   Home: 'home',
   Plan: 'clipboard-text',
+  Events: 'calendar-month',
   Chat: 'chat',
   Profile: 'account-circle',
 };
@@ -41,7 +44,12 @@ export function MainTabNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: colors.primary,
+        /*
+         * Coral, not the theme's indigo. Every customer surface in this app is
+         * built on the web palette's accent, and a tab bar that lit up in a
+         * colour appearing nowhere else on the screen read as a different app.
+         */
+        tabBarActiveTintColor: BOOKING_ACCENT,
         tabBarInactiveTintColor: colors.textMuted,
         tabBarIcon: ({ color, size }) => <TabIcon routeName={route.name} color={color} size={size} />,
       })}
@@ -51,6 +59,9 @@ export function MainTabNavigator() {
           stay shared for now. */}
       <Tab.Screen name="Home" component={isOrganizer ? OrganizerHomeScreen : HomeScreen} />
       <Tab.Screen name="Plan" component={PlanScreen} />
+      {/* The customer's events, alongside Plan and Chat — shared for now, in
+          the same way those are, rather than hidden behind the view switch. */}
+      <Tab.Screen name="Events" component={BookingScreen} />
       <Tab.Screen name="Chat" component={ChatScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>

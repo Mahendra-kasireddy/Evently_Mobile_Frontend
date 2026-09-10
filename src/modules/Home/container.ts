@@ -3,15 +3,18 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useEnsureLocation } from '../../hooks/useEnsureLocation';
 import { selectLocationStatus } from '../../store/locationSlice';
 import { useAppSelector } from '../../store/hooks';
-import { useHomeFeed, useOrganizerProfile, useRequestQuotes, useRequestQuoteFromOrganizer } from './hooks';
+import { useSavedPackageIds } from './hooks';
+import { useHomeFeed, useRequestQuotes, useRequestQuoteFromOrganizer } from './hooks';
 import { mapHomeFeed } from './utils';
-import type { HeroDraft, HomeHeaderViewModel, HomeViewModel, OrganizerProfileDTO } from './types';
+import type { HeroDraft, HomeHeaderViewModel, HomeViewModel } from './types';
 
 const EMPTY_VIEW_MODEL: HomeViewModel = {
   banner: null,
   bookedEvent: null,
   currentEvent: null,
   categories: null,
+  occasions: null,
+  offers: null,
   packages: null,
   topOrganizers: null,
   howItWorks: null,
@@ -39,13 +42,12 @@ export interface HomeContainerResult extends HomeViewModel {
   organizerRequestingId: string | null;
   organizerRequestError: string | null;
   requestQuoteFrom: (organizerId: string) => void;
-  /** The profile sheet: which organizer, its data, and its load state. */
-  openOrganizerProfile: (organizerId: string) => void;
-  closeOrganizerProfile: () => void;
-  organizerProfileId: string | null;
-  organizerProfile: OrganizerProfileDTO | null;
-  isLoadingOrganizerProfile: boolean;
-  organizerProfileError: string | null;
+
+  // --- saved packages ---
+  /** Ids of the packages this account has kept, so the heart shows its state. */
+  savedPackageIds: string[];
+  /** Saves or unsaves one, whichever it currently is not. */
+  toggleSavedPackage: (packageId: string) => void;
 }
 
 /**
@@ -144,32 +146,22 @@ export function useHomeContainer(): HomeContainerResult {
     [heroDraft, organizerRequestingId, organizerQuoteCall, refetch],
   );
 
-  const organizerProfileCall = useOrganizerProfile();
-  const [organizerProfileId, setOrganizerProfileId] = useState<string | null>(null);
-  const [organizerProfile, setOrganizerProfile] = useState<OrganizerProfileDTO | null>(null);
 
-  const openOrganizerProfile = useCallback(
-    (organizerId: string) => {
-      setOrganizerProfileId(organizerId);
-      // Cleared first, so the sheet never shows the previous organizer's
-      // details under this organizer's name while the fetch is in flight.
-      setOrganizerProfile(null);
-      organizerProfileCall
-        .execute(organizerId)
-        .then(setOrganizerProfile)
-        .catch(() => {
-          // error surfaces through organizerProfileCall.error
-        });
-    },
-    [organizerProfileCall],
-  );
-
-  const closeOrganizerProfile = useCallback(() => setOrganizerProfileId(null), []);
+  const { savedPackageIds, toggleSavedPackage } = useSavedPackageIds();
 
   const header = useMemo<HomeHeaderViewModel>(
     () => ({
       unreadCount: data?.unreadCount ?? 0,
-      locationLabel: locationStatus === 'error' ? 'Location unavailable' : 'Current location',
+      savedCount: data?.savedPackageCount ?? 0,
+      /*
+       * The account's own city, which is what "organizers near you" matches
+       * on — not a reverse-geocoded street. Nothing in this system turns
+       * coordinates into a locality name, so naming one would be a guess about
+       * where the customer is standing.
+       */
+      locationLabel:
+        data?.user?.location?.trim() ||
+        (locationStatus === 'error' ? 'Location unavailable' : 'Set your city'),
     }),
     [data, locationStatus],
   );
@@ -192,11 +184,7 @@ export function useHomeContainer(): HomeContainerResult {
     organizerRequestingId,
     organizerRequestError: organizerQuoteCall.error?.message ?? null,
     requestQuoteFrom,
-    openOrganizerProfile,
-    closeOrganizerProfile,
-    organizerProfileId,
-    organizerProfile,
-    isLoadingOrganizerProfile: organizerProfileCall.loading,
-    organizerProfileError: organizerProfileCall.error?.message ?? null,
+    savedPackageIds,
+    toggleSavedPackage,
   };
 }

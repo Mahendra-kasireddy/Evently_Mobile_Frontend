@@ -1,6 +1,7 @@
 import { ScrollView, TouchableOpacity, View } from 'react-native';
 import { ActivityIndicator } from 'react-native';
 import { EventlyIcon, EventlyImage, EventlyText } from '../../../Components';
+import { absoluteFileUrl } from '../../../services/urls';
 import { colors } from '../../../theme';
 import {
   BOARD_FILTERS,
@@ -165,7 +166,7 @@ export function IdeaCard({ idea, isApproving, onApprove }: IdeaCardProps) {
           {idea.images.map((image) => (
             <EventlyImage
               key={image.url}
-              source={{ uri: image.url }}
+              source={{ uri: absoluteFileUrl(image.url) }}
               style={s.image}
               accessibilityLabel={image.originalName || 'Reference photo'}
             />

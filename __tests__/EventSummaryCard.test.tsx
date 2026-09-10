@@ -45,6 +45,12 @@ const fullEvent: CurrentEventViewModel = {
   daysToGo: 74,
   stage: 'booking_created',
   source: 'booking',
+  refId: 'bk1',
+  factsLine: '5 September 2026 · Jubilee Hills, Hyderabad · 150 guests',
+  stageLabel: 'Booking placed',
+  quoteCount: 0,
+  spreadLabel: '',
+  quotedLabel: '',
 };
 
 // An older booking raised outside the quote flow: a fixed date and venue, but

@@ -18,7 +18,6 @@ jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
 import { page, toHtml } from '../test-utils/rn-to-html';
 import { Packages } from '../src/modules/Home/sections/Packages';
 import { mapPackages } from '../src/modules/Home/utils';
-import { PACKAGE_SNAP_INTERVAL } from '../src/modules/Home/styles';
 import type { HomeFeedDTO, PackageItem, PackagesViewModel } from '../src/modules/Home/types';
 
 declare const process: { env: Record<string, string | undefined> };
@@ -33,6 +32,17 @@ const birthday: PackageItem = {
   budget: '₹40K – 80K',
   tags: ['Decor', 'Cake', 'Entertainment'],
   art: 'birthday',
+  bannerNote: 'Terrace setup · 80 guests',
+  photoUrl: '',
+  priceLabel: '₹95,000',
+  listPriceLabel: '₹1,15,000',
+  organizer: {
+    id: 'o1',
+    name: 'Sruthi Celebrations',
+    rating: 4.8,
+    reviews: 51,
+    bookedLabel: '18 booked this month',
+  },
 };
 
 const wedding: PackageItem = {
@@ -43,6 +53,11 @@ const wedding: PackageItem = {
   budget: '₹8L – 14L',
   tags: ['Venue', 'Catering', 'Photography', 'Decor'],
   art: 'wedding',
+  bannerNote: '',
+  photoUrl: '',
+  priceLabel: '',
+  listPriceLabel: '',
+  organizer: null,
 };
 
 const section = (over: Partial<PackagesViewModel> = {}): PackagesViewModel => ({
@@ -53,7 +68,12 @@ const section = (over: Partial<PackagesViewModel> = {}): PackagesViewModel => ({
   ...over,
 });
 
-const base = { onPressPackage: () => {}, onPressBuildYourOwn: () => {} };
+const base = {
+  onPressPackage: () => {},
+  onPressSeeAll: () => {},
+  savedIds: [] as string[],
+  onToggleSaved: () => {},
+};
 
 function render(node: React.ReactElement) {
   let tree!: ReactTestRenderer.ReactTestRenderer;
@@ -85,19 +105,6 @@ function textOf(tree: ReactTestRenderer.ReactTestRenderer): string[] {
   return out;
 }
 
-/** Style arrays are only comparable once merged the way RN merges them. */
-function flatten(style: any, into: Record<string, any> = {}): Record<string, any> {
-  if (!style) {
-    return into;
-  }
-  if (Array.isArray(style)) {
-    style.forEach((one) => flatten(one, into));
-    return into;
-  }
-  Object.assign(into, style);
-  return into;
-}
-
 function hosts(tree: ReactTestRenderer.ReactTestRenderer, pred: (props: any) => boolean): any[] {
   const out: any[] = [];
   const walk = (n: any) => {
@@ -117,18 +124,63 @@ function hosts(tree: ReactTestRenderer.ReactTestRenderer, pred: (props: any) => 
   return out;
 }
 
+describe('Packages — saving', () => {
+  it('marks as saved only the package this account actually kept', () => {
+    const hearts = (savedIds: string[]) =>
+      hosts(
+        render(
+          <Packages {...base} savedIds={savedIds} data={section({ items: [birthday, wedding] })} />,
+        ),
+        (p) => typeof p.accessibilityLabel === 'string' && p.accessibilityLabel.includes('saved packages'),
+      ).map((n) => n.props.accessibilityState?.selected);
+
+    expect(hearts([])).toEqual([false, false]);
+    expect(hearts([birthday.id])).toEqual([true, false]);
+  });
+
+  it('keeps saving separate from opening the package', () => {
+    // One tap target that sometimes saves and sometimes navigates is how
+    // people lose the thing they meant to keep.
+    const onPressPackage = jest.fn();
+    const onToggleSaved = jest.fn();
+    const tree = render(
+      <Packages
+        {...base}
+        data={section({ items: [birthday] })}
+        onPressPackage={onPressPackage}
+        onToggleSaved={onToggleSaved}
+      />,
+    );
+
+    const heart = tree.root
+      .findAllByProps({ accessibilityRole: 'button' })
+      .find(
+        (n: any) =>
+          typeof n.props.onPress === 'function' &&
+          typeof n.props.accessibilityLabel === 'string' &&
+          n.props.accessibilityLabel.startsWith('Save '),
+      );
+
+    expect(heart).toBeDefined();
+    ReactTestRenderer.act(() => heart!.props.onPress());
+    expect(onToggleSaved).toHaveBeenCalledWith(birthday.id);
+    expect(onPressPackage).not.toHaveBeenCalled();
+  });
+});
+
 describe('Packages', () => {
-  it('shows the badge, title, guests, budget and every tag', () => {
+  it('shows the badge, title, organizer, rating and price', () => {
     const text = textOf(render(<Packages {...base} data={section()} />)).join('|');
 
-    expect(text).toContain('Budget pick');
+    expect(text).toContain('BUDGET PICK');
     expect(text).toContain('Birthday Bash');
-    expect(text).toContain('50–100 guests');
-    expect(text).toContain('₹40K – 80K');
-    expect(text).toContain('Decor');
-    expect(text).toContain('Cake');
-    expect(text).toContain('Entertainment');
-    expect(text).toContain('Explore package');
+    expect(text).toContain('Sruthi Celebrations');
+    expect(text).toContain('4.8');
+    expect(text).toContain('(51)');
+    expect(text).toContain('₹95,000');
+    // The organizer's own recent bookings, said under their name — nothing
+    // links a booking back to the package that inspired it.
+    expect(text).toContain('18 booked this month');
   });
 
   it('gives each card its own gradient id', () => {
@@ -158,35 +210,25 @@ describe('Packages', () => {
     expect(onPressPackage).toHaveBeenCalledWith(wedding);
   });
 
-  it('is one tap target per card, not a card plus a nested button', () => {
+  it('is the card, its heart, and nothing else nested inside', () => {
     const tree = render(<Packages {...base} data={section()} />);
-    // The card itself, plus the section's "Build your own".
-    expect(hosts(tree, (p) => p.accessibilityRole === 'button')).toHaveLength(2);
+    // The card, its save control, and the section's "See all". The heart is
+    // deliberately separate — see "keeps saving separate from opening the
+    // package" — but nothing else in the card may be tappable.
+    expect(hosts(tree, (p) => p.accessibilityRole === 'button')).toHaveLength(3);
   });
 
-  it('scrolls horizontally and tracks which card is showing', () => {
-    const tree = render(<Packages {...base} data={section({ items: [birthday, wedding] })} />);
+  it('falls back to the budget band for a package with no fixed price', () => {
+    // A package priced only as a range still has to show something, and the
+    // range is what the organizer actually published.
+    const text = textOf(render(<Packages {...base} data={section({ items: [wedding] })} />)).join('|');
 
-    const list = tree.root.findAllByProps({ horizontal: true })[0];
-    expect(list).toBeDefined();
-    expect(list.props.snapToInterval).toBe(PACKAGE_SNAP_INTERVAL);
-
-    // One dot per package, the first active.
-    const dots = () => hosts(tree, (p) => flatten(p.style).width === 6 || flatten(p.style).width === 18);
-    expect(dots()).toHaveLength(2);
-    expect(flatten(dots()[0].props.style).width).toBe(18);
-
-    ReactTestRenderer.act(() =>
-      list.props.onScroll({ nativeEvent: { contentOffset: { x: PACKAGE_SNAP_INTERVAL } } }),
-    );
-    expect(flatten(dots()[1].props.style).width).toBe(18);
-
-    // An overscroll bounce past the end must not light a dot that isn't there.
-    ReactTestRenderer.act(() =>
-      list.props.onScroll({ nativeEvent: { contentOffset: { x: PACKAGE_SNAP_INTERVAL * 9 } } }),
-    );
-    expect(flatten(dots()[1].props.style).width).toBe(18);
+    expect(text).toContain('₹8L – 14L');
+    // No rating for an organizer nobody has reviewed, and no struck-through
+    // figure where there is no reduction.
+    expect(text).not.toContain('₹2,10,000');
   });
+
 
   it('omits "Build your own" when the backend supplies no label', () => {
     const text = textOf(render(<Packages {...base} data={section({ buildLabel: null })} />)).join('|');

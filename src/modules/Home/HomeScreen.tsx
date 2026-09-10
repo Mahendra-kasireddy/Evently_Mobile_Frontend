@@ -5,21 +5,19 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ActivityIndicator, RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EventlyText } from '../../Components';
-import { colors } from '../../theme';
 import type { MainTabParamList, RootStackParamList } from '../../navigation/types';
 import { NameGateSheet } from '../NameCapture';
+import { CURRENT_EVENT_CTA, HERO_ACCENT_COLOR, SEARCH_PLACEHOLDER } from './constants';
 import { useHomeContainer } from './container';
-import { Banner } from './sections/Banner';
 import { BookedEventCard } from './sections/BookedEventCard';
-import { Categories } from './sections/Categories';
-import { CurrentEventCard } from './sections/CurrentEventCard';
-import { Packages } from './sections/Packages';
+import { EventHero } from './sections/EventHero';
 import { HomeHeader } from './sections/HomeHeader';
-import { HowItWorks } from './sections/HowItWorks';
-import { PlanSmarter } from './sections/PlanSmarter';
-import { OrganizerProfileSheet } from './sections/OrganizerProfileSheet';
+import { OccasionGrid } from './sections/OccasionGrid';
+import { Offers } from './sections/Offers';
+import { Packages } from './sections/Packages';
 import { TopOrganizers } from './sections/TopOrganizers';
-import { styles } from './styles';
+import { TrustStrip } from './sections/TrustStrip';
+import { sectionStyles, styles } from './styles';
 
 type HomeNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<MainTabParamList, 'Home'>,
@@ -33,76 +31,68 @@ export function HomeScreen() {
     banner,
     bookedEvent,
     currentEvent,
-    categories,
+    occasions,
+    offers,
     packages,
+    savedPackageIds,
+    toggleSavedPackage,
     topOrganizers,
-    howItWorks,
-    tools,
     header,
     isLoading,
     isError,
     errorMessage,
     refetch,
-    heroDraft,
-    setHeroField,
-    submitHeroDraft,
-    isRequestingQuotes,
-    quotesRequested,
-    quotesErrorMessage,
-    resetQuotesRequest,
-    organizerRequestedIds,
-    organizerRequestingId,
-    organizerRequestError,
-    requestQuoteFrom,
-    openOrganizerProfile,
-    closeOrganizerProfile,
-    organizerProfileId,
-    organizerProfile,
-    isLoadingOrganizerProfile,
-    organizerProfileError,
   } = useHomeContainer();
 
   const hasAnyContent = Boolean(
-    banner ||
-      bookedEvent ||
-      currentEvent ||
-      categories ||
-      packages ||
-      topOrganizers ||
-      howItWorks ||
-      tools,
+    bookedEvent || currentEvent || occasions || offers || packages || topOrganizers,
   );
-
-  const handlePressLocation = () => navigation.navigate('Location');
-  const handlePressNotifications = () => navigation.navigate('Notification');
-  const handlePressOccasion = (occasionId: string) => navigation.navigate('Plan', { occasionId });
-  const handlePressPlanGeneric = () => navigation.navigate('Plan');
-
-  // Where the hero card's rows lead depends on which real record the event
-  // resolved from. A booking has its own screen; a quote request does not yet,
-  // so it opens the plan it was raised from — which is what the card's button
-  // says it will do.
-  const handlePressCurrentEvent = () => {
-    if (currentEvent?.source === 'booking') {
-      navigation.navigate('Bookings');
-      return;
-    }
-    navigation.navigate('Plan');
-  };
 
   const headerProps = {
     locationLabel: header.locationLabel,
     unreadCount: header.unreadCount,
-    onPressLocation: handlePressLocation,
-    onPressNotifications: handlePressNotifications,
+    savedCount: header.savedCount,
+    searchPlaceholder: SEARCH_PLACEHOLDER,
+    onPressLocation: () => navigation.navigate('Location'),
+    onPressSaved: () => navigation.navigate('SavedPackages'),
+    onPressNotifications: () => navigation.navigate('Notification'),
+    onPressSearch: () => navigation.navigate('Search'),
+    onPressFilters: () => navigation.navigate('Search', { openFilters: true }),
   };
+
+  /**
+   * Where the hero's button goes, by the stage the event has reached.
+   *
+   * Each destination is a screen that exists and shows the thing the label
+   * promises — comparing quotes opens the quotes, opening a workspace opens
+   * the booking. A stage with nothing built behind it falls back to the plan
+   * it came from rather than to a dead end.
+   */
+  const handlePressHeroCta = () => {
+    if (!currentEvent) return;
+    if (currentEvent.source === 'booking') {
+      return navigation.navigate('Main', { screen: 'Events' });
+    }
+    if (currentEvent.stage === 'quotes_received' && currentEvent.quoteCount > 0) {
+      return navigation.navigate('CompareQuotes', {
+        requestId: currentEvent.refId,
+        title: currentEvent.title,
+      });
+    }
+    return navigation.navigate('Plan');
+  };
+
+  const handlePressHeroDetails = () =>
+    currentEvent?.source === 'booking'
+      ? navigation.navigate('Main', { screen: 'Events' })
+      : navigation.navigate('Plan');
 
   if (isLoading && !hasAnyContent) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <HomeHeader {...headerProps} />
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={HERO_ACCENT_COLOR} />
           <EventlyText variant="body" style={styles.loadingText}>
             Loading your home…
           </EventlyText>
@@ -132,27 +122,15 @@ export function HomeScreen() {
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
       >
-        {banner && (
-          <Banner
-            data={banner}
-            currentEvent={currentEvent}
-            // Only the very first load; a pull-to-refresh keeps whatever is on
-            // screen rather than flashing placeholders over it.
-            isFeedLoading={isLoading && !hasAnyContent}
-            feedErrorMessage={isError ? (errorMessage ?? 'Something went wrong.') : null}
-            onRetryFeed={refetch}
-            onPressCurrentEvent={handlePressCurrentEvent}
-            heroDraft={heroDraft}
-            onChangeField={setHeroField}
-            onSubmit={submitHeroDraft}
-            isSubmitting={isRequestingQuotes}
-            quotesRequested={quotesRequested}
-            quotesErrorMessage={quotesErrorMessage}
-            onEditAgain={resetQuotesRequest}
-          />
-        )}
+        {banner?.greeting ? (
+          <EventlyText variant="body" style={sectionStyles.greeting} numberOfLines={1}>
+            {banner.greeting}
+          </EventlyText>
+        ) : null}
+
         {/*
           Mutually exclusive, as on web: once there is a live booking, the rich
           card replaces the compact stage widget rather than sitting above a
@@ -161,9 +139,6 @@ export function HomeScreen() {
         {bookedEvent ? (
           <BookedEventCard
             data={bookedEvent}
-            // Straight into this booking's workspace. The name is passed
-            // through so the header is right during the first load rather
-            // than reading "Your event workspace" for a moment.
             onPress={() =>
               navigation.navigate('Workspace', {
                 bookingId: bookedEvent.id,
@@ -171,41 +146,66 @@ export function HomeScreen() {
               })
             }
           />
-        ) : (
-          currentEvent && <CurrentEventCard data={currentEvent} />
-        )}
-        {categories && <Categories data={categories} onPressOccasion={handlePressOccasion} />}
-        {howItWorks && <HowItWorks data={howItWorks} />}
-        {topOrganizers && (
-          <TopOrganizers
-            data={topOrganizers}
-            onPressProfile={openOrganizerProfile}
-            onPressQuote={requestQuoteFrom}
-            requestedIds={organizerRequestedIds}
-            requestingId={organizerRequestingId}
-            requestErrorMessage={organizerRequestError}
-            onPressChangeCity={handlePressLocation}
+        ) : currentEvent ? (
+          <EventHero
+            event={currentEvent}
+            ctaLabel={CURRENT_EVENT_CTA[currentEvent.stage]}
+            onPressCta={handlePressHeroCta}
+            onPressDetails={handlePressHeroDetails}
           />
+        ) : null}
+
+        {offers && (
+          <View style={sectionStyles.block}>
+            <Offers
+              data={offers}
+              // Terms live with the offer itself; there is nothing to redeem
+              // yet, so this opens support rather than pretending otherwise.
+              onPressOffer={() => navigation.navigate('LegalSupport')}
+            />
+          </View>
         )}
+
+        {occasions && (
+          <View style={sectionStyles.block}>
+            <OccasionGrid
+              data={occasions}
+              onPressOccasion={(occasionId) => navigation.navigate('Plan', { occasionId })}
+            />
+          </View>
+        )}
+
         {packages && (
-          <Packages
-            data={packages}
-            // A package's art key is its occasion id, so "Explore package"
-            // opens the planner already set to that occasion rather than to a
-            // blank first step.
-            onPressPackage={(item) => navigation.navigate('Plan', { occasionId: item.art })}
-            onPressBuildYourOwn={handlePressPlanGeneric}
-          />
+          <View style={sectionStyles.block}>
+            <Packages
+              data={packages}
+              // A package's art key is its occasion id, so opening one lands
+              // the planner on that occasion rather than a blank first step.
+              onPressPackage={(item) => navigation.navigate('Plan', { occasionId: item.art })}
+              onPressSeeAll={() => navigation.navigate('Search', { kind: 'packages' })}
+              savedIds={savedPackageIds}
+              onToggleSaved={toggleSavedPackage}
+            />
+          </View>
         )}
-        {tools && <PlanSmarter data={tools} />}
+
+        {topOrganizers && (
+          <View style={sectionStyles.block}>
+            <TopOrganizers
+              data={topOrganizers}
+              // The full profile screen, not the old sheet: a sheet was the
+              // right size for four facts and the wrong size for a portfolio,
+              // a service list and a body of reviews.
+              onPressOrganizer={(organizerId) => navigation.navigate('Organizer', { organizerId })}
+              onPressSeeAll={() => navigation.navigate('Search', { kind: 'organizers' })}
+              onPressChangeCity={() => navigation.navigate('Location')}
+            />
+          </View>
+        )}
+
+        {banner?.trust?.length ? <TrustStrip items={banner.trust} /> : null}
       </ScrollView>
-      <OrganizerProfileSheet
-        organizerId={organizerProfileId}
-        profile={organizerProfile}
-        isLoading={isLoadingOrganizerProfile}
-        errorMessage={organizerProfileError}
-        onClose={closeOrganizerProfile}
-      />
+
       <NameGateSheet onNameSaved={refetch} />
     </SafeAreaView>
   );

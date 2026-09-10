@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors, spacing, typography } from '../theme';
+import { colors, fontFor, spacing, typography } from '../theme';
 
 export const appHeaderStyles = StyleSheet.create({
   container: {
@@ -43,6 +43,10 @@ export const eventlyButtonStyles = StyleSheet.create({
 export const eventlyTextInputStyles = StyleSheet.create({
   base: {
     ...typography.subtitle,
+    // A TextInput is not an EventlyText, so nothing resolves its weight into a
+    // Poppins face for it — without this the field falls back to the system
+    // font and the form looks like it belongs to a different app.
+    fontFamily: fontFor(typography.subtitle.fontWeight),
     color: colors.text,
     borderWidth: 1,
     borderColor: colors.border,

@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, spacing } from '../../theme';
+import { colors, fontFor, spacing } from '../../theme';
 import { WORKSPACE_ACCENT, WORKSPACE_ACCENT_SOFT, WORKSPACE_NAVY, WORKSPACE_NAVY_DEEP } from './constants';
 
 export const styles = StyleSheet.create({
@@ -158,7 +158,13 @@ export const timelineStyles = StyleSheet.create({
  * screen, so they share one layout.
  */
 export const summaryRowStyles = StyleSheet.create({
-  row: { ...globalStyles.row, gap: spacing.md },
+  /*
+   * Tight gaps and a button that never grows. Poppins sets wider than the
+   * platform faces this row was first measured in, and the description here is
+   * the longest text on the screen — every point taken from the gutters and
+   * from the button's padding is a point the sentence gets back.
+   */
+  row: { ...globalStyles.row, gap: 12, alignItems: 'flex-start' },
   iconChip: {
     width: 44,
     height: 44,
@@ -173,8 +179,9 @@ export const summaryRowStyles = StyleSheet.create({
   cta: {
     ...globalStyles.row,
     gap: 2,
+    flexShrink: 0,
     borderRadius: 12,
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: 12,
     paddingVertical: spacing.sm,
     backgroundColor: WORKSPACE_ACCENT,
   },
@@ -242,6 +249,8 @@ export const boardStyles = StyleSheet.create({
   avatarText: { color: colors.onPrimary, fontWeight: '800', fontSize: 13 },
   input: {
     flex: 1,
+    // A TextInput resolves no face of its own — see Components/EventlyText.
+    fontFamily: fontFor('400'),
     minHeight: 62,
     maxHeight: 160,
     color: colors.text,

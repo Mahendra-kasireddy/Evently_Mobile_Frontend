@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, spacing } from '../../theme';
+import { colors, fontFor, spacing } from '../../theme';
 import { INV_ACCENT, INV_ACCENT_SOFT, INV_GREEN, INV_GREEN_SOFT, INV_NAVY, INV_NAVY_DEEP } from './constants';
 
 export const styles = StyleSheet.create({
@@ -96,7 +96,11 @@ export const heroStyles = StyleSheet.create({
   },
   eyebrow: {
     color: colors.onPrimaryMuted,
-    letterSpacing: 0.8,
+    // 11 with less tracking: this line carries the organizer's name, and in
+    // Poppins — wider than the face this was set in — 12/0.8 pushed all but
+    // the shortest names past the ellipsis.
+    fontSize: 11,
+    letterSpacing: 0.5,
     fontWeight: '700',
   },
   heading: { color: colors.onPrimary, fontSize: 22, fontWeight: '800', marginTop: spacing.sm },
@@ -344,6 +348,8 @@ export const sheetStyles = StyleSheet.create({
   hint: { color: colors.textMuted, marginTop: 2 },
   input: {
     borderRadius: 14,
+    // A TextInput resolves no face of its own — see Components/EventlyText.
+    fontFamily: fontFor('400'),
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surface,

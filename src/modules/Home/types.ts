@@ -101,6 +101,18 @@ export interface HomeContentDTO {
   tools: ToolsSectionDTO;
 }
 
+/** Who delivers a package, as its card names them. */
+export interface PackageOrganizerDTO {
+  id: string;
+  name: string;
+  initials: string;
+  avatarColor: string;
+  rating: number;
+  reviews: number;
+  /** The organizer's bookings this month — theirs, not the package's. */
+  bookedThisMonth: number;
+}
+
 export interface PackageItemDTO {
   id: string;
   badge: string;
@@ -108,6 +120,15 @@ export interface PackageItemDTO {
   guests: string;
   budget: string;
   tags: string[];
+  /** The line over the banner, e.g. "Marigold stage · 150 guests". */
+  bannerNote: string;
+  /** '' falls back to the occasion illustration. */
+  photoUrl: string;
+  /** 0 when only the budget band is known. */
+  price: number;
+  /** 0 unless this is a real reduction — never a decorative "was" figure. */
+  listPrice: number;
+  organizer: PackageOrganizerDTO | null;
   /** Which illustration and gradient the card's banner uses. */
   art: OccasionArtKey;
 }
@@ -122,6 +143,12 @@ export interface OrganizerDTO {
   tier: OrganizerTier;
   rating: number;
   reviews: number;
+  /** Published starting price, in rupees. 0 when they have not set one. */
+  basePrice: number;
+  /** Typical hours to reply. 0 when unknown. */
+  responseHours: number;
+  /** Bookings taken since the start of the month; 0 when none. */
+  bookedThisMonth: number;
   /** Events this organizer has run — 0 for one who has not run any yet. */
   events: number;
   tags: string[];
@@ -176,6 +203,8 @@ export type CurrentEventStage =
 
 export interface CurrentEventDTO {
   stage: CurrentEventStage;
+  /** The underlying record's id — the request, plan or booking behind it. */
+  refId: string;
   title: string;
   /**
    * The four facts the Home card shows. Each comes from the underlying record
@@ -190,6 +219,11 @@ export interface CurrentEventDTO {
   source: EventSource;
   progress: number;
   daysToGo: number | null;
+  /** How many organizers have replied so far. */
+  quoteCount: number;
+  /** The spread across those replies, in rupees. Both 0 when none are priced. */
+  lowestQuote: number;
+  highestQuote: number;
 }
 
 /**
@@ -223,6 +257,29 @@ export interface BookedEventDTO {
   steps: BookedStepDTO[];
 }
 
+/** GET /offer/live, via the home payload — only offers live right now. */
+export interface OfferDTO {
+  id: string;
+  eyebrow: string;
+  title: string;
+  terms: string;
+  ctaLabel: string;
+  tone: string;
+  /** '' when the offer does not expire. */
+  endsLabel: string;
+}
+
+/** One tile in "Plan something new". */
+export interface OccasionTileDTO {
+  id: string;
+  label: string;
+  art: string;
+  /** Cheapest published base price among organizers serving it; 0 when none. */
+  fromPrice: number;
+  /** True for the single most-planned occasion, false for all when none. */
+  mostPlanned: boolean;
+}
+
 export interface HomeFeedDTO {
   user: ProfileSummaryDTO;
   content: HomeContentDTO;
@@ -237,6 +294,10 @@ export interface HomeFeedDTO {
   booking: BookedEventDTO | null;
   currentEvent: CurrentEventDTO | null;
   unreadCount: number;
+  offers: OfferDTO[];
+  occasions: OccasionTileDTO[];
+  /** For the header's heart badge, without fetching the list it does not show. */
+  savedPackageCount: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -246,6 +307,8 @@ export interface HomeFeedDTO {
 // ---------------------------------------------------------------------------
 
 export interface CurrentEventViewModel {
+  /** The underlying record's id, so the hero's button can open it. */
+  refId: string;
   title: string;
   occasion: string;
   when: string;
@@ -255,6 +318,15 @@ export interface CurrentEventViewModel {
   progress: number;
   daysToGo: number | null;
   stage: CurrentEventStage;
+  /** "5 Sep 2026 · Kukatpally · 150 guests" — only the parts that exist. */
+  factsLine: string;
+  /** The stage, as the card's eyebrow says it. */
+  stageLabel: string;
+  quoteCount: number;
+  /** '' when nothing is priced yet; else "Lowest ₹6,25,000 · highest ₹7,42,000". */
+  spreadLabel: string;
+  /** '' when no quotes have arrived; else "3 organizers have quoted". */
+  quotedLabel: string;
 }
 
 export interface BookedStep {
@@ -306,6 +378,15 @@ export interface CategoriesViewModel {
   items: CategoryItem[];
 }
 
+export interface PackageOrganizer {
+  id: string;
+  name: string;
+  rating: number;
+  reviews: number;
+  /** '' when the organizer has taken none this month. */
+  bookedLabel: string;
+}
+
 export interface PackageItem {
   id: string;
   badge: string;
@@ -314,6 +395,44 @@ export interface PackageItem {
   budget: string;
   tags: string[];
   art: OccasionArtKey;
+  bannerNote: string;
+  photoUrl: string;
+  /** The price as printed, or '' when only the band is known. */
+  priceLabel: string;
+  /** The struck-through original, or '' when there is no real reduction. */
+  listPriceLabel: string;
+  organizer: PackageOrganizer | null;
+}
+
+export interface Offer {
+  id: string;
+  eyebrow: string;
+  title: string;
+  terms: string;
+  ctaLabel: string;
+  tone: 'accent' | 'navy';
+}
+
+export interface OffersViewModel {
+  title: string;
+  /** "3 live" — the real count, never a fixed label. */
+  countLabel: string;
+  items: Offer[];
+}
+
+export interface OccasionTile {
+  id: string;
+  label: string;
+  art: OccasionArtKey;
+  icon: OccasionIcon;
+  /** "From ₹40,000", "Most planned", or '' when neither is known. */
+  note: string;
+}
+
+export interface OccasionsViewModel {
+  title: string;
+  subtitle: string;
+  items: OccasionTile[];
 }
 
 export interface PackagesViewModel {
@@ -334,10 +453,18 @@ export interface OrganizerItem {
   reviews: number;
   events: number;
   tags: string[];
+  /** "₹7L" — '' when they have published no starting price. */
+  fromLabel: string;
+  /** "Replies in 1h" — '' when their response time is unknown. */
+  repliesLabel: string;
+  /** "19 booked this month" — '' when they have taken none. */
+  bookedLabel: string;
 }
 
 export interface TopOrganizersViewModel {
   title: string;
+  /** The caveat when the list had to widen past the city; '' when it did not. */
+  scopeNote: string;
   items: OrganizerItem[];
   /** Where these organizers came from, so the section can caveat itself. */
   scope: OrganizerScope;
@@ -376,6 +503,9 @@ export interface HomeViewModel {
   bookedEvent: BookedEventViewModel | null;
   currentEvent: CurrentEventViewModel | null;
   categories: CategoriesViewModel | null;
+  /** "Plan something new" — the occasion grid, replacing the old categories. */
+  occasions: OccasionsViewModel | null;
+  offers: OffersViewModel | null;
   packages: PackagesViewModel | null;
   topOrganizers: TopOrganizersViewModel | null;
   howItWorks: HowItWorksViewModel | null;
@@ -384,5 +514,7 @@ export interface HomeViewModel {
 
 export interface HomeHeaderViewModel {
   unreadCount: number;
+  /** How many packages the account has kept — the heart's badge. */
+  savedCount: number;
   locationLabel: string;
 }

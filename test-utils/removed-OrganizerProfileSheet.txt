@@ -1,10 +1,16 @@
 import { ActivityIndicator, Modal, Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
-import { EventlyText } from '../../../Components';
+import { EventlyIcon, EventlyText } from '../../../Components';
 import { colors } from '../../../theme';
+import { HOME_GREEN as ORGANIZER_SENT_COLOR } from '../constants';
 import { organizerSheetStyles as s } from '../styles';
 import type { OrganizerProfileDTO } from '../types';
 
 interface OrganizerProfileSheetProps {
+  /** True once a request has gone to this organizer this session. */
+  hasRequested: boolean;
+  isRequesting: boolean;
+  requestErrorMessage: string | null;
+  onRequestQuote: () => void;
   /** Non-null while the sheet is open — the organizer being looked at. */
   organizerId: string | null;
   profile: OrganizerProfileDTO | null;
@@ -44,6 +50,10 @@ export function OrganizerProfileSheet({
   profile,
   isLoading,
   errorMessage,
+  hasRequested,
+  isRequesting,
+  requestErrorMessage,
+  onRequestQuote,
   onClose,
 }: OrganizerProfileSheetProps) {
   const capacity =
@@ -111,6 +121,42 @@ export function OrganizerProfileSheet({
                 />
                 <Fact label="Business" value={profile.businessName} />
               </View>
+
+              {/*
+                Asking this organizer for a quote.
+                Moved here from the card in the list: the row itself is now a
+                single tap target that opens this profile, and a second button
+                on a 54pt row made "look at them" and "commit to asking them"
+                the same gesture. Once a request has gone out the button
+                becomes a receipt — sending twice creates two requests.
+              */}
+              {hasRequested ? (
+                <View style={s.requestedRow}>
+                  <EventlyIcon name="check-circle" size={18} color={ORGANIZER_SENT_COLOR} />
+                  <EventlyText variant="body" style={s.requestedText}>
+                    Request sent
+                  </EventlyText>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  style={[s.quoteButton, isRequesting && s.quoteButtonBusy]}
+                  activeOpacity={0.85}
+                  disabled={isRequesting}
+                  onPress={onRequestQuote}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Get quote from ${profile.name}`}
+                >
+                  <EventlyText variant="subtitle" style={s.quoteText}>
+                    {isRequesting ? 'Sending…' : 'Get quote'}
+                  </EventlyText>
+                </TouchableOpacity>
+              )}
+
+              {requestErrorMessage ? (
+                <EventlyText variant="caption" style={s.requestError}>
+                  {requestErrorMessage}
+                </EventlyText>
+              ) : null}
 
               <TouchableOpacity
                 style={s.closeButton}

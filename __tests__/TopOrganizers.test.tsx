@@ -37,6 +37,9 @@ const newcomer: OrganizerItem = {
   reviews: 0,
   events: 0,
   tags: [],
+  fromLabel: '₹7L',
+  repliesLabel: 'Replies in 1h',
+  bookedLabel: '19 booked this month',
 };
 
 const established: OrganizerItem = {
@@ -48,11 +51,15 @@ const established: OrganizerItem = {
   rating: 4.6,
   reviews: 128,
   events: 74,
-  tags: ['Weddings', 'Catering'],
+  tags: [],
+  fromLabel: '₹7L',
+  repliesLabel: 'Replies in 1h',
+  bookedLabel: '19 booked this month',
 };
 
 const section = (over: Partial<TopOrganizersViewModel> = {}): TopOrganizersViewModel => ({
-  title: 'Top organizers near you',
+  title: 'Organizers near you',
+  scopeNote: '',
   items: [newcomer],
   scope: 'city',
   city: 'Hyderabad',
@@ -60,11 +67,8 @@ const section = (over: Partial<TopOrganizersViewModel> = {}): TopOrganizersViewM
 });
 
 const base = {
-  onPressProfile: () => {},
-  onPressQuote: () => {},
-  requestedIds: [] as string[],
-  requestingId: null,
-  requestErrorMessage: null,
+  onPressOrganizer: () => {},
+  onPressSeeAll: () => {},
   onPressChangeCity: () => {},
 };
 
@@ -103,78 +107,82 @@ const textOf = (t: ReactTestRenderer.ReactTestRenderer) => collect(t, false);
 const iconsOf = (t: ReactTestRenderer.ReactTestRenderer) => collect(t, true);
 
 describe('TopOrganizers', () => {
-  it('draws no filled stars for an organizer with no reviews', () => {
+  it('says an organizer has no reviews rather than drawing a rating', () => {
     // The web card renders five filled stars unconditionally, so a brand-new
     // organizer reads as a five-star business beside the text "0 (0)".
     const tree = render(<TopOrganizers {...base} data={section()} />);
 
     expect(iconsOf(tree).filter((n) => n === 'star')).toHaveLength(0);
-    expect(textOf(tree).join('|')).toContain('No reviews yet');
+    expect(textOf(tree).join('')).toContain('No reviews yet');
   });
 
-  it('fills only the stars a real rating has earned', () => {
+  it('shows a real rating with the reviews behind it', () => {
     const tree = render(<TopOrganizers {...base} data={section({ items: [established] })} />);
-    const stars = iconsOf(tree);
 
-    expect(stars.filter((n) => n === 'star')).toHaveLength(5); // 4.6 rounds to 5
+    expect(iconsOf(tree).filter((n) => n === 'star')).toHaveLength(1);
     // Joined without a separator: React splits an interpolated string into
     // several text children, so the rendered line only reads back whole here.
     const line = textOf(tree).join('');
     expect(line).toContain('4.6');
-    expect(line).toContain('(128) · 74 events');
+    expect(line).toContain('(128)');
   });
 
-  it('rounds a middling rating rather than always filling the row', () => {
-    const tree = render(
-      <TopOrganizers {...base} data={section({ items: [{ ...established, rating: 3.2 }] })} />,
-    );
-    const stars = iconsOf(tree);
+  it('drops a figure the organizer has not published', () => {
+    const bare = { ...established, fromLabel: '', repliesLabel: '', bookedLabel: '' };
+    const line = textOf(render(<TopOrganizers {...base} data={section({ items: [bare] })} />)).join('');
 
-    expect(stars.filter((n) => n === 'star')).toHaveLength(3);
-    expect(stars.filter((n) => n === 'star-outline')).toHaveLength(2);
+    // "FROM ₹0" and "Replies in 0h" are worse than saying nothing.
+    expect(line).not.toContain('From');
+    expect(line).not.toContain('Replies in');
+    expect(line).not.toContain('booked this month');
   });
 
-  it('says so when the organizers are not actually nearby', () => {
-    const local = textOf(render(<TopOrganizers {...base} data={section({ scope: 'city' })} />)).join('|');
-    expect(local).not.toContain('showing highly-rated organizers');
-
-    const distant = textOf(render(<TopOrganizers {...base} data={section({ scope: 'all' })} />)).join('|');
-    expect(distant).toContain('No organizers in Hyderabad yet');
-  });
-
-  it('offers a way forward instead of an empty list under a "near you" heading', () => {
-    const tree = render(<TopOrganizers {...base} data={section({ items: [] })} />);
-    const text = textOf(tree).join('|');
-
-    expect(text).toContain('Looking for organizers in your area?');
-    expect(text).toContain('Change city');
-  });
-
-  it('sends the quote request for the organizer whose button was pressed', () => {
-    const onPressQuote = jest.fn();
+  it('is one tap target per organizer, opening their profile', () => {
+    const onPressOrganizer = jest.fn();
     const tree = render(
       <TopOrganizers
         {...base}
         data={section({ items: [newcomer, established] })}
-        onPressQuote={onPressQuote}
+        onPressOrganizer={onPressOrganizer}
       />,
     );
 
-    const button = tree.root
+    const row = tree.root
       .findAllByProps({ accessibilityRole: 'button' })
-      .find((n) => n.props.accessibilityLabel === 'Get quote from Sunrise Weddings');
-    expect(button).toBeDefined();
+      .find(
+        (n) =>
+          typeof n.props.onPress === 'function' &&
+          typeof n.props.accessibilityLabel === 'string' &&
+          n.props.accessibilityLabel.startsWith('Sunrise Weddings'),
+      );
+    expect(row).toBeDefined();
 
-    ReactTestRenderer.act(() => button!.props.onPress());
-    expect(onPressQuote).toHaveBeenCalledWith('o2');
+    ReactTestRenderer.act(() => row!.props.onPress());
+    expect(onPressOrganizer).toHaveBeenCalledWith('o2');
   });
 
-  it('replaces the actions with a receipt once a request has gone out', () => {
-    const tree = render(<TopOrganizers {...base} data={section()} requestedIds={['o1']} />);
-    const text = textOf(tree).join('|');
+  it('offers a way forward instead of a heading with nothing under it', () => {
+    const text = textOf(render(<TopOrganizers {...base} data={section({ items: [] })} />)).join('');
+    expect(text).toContain('No organizers listed for Hyderabad yet');
+  });
 
-    expect(text).toContain('Request sent');
-    expect(text).not.toContain('Get quote');
+  it('says so when the organizers are not actually nearby', () => {
+    const local = textOf(render(<TopOrganizers {...base} data={section()} />)).join('');
+    expect(local).toContain('Organizers near you');
+    expect(local).not.toContain('serve other cities');
+
+    const distant = textOf(
+      render(
+        <TopOrganizers
+          {...base}
+          data={section({
+            title: 'Organizers on Evently',
+            scopeNote: 'No organizers listed in Hyderabad yet — these serve other cities. Change your city.',
+          })}
+        />,
+      ),
+    ).join('');
+    expect(distant).toContain('No organizers listed in Hyderabad yet');
   });
 });
 
@@ -191,6 +199,9 @@ describe('mapTopOrganizers', () => {
     // assert a locality nothing verified.
     const vm = mapTopOrganizers(feed({ topOrganizers: [{ id: 'o1', tags: [] }] }));
     expect(vm?.scope).toBe('all');
+    // And it says so in words rather than heading the list "near you".
+    expect(vm?.title).not.toContain('near you');
+    expect(vm?.scopeNote).not.toBe('');
   });
 
   it('does not invent a rating, review count or event count', () => {
@@ -216,9 +227,17 @@ describe('render dump', () => {
       ],
       [
         'Results are not actually local',
-        <TopOrganizers {...base} data={section({ items: [established], scope: 'all' })} />,
+        <TopOrganizers
+          {...base}
+          data={section({
+            items: [established],
+            scope: 'all',
+            title: 'Organizers on Evently',
+            scopeNote:
+              'No organizers listed in Hyderabad yet — these serve other cities. Change your city.',
+          })}
+        />,
       ],
-      ['Request sent', <TopOrganizers {...base} data={section()} requestedIds={['o1']} />],
       ['No organizers at all', <TopOrganizers {...base} data={section({ items: [] })} />],
     ];
 
@@ -226,7 +245,7 @@ describe('render dump', () => {
 
     fs.writeFileSync(
       out,
-      page(panels, { title: 'TopOrganizers', width: 390, background: '#fff', padding: 0 }),
+      page(panels, { title: 'TopOrganizers', width: 390, background: '#faf8f7', padding: 0 }),
       'utf8',
     );
     expect(fs.existsSync(out)).toBe(true);

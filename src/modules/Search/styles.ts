@@ -1,0 +1,145 @@
+import { StyleSheet } from 'react-native';
+import { globalStyles } from '../../styles/globalStyles';
+import { colors, fontFor, spacing } from '../../theme';
+import { SEARCH_ACCENT, SEARCH_CANVAS, SEARCH_NAVY, SEARCH_NAVY_DEEP } from './constants';
+
+const HAIRLINE = '#efe9e5';
+const TRACK = '#f0ecea';
+
+export const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: SEARCH_CANVAS },
+  list: { paddingBottom: spacing.xl },
+  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
+  centeredIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 22,
+    backgroundColor: '#fdeee7',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyTitle: { color: SEARCH_NAVY, marginTop: spacing.md, textAlign: 'center' },
+  emptyBody: { color: colors.textMuted, marginTop: spacing.sm, textAlign: 'center', lineHeight: 20 },
+  errorText: { color: colors.danger, textAlign: 'center', marginTop: spacing.sm },
+  retryButton: {
+    ...globalStyles.row,
+    gap: spacing.xs,
+    marginTop: spacing.md,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: HAIRLINE,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  retryText: { color: SEARCH_ACCENT, fontWeight: '700' },
+
+  bar: { ...globalStyles.row, gap: 10, paddingHorizontal: spacing.md, paddingBottom: spacing.sm },
+  back: { padding: 4, marginLeft: -4 },
+  field: {
+    ...globalStyles.row,
+    flex: 1,
+    gap: 10,
+    minHeight: 48,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: HAIRLINE,
+    backgroundColor: colors.background,
+    paddingHorizontal: 14,
+  },
+  input: { flex: 1, color: colors.text, fontSize: 15, fontFamily: fontFor('400'), padding: 0 },
+  filterButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: SEARCH_NAVY_DEEP,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 999,
+    backgroundColor: SEARCH_ACCENT,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterBadgeText: { color: colors.onPrimary, fontSize: 10, fontWeight: '700', lineHeight: 13 },
+
+  tabs: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.md, paddingBottom: spacing.sm },
+  tab: { borderRadius: 999, backgroundColor: TRACK, paddingHorizontal: 18, paddingVertical: 8 },
+  tabOn: { backgroundColor: SEARCH_NAVY },
+  tabText: { color: '#6f6a66', fontSize: 13.5, fontWeight: '600' },
+  tabTextOn: { color: colors.onPrimary },
+
+  countLine: {
+    color: colors.textMuted,
+    fontSize: 12.5,
+    fontWeight: '700',
+    letterSpacing: 0.9,
+    textTransform: 'uppercase',
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.md,
+    marginBottom: 4,
+  },
+});
+
+export const filterSheetStyles = StyleSheet.create({
+  backdrop: { flex: 1, backgroundColor: 'rgba(14,26,51,0.45)', justifyContent: 'flex-end' },
+  sheet: {
+    backgroundColor: SEARCH_CANVAS,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingBottom: spacing.lg,
+    maxHeight: '86%',
+  },
+  grabber: {
+    width: 40,
+    height: 4,
+    borderRadius: 999,
+    backgroundColor: TRACK,
+    alignSelf: 'center',
+    marginTop: 10,
+  },
+  head: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
+  },
+  title: { color: SEARCH_NAVY, fontSize: 20, fontWeight: '700' },
+  clear: { color: SEARCH_ACCENT, fontSize: 14.5, fontWeight: '600' },
+  group: { paddingHorizontal: spacing.md, marginTop: spacing.lg },
+  groupTitle: {
+    color: '#7b8595',
+    fontSize: 12.5,
+    fontWeight: '700',
+    letterSpacing: 0.9,
+    textTransform: 'uppercase',
+    marginBottom: 10,
+  },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  chip: {
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: HAIRLINE,
+    backgroundColor: colors.background,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  chipOn: { backgroundColor: SEARCH_NAVY, borderColor: SEARCH_NAVY },
+  chipText: { color: '#414b5c', fontSize: 13.5, fontWeight: '500' },
+  chipTextOn: { color: colors.onPrimary },
+  apply: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 52,
+    borderRadius: 14,
+    backgroundColor: SEARCH_ACCENT,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.lg,
+  },
+  applyText: { color: colors.onPrimary, fontSize: 16, fontWeight: '600' },
+});

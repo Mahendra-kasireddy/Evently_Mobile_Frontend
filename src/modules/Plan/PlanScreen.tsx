@@ -19,7 +19,7 @@ import { splitBannerSentence } from './utils';
 
 export function PlanScreen() {
   const route = useRoute<RouteProp<MainTabParamList, 'Plan'>>();
-  const container = usePlanContainer(route.params?.occasionId);
+  const container = usePlanContainer(route.params?.occasionId, route.params?.organizerId);
 
   if (container.isLoadingScreen) {
     return (

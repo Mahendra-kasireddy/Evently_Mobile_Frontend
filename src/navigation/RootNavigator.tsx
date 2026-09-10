@@ -1,14 +1,20 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { BookingScreen } from '../modules/Booking';
+import { ConversationScreen } from '../modules/Chat';
 import { ComingSoonScreen } from '../modules/ComingSoon';
+import { CompareQuotesScreen } from '../modules/CompareQuotes';
 import { InvitationScreen } from '../modules/Invitation';
 import { JoinScreen } from '../modules/Join';
 import { ContactScreen, LegalSupportScreen } from '../modules/LegalSupport';
 import { LocationScreen } from '../modules/Location';
 import { LoginScreen } from '../modules/Login';
 import { NotificationScreen } from '../modules/Notification';
+import { OrganizerScreen, ReviewsScreen } from '../modules/Organizer';
+import { PaymentsScreen } from '../modules/Payments';
 import { OnboardingScreen } from '../modules/Onboarding';
 import { OrganizerOnboardingScreen } from '../modules/OrganizerOnboarding';
+import { SavedPackagesScreen } from '../modules/SavedPackages';
+import { SearchScreen } from '../modules/Search';
 import { SettingsScreen } from '../modules/Settings';
 import { SplashScreen } from '../modules/Splash';
 import { IdeaBoardScreen, WorkspaceScreen } from '../modules/Workspace';
@@ -41,6 +47,13 @@ export function RootNavigator() {
           <Stack.Screen name="Workspace" component={WorkspaceScreen} />
           <Stack.Screen name="IdeaBoard" component={IdeaBoardScreen} />
           <Stack.Screen name="Invitations" component={InvitationScreen} />
+          <Stack.Screen name="SavedPackages" component={SavedPackagesScreen} />
+          <Stack.Screen name="Search" component={SearchScreen} />
+          <Stack.Screen name="CompareQuotes" component={CompareQuotesScreen} />
+          <Stack.Screen name="Organizer" component={OrganizerScreen} />
+          <Stack.Screen name="OrganizerReviews" component={ReviewsScreen} />
+          <Stack.Screen name="Conversation" component={ConversationScreen} />
+          <Stack.Screen name="Payments" component={PaymentsScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen name="LegalSupport" component={LegalSupportScreen} />
           <Stack.Screen name="Contact" component={ContactScreen} />

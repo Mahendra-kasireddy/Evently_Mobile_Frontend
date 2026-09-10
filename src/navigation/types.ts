@@ -1,6 +1,20 @@
+import type { NavigatorScreenParams } from '@react-navigation/native';
+
 export type MainTabParamList = {
   Home: undefined;
-  Plan: { occasionId?: string } | undefined;
+  /**
+   * The plan wizard. `organizerId` pre-selects an organizer, so "Request a
+   * quote" from a profile lands here with them already chosen and the
+   * customer only has to write the brief.
+   */
+  Plan: { occasionId?: string; organizerId?: string } | undefined;
+  /**
+   * The customer's events. The same screen is also registered on the root
+   * stack as `Bookings`, which is where Home's booked card and the workspace's
+   * back button land; as a tab it is the customer's own way in, with no back
+   * arrow because there is nothing to go back to.
+   */
+  Events: undefined;
   Chat: undefined;
   Profile: undefined;
 };
@@ -13,7 +27,12 @@ export type RootStackParamList = {
   Join: undefined;
   ComingSoon: { role: JoinRole };
   OrganizerOnboarding: undefined;
-  Main: undefined;
+  /**
+   * Typed with the tab list so a screen can name a tab — `navigate('Main', {
+   * screen: 'Plan' })` — from either side of the boundary: from a tab it
+   * bubbles up to this navigator, from a pushed stack screen it acts here.
+   */
+  Main: NavigatorScreenParams<MainTabParamList> | undefined;
   Location: undefined;
   Notification: undefined;
   Bookings: undefined;
@@ -35,6 +54,23 @@ export type RootStackParamList = {
    * without a second request for what the workspace already knows.
    */
   IdeaBoard: { bookingId: string; organizerName?: string; authorName?: string };
+  /** What the customer has kept for later, from the Home carousel. */
+  SavedPackages: undefined;
+  /**
+   * Packages and organizers matching a query. `openFilters` is how the home
+   * header's filter button lands with the sheet already up.
+   */
+  Search: { kind?: 'packages' | 'organizers'; openFilters?: boolean } | undefined;
+  /** Every quote on one request, side by side. */
+  CompareQuotes: { requestId: string; title?: string };
+  /** One organizer's full profile. `name` is only for the first render. */
+  Organizer: { organizerId: string; name?: string };
+  /** Everything people have said about that organizer. */
+  OrganizerReviews: { organizerId: string; name?: string };
+  /** One message thread. `withName` is only for the first render's header. */
+  Conversation: { conversationId: string; withName?: string };
+  /** Every event's agreed amount, what has been paid and what is still owed. */
+  Payments: undefined;
   Settings: undefined;
   LegalSupport: undefined;
   /** Contact the Evently team — a real message, not a mailto. */

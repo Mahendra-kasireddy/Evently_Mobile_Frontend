@@ -43,7 +43,21 @@ export const TRUST_ICON_NAME: Record<TrustIcon, string> = {
 
 // Web's actual Hero.module.css tokens — a deep navy hero with warm-orange
 // accents, not the app's bright indigo primary. Scoped to this section only.
+/** The one line in the header's search field — what can actually be searched. */
+export const SEARCH_PLACEHOLDER = 'Search packages, organizers, decor';
+
 export const HERO_BACKGROUND_COLOR = '#0e1a33'; // --color-navy-deep
+
+// The screen's own tokens, matching the other ported surfaces.
+export const HOME_NAVY = '#1a2e5a';
+export const HOME_NAVY_DEEP = '#0e1a33';
+/** One step lighter than the hero, for a panel sitting on it. */
+export const HOME_NAVY_PANEL = '#1b2a49';
+export const HOME_ACCENT_SOFT = '#fdeee7';
+export const HOME_GREEN = '#1d9e75';
+export const HOME_CANVAS = '#faf8f7';
+export const HOME_HAIRLINE = '#efe9e5';
+export const HOME_TRACK = '#f0ecea';
 export const HERO_ACCENT_COLOR = '#e8633a'; // --color-primary
 export const HERO_ACCENT_WARM_COLOR = '#ff8b5e'; // --color-accent-warm
 export const HERO_FIELD_ICON_BG = '#fdeee7'; // --color-primary-soft
@@ -109,7 +123,7 @@ export const TOOL_ICON_COLOR: Record<ToolIcon, string> = {
 };
 
 // Existing app theme tier colors (already defined, previously unused).
-export const ORGANIZER_TIER_COLOR: Record<OrganizerTier, string> = {
+export const TIER_COLOR: Record<OrganizerTier, string> = {
   Gold: colors.tierGold,
   Silver: colors.tierSilver,
   Platinum: colors.tierPlatinum,
@@ -127,6 +141,40 @@ export const CURRENT_EVENT_STAGE_LABEL: Record<CurrentEventStage, string> = {
   booking_confirmed: 'Booking confirmed',
   in_progress: 'Event in progress',
   completed: 'Event completed',
+};
+
+/**
+ * The glyph on an occasion tile.
+ *
+ * Keyed on the occasion's own art key, which is what the backend sends, and
+ * falling back to the neutral sparkle so a new occasion added in the admin
+ * appears with a sensible icon rather than crashing the grid.
+ */
+export const OCCASION_TILE_ICON: Record<string, OccasionIcon> = {
+  wedding: 'heart',
+  birthday: 'gift',
+  housewarming: 'home',
+  naming: 'sparkles',
+  anniversary: 'star',
+  corporate: 'briefcase',
+};
+
+/**
+ * What the hero's button offers, by stage.
+ *
+ * Each one leads somewhere that exists: comparing quotes needs quotes to have
+ * arrived, opening a workspace needs a booking. A stage with nothing to do
+ * yet says so plainly rather than offering an action that lands nowhere.
+ */
+export const CURRENT_EVENT_CTA: Record<CurrentEventStage, string> = {
+  draft: 'Finish your plan',
+  submitted: 'See your request',
+  quotes_received: 'Compare quotes',
+  quote_accepted: 'See your booking',
+  booking_created: 'Open workspace',
+  booking_confirmed: 'Open workspace',
+  in_progress: 'Open workspace',
+  completed: 'See what happened',
 };
 
 export const CURRENT_EVENT_STAGE_COLOR: Record<CurrentEventStage, string> = {

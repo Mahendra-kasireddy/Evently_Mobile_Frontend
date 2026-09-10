@@ -1,171 +1,203 @@
-import { useState } from 'react';
 import { FlatList, TouchableOpacity, View } from 'react-native';
-import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
-import { Confetti, EventlyIcon, EventlyText, OccasionArt } from '../../../Components';
-import { colors } from '../../../theme';
-import { CATEGORY_GRADIENT, HERO_ACCENT_COLOR, PACKAGE_EXPLORE_CTA } from '../constants';
-import { PACKAGE_SNAP_INTERVAL, packagesStyles as s } from '../styles';
+import { EventlyIcon, EventlyImage, EventlyText, OccasionArt } from '../../../Components';
+import { CATEGORY_GRADIENT, HERO_ACCENT_COLOR, HOME_NAVY } from '../constants';
+import { packageCardStyles as s } from '../styles';
+import { SectionHead } from './SectionHead';
 import type { PackageItem, PackagesViewModel } from '../types';
 
 interface PackagesProps {
   data: PackagesViewModel;
   /** Opens the planner for this package's occasion. */
   onPressPackage: (item: PackageItem) => void;
-  /** "Build your own" — the planner, with nothing pre-set. */
-  onPressBuildYourOwn: () => void;
+  /** "See all" — the search screen, filtered to packages. */
+  onPressSeeAll: () => void;
+  /** Ids the account has kept, so each heart shows its own state. */
+  savedIds: string[];
+  onToggleSaved: (packageId: string) => void;
 }
 
-function PackageCard({ item, onPress }: { item: PackageItem; onPress: () => void }) {
-  const [gradientStart, gradientEnd] = CATEGORY_GRADIENT[item.art];
+interface PackageCardProps {
+  item: PackageItem;
+  onPress: () => void;
+  saved: boolean;
+  onToggleSaved: () => void;
+}
+
+function PackageCard({ item, onPress, saved, onToggleSaved }: PackageCardProps) {
+  const [start, end] = CATEGORY_GRADIENT[item.art];
   /*
    * SVG ids are global to the document, so a shared id would make every card
    * on the screen paint whichever gradient rendered last. Scoped per package.
    */
   const gradientId = `packageBanner-${item.id}`;
+  const rating = item.organizer && item.organizer.reviews > 0 ? item.organizer : null;
 
   return (
-    <TouchableOpacity
-      style={s.card}
-      activeOpacity={0.9}
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={`${item.title}, ${item.budget}, ${item.guests}. ${PACKAGE_EXPLORE_CTA}.`}
-    >
-      <View style={s.banner}>
-        <View style={s.bannerLayer}>
-          <Svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <Defs>
-              <LinearGradient id={gradientId} x1="37%" y1="2%" x2="63%" y2="98%">
-                <Stop offset="0" stopColor={gradientStart} />
-                <Stop offset="1" stopColor={gradientEnd} />
-              </LinearGradient>
-            </Defs>
-            <Rect x={0} y={0} width={100} height={100} fill={`url(#${gradientId})`} />
-          </Svg>
-        </View>
-        <View style={[s.bannerLayer, s.bannerConfetti]} pointerEvents="none">
-          <Confetti />
-        </View>
-        <View style={s.bannerArt} pointerEvents="none">
-          <OccasionArt art={item.art} />
-        </View>
-        <View style={s.badge}>
-          <EventlyText variant="caption" style={s.badgeText}>
-            {item.badge}
-          </EventlyText>
-        </View>
-      </View>
+    <View style={s.card}>
+      {/*
+        The whole card is one control — banner and body together — so there is
+        one tap target and one accessible name. The heart is its sibling rather
+        than a child: nesting it would make keeping a package and opening it
+        the same gesture, which is how people lose the thing they meant to save.
+      */}
+      <TouchableOpacity
+        activeOpacity={0.9}
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={[
+          item.title,
+          item.organizer?.name,
+          item.priceLabel || item.budget,
+          item.guests,
+        ]
+          .filter(Boolean)
+          .join(', ')}
+      >
+        <View style={s.banner}>
+          {/* A real photo when the package has one; otherwise the occasion's
+              own illustration over its gradient, never a broken frame. */}
+          {item.photoUrl ? (
+            <EventlyImage source={{ uri: item.photoUrl }} style={s.bannerLayer} resizeMode="cover" />
+          ) : (
+            <>
+              <View style={s.bannerLayer}>
+                <Svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <Defs>
+                    <LinearGradient id={gradientId} x1="20%" y1="0%" x2="80%" y2="100%">
+                      <Stop offset="0" stopColor={start} />
+                      <Stop offset="1" stopColor={end} />
+                    </LinearGradient>
+                  </Defs>
+                  <Rect x={0} y={0} width={100} height={100} fill={`url(#${gradientId})`} />
+                </Svg>
+              </View>
+              <View style={s.bannerArt} pointerEvents="none">
+                <OccasionArt art={item.art} />
+              </View>
+            </>
+          )}
 
-      <View style={s.body}>
-        <View style={s.titleRow}>
-          <EventlyText variant="h2" style={s.packageTitle} numberOfLines={2}>
+          {item.badge ? (
+            <View style={s.badge}>
+              <EventlyText variant="caption" style={s.badgeText} numberOfLines={1}>
+                {item.badge.toUpperCase()}
+              </EventlyText>
+            </View>
+          ) : null}
+
+          {item.bannerNote ? (
+            <EventlyText variant="caption" style={s.bannerNote} numberOfLines={1}>
+              {item.bannerNote}
+            </EventlyText>
+          ) : null}
+        </View>
+
+        <View style={s.body}>
+          <EventlyText variant="subtitle" style={s.title} numberOfLines={2}>
             {item.title}
           </EventlyText>
-          <EventlyText variant="body" style={s.guests} numberOfLines={1}>
-            {item.guests}
-          </EventlyText>
-        </View>
+          {item.organizer ? (
+            <EventlyText variant="caption" style={s.organizer} numberOfLines={1}>
+              {item.organizer.name}
+            </EventlyText>
+          ) : null}
 
-        <EventlyText variant="h2" style={s.budget}>
-          {item.budget}
-        </EventlyText>
-
-        {item.tags.length > 0 ? (
-          <View style={s.tagRow}>
-            {item.tags.map((tag) => (
-              <EventlyText key={tag} variant="body" style={s.tag}>
-                {tag}
+          {/* A score with no reviews behind it is not a rating. */}
+          {rating ? (
+            <View style={s.ratingRow}>
+              <EventlyIcon name="star" size={15} color="#e8a33a" />
+              <EventlyText variant="caption" style={s.rating}>
+                {rating.rating.toFixed(1)}
               </EventlyText>
-            ))}
-          </View>
-        ) : null}
+              <EventlyText variant="caption" style={s.reviews}>
+                {`(${rating.reviews})`}
+              </EventlyText>
+            </View>
+          ) : null}
 
-        <View style={s.explore}>
-          <EventlyIcon name="chevron-right" size={18} color={colors.onPrimary} />
-          <EventlyText variant="subtitle" style={s.exploreText}>
-            {PACKAGE_EXPLORE_CTA}
-          </EventlyText>
+          <View style={s.priceRow}>
+            <EventlyText variant="h2" style={s.price}>
+              {item.priceLabel || item.budget}
+            </EventlyText>
+            {/* Only a genuine reduction; the server refuses a "was" figure
+                that is not above the current price. */}
+            {item.listPriceLabel ? (
+              <EventlyText variant="caption" style={s.listPrice}>
+                {item.listPriceLabel}
+              </EventlyText>
+            ) : null}
+          </View>
+
+          {item.organizer?.bookedLabel ? (
+            <EventlyText variant="caption" style={s.booked}>
+              {item.organizer.bookedLabel}
+            </EventlyText>
+          ) : null}
         </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={s.heart}
+        activeOpacity={0.8}
+        onPress={onToggleSaved}
+        accessibilityRole="button"
+        accessibilityState={{ selected: saved }}
+        accessibilityLabel={`${saved ? 'Remove' : 'Save'} ${item.title}${saved ? ' from' : ' to'} your saved packages`}
+      >
+        <EventlyIcon
+          name={saved ? 'heart' : 'heart-outline'}
+          size={18}
+          color={saved ? HERO_ACCENT_COLOR : HOME_NAVY}
+        />
+      </TouchableOpacity>
+    </View>
   );
 }
 
 /**
- * Home's curated packages.
+ * The packages on offer.
  *
- * Every package comes from the home feed's `packages` collection, including
- * the `art` key that picks its banner gradient and illustration — mobile was
- * dropping that field, which is why these cards had no banner at all.
- *
- * The whole card is one control: "Explore package" is presentational, so there
- * is a single tap target with one accessible name, as on the booked card.
+ * Every figure on a card is read live: the price and any reduction from the
+ * package itself, the rating, review count and recent bookings from the
+ * organizer who delivers it. The "booked this month" line is that organizer's
+ * — nothing links a booking back to the package that inspired it — which is
+ * why it sits under their name rather than under the title.
  */
-export function Packages({ data, onPressPackage, onPressBuildYourOwn }: PackagesProps) {
-  const [active, setActive] = useState(0);
-
-  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const index = Math.round(e.nativeEvent.contentOffset.x / PACKAGE_SNAP_INTERVAL);
-    // Clamped: an overscroll bounce at either end would otherwise light up a
-    // dot that does not exist.
-    const clamped = Math.min(data.items.length - 1, Math.max(0, index));
-    if (clamped !== active) setActive(clamped);
-  };
-
+export function Packages({
+  data,
+  onPressPackage,
+  onPressSeeAll,
+  savedIds,
+  onToggleSaved,
+}: PackagesProps) {
   return (
-    <View style={s.section}>
-      <View style={s.header}>
-        <View style={s.headText}>
-          <EventlyText variant="h2" style={s.title}>
-            {data.title}
-          </EventlyText>
-          {data.subtitle ? (
-            <EventlyText variant="body" style={s.subtitle}>
-              {data.subtitle}
-            </EventlyText>
-          ) : null}
-        </View>
-        {data.buildLabel ? (
-          <TouchableOpacity
-            style={s.buildButton}
-            activeOpacity={0.7}
-            onPress={onPressBuildYourOwn}
-            accessibilityRole="button"
-          >
-            <EventlyText variant="subtitle" style={s.buildText}>
-              {data.buildLabel}
-            </EventlyText>
-            <EventlyIcon name="chevron-right" size={16} color={HERO_ACCENT_COLOR} />
-          </TouchableOpacity>
-        ) : null}
-      </View>
-
+    <View>
+      <SectionHead
+        title={data.title}
+        subtitle={data.subtitle}
+        actionLabel="See all"
+        onPressAction={onPressSeeAll}
+      />
       <FlatList
         data={data.items}
+        keyExtractor={(item) => item.id}
         horizontal
         showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={s.list}
-        // Snapping to one card width keeps a package centred instead of
-        // leaving the row halfway between two.
-        snapToInterval={PACKAGE_SNAP_INTERVAL}
-        snapToAlignment="start"
-        decelerationRate="fast"
-        onScroll={onScroll}
-        scrollEventThrottle={16}
-        renderItem={({ item }) => <PackageCard item={item} onPress={() => onPressPackage(item)} />}
+        contentContainerStyle={PACKAGE_LIST_PADDING}
+        renderItem={({ item }) => (
+          <PackageCard
+            item={item}
+            onPress={() => onPressPackage(item)}
+            saved={savedIds.includes(item.id)}
+            onToggleSaved={() => onToggleSaved(item.id)}
+          />
+        )}
       />
-
-      {data.items.length > 1 ? (
-        <View style={s.dots}>
-          {data.items.map((item, i) => (
-            <View key={item.id} style={[s.dot, i === active && s.dotOn]} />
-          ))}
-        </View>
-      ) : null}
     </View>
   );
 }
+
+const PACKAGE_LIST_PADDING = { paddingHorizontal: 16, paddingTop: 14, gap: 12 } as const;
 
 export default Packages;

@@ -1,6 +1,6 @@
 import { Platform, StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, spacing } from '../../theme';
+import { colors, fontFor, spacing } from '../../theme';
 import {
   LOGIN_ACCENT,
   LOGIN_BG,
@@ -129,6 +129,8 @@ export const otpEntryStyles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 22,
     fontWeight: '700',
+    // Named face, not a weight: a TextInput gets no help resolving one.
+    fontFamily: fontFor('700'),
     color: LOGIN_NAVY,
     backgroundColor: colors.surface,
   },

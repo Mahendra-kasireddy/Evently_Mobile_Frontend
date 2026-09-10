@@ -39,8 +39,21 @@ const DEFAULT_DRAFT: PlanDraft = {
   step: 0,
 };
 
-function buildInitialDraft(initialOccasionId?: string): PlanDraft {
-  return initialOccasionId ? { ...DEFAULT_DRAFT, occasionId: initialOccasionId } : DEFAULT_DRAFT;
+/**
+ * The draft a fresh wizard starts from.
+ *
+ * Both seeds are optional and independent: Home's occasion tiles pass an
+ * occasion, an organizer's profile passes an organizer, and the package cards
+ * pass an occasion. Seeding the organizer here rather than jumping straight to
+ * the review step is deliberate — the organizer still needs the brief, and a
+ * quote request with no occasion is one they cannot price.
+ */
+function buildInitialDraft(initialOccasionId?: string, initialOrganizerId?: string): PlanDraft {
+  return {
+    ...DEFAULT_DRAFT,
+    ...(initialOccasionId ? { occasionId: initialOccasionId } : {}),
+    ...(initialOrganizerId ? { selectedOrganizerId: initialOrganizerId } : {}),
+  };
 }
 
 export interface PlanContainerResult {
@@ -111,11 +124,14 @@ const EMPTY_SCREEN: PlanScreenDTO = {
   filters: { tiers: [], ratings: [], categories: [], sorts: [] },
 };
 
-export function usePlanContainer(initialOccasionId?: string): PlanContainerResult {
+export function usePlanContainer(
+  initialOccasionId?: string,
+  initialOrganizerId?: string,
+): PlanContainerResult {
   const { data: screenDataRaw, loading: screenLoading, error: screenError, refetch: refetchScreen } = usePlanScreenData();
   const { data: myDraft } = useMyDraft();
 
-  const [draft, setDraft] = useState<PlanDraft>(() => buildInitialDraft(initialOccasionId));
+  const [draft, setDraft] = useState<PlanDraft>(() => buildInitialDraft(initialOccasionId, initialOrganizerId));
   const hydratedRef = useRef(false);
 
   // Resume a previously saved draft once it arrives — only patch fields the

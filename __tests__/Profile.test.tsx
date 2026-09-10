@@ -4,8 +4,8 @@
  * The profile screen.
  *
  * Mostly about not inventing an account's details: a person with no name gets
- * a prompt rather than a stand-in, a missing fact reads as missing, and every
- * role the account holds is shown rather than only the first.
+ * a prompt rather than a stand-in, a badge only appears for a count that is
+ * really there, and no row leads to a screen this app does not have.
  */
 
 import React from 'react';
@@ -19,13 +19,12 @@ jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
 });
 
 import { page, toHtml } from '../test-utils/rn-to-html';
-import { ProfileHeader } from '../src/modules/Profile/sections/ProfileHeader';
-import { ProfileInfoList } from '../src/modules/Profile/sections/ProfileInfoList';
-import { ProfileMenuList } from '../src/modules/Profile/sections/ProfileMenuList';
-import { SignOutRow } from '../src/modules/Profile/sections/SignOutRow';
-import { ViewSwitch } from '../src/modules/Profile/sections/ViewSwitch';
-import { mapProfile } from '../src/modules/Profile/utils';
-import type { UserDetailsDTO } from '../src/modules/Profile/types';
+import { ProfileGroup } from '../src/modules/Profile/sections/ProfileGroup';
+import { ProfileIdentity } from '../src/modules/Profile/sections/ProfileIdentity';
+import { groupsFor, mapProfile, maskPhone } from '../src/modules/Profile/utils';
+import { PROFILE_COPY, PROFILE_GROUPS } from '../src/modules/Profile/constants';
+import { groupStyles, rowStyles } from '../src/modules/Profile/styles';
+import type { ProfileAction, UserDetailsDTO } from '../src/modules/Profile/types';
 
 declare const process: { env: Record<string, string | undefined> };
 const fs: { writeFileSync(p: string, d: string, e: string): void; existsSync(p: string): boolean } =
@@ -34,9 +33,9 @@ const fs: { writeFileSync(p: string, d: string, e: string): void; existsSync(p: 
 const user = (over: Partial<UserDetailsDTO> = {}): UserDetailsDTO =>
   ({
     id: 'u1',
-    name: 'Meera Rao',
-    phone: '+91 90000 00000',
-    email: 'meera@example.com',
+    name: 'Kasireddy',
+    phone: '9849012321',
+    email: 'kasireddy@example.com',
     phoneVerified: true,
     city: 'Hyderabad',
     roles: ['customer'],
@@ -71,128 +70,175 @@ function textOf(tree: ReactTestRenderer.ReactTestRenderer): string {
   return out.join('');
 }
 
+function drawnButtons(tree: ReactTestRenderer.ReactTestRenderer): any[] {
+  const out: any[] = [];
+  const walk = (n: any) => {
+    if (n == null || typeof n === 'string') return;
+    if (Array.isArray(n)) {
+      n.forEach(walk);
+      return;
+    }
+    if (n.props?.accessibilityRole === 'button') out.push(n);
+    walk(n.children);
+  };
+  walk(tree.toJSON());
+  return out;
+}
+
+/** One control per handler; host nodes repeat the composite's props. */
+function pressables(tree: ReactTestRenderer.ReactTestRenderer): any[] {
+  const seen = new Set<unknown>();
+  return tree.root.findAllByProps({ accessibilityRole: 'button' }).filter((n: any) => {
+    if (typeof n.props.onPress !== 'function' || seen.has(n.props.onPress)) return false;
+    seen.add(n.props.onPress);
+    return true;
+  });
+}
+
 const noop = () => {};
+const noBadge = () => '';
 
 describe('mapProfile', () => {
-  it('leaves the name empty rather than inventing one', () => {
-    // The old fallback printed "there" — borrowed from the greeting "Hi
-    // there" — as if it were the person's name.
+  it('prompts for a name rather than inventing one', () => {
+    // The old fallback printed the literal word "there" as a person's name.
     expect(mapProfile(user({ name: '' })).displayName).toBe('');
-    expect(mapProfile(user()).displayName).toBe('Meera Rao');
+    expect(mapProfile(user()).displayName).toBe('Kasireddy');
   });
 
-  it('still finds a monogram when there is no name', () => {
-    expect(mapProfile(user()).initials).toBe('MR');
-    expect(mapProfile(user({ name: '', phone: '9000000000' })).initials).toBe('9');
+  it('falls back to a monogram it can actually draw', () => {
+    expect(mapProfile(user({ name: 'Meera Rao' })).initials).toBe('MR');
+    // One name is still two letters — a lone capital reads as a placeholder.
+    expect(mapProfile(user({ name: 'Kasireddy' })).initials).toBe('KA');
     expect(mapProfile(user({ name: '', phone: '' })).initials).toBe('·');
   });
 
-  it('shows every role the account holds', () => {
-    // An account that is both previously read as "Customer" alone.
+  it('names every role the account holds, not just the first', () => {
     expect(mapProfile(user({ roles: ['customer', 'organizer'] })).roles).toEqual([
       'Customer',
       'Organizer',
     ]);
-    expect(mapProfile(user({ roles: [] })).roles).toEqual([]);
-  });
-
-  it('keeps a missing fact as a prompt, not a blank', () => {
-    const facts = mapProfile(user({ city: '', email: undefined })).facts;
-    const city = facts.find((f) => f.key === 'city');
-    const email = facts.find((f) => f.key === 'email');
-
-    expect(city?.value).toBe('');
-    expect(city?.emptyHint).toBe('Not set');
-    expect(email?.emptyHint).toBe('Not added');
-  });
-
-  it('drops a fact that has neither a value nor a prompt', () => {
-    // "Member since" on an account with no usable created date says nothing.
-    const facts = mapProfile(user({ createdAt: 'nonsense' })).facts;
-    expect(facts.find((f) => f.key === 'since')).toBeUndefined();
-  });
-
-  it('carries whether the phone is verified', () => {
-    expect(mapProfile(user()).facts.find((f) => f.key === 'phone')?.verified).toBe(true);
-    expect(mapProfile(user({ phoneVerified: false })).facts.find((f) => f.key === 'phone')?.verified).toBe(
-      false,
-    );
   });
 });
 
-describe('ProfileHeader', () => {
-  it('prompts for a name the account does not have', () => {
-    expect(textOf(render(<ProfileHeader data={mapProfile(user({ name: '' }))} />))).toContain(
-      'Add your name',
-    );
+describe('maskPhone', () => {
+  it('hides the middle and keeps enough to recognise the number', () => {
+    expect(maskPhone('9849012321')).toBe('+91 98490 ••• 21');
   });
 
-  it('lists both roles for an account that holds both', () => {
+  it('uses one dot per hidden digit, so the length is not misstated', () => {
+    // A fixed run of dots would make an 8-digit number look like a 10-digit one.
+    const masked = maskPhone('9849012321');
+    expect((masked.match(/•/g) ?? []).length).toBe(10 - 5 - 2);
+  });
+
+  it('leaves a number too short to mask alone', () => {
+    // Hiding one digit of a short string protects nothing and just obscures it.
+    expect(maskPhone('12345')).toBe('+91 12345');
+    expect(maskPhone('')).toBe('');
+  });
+
+  it('reads the digits out of whatever formatting it is given', () => {
+    expect(maskPhone('+91 98490 12321')).toBe('+91 98490 ••• 21');
+  });
+});
+
+describe('the menu', () => {
+  it('offers to list a business only to someone who has not', () => {
+    const asCustomer = groupsFor(false)
+      .flatMap((g) => g.rows)
+      .map((r) => r.action);
+    const asOrganizer = groupsFor(true)
+      .flatMap((g) => g.rows)
+      .map((r) => r.action);
+
+    expect(asCustomer).toContain('listBusiness');
+    expect(asOrganizer).not.toContain('listBusiness');
+    // Dropped, not disabled — a greyed row invites a tap that does nothing.
+    expect(asOrganizer).toContain('help');
+    expect(asOrganizer).toContain('signOut');
+  });
+
+  it('does not promise a stored address book', () => {
+    /*
+     * What the app has is one Location screen reading the device's position.
+     * There is nowhere to keep a list of addresses, so the row is not called
+     * "Saved locations".
+     */
+    const labels = PROFILE_GROUPS.flatMap((g) => g.rows).map((r) => r.label);
+    expect(labels).toContain('Location');
+    expect(labels).not.toContain('Saved locations');
+  });
+
+  it('sets a group heading apart from the rows inside it', () => {
+    // A label at the same size, weight and colour as its rows stops grouping.
+    const heading = groupStyles.title as Record<string, unknown>;
+    const label = rowStyles.label as Record<string, unknown>;
+    expect(Number(heading.fontSize)).toBeLessThan(Number(label.fontSize));
+    expect(heading.color).not.toBe(label.color);
+  });
+});
+
+describe('ProfileIdentity', () => {
+  it('shows the name, the masked number and a way to change them', () => {
+    const text = textOf(render(<ProfileIdentity profile={mapProfile(user())} onEdit={noop} />));
+
+    expect(text).toContain('Kasireddy');
+    expect(text).toContain('+91 98490 ••• 21');
+    expect(text).toContain(PROFILE_COPY.edit);
+  });
+
+  it('asks for a name when the account has none', () => {
     const text = textOf(
-      render(<ProfileHeader data={mapProfile(user({ roles: ['customer', 'organizer'] }))} />),
+      render(<ProfileIdentity profile={mapProfile(user({ name: '' }))} onEdit={noop} />),
     );
-    expect(text).toContain('Customer');
-    expect(text).toContain('Organizer');
+
+    expect(text).toContain(PROFILE_COPY.noName);
+  });
+
+  it('opens the screen where details are actually changed', () => {
+    const onEdit = jest.fn();
+    const tree = render(<ProfileIdentity profile={mapProfile(user())} onEdit={onEdit} />);
+
+    ReactTestRenderer.act(() => pressables(tree)[0].props.onPress());
+    expect(onEdit).toHaveBeenCalledTimes(1);
   });
 });
 
-describe('ProfileInfoList', () => {
-  it('shows the verification the screen used to fetch and discard', () => {
-    expect(textOf(render(<ProfileInfoList data={mapProfile(user())} />))).toContain('Verified');
-    expect(textOf(render(<ProfileInfoList data={mapProfile(user({ phoneVerified: false }))} />))).toContain(
-      'Not verified',
-    );
-  });
+describe('ProfileGroup', () => {
+  const events = PROFILE_GROUPS[0];
 
-  it('does not claim a missing number is unverified', () => {
-    // No phone at all is a different thing from an unverified one.
-    const text = textOf(render(<ProfileInfoList data={mapProfile(user({ phone: '' }))} />));
-    expect(text).not.toContain('Not verified');
-  });
-});
-
-describe('ProfileMenuList', () => {
-  it('renders nothing at all for an empty group', () => {
-    expect(render(<ProfileMenuList title="Your events" items={[]} />).toJSON()).toBeNull();
-  });
-
-  it('titles the group and describes each destination', () => {
-    const text = textOf(
-      render(
-        <ProfileMenuList
-          title="Your events"
-          items={[{ key: 'b', icon: 'calendar-check-outline', label: 'My Bookings', hint: 'Plans and payments', onPress: noop }]}
-        />,
-      ),
+  it('is one tap target per row, and reports which was pressed', () => {
+    const pressed: ProfileAction[] = [];
+    const tree = render(
+      <ProfileGroup group={events} badgeFor={noBadge} onPress={(a) => pressed.push(a)} />,
     );
 
-    expect(text).toContain('Your events');
-    expect(text).toContain('My Bookings');
-    expect(text).toContain('Plans and payments');
+    expect(drawnButtons(tree)).toHaveLength(events.rows.length);
+    ReactTestRenderer.act(() => pressables(tree).forEach((b) => b.props.onPress()));
+    expect(pressed).toEqual(['bookings', 'savedPackages', 'invitations', 'payments']);
   });
-});
 
-describe('ViewSwitch', () => {
-  it('names the view it switches to, not the one you are in', () => {
-    expect(textOf(render(<ViewSwitch isOrganizerView={false} onPress={noop} />))).toContain(
-      'Switch to organizer dashboard',
+  it('shows a badge only for a count that is really there', () => {
+    // A pill reading "0 saved" is noise, not information.
+    const badgeFor = (action: ProfileAction) =>
+      action === 'invitations' ? PROFILE_COPY.approveBadge(2) : '';
+    const tree = render(<ProfileGroup group={events} badgeFor={badgeFor} onPress={noop} />);
+    expect(textOf(tree)).toContain('2 to approve');
+    expect(textOf(tree)).not.toContain('saved');
+  });
+
+  it('speaks the badge as part of the row, not as a separate thing', () => {
+    const tree = render(
+      <ProfileGroup
+        group={events}
+        badgeFor={(a) => (a === 'savedPackages' ? PROFILE_COPY.savedBadge(1) : '')}
+        onPress={noop}
+      />,
     );
-    expect(textOf(render(<ViewSwitch isOrganizerView onPress={noop} />))).toContain(
-      'Switch to the customer app',
-    );
-  });
-});
+    const labels = drawnButtons(tree).map((b) => b.props.accessibilityLabel);
 
-describe('SignOutRow', () => {
-  it('says what it is doing while it does it', () => {
-    expect(textOf(render(<SignOutRow onPress={noop} loading={false} />))).toContain('Sign out');
-    expect(textOf(render(<SignOutRow onPress={noop} loading />))).toContain('Signing out…');
-  });
-
-  it('cannot be pressed twice while signing out', () => {
-    const tree = render(<SignOutRow onPress={noop} loading />);
-    const button = tree.root.findAllByProps({ accessibilityRole: 'button' })[0];
-    expect(button.props.disabled).toBe(true);
+    expect(labels).toContain('Saved packages, 1 saved');
+    expect(labels).toContain('Bookings');
   });
 });
 
@@ -201,41 +247,50 @@ describe('render dump', () => {
     const out = process.env.EVENTLY_RENDER_OUT;
     if (!out) return;
 
-    const screen = (dto: UserDetailsDTO, organizer: boolean) => {
-      const data = mapProfile(dto);
+    const screen = (dto: UserDetailsDTO, badges: Partial<Record<ProfileAction, string>>) => {
+      const profile = mapProfile(dto);
       return (
         <>
-          <ProfileHeader data={data} />
-          <ProfileInfoList data={data} />
-          {organizer ? <ViewSwitch isOrganizerView={false} onPress={noop} /> : null}
-          <ProfileMenuList
-            title="Your events"
-            items={[
-              { key: 'b', icon: 'calendar-check-outline', label: 'My Bookings', hint: 'Plans, payments and progress', onPress: noop },
-              { key: 'i', icon: 'email-heart-outline', label: 'My Invitations', hint: 'Review and send to guests', onPress: noop },
-            ]}
-          />
-          <ProfileMenuList
-            title="Account"
-            items={[
-              { key: 's', icon: 'cog-outline', label: 'Settings', hint: 'Notifications and preferences', onPress: noop },
-              { key: 'l', icon: 'shield-check-outline', label: 'Legal & Support', hint: 'Terms, privacy and help', onPress: noop },
-            ]}
-          />
-          <SignOutRow onPress={noop} loading={false} />
+          <ProfileIdentity profile={profile} onEdit={noop} />
+          {groupsFor(profile.isOrganizer).map((group) => (
+            <ProfileGroup
+              key={group.key}
+              group={group}
+              badgeFor={(action) => badges[action] ?? ''}
+              onPress={noop}
+            />
+          ))}
         </>
       );
     };
 
     const panels: Array<[string, string]> = [
-      ['A complete account', toHtml(render(screen(user({ roles: ['customer', 'organizer'] }), true)).toJSON())],
+      [
+        'A customer with things waiting',
+        toHtml(
+          render(
+            screen(user(), {
+              savedPackages: PROFILE_COPY.savedBadge(1),
+              invitations: PROFILE_COPY.approveBadge(2),
+            }),
+          ).toJSON(),
+        ),
+      ],
       [
         'A new account, nothing filled in',
-        toHtml(render(screen(user({ name: '', email: undefined, city: '', phoneVerified: false }), false)).toJSON()),
+        toHtml(render(screen(user({ name: '', phone: '' }), {})).toJSON()),
+      ],
+      [
+        'An account that already runs a business',
+        toHtml(render(screen(user({ roles: ['customer', 'organizer'] }), {})).toJSON()),
       ],
     ];
 
-    fs.writeFileSync(out, page(panels, { title: 'Profile', width: 390, background: '#fff', padding: 0 }), 'utf8');
+    fs.writeFileSync(
+      out,
+      page(panels, { title: 'Profile', width: 390, background: '#faf8f7', padding: 0 }),
+      'utf8',
+    );
     expect(fs.existsSync(out)).toBe(true);
   });
 });

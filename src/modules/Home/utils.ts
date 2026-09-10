@@ -1,4 +1,6 @@
 import { isNonEmptyArray } from '../../utils/guards';
+import { absoluteFileUrl } from '../../services/urls';
+import { CURRENT_EVENT_STAGE_LABEL, OCCASION_TILE_ICON } from './constants';
 import type {
   BannerViewModel,
   BookedEventStatus,
@@ -6,6 +8,8 @@ import type {
   CategoriesViewModel,
   CurrentEventViewModel,
   OccasionArtKey,
+  OccasionsViewModel,
+  OffersViewModel,
   PackagesViewModel,
   HomeFeedDTO,
   HomeViewModel,
@@ -79,12 +83,56 @@ function clampPercent(value: number): number {
   return Math.min(100, Math.max(0, Math.round(value)));
 }
 
+/**
+ * Indian-format currency. '' for an amount nobody set, so every caller drops
+ * the line rather than printing ₹0 as though it were a figure.
+ */
+/**
+ * A price short enough for a card corner: ₹7L, ₹6.5L, ₹40K.
+ *
+ * Indian units rather than a truncated full figure, because "₹7,00,000" in a
+ * 60pt column either wraps or gets an ellipsis, and an ellipsised price is
+ * worse than no price. Below a thousand it is printed in full — rounding a
+ * small number into a unit loses more than it saves.
+ */
+export function formatCompactINR(amount: number | undefined | null): string {
+  if (!Number.isFinite(amount) || (amount as number) <= 0) return '';
+  const value = amount as number;
+  if (value >= 10000000) return `₹${trimZero(value / 10000000)}Cr`;
+  if (value >= 100000) return `₹${trimZero(value / 100000)}L`;
+  if (value >= 1000) return `₹${trimZero(value / 1000)}K`;
+  return `₹${Math.round(value)}`;
+}
+
+/** 6.5 stays 6.5; 7.0 becomes 7 — a trailing zero is noise at this size. */
+function trimZero(value: number): string {
+  const rounded = Math.round(value * 10) / 10;
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+}
+
+export function formatINR(amount: number | undefined | null): string {
+  if (!Number.isFinite(amount) || (amount as number) <= 0) return '';
+  return `₹${Math.round(amount as number).toLocaleString('en-IN')}`;
+}
+
+/**
+ * The one line under the hero's title: date, place, headcount.
+ *
+ * Only the parts the record actually carries, joined — an event with no venue
+ * yet reads "5 Sep 2026 · 150 guests" rather than showing an empty slot the
+ * customer would read as missing information about their own event.
+ */
+export function factsLineOf(when: string, where: string, guests: string): string {
+  return [when, where, guests].map((v) => (v ?? '').trim()).filter(Boolean).join(' · ');
+}
+
 /** the customer's in-progress event, shown as its own section. Hidden if there is none. */
 export function mapCurrentEvent(feed: HomeFeedDTO): CurrentEventViewModel | null {
   if (!feed.currentEvent) return null;
 
   const e = feed.currentEvent;
   return {
+    refId: e.refId,
     title: e.title,
     // Each of these is passed through untouched: a value the backend left
     // blank stays blank, so the card can say "not set" instead of guessing.
@@ -96,6 +144,72 @@ export function mapCurrentEvent(feed: HomeFeedDTO): CurrentEventViewModel | null
     progress: e.progress,
     daysToGo: e.daysToGo,
     stage: e.stage,
+    factsLine: factsLineOf(e.when ?? '', e.where ?? '', e.guests ?? ''),
+    stageLabel: CURRENT_EVENT_STAGE_LABEL[e.stage] ?? '',
+    quoteCount: e.quoteCount ?? 0,
+    /*
+     * Both figures or neither. A lone "lowest ₹6,25,000" reads as the price,
+     * and the whole point of the line is that there is a range to compare.
+     */
+    spreadLabel:
+      e.lowestQuote > 0 && e.highestQuote > 0
+        ? `Lowest ${formatINR(e.lowestQuote)} · highest ${formatINR(e.highestQuote)}`
+        : '',
+    quotedLabel:
+      (e.quoteCount ?? 0) > 0
+        ? `${e.quoteCount} organizer${e.quoteCount === 1 ? '' : 's'} have quoted`
+        : '',
+  };
+}
+
+/**
+ * "Plan something new" — every occasion, with the one honest line under it.
+ *
+ * The badge wins over the price when an occasion has both: "Most planned" says
+ * something about this platform that a starting price does not, and two lines
+ * in a tile that size is a squeeze.
+ */
+export function mapOccasions(feed: HomeFeedDTO): OccasionsViewModel | null {
+  const tiles = feed.occasions;
+  if (!isNonEmptyArray(tiles)) return null;
+
+  return {
+    title: feed.content?.planSection?.title ?? 'Plan something new',
+    subtitle: feed.content?.planSection?.subtitle ?? '',
+    items: tiles.map((tile) => ({
+      id: tile.id,
+      art: PACKAGE_ART_KEYS.includes(tile.art as OccasionArtKey)
+        ? (tile.art as OccasionArtKey)
+        : 'wedding',
+      label: tile.label,
+      icon: OCCASION_TILE_ICON[tile.art] ?? 'sparkles',
+      note: tile.mostPlanned ? 'Most planned' : tile.fromPrice > 0 ? `From ${formatINR(tile.fromPrice)}` : '',
+    })),
+  };
+}
+
+/**
+ * The live offers.
+ *
+ * The count is the real number of cards, not a fixed "3 live" — a section
+ * header that says three when two are running is the kind of small lie that
+ * makes a customer stop believing the rest of the screen.
+ */
+export function mapOffers(feed: HomeFeedDTO): OffersViewModel | null {
+  if (!isNonEmptyArray(feed.offers)) return null;
+
+  return {
+    title: 'Offers for you',
+    countLabel: `${feed.offers.length} live`,
+    items: feed.offers.map((offer) => ({
+      id: offer.id,
+      eyebrow: offer.eyebrow,
+      title: offer.title,
+      // The window, when there is one, is worth more than generic terms.
+      terms: offer.endsLabel || offer.terms,
+      ctaLabel: offer.ctaLabel,
+      tone: offer.tone === 'navy' ? ('navy' as const) : ('accent' as const),
+    })),
   };
 }
 
@@ -135,6 +249,24 @@ export function mapPackages(feed: HomeFeedDTO): PackagesViewModel | null {
       guests: p.guests,
       budget: p.budget,
       tags: isNonEmptyArray(p.tags) ? p.tags : [],
+      bannerNote: p.bannerNote ?? '',
+      photoUrl: absoluteFileUrl(p.photoUrl),
+      priceLabel: formatINR(p.price),
+      // Only a genuine reduction is struck through; the backend already
+      // refuses a "was" figure that is not above the current price.
+      listPriceLabel: formatINR(p.listPrice),
+      organizer: p.organizer
+        ? {
+            id: p.organizer.id,
+            name: p.organizer.name,
+            rating: p.organizer.rating ?? 0,
+            reviews: p.organizer.reviews ?? 0,
+            bookedLabel:
+              (p.organizer.bookedThisMonth ?? 0) > 0
+                ? `${p.organizer.bookedThisMonth} booked this month`
+                : '',
+          }
+        : null,
       // An unknown art key would index the gradient map to undefined and crash
       // the banner; 'wedding' is the neutral navy the app already uses as its
       // default card treatment.
@@ -147,13 +279,24 @@ export function mapPackages(feed: HomeFeedDTO): PackagesViewModel | null {
 export function mapTopOrganizers(feed: HomeFeedDTO): TopOrganizersViewModel | null {
   if (!isNonEmptyArray(feed.topOrganizers)) return null;
 
+  const scope = feed.topOrganizersScope === 'city' ? 'city' : 'all';
+  const city = feed.user?.location ?? '';
+
   return {
-    title: feed.content?.topOrganizers?.title ?? 'Top organizers near you',
+    // "near you" only when they really are. When the search had to widen, the
+    // heading says so rather than claiming a locality the server never asserted.
+    title: scope === 'city' ? 'Organizers near you' : 'Organizers on Evently',
+    scopeNote:
+      scope === 'city'
+        ? ''
+        : city
+          ? `No organizers listed in ${city} yet — these serve other cities. Change your city.`
+          : ('These organizers serve other cities. Set your city to see local ones.' as string),
     // 'all' means nothing local matched and these come from further afield.
     // Defaulted to 'all' so an older payload caveats itself rather than
     // claiming a locality it never asserted.
-    scope: feed.topOrganizersScope === 'city' ? 'city' : 'all',
-    city: feed.user?.location ?? '',
+    scope,
+    city,
     items: feed.topOrganizers.map((o) => ({
       id: o.id,
       name: o.name,
@@ -166,6 +309,12 @@ export function mapTopOrganizers(feed: HomeFeedDTO): TopOrganizersViewModel | nu
       reviews: Number.isFinite(o.reviews) ? o.reviews : 0,
       events: Number.isFinite(o.events) ? o.events : 0,
       tags: isNonEmptyArray(o.tags) ? o.tags : [],
+      // Each of these is '' when the organizer has not published the figure:
+      // "FROM ₹0" and "Replies in 0h" are worse than saying nothing at all.
+      fromLabel: formatCompactINR(o.basePrice),
+      repliesLabel: o.responseHours > 0 ? `Replies in ${o.responseHours}h` : '',
+      bookedLabel:
+        (o.bookedThisMonth ?? 0) > 0 ? `${o.bookedThisMonth} booked this month` : '',
     })),
   };
 }
@@ -200,6 +349,8 @@ export function mapHomeFeed(feed: HomeFeedDTO): HomeViewModel {
     bookedEvent: mapBookedEvent(feed),
     currentEvent: mapCurrentEvent(feed),
     categories: mapCategories(feed),
+    occasions: mapOccasions(feed),
+    offers: mapOffers(feed),
     packages: mapPackages(feed),
     topOrganizers: mapTopOrganizers(feed),
     howItWorks: mapHowItWorks(feed),

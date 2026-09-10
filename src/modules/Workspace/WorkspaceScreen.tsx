@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -12,6 +13,8 @@ import { workspaceBackAction } from './utils';
 import { WorkspaceHero } from './sections/WorkspaceHero';
 import { EventFacts, Milestones, Payment, Tasks, Timeline } from './sections/WorkspaceSections';
 import { IdeasSummary, InvitationSummary } from './sections/WorkspaceLinks';
+import { ReviewPrompt } from './sections/ReviewPrompt';
+import { LeaveReviewSheet, useCanReview } from '../Organizer';
 import { styles } from './styles';
 
 type WorkspaceNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Workspace'>;
@@ -28,6 +31,8 @@ type WorkspaceRouteProp = RouteProp<RootStackParamList, 'Workspace'>;
 export function WorkspaceScreen() {
   const navigation = useNavigation<WorkspaceNavigationProp>();
   const { params } = useRoute<WorkspaceRouteProp>();
+  const canReview = useCanReview(params.bookingId);
+  const [reviewOpen, setReviewOpen] = useState(false);
   const { workspace, ideaCounts, invitation, isLoading, isError, errorMessage, refetch } =
     useWorkspaceContainer(params.bookingId);
 
@@ -97,6 +102,14 @@ export function WorkspaceScreen() {
       >
         <WorkspaceHero data={workspace} />
         <Milestones data={workspace} />
+        {/* Only for a delivered booking this customer has not reviewed —
+            both decided by the server, so the ask never repeats. */}
+        {canReview.data?.canReview ? (
+          <ReviewPrompt
+            organizerName={workspace.organizerName}
+            onPress={() => setReviewOpen(true)}
+          />
+        ) : null}
         <IdeasSummary
           counts={ideaCounts}
           organizerName={workspace.organizerName}
@@ -123,6 +136,18 @@ export function WorkspaceScreen() {
         <Tasks data={workspace} />
         <Timeline data={workspace} />
       </ScrollView>
+
+      <LeaveReviewSheet
+        visible={reviewOpen}
+        bookingId={workspace.id}
+        onClose={() => setReviewOpen(false)}
+        onPosted={() => {
+          setReviewOpen(false);
+          // Re-asks the server rather than assuming: the prompt disappears
+          // because the review is stored, not because the sheet closed.
+          canReview.refetch();
+        }}
+      />
     </SafeAreaView>
   );
 }

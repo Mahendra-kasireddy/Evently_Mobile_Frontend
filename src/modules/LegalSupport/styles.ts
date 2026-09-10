@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, spacing } from '../../theme';
+import { colors, fontFor, spacing } from '../../theme';
 import { LEGAL_ACCENT, LEGAL_ACCENT_SOFT, LEGAL_GREEN, LEGAL_NAVY } from './constants';
 
 export const styles = StyleSheet.create({
@@ -54,6 +54,8 @@ export const contactStyles = StyleSheet.create({
   labelFirst: { marginTop: 0 },
   input: {
     borderRadius: 14,
+    // A TextInput resolves no face of its own — see Components/EventlyText.
+    fontFamily: fontFor('400'),
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surface,

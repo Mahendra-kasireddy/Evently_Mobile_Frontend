@@ -299,8 +299,26 @@ export function page(panels: Array<[string, string]>, opts: PageOptions): string
     )
     .join('\n');
 
+  /*
+   * The bundled Poppins faces, by the same names the app asks for. Without
+   * these the preview falls back to a system font and every judgement made
+   * from it — line breaks, how heavy a heading looks, whether a label fits on
+   * one line — is a judgement about the wrong typeface. The files are expected
+   * beside the written HTML in ./fonts.
+   */
+  const faces = [
+    'Poppins-Regular',
+    'Poppins-Medium',
+    'Poppins-SemiBold',
+    'Poppins-Bold',
+    'Poppins-ExtraBold',
+  ]
+    .map((face) => `@font-face{font-family:'${face}';src:url('fonts/${face}.ttf') format('truetype')}`)
+    .join('\n  ');
+
   return `<!doctype html><meta charset="utf-8"><title>${opts.title}</title>
 <style>
+  ${faces}
   body{margin:0;padding:28px;background:#eef0f4;font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
        display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
   .phone{margin:0}

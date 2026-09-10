@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, spacing } from '../../theme';
+import { colors, fontFor, spacing } from '../../theme';
 import { SETTINGS_ACCENT, SETTINGS_ACCENT_SOFT, SETTINGS_GREEN, SETTINGS_NAVY } from './constants';
 
 export const styles = StyleSheet.create({
@@ -44,6 +44,8 @@ export const styles = StyleSheet.create({
   hint: { color: colors.textMuted, marginTop: 1 },
   input: {
     borderRadius: 14,
+    // A TextInput resolves no face of its own — see Components/EventlyText.
+    fontFamily: fontFor('400'),
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surface,
