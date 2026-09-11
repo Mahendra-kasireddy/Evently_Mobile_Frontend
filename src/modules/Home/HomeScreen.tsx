@@ -1,3 +1,4 @@
+import { useCallback, useState } from 'react';
 import type { CompositeNavigationProp } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -6,14 +7,17 @@ import { ActivityIndicator, RefreshControl, ScrollView, View } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EventlyText } from '../../Components';
 import type { MainTabParamList, RootStackParamList } from '../../navigation/types';
+import type { CouponOffer } from './types';
 import { NameGateSheet } from '../NameCapture';
 import { CURRENT_EVENT_CTA, HERO_ACCENT_COLOR, SEARCH_PLACEHOLDER } from './constants';
+import { useOpenWithOrganizer } from '../Chat';
 import { useHomeContainer } from './container';
 import { BookedEventCard } from './sections/BookedEventCard';
 import { EventHero } from './sections/EventHero';
 import { HomeHeader } from './sections/HomeHeader';
 import { OccasionGrid } from './sections/OccasionGrid';
 import { Offers } from './sections/Offers';
+import { CouponSheet } from './sections/CouponSheet';
 import { Packages } from './sections/Packages';
 import { TopOrganizers } from './sections/TopOrganizers';
 import { TrustStrip } from './sections/TrustStrip';
@@ -27,6 +31,33 @@ type HomeNavigationProp = CompositeNavigationProp<
 /** Renders whatever sections the container provides. No fetching, no mapping here. */
 export function HomeScreen() {
   const navigation = useNavigation<HomeNavigationProp>();
+  /* The coupon whose terms are open, or null. Local because it is a reading
+     state, not something the feed needs to know about. */
+  const [openCoupon, setOpenCoupon] = useState<CouponOffer | null>(null);
+  const openThread = useOpenWithOrganizer();
+
+  /**
+   * Opens the thread with the organizer running this booking.
+   *
+   * The conversation is created on first contact server-side and the same one
+   * comes back on every later tap, so this cannot make a second thread — and
+   * navigation waits for the id rather than guessing one.
+   */
+  const messageOrganizer = useCallback(
+    (organizerId: string, withName: string) => {
+      if (openThread.loading) return;
+      openThread
+        .execute(organizerId)
+        .then((conversation) =>
+          navigation.navigate('Conversation', { conversationId: conversation.id, withName }),
+        )
+        .catch(() => {
+          // The failure is already captured in openThread.error; a booked
+          // customer tapping again is a better outcome than an alert.
+        });
+    },
+    [navigation, openThread],
+  );
   const {
     banner,
     bookedEvent,
@@ -145,6 +176,14 @@ export function HomeScreen() {
                 workspaceName: bookedEvent.title,
               })
             }
+            /* Offered only when there is an organizer to message. A booking
+               with none — older rows — gets no button rather than one that
+               fails on tap. */
+            onMessageOrganizer={
+              bookedEvent.organizerId
+                ? () => messageOrganizer(bookedEvent.organizerId, bookedEvent.organizerName)
+                : undefined
+            }
           />
         ) : currentEvent ? (
           <EventHero
@@ -159,9 +198,13 @@ export function HomeScreen() {
           <View style={sectionStyles.block}>
             <Offers
               data={offers}
-              // Terms live with the offer itself; there is nothing to redeem
-              // yet, so this opens support rather than pretending otherwise.
-              onPressOffer={() => navigation.navigate('LegalSupport')}
+              /*
+               * Opens the coupon's terms rather than "claiming" it. A coupon is
+               * a code that does its work at checkout, and a tap that claimed
+               * something would be promising a discount no booking has agreed
+               * to yet.
+               */
+              onPressOffer={setOpenCoupon}
             />
           </View>
         )}
@@ -207,6 +250,7 @@ export function HomeScreen() {
       </ScrollView>
 
       <NameGateSheet onNameSaved={refetch} />
+      <CouponSheet coupon={openCoupon} onClose={() => setOpenCoupon(null)} />
     </SafeAreaView>
   );
 }

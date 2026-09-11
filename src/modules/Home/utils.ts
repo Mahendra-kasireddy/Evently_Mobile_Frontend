@@ -9,7 +9,8 @@ import type {
   CurrentEventViewModel,
   OccasionArtKey,
   OccasionsViewModel,
-  OffersViewModel,
+  ClaimableCouponDTO,
+  CouponsViewModel,
   PackagesViewModel,
   HomeFeedDTO,
   HomeViewModel,
@@ -53,6 +54,28 @@ const BOOKED_STATUSES: BookedEventStatus[] = [
  * reference or title cannot be drawn as a booking, and a milestone with no
  * label would render as a blank chip, so it is dropped rather than shown.
  */
+/** Two letters from a business name, for the avatar the server did not send. */
+function initialsOf(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '·';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+/**
+ * What the organizer is actually doing for this customer right now.
+ *
+ * A count is only quoted once there is one — a fresh booking has no tasks, and
+ * "Managing 0 vendors for you" is the kind of line that makes a customer stop
+ * believing the rest of the card. Before the organizer has confirmed, the true
+ * thing to say is that they have not yet.
+ */
+function organizerNote(confirmed: boolean, vendorCount: number): string {
+  if (!confirmed) return 'Confirming your booking';
+  if (vendorCount === 0) return 'Managing your event';
+  return `Managing ${vendorCount} vendor${vendorCount === 1 ? '' : 's'} for you`;
+}
+
 export function mapBookedEvent(feed: HomeFeedDTO): BookedEventViewModel | null {
   const b = feed.booking;
   // The card's whole action is opening this booking's workspace, so a record
@@ -60,21 +83,43 @@ export function mapBookedEvent(feed: HomeFeedDTO): BookedEventViewModel | null {
   // title be drawn as a booking at all.
   if (!b || !b.id || !b.ref || !b.title) return null;
 
+  const steps = isNonEmptyArray(b.steps)
+    ? b.steps.filter((s) => !!s?.label).map((s) => ({ label: s.label, done: s.done === true }))
+    : [];
+  const daysToGo = Number.isFinite(b.daysToGo) ? Math.max(0, Math.trunc(b.daysToGo)) : 0;
+  const confirmed = b.organizerConfirmed !== false;
+  const organizerName = b.organizerName || 'Your organizer';
+  const vendorCount = Number.isFinite(b.vendorCount) ? Math.max(0, Math.trunc(b.vendorCount)) : 0;
+
   return {
     id: b.id,
     ref: b.ref,
     title: b.title,
     description: b.description ?? '',
+    /*
+     * Only the facts the booking actually holds. A booking with no brief has
+     * no headcount, and a line reading "5 Sep 2026 · Kukatpally · guests" is
+     * worse than one that stops after the venue.
+     */
+    factsLine: [b.dateLabel, b.location, b.guests ? `${b.guests} guests` : '']
+      .map((part) => (part ?? '').trim())
+      .filter(Boolean)
+      .join(' · '),
+    daysToGoValue: daysToGo === 0 ? 'Today' : String(daysToGo),
+    daysToGoLabel: daysToGo === 0 ? '' : daysToGo === 1 ? 'day to go' : 'days to go',
     progress: clampPercent(b.progress),
-    daysToGo: Number.isFinite(b.daysToGo) ? Math.max(0, Math.trunc(b.daysToGo)) : 0,
+    daysToGo,
     status: BOOKED_STATUSES.includes(b.status) ? b.status : 'confirmed',
     // A record predating the field is treated as confirmed rather than as
     // "awaiting confirmation", which would be a scarier claim than the truth.
-    organizerConfirmed: b.organizerConfirmed !== false,
-    organizerName: b.organizerName || 'Your organizer',
-    steps: isNonEmptyArray(b.steps)
-      ? b.steps.filter((s) => !!s?.label).map((s) => ({ label: s.label, done: s.done === true }))
-      : [],
+    organizerConfirmed: confirmed,
+    organizerName,
+    organizerId: b.organizerId ?? '',
+    organizerInitials: b.organizerInitials || initialsOf(organizerName),
+    organizerAvatarColor: b.organizerAvatarColor || '#1a2e5a',
+    organizerNote: organizerNote(confirmed, vendorCount),
+    stepsDoneLabel: `${steps.filter((s) => s.done).length} of ${steps.length} steps done`,
+    steps,
   };
 }
 
@@ -195,20 +240,112 @@ export function mapOccasions(feed: HomeFeedDTO): OccasionsViewModel | null {
  * header that says three when two are running is the kind of small lie that
  * makes a customer stop believing the rest of the screen.
  */
-export function mapOffers(feed: HomeFeedDTO): OffersViewModel | null {
-  if (!isNonEmptyArray(feed.offers)) return null;
+/**
+ * "30 Sep" for a card, "30 September" for the sheet behind it.
+ *
+ * Two forms because the card has two lines and the sheet has a row: the same
+ * date spelled out in full is what pushed the conditions onto a third line
+ * that then got clipped.
+ */
+function endsOn(iso: string | null, style: 'short' | 'long' = 'long'): string {
+  if (!iso) return '';
+  const date = new Date(iso);
+  return Number.isNaN(date.getTime())
+    ? ''
+    : date.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: style === 'short' ? 'short' : 'long',
+      });
+}
+
+/** "10% off", "10% off up to ₹5,000", "₹2,000 off". */
+function discountLine(coupon: ClaimableCouponDTO): string {
+  if (coupon.discountType === 'fixed') return `${formatINR(coupon.discountValue)} off`;
+  const cap = coupon.maxDiscount > 0 ? ` up to ${formatINR(coupon.maxDiscount)}` : '';
+  return `${coupon.discountValue}% off${cap}`;
+}
+
+/**
+ * The conditions, in the order a customer runs into them.
+ *
+ * The organizer comes first when there is one, because it is the condition
+ * that decides whether the rest of the card is relevant at all — a 15% code
+ * that only works with one organizer is a different offer from a 15% code that
+ * works anywhere, and the card has to say which it is before it says anything
+ * else.
+ *
+ * The rest is built from the coupon's own limits rather than from a sentence
+ * somebody typed, so a card cannot advertise a deadline or a minimum the
+ * coupon does not actually have. A coupon with none of the three says nothing
+ * rather than padding the card with reassurance.
+ */
+function termsLine(coupon: ClaimableCouponDTO): string {
+  const parts: string[] = [];
+  if (coupon.organizerName) parts.push(`With ${coupon.organizerName}`);
+  if (coupon.minBookingAmount > 0) {
+    /* Terser once something precedes it — "on bookings over" reads fine as an
+       opener and as padding after an organizer's name. */
+    const amount = formatINR(coupon.minBookingAmount);
+    parts.push(parts.length > 0 ? `over ${amount}` : `On bookings over ${amount}`);
+  }
+  const ends = endsOn(coupon.endsAt, 'short');
+  if (ends) parts.push(parts.length > 0 ? `ends ${ends}` : `Ends ${ends}`);
+  return parts.join(' · ');
+}
+
+/**
+ * How many times this customer may still use it.
+ *
+ * Only worth a line when it is finite — "Unlimited" is not news, and a card
+ * that says it on every coupon has taught the reader to skip the row.
+ */
+function usesLeftLine(coupon: ClaimableCouponDTO): string {
+  if (coupon.perCustomerLimit === 0) return 'As often as you like';
+  const left = Math.max(0, coupon.perCustomerLimit - coupon.timesUsed);
+  return left === 1 ? 'Once' : `${left} more times`;
+}
+
+/**
+ * Live platform coupons -> the home promo strip.
+ *
+ * The server sends only coupons this customer could still use — live, inside
+ * their window, with slots left, and not already used up by them — so an empty
+ * list here means there genuinely are none.
+ *
+ * Two conditions cannot be checked away from a booking: the minimum spend and,
+ * for an organizer's coupon, the organizer. The first is printed on the card
+ * instead of assumed; the second is why organizer coupons are not sent here at
+ * all, and appear at checkout where the organizer is known.
+ */
+export function mapCoupons(feed: HomeFeedDTO): CouponsViewModel | null {
+  if (!isNonEmptyArray(feed.coupons)) return null;
 
   return {
     title: 'Offers for you',
-    countLabel: `${feed.offers.length} live`,
-    items: feed.offers.map((offer) => ({
-      id: offer.id,
-      eyebrow: offer.eyebrow,
-      title: offer.title,
-      // The window, when there is one, is worth more than generic terms.
-      terms: offer.endsLabel || offer.terms,
-      ctaLabel: offer.ctaLabel,
-      tone: offer.tone === 'navy' ? ('navy' as const) : ('accent' as const),
+    countLabel: `${feed.coupons.length} live`,
+    items: feed.coupons.map((coupon, index) => ({
+      id: coupon.id,
+      code: coupon.code,
+      title: coupon.title,
+      terms: termsLine(coupon),
+      ctaLabel: 'See details',
+      // Alternating, so a run of cards reads as a row rather than a block.
+      tone: index % 2 === 0 ? ('accent' as const) : ('navy' as const),
+      description: coupon.description ?? '',
+      details: [
+        { label: 'Code', value: coupon.code },
+        { label: 'Discount', value: discountLine(coupon) },
+        // Only for an organizer's coupon — "Any organizer" on every platform
+        // coupon is a row that teaches the reader to skip the list.
+        ...(coupon.organizerName
+          ? [{ label: 'Works with', value: coupon.organizerName }]
+          : []),
+        ...(coupon.minBookingAmount > 0
+          ? [{ label: 'Minimum booking', value: formatINR(coupon.minBookingAmount) }]
+          : []),
+        { label: 'Valid until', value: endsOn(coupon.endsAt) || 'No end date' },
+        { label: 'You can use it', value: usesLeftLine(coupon) },
+      ],
     })),
   };
 }
@@ -350,7 +487,7 @@ export function mapHomeFeed(feed: HomeFeedDTO): HomeViewModel {
     currentEvent: mapCurrentEvent(feed),
     categories: mapCategories(feed),
     occasions: mapOccasions(feed),
-    offers: mapOffers(feed),
+    offers: mapCoupons(feed),
     packages: mapPackages(feed),
     topOrganizers: mapTopOrganizers(feed),
     howItWorks: mapHowItWorks(feed),

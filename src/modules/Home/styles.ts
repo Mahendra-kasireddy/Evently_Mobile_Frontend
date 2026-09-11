@@ -2,7 +2,7 @@ import { Dimensions, StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
 import { colors, spacing } from '../../theme';
 import {
-  BOOKED_RING_DISC,
+  BOOKED_STEP_DONE_COLOR,
   BOOKED_STEP_PENDING_COLOR,
   CATEGORY_ICON_BADGE_COLOR,
   HERO_ACCENT_COLOR,
@@ -12,6 +12,7 @@ import {
   HERO_FIELD_ICON_BG,
   HOME_CANVAS,
   HOME_GREEN,
+  HOME_GREEN_SOFT,
   HOME_HAIRLINE,
   HOME_NAVY,
   HOME_NAVY_DEEP,
@@ -308,74 +309,113 @@ export const bookedEventStyles = StyleSheet.create({
     ...globalStyles.card,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: colors.border,
-    paddingVertical: spacing.lg - 4,
-    paddingLeft: spacing.md + 5,
-    paddingRight: spacing.md,
-    // Clips the coral edge to the card's rounded corners.
+    borderColor: HOME_HAIRLINE,
+    padding: spacing.md,
+  },
+
+  /* Status, reference and countdown on one line: three facts about the same
+     booking, none of them worth a row of its own. */
+  topRow: { ...globalStyles.row, alignItems: 'center', gap: 10 },
+  statusPill: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    gap: 5,
+    borderRadius: 999,
+    backgroundColor: HOME_GREEN_SOFT,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  statusText: {
+    color: BOOKED_STEP_DONE_COLOR,
+    fontSize: 11.5,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+  },
+  ref: { color: colors.textMuted, fontSize: 13, letterSpacing: 0.4, flexShrink: 1 },
+  /* Pushed right on its own, so the reference can be any length without the
+     countdown drifting off the edge. */
+  days: { ...globalStyles.row, alignItems: 'baseline', gap: 5, marginLeft: 'auto', flexShrink: 0 },
+  daysCount: { color: HOME_NAVY_DEEP, fontSize: 17, fontWeight: '800' },
+  daysLabel: { color: colors.textMuted, fontSize: 13 },
+
+  title: {
+    color: HOME_NAVY_DEEP,
+    fontSize: 24,
+    fontWeight: '700',
+    letterSpacing: -0.4,
+    marginTop: 12,
+  },
+  facts: { color: colors.textMuted, fontSize: 14, marginTop: 5, lineHeight: 20 },
+
+  /* The organizer sits in their own panel: they are a party to the event, not
+     another fact about it. */
+  organizer: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 16,
+    borderRadius: 16,
+    backgroundColor: HOME_CANVAS,
+    padding: 12,
+  },
+  avatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  avatarText: { color: colors.onPrimary, fontSize: 14, fontWeight: '700' },
+  organizerText: { flex: 1 },
+  organizerName: { color: HOME_NAVY_DEEP, fontSize: 15.5, fontWeight: '700' },
+  organizerNote: { color: colors.textMuted, fontSize: 13.5, marginTop: 1 },
+  chat: {
+    width: 42,
+    height: 42,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: HOME_HAIRLINE,
+    backgroundColor: colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+
+  progressHead: { ...globalStyles.row, alignItems: 'center', marginTop: 18 },
+  progressTitle: { color: HOME_NAVY_DEEP, fontSize: 15.5, fontWeight: '700' },
+  progressCount: { color: colors.textMuted, fontSize: 13.5, marginLeft: 'auto' },
+  track: {
+    height: 6,
+    borderRadius: 999,
+    backgroundColor: HOME_TRACK,
+    marginTop: 10,
     overflow: 'hidden',
   },
-  // Inset rather than a left border, so the radius stays a true 20 on both sides.
-  accent: { position: 'absolute', left: 0, top: 0, bottom: 0, width: 5, backgroundColor: HERO_ACCENT_COLOR },
+  fill: { height: 6, borderRadius: 999, backgroundColor: HERO_ACCENT_COLOR },
 
-  ringWrap: {
-    width: BOOKED_RING_DISC,
-    height: BOOKED_RING_DISC,
-    borderRadius: 999,
-    backgroundColor: HERO_FIELD_ICON_BG,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  ringText: { position: 'absolute', alignItems: 'center', justifyContent: 'center' },
-  ringPercent: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 17, fontWeight: '800' },
-  ringCaption: { color: colors.textMuted, fontSize: 10, marginTop: 2 },
+  /* One column per milestone, equal width, so the dots line up with the bar
+     above them rather than bunching under the longest label. */
+  steps: { flexDirection: 'row', marginTop: 12 },
+  step: { flex: 1, paddingRight: 8 },
+  stepDot: { width: 8, height: 8, borderRadius: 999, backgroundColor: BOOKED_STEP_PENDING_COLOR },
+  stepDotDone: { backgroundColor: BOOKED_STEP_DONE_COLOR },
+  stepDotNext: { backgroundColor: HERO_ACCENT_COLOR },
+  stepLabel: { color: colors.textMuted, fontSize: 12.5, marginTop: 7, lineHeight: 16 },
+  stepLabelDone: { color: HOME_NAVY_DEEP },
+  /* The one still to do is the only thing on this card worth acting on, so it
+     is the only label in the accent colour. */
+  stepLabelNext: { color: HERO_ACCENT_COLOR, fontWeight: '600' },
 
-  refPill: {
-    alignSelf: 'flex-start',
-    marginTop: spacing.md,
-    borderRadius: 999,
-    backgroundColor: HERO_FIELD_ICON_BG,
-    paddingHorizontal: spacing.sm + 1,
-    paddingVertical: 3,
-  },
-  refText: { color: HERO_ACCENT_COLOR, fontSize: 11, fontWeight: '700', letterSpacing: 0.6 },
-
-  title: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 19, fontWeight: '800', marginTop: spacing.sm + 1 },
-  desc: { color: colors.textMuted, marginTop: spacing.xs, lineHeight: 20 },
-
-  steps: { flexDirection: 'row', flexWrap: 'wrap', marginTop: spacing.md, rowGap: spacing.sm },
-  step: { ...globalStyles.row, gap: 6, marginRight: spacing.md },
-  stepDot: {
-    width: 16,
-    height: 16,
-    borderRadius: 999,
-    backgroundColor: BOOKED_STEP_PENDING_COLOR,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stepLabel: { color: colors.textMuted, fontSize: 12 },
-  stepLabelDone: { color: CATEGORY_ICON_BADGE_COLOR, fontWeight: '700' },
-
-  footer: {
-    ...globalStyles.row,
-    justifyContent: 'space-between',
-    marginTop: spacing.md,
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  days: { ...globalStyles.row, alignItems: 'baseline', gap: 6 },
-  daysCount: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 26, fontWeight: '800' },
-  daysLabel: { color: colors.textMuted, fontSize: 13 },
   cta: {
-    ...globalStyles.row,
-    gap: spacing.xs,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: HERO_ACCENT_COLOR,
-    borderRadius: 12,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm + 3,
+    borderRadius: 14,
+    paddingVertical: 16,
+    marginTop: 18,
   },
-  ctaText: { color: colors.onPrimary, fontSize: 14, fontWeight: '700' },
+  ctaText: { color: colors.onPrimary, fontSize: 16, fontWeight: '700' },
 });
 
 export const currentEventStyles = StyleSheet.create({
@@ -987,7 +1027,15 @@ export const eventHeroStyles = StyleSheet.create({
 
 export const offersStyles = StyleSheet.create({
   list: { paddingHorizontal: spacing.md, paddingTop: 12, gap: 12 },
-  card: { width: 268, borderRadius: 18, padding: spacing.md, minHeight: 168 },
+  /*
+   * Height is content-driven, with a floor rather than a fixed size.
+   *
+   * A promo strip sits between the event card and the occasion grid, and every
+   * pixel it takes is a pixel of the next section the customer does not see.
+   * The floor stops a one-line coupon from looking stubby next to a two-line
+   * one; nothing forces the card taller than what is written on it.
+   */
+  card: { width: 268, borderRadius: 18, padding: 14, minHeight: 132 },
   cardAccent: { backgroundColor: '#c9542c' },
   cardNavy: { backgroundColor: HOME_NAVY },
   eyebrow: {
@@ -997,10 +1045,62 @@ export const offersStyles = StyleSheet.create({
     letterSpacing: 1,
     textTransform: 'uppercase',
   },
-  title: { color: colors.onPrimary, fontSize: 21, fontWeight: '700', marginTop: 8, lineHeight: 27 },
-  terms: { color: 'rgba(255,255,255,0.75)', fontSize: 13.5, marginTop: 8, lineHeight: 19 },
-  ctaRow: { ...globalStyles.row, gap: 5, marginTop: 'auto', paddingTop: 14 },
-  ctaText: { color: colors.onPrimary, fontSize: 14.5, fontWeight: '600' },
+  title: { color: colors.onPrimary, fontSize: 19, fontWeight: '700', marginTop: 6, lineHeight: 24 },
+  terms: { color: 'rgba(255,255,255,0.75)', fontSize: 13, marginTop: 6, lineHeight: 17 },
+  ctaRow: { ...globalStyles.row, gap: 5, marginTop: 'auto', paddingTop: 10 },
+  ctaText: { color: colors.onPrimary, fontSize: 14, fontWeight: '600' },
+});
+
+export const couponSheetStyles = StyleSheet.create({
+  backdrop: { flex: 1, backgroundColor: 'rgba(10,16,28,0.45)' },
+  sheet: {
+    backgroundColor: colors.background,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: spacing.md,
+    paddingTop: 10,
+    paddingBottom: spacing.xl,
+  },
+  grabber: {
+    alignSelf: 'center',
+    width: 40,
+    height: 4,
+    borderRadius: 999,
+    backgroundColor: '#e0dbd7',
+    marginBottom: 14,
+  },
+  head: { ...globalStyles.row, alignItems: 'flex-start', gap: 12 },
+  headText: { flex: 1 },
+  code: {
+    color: HERO_ACCENT_COLOR,
+    fontSize: 12.5,
+    fontWeight: '700',
+    letterSpacing: 1.2,
+  },
+  title: { color: HOME_NAVY, fontSize: 22, fontWeight: '700', marginTop: 4, lineHeight: 28 },
+  close: {
+    width: 34,
+    height: 34,
+    borderRadius: 999,
+    backgroundColor: '#f2efed',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  description: { color: '#414b5c', fontSize: 14.5, marginTop: 10, lineHeight: 21 },
+  rows: { marginTop: 18, borderTopWidth: 1, borderTopColor: '#efe9e5' },
+  row: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    gap: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#efe9e5',
+  },
+  rowLabel: { color: colors.textMuted, fontSize: 14 },
+  rowValue: { color: HOME_NAVY, fontSize: 14.5, fontWeight: '600', flexShrink: 1, textAlign: 'right' },
+  note: { ...globalStyles.row, alignItems: 'flex-start', gap: 8, marginTop: 16 },
+  noteText: { color: '#5b6470', fontSize: 13, lineHeight: 19, flex: 1 },
 });
 
 export const occasionGridStyles = StyleSheet.create({

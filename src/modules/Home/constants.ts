@@ -55,6 +55,8 @@ export const HOME_NAVY_DEEP = '#0e1a33';
 export const HOME_NAVY_PANEL = '#1b2a49';
 export const HOME_ACCENT_SOFT = '#fdeee7';
 export const HOME_GREEN = '#1d9e75';
+/** The wash behind a green pill — web's --color-green-soft. */
+export const HOME_GREEN_SOFT = '#e8f6ef';
 export const HOME_CANVAS = '#faf8f7';
 export const HOME_HAIRLINE = '#efe9e5';
 export const HOME_TRACK = '#f0ecea';

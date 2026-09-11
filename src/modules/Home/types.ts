@@ -246,14 +246,25 @@ export interface BookedStepDTO {
 export interface BookedEventDTO {
   id: string;
   ref: string;
+  /** The occasion alone — the date and venue are their own fields. */
   title: string;
   description: string;
+  /** "5 Sep 2026", '' when the booking has no date. */
+  dateLabel: string;
+  location: string;
+  /** '' when the booking came from no brief — see ActiveBookingView. */
+  guests: string;
   progress: number;
   daysToGo: number;
   status: BookedEventStatus;
   /** False while the booking is paid for but not yet accepted by the organizer. */
   organizerConfirmed: boolean;
   organizerName: string;
+  organizerId: string;
+  organizerInitials: string;
+  organizerAvatarColor: string;
+  /** Distinct sub-vendors actually assigned to this event; 0 if none yet. */
+  vendorCount: number;
   steps: BookedStepDTO[];
 }
 
@@ -267,6 +278,31 @@ export interface OfferDTO {
   tone: string;
   /** '' when the offer does not expire. */
   endsLabel: string;
+}
+
+/**
+ * GET /home/getHomeFeed → `coupons`. A live platform coupon this customer
+ * could still use — see `CouponService.listClaimable`.
+ *
+ * Deliberately unpriced: away from a checkout there is no booking total to
+ * take a percentage of, so the terms come across and the saving does not.
+ */
+export interface ClaimableCouponDTO {
+  id: string;
+  code: string;
+  title: string;
+  /** The organizer it belongs to, or '' when it is platform-wide. */
+  organizerName: string;
+  description: string;
+  discountType: 'percentage' | 'fixed';
+  discountValue: number;
+  maxDiscount: number;
+  minBookingAmount: number;
+  /** '' / null when the coupon does not expire. */
+  endsAt: string | null;
+  perCustomerLimit: number;
+  /** How many times this customer has already spent it. */
+  timesUsed: number;
 }
 
 /** One tile in "Plan something new". */
@@ -295,6 +331,7 @@ export interface HomeFeedDTO {
   currentEvent: CurrentEventDTO | null;
   unreadCount: number;
   offers: OfferDTO[];
+  coupons: ClaimableCouponDTO[];
   occasions: OccasionTileDTO[];
   /** For the header's heart badge, without fetching the list it does not show. */
   savedPackageCount: number;
@@ -339,11 +376,23 @@ export interface BookedEventViewModel {
   ref: string;
   title: string;
   description: string;
+  /** "5 Sep 2026 · Kukatpally · 150 guests" — only the facts we hold. */
+  factsLine: string;
+  /** "3 days to go" / "Today" — the number is emphasised by the card. */
+  daysToGoValue: string;
+  daysToGoLabel: string;
   progress: number;
   daysToGo: number;
   status: BookedEventStatus;
   organizerConfirmed: boolean;
   organizerName: string;
+  organizerId: string;
+  organizerInitials: string;
+  organizerAvatarColor: string;
+  /** "Managing 6 vendors for you", or what is true when there are none. */
+  organizerNote: string;
+  /** "1 of 4 steps done". */
+  stepsDoneLabel: string;
   steps: BookedStep[];
 }
 
@@ -404,20 +453,39 @@ export interface PackageItem {
   organizer: PackageOrganizer | null;
 }
 
-export interface Offer {
+/** A label/value line in the coupon's details sheet. */
+export interface CouponDetail {
+  label: string;
+  value: string;
+}
+
+/**
+ * One card in the promo strip.
+ *
+ * The code sits where a category label used to: it is the part the customer
+ * actually needs, and reading it off the card is the only way to carry it to a
+ * checkout. `terms` is derived from the coupon's real limits rather than from
+ * marketing copy, so a card cannot promise a condition the coupon does not
+ * have.
+ */
+export interface CouponOffer {
   id: string;
-  eyebrow: string;
+  /** Shown as the eyebrow — this is a real, spendable code. */
+  code: string;
   title: string;
+  /** "On bookings over ₹50,000 · ends 30 September", or '' when unbounded. */
   terms: string;
   ctaLabel: string;
   tone: 'accent' | 'navy';
+  description: string;
+  details: CouponDetail[];
 }
 
-export interface OffersViewModel {
+export interface CouponsViewModel {
   title: string;
   /** "3 live" — the real count, never a fixed label. */
   countLabel: string;
-  items: Offer[];
+  items: CouponOffer[];
 }
 
 export interface OccasionTile {
@@ -505,7 +573,7 @@ export interface HomeViewModel {
   categories: CategoriesViewModel | null;
   /** "Plan something new" — the occasion grid, replacing the old categories. */
   occasions: OccasionsViewModel | null;
-  offers: OffersViewModel | null;
+  offers: CouponsViewModel | null;
   packages: PackagesViewModel | null;
   topOrganizers: TopOrganizersViewModel | null;
   howItWorks: HowItWorksViewModel | null;

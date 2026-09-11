@@ -1,14 +1,7 @@
 import { TouchableOpacity, View } from 'react-native';
-import Svg, { Circle, G } from 'react-native-svg';
 import { EventlyIcon, EventlyText } from '../../../Components';
-import { colors } from '../../../theme';
 import {
   BOOKED_CTA,
-  BOOKED_RING_CIRCUMFERENCE,
-  BOOKED_RING_RADIUS,
-  BOOKED_RING_SIZE,
-  BOOKED_RING_STROKE,
-  BOOKED_RING_TRACK_COLOR,
   BOOKED_STATUS_LABEL,
   BOOKED_STEP_DONE_COLOR,
   HERO_ACCENT_COLOR,
@@ -20,6 +13,8 @@ interface BookedEventCardProps {
   data: BookedEventViewModel;
   /** Opens this booking's workspace. */
   onPress: () => void;
+  /** Opens the thread with the organizer. Dropped when there is none to open. */
+  onMessageOrganizer?: () => void;
 }
 
 /**
@@ -27,118 +22,151 @@ interface BookedEventCardProps {
  * turns into a live event summary once the customer actually has a booking.
  *
  * Every value is composed by the backend (BookingService.getActiveForUser) and
- * rendered as given. In particular the ring's percentage is the share of the
- * milestones below it that are done, so the ring and the ticks can never
- * disagree — a card reading "82% ready" with nothing ticked is a bug the
- * customer can see.
+ * rendered as given. The four milestones are each resolved from real state —
+ * the organizer accepting, every assigned sub-vendor accepting, the invitation
+ * being approved, delivery starting — and the bar above them is the share of
+ * those that are done, so the bar and the dots can never disagree.
  *
- * The whole card is one control, as on web: a single tap target with one
- * accessible name, so the "Open workspace" pill is presentational rather than
- * a nested button.
+ * The card is no longer one big tap target. It has two things worth doing —
+ * open the workspace, message the organizer — and collapsing them into a
+ * single control would mean one of them could not be reached.
  */
-export function BookedEventCard({ data, onPress }: BookedEventCardProps) {
-  const center = BOOKED_RING_SIZE / 2;
-  const offset = BOOKED_RING_CIRCUMFERENCE * (1 - data.progress / 100);
-  const dayWord = data.daysToGo === 1 ? 'day to go' : 'days to go';
+export function BookedEventCard({ data, onPress, onMessageOrganizer }: BookedEventCardProps) {
+  const nextIndex = data.steps.findIndex((step) => !step.done);
 
   return (
     <View style={s.section}>
-      <TouchableOpacity
-        style={s.card}
-        activeOpacity={0.9}
-        onPress={onPress}
-        accessibilityRole="button"
-        accessibilityLabel={`${data.title} — ${data.progress}% ready, ${data.daysToGo} ${dayWord}. ${BOOKED_CTA}.`}
-      >
-        <View style={s.accent} pointerEvents="none" />
-
-        <View style={s.ringWrap}>
-          <Svg width={BOOKED_RING_SIZE} height={BOOKED_RING_SIZE}>
-            <Circle
-              cx={center}
-              cy={center}
-              r={BOOKED_RING_RADIUS}
-              stroke={BOOKED_RING_TRACK_COLOR}
-              strokeWidth={BOOKED_RING_STROKE}
-              fill="none"
-            />
-            {/* Starts at 12 o'clock rather than 3, so the arc reads as progress. */}
-            <G rotation={-90} originX={center} originY={center}>
-              <Circle
-                cx={center}
-                cy={center}
-                r={BOOKED_RING_RADIUS}
-                stroke={HERO_ACCENT_COLOR}
-                strokeWidth={BOOKED_RING_STROKE}
-                strokeLinecap="round"
-                strokeDasharray={[BOOKED_RING_CIRCUMFERENCE, BOOKED_RING_CIRCUMFERENCE]}
-                strokeDashoffset={offset}
-                fill="none"
-              />
-            </G>
-          </Svg>
-          <View style={s.ringText} pointerEvents="none">
-            <EventlyText variant="h2" style={s.ringPercent}>
-              {data.progress}%
+      <View style={s.card}>
+        <View style={s.topRow}>
+          <View style={s.statusPill}>
+            <EventlyIcon name="check" size={13} color={BOOKED_STEP_DONE_COLOR} />
+            <EventlyText variant="caption" style={s.statusText}>
+              {BOOKED_STATUS_LABEL[data.status]}
             </EventlyText>
-            <EventlyText variant="caption" style={s.ringCaption}>
-              ready
+          </View>
+          <EventlyText variant="caption" style={s.ref} numberOfLines={1}>
+            {data.ref}
+          </EventlyText>
+          {/* "Today" carries no trailing word — a countdown of nothing does not
+              need the units it is not counting. */}
+          <View style={s.days}>
+            <EventlyText variant="subtitle" style={s.daysCount}>
+              {data.daysToGoValue}
             </EventlyText>
+            {data.daysToGoLabel ? (
+              <EventlyText variant="caption" style={s.daysLabel}>
+                {data.daysToGoLabel}
+              </EventlyText>
+            ) : null}
           </View>
         </View>
 
-        <View style={s.refPill}>
-          <EventlyText variant="caption" style={s.refText}>
-            {BOOKED_STATUS_LABEL[data.status]} · {data.ref}
-          </EventlyText>
-        </View>
-
-        <EventlyText variant="h2" style={s.title}>
+        <EventlyText variant="h1" style={s.title} numberOfLines={2}>
           {data.title}
         </EventlyText>
 
-        {data.description ? (
-          <EventlyText variant="body" style={s.desc}>
-            {data.description}
+        {/* Dropped rather than left as an empty line for a booking that came
+            from no brief and so has no date, venue or headcount to state. */}
+        {data.factsLine ? (
+          <EventlyText variant="body" style={s.facts} numberOfLines={2}>
+            {data.factsLine}
           </EventlyText>
         ) : null}
 
-        {data.steps.length > 0 ? (
-          <View style={s.steps}>
-            {data.steps.map((step) => (
-              <View
-                key={step.label}
-                style={s.step}
-                accessibilityLabel={`${step.label}: ${step.done ? 'done' : 'not yet'}`}
-              >
-                <View style={[s.stepDot, step.done && { backgroundColor: BOOKED_STEP_DONE_COLOR }]}>
-                  {step.done ? <EventlyIcon name="check" size={10} color={colors.onPrimary} /> : null}
-                </View>
-                <EventlyText variant="caption" style={[s.stepLabel, step.done && s.stepLabelDone]}>
-                  {step.label}
-                </EventlyText>
-              </View>
-            ))}
+        <View style={s.organizer}>
+          <View style={[s.avatar, { backgroundColor: data.organizerAvatarColor }]}>
+            <EventlyText variant="subtitle" style={s.avatarText}>
+              {data.organizerInitials}
+            </EventlyText>
           </View>
+          <View style={s.organizerText}>
+            <EventlyText variant="subtitle" style={s.organizerName} numberOfLines={1}>
+              {data.organizerName}
+            </EventlyText>
+            <EventlyText variant="caption" style={s.organizerNote} numberOfLines={1}>
+              {data.organizerNote}
+            </EventlyText>
+          </View>
+          {onMessageOrganizer ? (
+            <TouchableOpacity
+              style={s.chat}
+              activeOpacity={0.7}
+              onPress={onMessageOrganizer}
+              accessibilityRole="button"
+              accessibilityLabel={`Message ${data.organizerName}`}
+            >
+              <EventlyIcon name="chat-outline" size={19} color={HERO_ACCENT_COLOR} />
+            </TouchableOpacity>
+          ) : null}
+        </View>
+
+        {data.steps.length > 0 ? (
+          <>
+            <View style={s.progressHead}>
+              <EventlyText variant="subtitle" style={s.progressTitle}>
+                Getting ready
+              </EventlyText>
+              <EventlyText variant="caption" style={s.progressCount}>
+                {data.stepsDoneLabel}
+              </EventlyText>
+            </View>
+
+            <View
+              style={s.track}
+              accessibilityRole="progressbar"
+              accessibilityValue={{ now: data.progress, min: 0, max: 100 }}
+            >
+              <View style={[s.fill, { width: `${data.progress}%` }]} />
+            </View>
+
+            <View style={s.steps}>
+              {data.steps.map((step, index) => {
+                // Done, next, or not yet — told apart by the dot's colour and
+                // the label's, so neither carries the state on its own.
+                const isNext = index === nextIndex;
+                return (
+                  <View
+                    key={step.label}
+                    style={s.step}
+                    accessibilityLabel={`${step.label}: ${step.done ? 'done' : 'not yet'}`}
+                  >
+                    <View
+                      style={[
+                        s.stepDot,
+                        step.done && s.stepDotDone,
+                        isNext && s.stepDotNext,
+                      ]}
+                    />
+                    <EventlyText
+                      variant="caption"
+                      style={[
+                        s.stepLabel,
+                        step.done && s.stepLabelDone,
+                        isNext && s.stepLabelNext,
+                      ]}
+                      numberOfLines={2}
+                    >
+                      {step.label}
+                    </EventlyText>
+                  </View>
+                );
+              })}
+            </View>
+          </>
         ) : null}
 
-        <View style={s.footer}>
-          <View style={s.days}>
-            <EventlyText variant="h1" style={s.daysCount}>
-              {data.daysToGo}
-            </EventlyText>
-            <EventlyText variant="body" style={s.daysLabel}>
-              {dayWord}
-            </EventlyText>
-          </View>
-          <View style={s.cta}>
-            <EventlyIcon name="chevron-right" size={16} color={colors.onPrimary} />
-            <EventlyText variant="subtitle" style={s.ctaText}>
-              {BOOKED_CTA}
-            </EventlyText>
-          </View>
-        </View>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={s.cta}
+          activeOpacity={0.85}
+          onPress={onPress}
+          accessibilityRole="button"
+          accessibilityLabel={`${BOOKED_CTA} for ${data.title}`}
+        >
+          <EventlyText variant="subtitle" style={s.ctaText}>
+            {BOOKED_CTA}
+          </EventlyText>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }

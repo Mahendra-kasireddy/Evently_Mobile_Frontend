@@ -29,7 +29,7 @@ import {
   formatCompactINR,
   mapCurrentEvent,
   mapOccasions,
-  mapOffers,
+  mapCoupons,
   mapPackages,
 } from '../src/modules/Home/utils';
 import { CURRENT_EVENT_CTA, SEARCH_PLACEHOLDER } from '../src/modules/Home/constants';
@@ -173,25 +173,101 @@ describe('mapOccasions', () => {
   });
 });
 
-describe('mapOffers', () => {
-  const offers = (items: Array<Record<string, unknown>>) =>
-    mapOffers(feed({ offers: items as unknown as HomeFeedDTO['offers'] }));
+describe('mapCoupons', () => {
+  const coupon = (over: Record<string, unknown> = {}) => ({
+    id: 'c1',
+    code: 'FESTIVE10',
+    title: '10% off decor',
+    organizerName: '',
+    description: '',
+    discountType: 'percentage',
+    discountValue: 10,
+    maxDiscount: 0,
+    minBookingAmount: 0,
+    endsAt: null,
+    perCustomerLimit: 1,
+    timesUsed: 0,
+    ...over,
+  });
+  const coupons = (items: Array<Record<string, unknown>>) =>
+    mapCoupons(feed({ coupons: items as unknown as HomeFeedDTO['coupons'] }));
 
   it('counts the cards actually on screen', () => {
     // A header saying "3 live" over two cards is the kind of small lie that
     // makes a customer stop believing the rest of the screen.
-    expect(offers([{ id: 'a' }, { id: 'b' }])?.countLabel).toBe('2 live');
+    expect(coupons([coupon(), coupon({ id: 'c2' })])?.countLabel).toBe('2 live');
   });
 
-  it('prefers the end date to generic terms', () => {
-    const vm = offers([
-      { id: 'a', terms: 'Conditions apply', endsLabel: 'Ends 30 September', tone: 'accent' },
+  it('leads with the code, because that is what has to be carried', () => {
+    expect(coupons([coupon()])?.items[0].code).toBe('FESTIVE10');
+  });
+
+  it('builds the terms from the coupon\u2019s real limits', () => {
+    const vm = coupons([
+      coupon({ minBookingAmount: 50000, endsAt: '2026-09-30T18:29:59.000Z' }),
     ]);
-    expect(vm?.items[0].terms).toBe('Ends 30 September');
+    expect(vm?.items[0].terms).toContain('On bookings over');
+    // Abbreviated on the card, spelled out in the sheet — the card has two
+    // lines to say this in and a third would be clipped.
+    expect(vm?.items[0].terms).toContain('ends 30 Sep');
+    expect(vm?.items[0].details.find((row) => row.label === 'Valid until')?.value).toBe(
+      '30 September',
+    );
+  });
+
+  it('says nothing rather than padding a coupon with no conditions', () => {
+    // "Terms apply" under a coupon with no terms is filler that teaches the
+    // reader to skip the line on the coupons that do have some.
+    expect(coupons([coupon()])?.items[0].terms).toBe('');
+  });
+
+  it('states the cap on a percentage, which is the part that surprises people', () => {
+    const vm = coupons([coupon({ maxDiscount: 5000 })]);
+    const discount = vm?.items[0].details.find((row) => row.label === 'Discount');
+    expect(discount?.value).toContain('up to');
+  });
+
+  it('counts down how many uses this customer has left', () => {
+    const vm = coupons([coupon({ perCustomerLimit: 3, timesUsed: 2 })]);
+    const uses = vm?.items[0].details.find((row) => row.label === 'You can use it');
+    expect(uses?.value).toBe('Once');
+  });
+
+  it('leads the terms with the organizer, when the coupon is only theirs', () => {
+    // Whether a code works anywhere or with one organizer changes what the
+    // whole card means, so it is said before the minimum or the deadline.
+    const vm = coupons([
+      coupon({
+        organizerName: 'Mahendra Events',
+        minBookingAmount: 50000,
+        endsAt: '2026-09-30T18:29:59.000Z',
+      }),
+    ]);
+    // "Sep" or "Sept" depending on the platform's ICU data — the order and the
+    // separators are what this test is about, not the abbreviation.
+    expect(vm?.items[0].terms).toMatch(
+      /^With Mahendra Events · over ₹50,000 · ends 30 Sept?$/,
+    );
+  });
+
+  it('names the organizer in the details, and says nothing for a platform coupon', () => {
+    const scoped = coupons([coupon({ organizerName: 'Mahendra Events' })]);
+    expect(scoped?.items[0].details.find((row) => row.label === 'Works with')?.value).toBe(
+      'Mahendra Events',
+    );
+
+    // "Any organizer" on every platform coupon is a row nobody reads twice.
+    const platform = coupons([coupon()]);
+    expect(platform?.items[0].details.some((row) => row.label === 'Works with')).toBe(false);
+  });
+
+  it('alternates the card tone so a run reads as a row', () => {
+    const vm = coupons([coupon(), coupon({ id: 'c2' }), coupon({ id: 'c3' })]);
+    expect(vm?.items.map((item) => item.tone)).toEqual(['accent', 'navy', 'accent']);
   });
 
   it('hides the section entirely when nothing is running', () => {
-    expect(offers([])).toBeNull();
+    expect(coupons([])).toBeNull();
   });
 });
 
@@ -329,28 +405,38 @@ describe('render dump', () => {
     const out = process.env.EVENTLY_RENDER_OUT;
     if (!out) return;
 
-    const offers = mapOffers(
+    const offers = mapCoupons(
       feed({
-        offers: [
+        coupons: [
           {
-            id: 'o1',
-            eyebrow: 'Festive season',
+            id: 'c1',
+            code: 'FESTIVE10',
             title: '10% off decor',
-            terms: '',
-            ctaLabel: 'Claim offer',
-            tone: 'accent',
-            endsLabel: 'Ends 30 September',
+            organizerName: '',
+            description: '',
+            discountType: 'percentage',
+            discountValue: 10,
+            maxDiscount: 0,
+            minBookingAmount: 0,
+            endsAt: '2026-09-30T18:29:59.000Z',
+            perCustomerLimit: 1,
+            timesUsed: 0,
           },
           {
-            id: 'o2',
-            eyebrow: 'First booking',
-            title: 'Zero platform fee',
-            terms: 'About ₹4,500 saved on a 150-guest event',
-            ctaLabel: 'Apply',
-            tone: 'navy',
-            endsLabel: '',
+            id: 'c2',
+            code: 'MONSOON15',
+            title: '15% off monsoon bookings',
+            organizerName: 'Mahendra Events',
+            description: '',
+            discountType: 'fixed',
+            discountValue: 4500,
+            maxDiscount: 0,
+            minBookingAmount: 150000,
+            endsAt: null,
+            perCustomerLimit: 1,
+            timesUsed: 0,
           },
-        ] as HomeFeedDTO['offers'],
+        ] as HomeFeedDTO['coupons'],
       }),
     )!;
 
