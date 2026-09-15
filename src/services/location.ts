@@ -101,16 +101,20 @@ function getCurrentPosition(fresh: boolean): Promise<LocationCoordinates> {
         }
       },
       {
-        enableHighAccuracy: false,
-        timeout: 15_000,
         /*
-         * Zero when the customer asked.
+         * High accuracy only when the customer asked.
          *
-         * A cached fix is exactly what "Refresh" is for getting past: with a
-         * minute's grace, someone who has moved — or who has just changed the
-         * simulator's location — taps Refresh and is handed the old position
-         * back, which reads as the app not reading location at all.
+         * `maximumAge: 0` forbids the cached fix, so the platform has to go and
+         * acquire a new one. At balanced accuracy on Android that means the
+         * network provider, which indoors frequently never returns at all — the
+         * request just sits until the timeout. So a read that refuses the cache
+         * must also ask for the provider that can actually satisfy it (GPS /
+         * fused), and must be given long enough to get a first fix from cold.
+         * The passive read keeps the cheap settings: it is allowed the cached
+         * fix, so it is answered immediately and costs no radio.
          */
+        enableHighAccuracy: fresh,
+        timeout: fresh ? 30_000 : 15_000,
         maximumAge: fresh ? 0 : CACHE_MAX_AGE_MS,
       },
     );
@@ -127,5 +131,22 @@ export async function getCurrentLocation(
   { fresh = false }: { fresh?: boolean } = {},
 ): Promise<LocationCoordinates> {
   await ensurePermission();
-  return getCurrentPosition(fresh);
+
+  if (!fresh) return getCurrentPosition(false);
+
+  /*
+   * A cold GPS fix is not always obtainable — indoors, in a lift, under cloud
+   * with no recent almanac. Rather than leave Refresh reporting a bare timeout
+   * and no position at all, fall back to the cheap read, which may still be
+   * answered from a cached fix. The customer gets the position they can have
+   * instead of an error screen; only a genuine failure of both reads surfaces.
+   */
+  try {
+    return await getCurrentPosition(true);
+  } catch (error) {
+    if (error instanceof LocationServiceError && error.code === 'timeout') {
+      return getCurrentPosition(false);
+    }
+    throw error;
+  }
 }

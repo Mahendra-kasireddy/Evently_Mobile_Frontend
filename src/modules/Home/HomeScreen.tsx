@@ -28,9 +28,6 @@ type HomeNavigationProp = CompositeNavigationProp<
   NativeStackNavigationProp<RootStackParamList>
 >;
 
-/** TEMPORARY — see the stamp in the scroll view below. */
-const BUILD_STAMP = '2026-09-15-nav+images';
-
 /** Renders whatever sections the container provides. No fetching, no mapping here. */
 export function HomeScreen() {
   const navigation = useNavigation<HomeNavigationProp>();
@@ -187,16 +184,6 @@ export function HomeScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
       >
-        {/*
-          TEMPORARY build stamp. React Native 0.86 no longer forwards the app's
-          console output to the Metro terminal, so a visible marker is the only
-          reliable way to tell whether the device is running current code.
-          Delete this block once that is confirmed.
-        */}
-        <EventlyText variant="caption" style={{ color: '#e8633a', paddingVertical: 4 }}>
-          {`BUILD ${BUILD_STAMP} · otherEvents=${otherEvents.length}`}
-        </EventlyText>
-
         {banner?.greeting ? (
           <EventlyText variant="body" style={sectionStyles.greeting} numberOfLines={1}>
             {banner.greeting}
