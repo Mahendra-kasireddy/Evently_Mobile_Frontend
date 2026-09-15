@@ -35,7 +35,6 @@ export type RootStackParamList = {
   Main: NavigatorScreenParams<MainTabParamList> | undefined;
   Location: undefined;
   Notification: undefined;
-  Bookings: undefined;
   /**
    * One booking's workspace. `workspaceName` is optional and purely cosmetic:
    * it lets the header show the right name during the first load, before the
@@ -63,6 +62,24 @@ export type RootStackParamList = {
   Search: { kind?: 'packages' | 'organizers'; openFilters?: boolean } | undefined;
   /** Every quote on one request, side by side. */
   CompareQuotes: { requestId: string; title?: string };
+  /**
+   * Two quotes on one request, matched line against line.
+   *
+   * Both quotation ids are route params rather than derived here, so the
+   * screen compares exactly the pair the customer chose.
+   */
+  LineByLine: { requestId: string; leftId: string; rightId: string; title?: string };
+  /**
+   * Paying the advance on an accepted quotation.
+   *
+   * The quotation is all that is required — the amount is priced server-side
+   * from it. `couponCode` is carried through so the discount the customer
+   * applied survives the hop, and `organizerId` only enables the "message
+   * first" path; neither affects what is charged.
+   */
+  Payment: { quotationId: string; couponCode?: string; organizerId?: string };
+  /** The receipt, after the advance is settled. */
+  PaymentSuccess: { bookingId: string; organizerName?: string };
   /** One organizer's full profile. `name` is only for the first render. */
   Organizer: { organizerId: string; name?: string };
   /** Everything people have said about that organizer. */

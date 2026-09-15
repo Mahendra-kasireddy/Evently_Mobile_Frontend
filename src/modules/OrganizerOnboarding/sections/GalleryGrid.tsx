@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { EventlyIcon, EventlyImage, EventlyText } from '../../../Components';
+import { absoluteFileUrl } from '../../../services/urls';
 import { GALLERY_MAX, ORG_ACCENT, ORG_TEXT_MUTED } from '../constants';
 import { fieldStyles, uploadStyles } from '../styles';
 import type { FileRef, PickedFile } from '../types';
@@ -40,7 +41,7 @@ export function GalleryGrid({ label, files, uploading, onAdd, onRemove }: Galler
       <View style={uploadStyles.galleryGrid}>
         {files.map((file, index) => (
           <View key={`${file.key}-${index}`} style={uploadStyles.galleryTile}>
-            <EventlyImage source={{ uri: file.url }} style={uploadStyles.galleryImage} />
+            <EventlyImage source={{ uri: absoluteFileUrl(file.url) }} style={uploadStyles.galleryImage} />
             <TouchableOpacity style={uploadStyles.removeBadge} onPress={() => onRemove(index)} accessibilityLabel="Remove image">
               <EventlyIcon name="close" size={12} color="#fff" />
             </TouchableOpacity>

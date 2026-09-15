@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { EventlyIcon, EventlyImage, EventlyText } from '../../../Components';
+import { absoluteFileUrl } from '../../../services/urls';
 import { ORG_ACCENT, ORG_TEXT_MUTED } from '../constants';
 import { fieldStyles, uploadStyles } from '../styles';
 import type { FileRef, PickedFile } from '../types';
@@ -52,7 +53,7 @@ export function UploadTile({ label, hint, file, uploading, onPick, onRemove, opt
             {uploading ? (
               <ActivityIndicator color={ORG_ACCENT} style={uploadStyles.avatarSpinner} />
             ) : file ? (
-              <EventlyImage source={{ uri: file.url }} style={uploadStyles.avatarImage} />
+              <EventlyImage source={{ uri: absoluteFileUrl(file.url) }} style={uploadStyles.avatarImage} />
             ) : (
               <EventlyIcon name="camera-plus-outline" size={28} color={ORG_TEXT_MUTED} />
             )}
@@ -80,7 +81,7 @@ export function UploadTile({ label, hint, file, uploading, onPick, onRemove, opt
           <ActivityIndicator color={ORG_ACCENT} />
         ) : file ? (
           <>
-            <EventlyImage source={{ uri: file.url }} style={uploadStyles.tileImage} />
+            <EventlyImage source={{ uri: absoluteFileUrl(file.url) }} style={uploadStyles.tileImage} />
             <TouchableOpacity style={uploadStyles.removeBadge} onPress={onRemove} accessibilityLabel={`Remove ${label}`}>
               <EventlyIcon name="close" size={14} color="#fff" />
             </TouchableOpacity>

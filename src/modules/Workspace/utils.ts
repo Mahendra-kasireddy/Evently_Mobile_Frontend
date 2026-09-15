@@ -120,16 +120,3 @@ export function mapWorkspace(dto: BookingDetailDTO): WorkspaceViewModel {
     customerName: dto.customer?.name ?? null,
   };
 }
-
-/**
- * How the workspace's back button should reach My Bookings, given the stack it
- * finds itself on.
- *
- * Opened from a bookings row, back is a plain pop. Opened from Home,
- * `navigate('Bookings')` would PUSH the list on top of the workspace, so the
- * list's own back button would come straight back here — a loop. Replacing the
- * workspace instead leaves Home → Bookings, which backs out to Home.
- */
-export function workspaceBackAction(routeNames: ReadonlyArray<string>): 'goBack' | 'replace' {
-  return routeNames[routeNames.length - 2] === 'Bookings' ? 'goBack' : 'replace';
-}

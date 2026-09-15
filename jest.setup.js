@@ -14,3 +14,25 @@ jest.mock('@react-native-community/geolocation', () => ({
   clearWatch: jest.fn(),
   stopObserving: jest.fn(),
 }));
+
+/*
+ * Razorpay builds a NativeEventEmitter the moment it is imported, which throws
+ * under Jest's fake native environment — so importing any screen that reaches
+ * the checkout would fail the whole suite before a test ran.
+ *
+ * `open` resolves with the shape a real success has. Nothing in the app trusts
+ * it: the server verifies the signature, so a test that stubs a payment is
+ * still testing the client's half of the flow and nothing more.
+ */
+jest.mock('react-native-razorpay', () => ({
+  __esModule: true,
+  default: {
+    open: jest.fn(() =>
+      Promise.resolve({
+        razorpay_order_id: 'order_TEST',
+        razorpay_payment_id: 'pay_TEST',
+        razorpay_signature: 'signature_TEST',
+      }),
+    ),
+  },
+}));

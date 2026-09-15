@@ -224,6 +224,35 @@ export interface CurrentEventDTO {
   /** The spread across those replies, in rupees. Both 0 when none are priced. */
   lowestQuote: number;
   highestQuote: number;
+  /** One row per organizer who replied, cheapest first. */
+  quotes: QuoteRowDTO[];
+  /**
+   * How many organizers the brief was sent to. 0 on briefs from before
+   * recipients were recorded — the card then counts what arrived rather than
+   * claiming a total it does not know.
+   */
+  sentToCount: number;
+  /** Recipients who have not replied yet, named. */
+  awaiting: QuoteOrganizerRefDTO[];
+  /** Whole days until the brief stops taking quotes; null if it never does. */
+  closesInDays: number | null;
+}
+
+export interface QuoteOrganizerRefDTO {
+  id: string;
+  name: string;
+  initials: string;
+  avatarColor: string;
+}
+
+/** One organizer's reply, as the Home card lists it. */
+export interface QuoteRowDTO {
+  id: string;
+  organizer: QuoteOrganizerRefDTO | null;
+  total: number;
+  lineItemCount: number;
+  /** ISO — turned into "2h ago" by the mapper. */
+  repliedAt: string | null;
 }
 
 /**
@@ -314,6 +343,8 @@ export interface OccasionTileDTO {
   fromPrice: number;
   /** True for the single most-planned occasion, false for all when none. */
   mostPlanned: boolean;
+  /** An uploaded photo for this tile, or '' to use the illustration. */
+  imageUrl?: string;
 }
 
 export interface HomeFeedDTO {
@@ -324,11 +355,19 @@ export interface HomeFeedDTO {
   topOrganizersScope: OrganizerScope;
   /**
    * The ongoing booking behind Home's rich "BOOKED" card. Null at every other
-   * stage, where the compact `currentEvent` widget shows instead — the two are
-   * mutually exclusive, as they are on web.
+   * stage, where the `currentEvent` hero carries the event instead.
    */
   booking: BookedEventDTO | null;
   currentEvent: CurrentEventDTO | null;
+  /**
+   * The customer's other live events, furthest along first, never repeating
+   * `currentEvent`.
+   *
+   * Empty for most accounts. It is not empty when somebody has, say, a
+   * confirmed booking in December and a brief still gathering quotes for
+   * September — two events, and Home used to show only the first.
+   */
+  otherEvents: CurrentEventDTO[];
   unreadCount: number;
   offers: OfferDTO[];
   coupons: ClaimableCouponDTO[];
@@ -364,6 +403,39 @@ export interface CurrentEventViewModel {
   spreadLabel: string;
   /** '' when no quotes have arrived; else "3 organizers have quoted". */
   quotedLabel: string;
+  /**
+   * "Your request went to 4 organizers · 3 have replied", or just the replies
+   * when the brief predates the recipient list. '' before anyone has answered.
+   */
+  reachLine: string;
+  /** "Closes in 4 days" / "Closes today", or '' when it never closes. */
+  closesLabel: string;
+  /** The replies, cheapest first. Empty until somebody quotes. */
+  quoteRows: QuoteRow[];
+  /** "Sreeja Wedding Co. hasn't replied yet", or '' when everyone has. */
+  awaitingLabel: string;
+  /**
+   * The main button's words.
+   *
+   * Counted where there is something to count — "Compare 3 quotes" says what
+   * pressing it gets you, which "Compare quotes" does not.
+   */
+  ctaLabel: string;
+}
+
+/** One organizer's reply, ready to render. */
+export interface QuoteRow {
+  id: string;
+  organizerName: string;
+  initials: string;
+  avatarColor: string;
+  /** "₹6,25,000". */
+  totalLabel: string;
+  /** "7 line items · 2h ago" — only the parts that are known. */
+  metaLabel: string;
+  /** "Lowest" on the cheapest, else "+₹59,000" against it. */
+  deltaLabel: string;
+  isLowest: boolean;
 }
 
 export interface BookedStep {
@@ -495,6 +567,13 @@ export interface OccasionTile {
   icon: OccasionIcon;
   /** "From ₹40,000", "Most planned", or '' when neither is known. */
   note: string;
+  /**
+   * An uploaded photo for this tile, already absolutised, or '' for none.
+   *
+   * '' is the ordinary case and not a missing value: the tile then paints its
+   * `art` gradient, which is what every tile has always shown.
+   */
+  photoUrl: string;
 }
 
 export interface OccasionsViewModel {
@@ -570,6 +649,8 @@ export interface HomeViewModel {
   banner: BannerViewModel | null;
   bookedEvent: BookedEventViewModel | null;
   currentEvent: CurrentEventViewModel | null;
+  /** The live events the big card is not already about. Usually empty. */
+  otherEvents: CurrentEventViewModel[];
   categories: CategoriesViewModel | null;
   /** "Plan something new" — the occasion grid, replacing the old categories. */
   occasions: OccasionsViewModel | null;

@@ -1,4 +1,4 @@
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ActivityIndicator, FlatList, RefreshControl, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -19,13 +19,11 @@ type EventsNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 /**
  * The customer's events.
  *
- * Two lives, one screen. As the Events tab it is a destination — no back
- * arrow, because there is nothing behind it. Pushed onto the stack as
- * `Bookings` — from Home's booked card, from Profile, and from the workspace's
- * back button — it needs one. The route's own name is the honest signal for
- * which of the two is rendering; a bottom-tab navigator keeps its own history,
- * so `canGoBack()` would claim a back arrow the moment someone had visited
- * another tab first.
+ * The Events tab, and only that. It was once registered a second time as a
+ * pushed `Bookings` route as well, which gave the app two identical events
+ * lists: backing out of one landed on the other, and the customer could not
+ * tell they had moved. There is one list now, it is a tab, and a tab is a
+ * destination — so it carries no back arrow.
  *
  * Active and Past are split because the two are read for different reasons —
  * one is a to-do list, the other a record — and both pills are always shown so
@@ -33,8 +31,6 @@ type EventsNavigationProp = NativeStackNavigationProp<RootStackParamList>;
  */
 export function BookingScreen() {
   const navigation = useNavigation<EventsNavigationProp>();
-  const route = useRoute();
-  const isPushed = route.name === 'Bookings';
 
   const {
     active,
@@ -70,7 +66,7 @@ export function BookingScreen() {
     }
   };
 
-  const header = <EventsHeader showBack={isPushed} onBack={() => navigation.goBack()} />;
+  const header = <EventsHeader />;
 
   if (isLoading && items.length === 0) {
     return (

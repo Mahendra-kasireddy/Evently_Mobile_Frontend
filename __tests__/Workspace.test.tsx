@@ -17,7 +17,7 @@ jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
 });
 
 import { page, toHtml } from '../test-utils/rn-to-html';
-import { mapWorkspace, formatINR, workspaceBackAction } from '../src/modules/Workspace/utils';
+import { mapWorkspace, formatINR } from '../src/modules/Workspace/utils';
 import { WorkspaceHero } from '../src/modules/Workspace/sections/WorkspaceHero';
 import {
   EventFacts,
@@ -130,17 +130,6 @@ describe('mapWorkspace', () => {
   });
 });
 
-describe('workspaceBackAction', () => {
-  it('pops when the customer came from My Bookings', () => {
-    expect(workspaceBackAction(['Main', 'Bookings', 'Workspace'])).toBe('goBack');
-  });
-
-  it('replaces itself when the customer came from Home', () => {
-    // Pushing the list instead would put it on top of the workspace, and its
-    // own back button would come straight back here.
-    expect(workspaceBackAction(['Main', 'Workspace'])).toBe('replace');
-  });
-});
 
 
 describe('render dump', () => {

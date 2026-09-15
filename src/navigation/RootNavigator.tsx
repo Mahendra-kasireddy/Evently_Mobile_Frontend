@@ -1,8 +1,8 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { BookingScreen } from '../modules/Booking';
 import { ConversationScreen } from '../modules/Chat';
 import { ComingSoonScreen } from '../modules/ComingSoon';
-import { CompareQuotesScreen } from '../modules/CompareQuotes';
+import { CompareQuotesScreen, LineByLineScreen } from '../modules/CompareQuotes';
+import { PaymentScreen, PaymentSuccessScreen } from '../modules/Payment';
 import { InvitationScreen } from '../modules/Invitation';
 import { JoinScreen } from '../modules/Join';
 import { ContactScreen, LegalSupportScreen } from '../modules/LegalSupport';
@@ -43,13 +43,21 @@ export function RootNavigator() {
           <Stack.Screen name="Main" component={MainTabNavigator} />
           <Stack.Screen name="Location" component={LocationScreen} />
           <Stack.Screen name="Notification" component={NotificationScreen} />
-          <Stack.Screen name="Bookings" component={BookingScreen} />
           <Stack.Screen name="Workspace" component={WorkspaceScreen} />
           <Stack.Screen name="IdeaBoard" component={IdeaBoardScreen} />
           <Stack.Screen name="Invitations" component={InvitationScreen} />
           <Stack.Screen name="SavedPackages" component={SavedPackagesScreen} />
           <Stack.Screen name="Search" component={SearchScreen} />
           <Stack.Screen name="CompareQuotes" component={CompareQuotesScreen} />
+          <Stack.Screen name="LineByLine" component={LineByLineScreen} />
+          <Stack.Screen name="Payment" component={PaymentScreen} />
+          {/* No gesture back: behind it is a payment form for a quotation that
+              has already been booked. See PaymentSuccessScreen. */}
+          <Stack.Screen
+            name="PaymentSuccess"
+            component={PaymentSuccessScreen}
+            options={{ gestureEnabled: false }}
+          />
           <Stack.Screen name="Organizer" component={OrganizerScreen} />
           <Stack.Screen name="OrganizerReviews" component={ReviewsScreen} />
           <Stack.Screen name="Conversation" component={ConversationScreen} />

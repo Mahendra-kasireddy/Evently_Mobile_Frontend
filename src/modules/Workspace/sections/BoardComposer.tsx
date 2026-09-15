@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ActivityIndicator, TextInput, TouchableOpacity, View } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { EventlyIcon, EventlyImage, EventlyText } from '../../../Components';
+import { absoluteFileUrl } from '../../../services/urls';
 import { colors } from '../../../theme';
 import {
   CUSTOMER_IDEA_TYPES,
@@ -125,7 +126,9 @@ export function BoardComposer({
         <View style={s.thumbs}>
           {images.map((image) => (
             <View key={image.url} style={s.thumb}>
-              <EventlyImage source={{ uri: image.url }} style={s.thumbImage} />
+              {/* Already uploaded — `onUpload` returns the server's own
+                  root-relative path, not the picker's local file. */}
+              <EventlyImage source={{ uri: absoluteFileUrl(image.url) }} style={s.thumbImage} />
               <TouchableOpacity
                 style={s.thumbRemove}
                 onPress={() => setImages((prev) => prev.filter((i) => i.url !== image.url))}

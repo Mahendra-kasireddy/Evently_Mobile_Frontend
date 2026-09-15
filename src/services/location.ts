@@ -24,6 +24,29 @@ export class LocationServiceError extends Error {
   }
 }
 
+/*
+ * react-native-permissions owns the prompt; the geolocation library must not.
+ *
+ * Left unconfigured, @react-native-community/geolocation runs its own
+ * CLLocationManager authorization request the first time a position is asked
+ * for — so two libraries ask iOS for the same permission, and the fix that
+ * should have answered the first request never arrives. `skipPermissionRequests`
+ * makes it a reader only, and `ensurePermission` below stays the single place
+ * permission is decided.
+ *
+ * `whenInUse` is stated rather than left to `auto` because that is the only
+ * usage description in Info.plist — asking for `always` against a plist that
+ * does not describe it is refused by iOS without an error anyone can see.
+ *
+ * Configured at module load so it is set before the first read, whichever
+ * screen gets there first.
+ */
+Geolocation.setRNConfiguration({
+  skipPermissionRequests: true,
+  authorizationLevel: 'whenInUse',
+  locationProvider: 'auto',
+});
+
 const LOCATION_PERMISSION = Platform.select({
   ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
   android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
@@ -52,7 +75,16 @@ async function ensurePermission(): Promise<void> {
   throw new LocationServiceError('permission_denied', 'Location permission was denied.');
 }
 
-function getCurrentPosition(): Promise<LocationCoordinates> {
+/**
+ * How old a cached fix may be, for a read the customer did not ask for.
+ *
+ * Worth having on the passive first read: several screens want the location at
+ * once, and a minute-old fix is the same street. Worth nothing on a Refresh —
+ * see `fresh` below.
+ */
+const CACHE_MAX_AGE_MS = 60_000;
+
+function getCurrentPosition(fresh: boolean): Promise<LocationCoordinates> {
   return new Promise((resolve, reject) => {
     Geolocation.getCurrentPosition(
       (position) => {
@@ -68,13 +100,32 @@ function getCurrentPosition(): Promise<LocationCoordinates> {
           reject(new LocationServiceError('unknown', error.message || 'Could not get your location.'));
         }
       },
-      { enableHighAccuracy: false, timeout: 15_000, maximumAge: 60_000 },
+      {
+        enableHighAccuracy: false,
+        timeout: 15_000,
+        /*
+         * Zero when the customer asked.
+         *
+         * A cached fix is exactly what "Refresh" is for getting past: with a
+         * minute's grace, someone who has moved — or who has just changed the
+         * simulator's location — taps Refresh and is handed the old position
+         * back, which reads as the app not reading location at all.
+         */
+        maximumAge: fresh ? 0 : CACHE_MAX_AGE_MS,
+      },
     );
   });
 }
 
-/** Single-shot current position — no background/continuous tracking. */
-export async function getCurrentLocation(): Promise<LocationCoordinates> {
+/**
+ * Single-shot current position — no background or continuous tracking.
+ *
+ * `fresh` decides whether a recent cached fix will do. Pass it for anything
+ * the customer initiated.
+ */
+export async function getCurrentLocation(
+  { fresh = false }: { fresh?: boolean } = {},
+): Promise<LocationCoordinates> {
   await ensurePermission();
-  return getCurrentPosition();
+  return getCurrentPosition(fresh);
 }

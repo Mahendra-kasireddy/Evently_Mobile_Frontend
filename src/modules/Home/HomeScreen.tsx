@@ -7,9 +7,9 @@ import { ActivityIndicator, RefreshControl, ScrollView, View } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EventlyText } from '../../Components';
 import type { MainTabParamList, RootStackParamList } from '../../navigation/types';
-import type { CouponOffer } from './types';
+import type { CouponOffer, CurrentEventViewModel } from './types';
 import { NameGateSheet } from '../NameCapture';
-import { CURRENT_EVENT_CTA, HERO_ACCENT_COLOR, SEARCH_PLACEHOLDER } from './constants';
+import { HERO_ACCENT_COLOR, SEARCH_PLACEHOLDER } from './constants';
 import { useOpenWithOrganizer } from '../Chat';
 import { useHomeContainer } from './container';
 import { BookedEventCard } from './sections/BookedEventCard';
@@ -27,6 +27,9 @@ type HomeNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<MainTabParamList, 'Home'>,
   NativeStackNavigationProp<RootStackParamList>
 >;
+
+/** TEMPORARY — see the stamp in the scroll view below. */
+const BUILD_STAMP = '2026-09-15-nav+images';
 
 /** Renders whatever sections the container provides. No fetching, no mapping here. */
 export function HomeScreen() {
@@ -62,6 +65,7 @@ export function HomeScreen() {
     banner,
     bookedEvent,
     currentEvent,
+    otherEvents,
     occasions,
     offers,
     packages,
@@ -99,24 +103,51 @@ export function HomeScreen() {
    * the booking. A stage with nothing built behind it falls back to the plan
    * it came from rather than to a dead end.
    */
-  const handlePressHeroCta = () => {
-    if (!currentEvent) return;
-    if (currentEvent.source === 'booking') {
+  const handlePressHeroCta = (event: CurrentEventViewModel) => {
+    if (event.source === 'booking') {
       return navigation.navigate('Main', { screen: 'Events' });
     }
-    if (currentEvent.stage === 'quotes_received' && currentEvent.quoteCount > 0) {
+    if (event.stage === 'quotes_received' && event.quoteCount > 0) {
       return navigation.navigate('CompareQuotes', {
-        requestId: currentEvent.refId,
-        title: currentEvent.title,
+        requestId: event.refId,
+        title: event.title,
       });
     }
     return navigation.navigate('Plan');
   };
 
-  const handlePressHeroDetails = () =>
-    currentEvent?.source === 'booking'
+  const handlePressHeroDetails = (event: CurrentEventViewModel) =>
+    event.source === 'booking'
       ? navigation.navigate('Main', { screen: 'Events' })
       : navigation.navigate('Plan');
+
+  /**
+   * One event's hero.
+   *
+   * Written once and used for the leading event and for every other live one,
+   * so a second event is presented with the same weight as the first rather
+   * than as a footnote.
+   */
+  const renderHero = (event: CurrentEventViewModel) => (
+    <EventHero
+      key={`${event.source}:${event.refId}`}
+      event={event}
+      ctaLabel={event.ctaLabel}
+      onPressCta={() => handlePressHeroCta(event)}
+      onPressDetails={() => handlePressHeroDetails(event)}
+      /* Tapping one reply opens the comparison rather than that quote
+         alone — the decision is between them, not about one. */
+      onPressQuote={
+        event.source === 'quote'
+          ? () =>
+              navigation.navigate('CompareQuotes', {
+                requestId: event.refId,
+                title: event.title,
+              })
+          : undefined
+      }
+    />
+  );
 
   if (isLoading && !hasAnyContent) {
     return (
@@ -156,6 +187,16 @@ export function HomeScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
       >
+        {/*
+          TEMPORARY build stamp. React Native 0.86 no longer forwards the app's
+          console output to the Metro terminal, so a visible marker is the only
+          reliable way to tell whether the device is running current code.
+          Delete this block once that is confirmed.
+        */}
+        <EventlyText variant="caption" style={{ color: '#e8633a', paddingVertical: 4 }}>
+          {`BUILD ${BUILD_STAMP} · otherEvents=${otherEvents.length}`}
+        </EventlyText>
+
         {banner?.greeting ? (
           <EventlyText variant="body" style={sectionStyles.greeting} numberOfLines={1}>
             {banner.greeting}
@@ -163,9 +204,11 @@ export function HomeScreen() {
         ) : null}
 
         {/*
-          Mutually exclusive, as on web: once there is a live booking, the rich
-          card replaces the compact stage widget rather than sitting above a
-          second summary of the same event.
+          The booked card replaces the hero for the booking itself — the two are
+          two renderings of one event, and stacking them would summarise it
+          twice. Any OTHER live event follows below on its own hero: a customer
+          with a confirmed booking in December and a brief still collecting
+          quotes for September has two events, and Home showed only the first.
         */}
         {bookedEvent ? (
           <BookedEventCard
@@ -186,13 +229,11 @@ export function HomeScreen() {
             }
           />
         ) : currentEvent ? (
-          <EventHero
-            event={currentEvent}
-            ctaLabel={CURRENT_EVENT_CTA[currentEvent.stage]}
-            onPressCta={handlePressHeroCta}
-            onPressDetails={handlePressHeroDetails}
-          />
+          renderHero(currentEvent)
         ) : null}
+
+        {/* The live events the card above is not about. Usually none. */}
+        {otherEvents.map(renderHero)}
 
         {offers && (
           <View style={sectionStyles.block}>

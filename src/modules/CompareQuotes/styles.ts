@@ -7,7 +7,10 @@ import {
   COMPARE_CANVAS,
   COMPARE_GREEN,
   COMPARE_GREEN_SOFT,
+  COMPARE_LINE_HAIRLINE,
+  COMPARE_LOWER_GREEN,
   COMPARE_NAVY,
+  COMPARE_NAVY_DEEP,
 } from './constants';
 
 const HAIRLINE = '#efe9e5';
@@ -121,4 +124,129 @@ export const quoteCardStyles = StyleSheet.create({
   acceptDisabled: { opacity: 0.5 },
   acceptText: { color: colors.onPrimary, fontSize: 15.5, fontWeight: '600' },
   acceptNote: { color: colors.textMuted, fontSize: 12, marginTop: 8, lineHeight: 17 },
+});
+
+export const compareEntryStyles = StyleSheet.create({
+  /* Offered only with two priced quotes to put side by side. Sits under the
+     brief, above the cards, because it is a way of reading them. */
+  button: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 7,
+    marginHorizontal: spacing.md,
+    marginTop: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COMPARE_ACCENT,
+    paddingVertical: 12,
+  },
+  label: { color: COMPARE_ACCENT, fontSize: 14.5, fontWeight: '700' },
+});
+
+export const lineByLineStyles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background },
+
+  header: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 10,
+  },
+  back: {
+    width: 40,
+    height: 40,
+    borderRadius: 999,
+    backgroundColor: '#f2efed',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: { color: COMPARE_NAVY, fontSize: 22, fontWeight: '700', letterSpacing: -0.3 },
+
+  /* The two organizers stay above the rows: a price column means nothing once
+     its heading has scrolled away. */
+  columns: {
+    ...globalStyles.row,
+    alignItems: 'flex-end',
+    paddingHorizontal: spacing.md,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: COMPARE_LINE_HAIRLINE,
+  },
+  columnSpacer: { flex: 1.25 },
+  column: { flex: 1, alignItems: 'center' },
+  columnAvatar: {
+    width: 46,
+    height: 46,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  columnAvatarText: { color: colors.onPrimary, fontSize: 14, fontWeight: '700' },
+  columnName: { color: colors.textMuted, fontSize: 14, marginTop: 8 },
+  columnTotal: { color: COMPARE_NAVY, fontSize: 17, fontWeight: '700', marginTop: 2 },
+
+  list: { paddingBottom: spacing.lg },
+  row: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: COMPARE_LINE_HAIRLINE,
+  },
+  rowLabel: { flex: 1.25, paddingRight: 10 },
+  rowTitle: { color: COMPARE_NAVY, fontSize: 15.5, fontWeight: '700', lineHeight: 21 },
+  rowSubtitle: { color: colors.textMuted, fontSize: 13, marginTop: 3, lineHeight: 18 },
+  cell: { flex: 1, alignItems: 'center' },
+  cellPrice: { color: COMPARE_NAVY, fontSize: 16, fontWeight: '600' },
+  cellLower: { color: COMPARE_LOWER_GREEN },
+  /* Stated, not left blank: a line one organizer did not quote is a difference
+     in what you get, and a blank cell reads as a price of nothing. */
+  cellMissing: { color: colors.textMuted, fontSize: 13.5, fontStyle: 'italic' },
+  lowerTag: {
+    color: COMPARE_LOWER_GREEN,
+    fontSize: 11.5,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+    marginTop: 3,
+  },
+
+  note: {
+    ...globalStyles.row,
+    alignItems: 'flex-start',
+    gap: 10,
+    margin: spacing.md,
+    borderRadius: 14,
+    backgroundColor: '#fdf6e7',
+    padding: 14,
+  },
+  noteText: { color: '#7a5d1f', flex: 1, fontSize: 13.5, lineHeight: 19 },
+
+  foot: {
+    ...globalStyles.row,
+    gap: 12,
+    borderTopWidth: 1,
+    borderTopColor: COMPARE_LINE_HAIRLINE,
+    backgroundColor: colors.background,
+    paddingHorizontal: spacing.md,
+    paddingTop: 12,
+    paddingBottom: spacing.md,
+  },
+  accept: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 56,
+    borderRadius: 14,
+    paddingHorizontal: 10,
+  },
+  acceptLeft: { backgroundColor: COMPARE_ACCENT },
+  acceptRight: { backgroundColor: COMPARE_NAVY_DEEP },
+  acceptDisabled: { opacity: 0.5 },
+  acceptText: { color: colors.onPrimary, fontSize: 15.5, fontWeight: '700' },
+  error: { color: colors.danger, fontSize: 13, paddingHorizontal: spacing.md, paddingBottom: 6 },
+  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
+  centeredText: { color: colors.textMuted, textAlign: 'center', lineHeight: 20 },
 });

@@ -1,4 +1,4 @@
-import { TouchableOpacity, View } from 'react-native';
+import { Image, TouchableOpacity, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { EventlyIcon, EventlyText } from '../../../Components';
 import { colors } from '../../../theme';
@@ -31,6 +31,11 @@ function Tile({ tile, onPress }: { tile: OccasionTile; onPress: () => void }) {
       accessibilityRole="button"
       accessibilityLabel={tile.note ? `${tile.label}. ${tile.note}.` : tile.label}
     >
+      {/*
+        The gradient is painted either way. With a photo it is what the image
+        sits on while it loads, and what shows again if the image fails — so a
+        tile is never a blank rectangle, whatever happens to the file.
+      */}
       <View style={FILL}>
         <Svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
           <Defs>
@@ -42,6 +47,17 @@ function Tile({ tile, onPress }: { tile: OccasionTile; onPress: () => void }) {
           <Rect x={0} y={0} width={100} height={100} fill={`url(#${gradientId})`} />
         </Svg>
       </View>
+
+      {tile.photoUrl ? (
+        <>
+          <Image source={{ uri: tile.photoUrl }} style={FILL} resizeMode="cover" />
+          {/*
+            The label and the price line sit on top of whatever was uploaded, so
+            they need a guaranteed dark ground rather than luck with the photo.
+          */}
+          <View style={[FILL, s.photoScrim]} />
+        </>
+      ) : null}
 
       <View style={s.tileBody}>
         <View style={s.iconChip}>

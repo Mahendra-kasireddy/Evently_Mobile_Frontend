@@ -1,15 +1,17 @@
-import { useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ActivityIndicator, ScrollView, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
-import { COMPARE_ACCENT, COMPARE_COPY as COPY } from './constants';
+import { COMPARE_ACCENT, COMPARE_COPY as COPY, LINE_BY_LINE_ENTRY } from './constants';
 import { useCompareContainer } from './container';
 import { QuoteCardView } from './sections/QuoteCardView';
-import { styles as s } from './styles';
+import { compareEntryStyles as entry, styles as s } from './styles';
 
 type CompareRouteProp = RouteProp<RootStackParamList, 'CompareQuotes'>;
+type CompareNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 /**
  * Every quote on one request, side by side.
@@ -23,11 +25,25 @@ type CompareRouteProp = RouteProp<RootStackParamList, 'CompareQuotes'>;
  * offering any more is not a comparison, it is an anchor.
  */
 export function CompareQuotesScreen() {
+  const navigation = useNavigation<CompareNavigationProp>();
   const { params } = useRoute<CompareRouteProp>();
   const { model, isLoading, isError, errorMessage, acceptingId, acceptError, accept, refetch } =
-    useCompareContainer(params.requestId, params.title ?? COPY.title);
+    useCompareContainer(params.requestId, params.title ?? COPY.title, (quotationId) => {
+      /*
+       * Accepting is the decision; paying the advance is what makes it a
+       * booking. Sending them straight there means the quote cannot sit
+       * accepted-but-unpaid without the customer knowing why.
+       */
+      const quote = model?.quotes.find((q) => q.id === quotationId);
+      navigation.navigate('Payment', {
+        quotationId,
+        ...(quote?.organizerId ? { organizerId: quote.organizerId } : {}),
+      });
+    });
 
-  const header = <AppHeader title={COPY.title} compact />;
+  /* Named for what the customer actually has: one reply is theirs to read,
+     not to compare. Falls back to the static title before anything loads. */
+  const header = <AppHeader title={model?.heading ?? COPY.title} compact />;
 
   if (isLoading && !model) {
     return (
@@ -115,6 +131,34 @@ export function CompareQuotesScreen() {
         ) : null}
       </View>
 
+      {/*
+        * Offered once there are two live quotes to put side by side, and not
+        * after the customer has decided — there is nothing left to compare.
+        * The two cheapest, because that is the comparison worth opening by
+        * default; the rest are still on this screen.
+        */}
+      {!model.isDecided && model.quotes.length >= 2 ? (
+        <TouchableOpacity
+          style={entry.button}
+          activeOpacity={0.8}
+          onPress={() =>
+            navigation.navigate('LineByLine', {
+              requestId: params.requestId,
+              leftId: model.quotes[0].id,
+              rightId: model.quotes[1].id,
+              title: model.title,
+            })
+          }
+          accessibilityRole="button"
+          accessibilityLabel={LINE_BY_LINE_ENTRY}
+        >
+          <EventlyIcon name="table-column" size={17} color={COMPARE_ACCENT} />
+          <EventlyText variant="caption" style={entry.label}>
+            {LINE_BY_LINE_ENTRY}
+          </EventlyText>
+        </TouchableOpacity>
+      ) : null}
+
       {acceptError ? (
         <EventlyText variant="caption" style={s.acceptError}>
           {COPY.acceptFailed}
@@ -127,6 +171,7 @@ export function CompareQuotesScreen() {
             key={quote.id}
             quote={quote}
             decided={model.isDecided}
+            isOnly={model.quotes.length === 1}
             isAccepting={acceptingId === quote.id}
             onAccept={() => accept(quote.id)}
           />

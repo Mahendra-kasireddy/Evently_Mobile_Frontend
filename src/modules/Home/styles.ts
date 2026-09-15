@@ -991,6 +991,64 @@ export const eventHeroStyles = StyleSheet.create({
   fill: { height: '100%', borderRadius: 3, backgroundColor: HERO_ACCENT_COLOR },
   progressLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 13.5, fontWeight: '500' },
 
+  /** "Closes in 4 days" — the one thing on this card with a clock on it. */
+  closesPill: {
+    ...globalStyles.row,
+    alignSelf: 'flex-start',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 14,
+    borderRadius: 999,
+    backgroundColor: HERO_ACCENT_COLOR,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  closesText: { color: colors.onPrimary, fontSize: 14, fontWeight: '700' },
+
+  /* One panel per reply. Each is a row the customer compares against the
+     others, so they share a width and differ only in what they say. */
+  quoteRow: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: HOME_NAVY_PANEL,
+    borderRadius: 16,
+    padding: 12,
+    marginTop: 10,
+  },
+  quoteAvatar: {
+    width: 46,
+    height: 46,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  quoteAvatarText: { color: colors.onPrimary, fontSize: 14, fontWeight: '700' },
+  quoteText: { flex: 1, minWidth: 0 },
+  quoteName: { color: colors.onPrimary, fontSize: 15.5, fontWeight: '600' },
+  quoteMeta: { color: 'rgba(255,255,255,0.55)', fontSize: 13, marginTop: 2 },
+  quoteMoney: { alignItems: 'flex-end', flexShrink: 0 },
+  quoteTotal: { color: colors.onPrimary, fontSize: 16.5, fontWeight: '700' },
+  /* Green on the cheapest, muted on the rest: the delta is information, not a
+     warning, and colouring every row would say all of them are notable. */
+  quoteDelta: { color: 'rgba(255,255,255,0.5)', fontSize: 13, marginTop: 2 },
+  quoteDeltaLowest: { color: HOME_GREEN, fontWeight: '600' },
+
+  /* The organizers still to answer, drawn as an empty seat rather than a row
+     — there is nothing to compare yet, and it should not look like there is. */
+  awaitingRow: { ...globalStyles.row, alignItems: 'center', gap: 12, marginTop: 14 },
+  awaitingSlot: {
+    width: 46,
+    height: 46,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    borderColor: 'rgba(255,255,255,0.28)',
+    flexShrink: 0,
+  },
+  awaitingText: { color: 'rgba(255,255,255,0.58)', fontSize: 14, flex: 1 },
+
   /** The quote-spread panel, a step lighter than the card it sits on. */
   panel: {
     ...globalStyles.row,
@@ -1104,6 +1162,10 @@ export const couponSheetStyles = StyleSheet.create({
 });
 
 export const occasionGridStyles = StyleSheet.create({
+  /* Sits between an uploaded photo and the tile's text. Dark enough that white
+     type stays legible on a bright photo, light enough not to grey out a good
+     one. */
+  photoScrim: { backgroundColor: 'rgba(14, 26, 51, 0.42)' },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',

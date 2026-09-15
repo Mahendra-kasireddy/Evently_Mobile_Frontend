@@ -484,7 +484,7 @@ describe('render dump', () => {
         toHtml(
           render(
             <>
-              <EventsHeader showBack={false} onBack={noop} />
+              <EventsHeader />
               <EventTabs value="active" onChange={noop} counts={{ active: 2, past: 1 }} />
               {list(activeList, 'bk1')}
               <JumpToGrid
@@ -503,7 +503,7 @@ describe('render dump', () => {
         toHtml(
           render(
             <>
-              <EventsHeader showBack onBack={noop} />
+              <EventsHeader />
               <EventTabs value="past" onChange={noop} counts={{ active: 2, past: 2 }} />
               {list(
                 [

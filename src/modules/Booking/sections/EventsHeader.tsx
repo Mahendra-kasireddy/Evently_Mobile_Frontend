@@ -1,32 +1,17 @@
-import { TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
-import { colors } from '../../../theme';
+import { View } from 'react-native';
+import { EventlyText } from '../../../Components';
 import { BOOKING_COPY as COPY } from '../constants';
 import { styles } from '../styles';
 
-interface EventsHeaderProps {
-  /**
-   * True only when the screen was pushed onto the stack. As the Events tab
-   * there is nothing behind it, so it carries no back arrow.
-   */
-  showBack: boolean;
-  onBack: () => void;
-}
-
-/** The screen's own title, in place of a header bar. */
-export function EventsHeader({ showBack, onBack }: EventsHeaderProps) {
+/**
+ * The screen's own title, in place of a header bar.
+ *
+ * No back arrow: this screen is a tab, and a tab is somewhere you go, not
+ * somewhere you are sent and have to escape.
+ */
+export function EventsHeader() {
   return (
     <View style={styles.headerRow}>
-      {showBack ? (
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={onBack}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-        >
-          <EventlyIcon name="chevron-left" size={26} color={colors.text} />
-        </TouchableOpacity>
-      ) : null}
       <EventlyText variant="h1" style={styles.screenTitle}>
         {COPY.title}
       </EventlyText>

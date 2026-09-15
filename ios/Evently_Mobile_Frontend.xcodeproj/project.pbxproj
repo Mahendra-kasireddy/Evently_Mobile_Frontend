@@ -8,15 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		13C7190D230F4FC3A49B592D /* Poppins-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 13EA34DAC48B4CBDA0F4691C /* Poppins-Regular.ttf */; };
 		2076DA95FDCB66922620203A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
+		597D9448F4C94C43B7D8D236 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5E0C94C0A1D3416A9091271C /* Poppins-Bold.ttf */; };
 		6217BB50F400BBBC5894955F /* libPods-Evently_Mobile_Frontend.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E31DDA3CD449FEE90BA6F256 /* libPods-Evently_Mobile_Frontend.a */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		EEDF6D006B7B41DA86D97531 /* Poppins-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6292192F615F485B885C4C42 /* Poppins-Medium.ttf */; };
-		D7065F3D10B54F4BA6118416 /* Poppins-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ACBAD93E1D4D4ABE9D3F81B7 /* Poppins-ExtraBold.ttf */; };
-		13C7190D230F4FC3A49B592D /* Poppins-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 13EA34DAC48B4CBDA0F4691C /* Poppins-Regular.ttf */; };
-		597D9448F4C94C43B7D8D236 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5E0C94C0A1D3416A9091271C /* Poppins-Bold.ttf */; };
 		C769D9E258AB4B758EA2C78B /* Poppins-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 99701AD383244242BC068A28 /* Poppins-SemiBold.ttf */; };
+		D7065F3D10B54F4BA6118416 /* Poppins-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ACBAD93E1D4D4ABE9D3F81B7 /* Poppins-ExtraBold.ttf */; };
+		EEDF6D006B7B41DA86D97531 /* Poppins-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6292192F615F485B885C4C42 /* Poppins-Medium.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,17 +24,17 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Evently_Mobile_Frontend/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Evently_Mobile_Frontend/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = Evently_Mobile_Frontend/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		13EA34DAC48B4CBDA0F4691C /* Poppins-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Regular.ttf"; path = "../assets/fonts/Poppins-Regular.ttf"; sourceTree = "<group>"; };
 		2C105EC43CDC2AB70225FC2F /* Pods-Evently_Mobile_Frontend.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Evently_Mobile_Frontend.release.xcconfig"; path = "Target Support Files/Pods-Evently_Mobile_Frontend/Pods-Evently_Mobile_Frontend.release.xcconfig"; sourceTree = "<group>"; };
+		5E0C94C0A1D3416A9091271C /* Poppins-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Bold.ttf"; path = "../assets/fonts/Poppins-Bold.ttf"; sourceTree = "<group>"; };
+		6292192F615F485B885C4C42 /* Poppins-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Medium.ttf"; path = "../assets/fonts/Poppins-Medium.ttf"; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Evently_Mobile_Frontend/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Evently_Mobile_Frontend/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		99701AD383244242BC068A28 /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-SemiBold.ttf"; path = "../assets/fonts/Poppins-SemiBold.ttf"; sourceTree = "<group>"; };
 		9DC9AC497FB43C8F6BB3DA12 /* Pods-Evently_Mobile_Frontend.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Evently_Mobile_Frontend.debug.xcconfig"; path = "Target Support Files/Pods-Evently_Mobile_Frontend/Pods-Evently_Mobile_Frontend.debug.xcconfig"; sourceTree = "<group>"; };
+		ACBAD93E1D4D4ABE9D3F81B7 /* Poppins-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraBold.ttf"; path = "../assets/fonts/Poppins-ExtraBold.ttf"; sourceTree = "<group>"; };
 		E31DDA3CD449FEE90BA6F256 /* libPods-Evently_Mobile_Frontend.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Evently_Mobile_Frontend.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		6292192F615F485B885C4C42 /* Poppins-Medium.ttf */ = {isa = PBXFileReference; name = "Poppins-Medium.ttf"; path = "../assets/fonts/Poppins-Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		ACBAD93E1D4D4ABE9D3F81B7 /* Poppins-ExtraBold.ttf */ = {isa = PBXFileReference; name = "Poppins-ExtraBold.ttf"; path = "../assets/fonts/Poppins-ExtraBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		13EA34DAC48B4CBDA0F4691C /* Poppins-Regular.ttf */ = {isa = PBXFileReference; name = "Poppins-Regular.ttf"; path = "../assets/fonts/Poppins-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		5E0C94C0A1D3416A9091271C /* Poppins-Bold.ttf */ = {isa = PBXFileReference; name = "Poppins-Bold.ttf"; path = "../assets/fonts/Poppins-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		99701AD383244242BC068A28 /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; name = "Poppins-SemiBold.ttf"; path = "../assets/fonts/Poppins-SemiBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,17 +100,8 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				9DC9AC497FB43C8F6BB3DA12 /* Pods-Evently_Mobile_Frontend.debug.xcconfig */,
-				2C105EC43CDC2AB70225FC2F /* Pods-Evently_Mobile_Frontend.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 		A6CC93553B9B45CB8145AAD2 /* Resources */ = {
-			isa = "PBXGroup";
+			isa = PBXGroup;
 			children = (
 				6292192F615F485B885C4C42 /* Poppins-Medium.ttf */,
 				ACBAD93E1D4D4ABE9D3F81B7 /* Poppins-ExtraBold.ttf */,
@@ -120,7 +111,15 @@
 			);
 			name = Resources;
 			sourceTree = "<group>";
-			path = "";
+		};
+		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				9DC9AC497FB43C8F6BB3DA12 /* Pods-Evently_Mobile_Frontend.debug.xcconfig */,
+				2C105EC43CDC2AB70225FC2F /* Pods-Evently_Mobile_Frontend.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
@@ -242,9 +241,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Evently_Mobile_Frontend/Pods-Evently_Mobile_Frontend-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Evently_Mobile_Frontend/Pods-Evently_Mobile_Frontend-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -259,9 +262,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Evently_Mobile_Frontend/Pods-Evently_Mobile_Frontend-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Evently_Mobile_Frontend/Pods-Evently_Mobile_Frontend-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -289,6 +296,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KJBGTQ3344;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Evently_Mobile_Frontend/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
@@ -319,6 +327,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KJBGTQ3344;
 				INFOPLIST_FILE = Evently_Mobile_Frontend/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (

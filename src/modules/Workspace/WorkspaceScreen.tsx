@@ -9,7 +9,6 @@ import { colors } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
 import { WORKSPACE_ACCENT, WORKSPACE_COPY } from './constants';
 import { useWorkspaceContainer } from './container';
-import { workspaceBackAction } from './utils';
 import { WorkspaceHero } from './sections/WorkspaceHero';
 import { EventFacts, Milestones, Payment, Tasks, Timeline } from './sections/WorkspaceSections';
 import { IdeasSummary, InvitationSummary } from './sections/WorkspaceLinks';
@@ -36,21 +35,21 @@ export function WorkspaceScreen() {
   const { workspace, ideaCounts, invitation, isLoading, isError, errorMessage, refetch } =
     useWorkspaceContainer(params.bookingId);
 
-  // Back always lands on My Bookings; see workspaceBackAction for how.
-  const goToBookings = () => {
-    const routes = navigation.getState()?.routes ?? [];
-    if (workspaceBackAction(routes.map((r) => r.name)) === 'goBack') {
-      navigation.goBack();
-      return;
-    }
-    navigation.replace('Bookings');
-  };
+  /*
+   * Back returns where the customer came from, and nothing else.
+   *
+   * This used to force every exit onto the events list: opened from Home, the
+   * back arrow REPLACED the workspace with a pushed copy of that list, so
+   * "back" landed somewhere the customer had never been, and its own back
+   * arrow then led to a third screen that looked identical to the second.
+   */
+  const goBack = () => navigation.goBack();
 
   // Until the booking loads there is no occasion to name the workspace after,
   // so the header carries whatever name the caller already knew.
   const headerTitle = workspace?.workspaceName ?? params.workspaceName ?? WORKSPACE_COPY.fallbackName;
 
-  const header = <AppHeader title={headerTitle} compact onBackPress={goToBookings} />;
+  const header = <AppHeader title={headerTitle} compact onBackPress={goBack} />;
 
   if (isLoading && !workspace) {
     return (

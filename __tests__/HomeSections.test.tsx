@@ -28,11 +28,13 @@ import { TrustStrip } from '../src/modules/Home/sections/TrustStrip';
 import {
   formatCompactINR,
   mapCurrentEvent,
+  mapOtherEvents,
   mapOccasions,
   mapCoupons,
   mapPackages,
 } from '../src/modules/Home/utils';
-import { CURRENT_EVENT_CTA, SEARCH_PLACEHOLDER } from '../src/modules/Home/constants';
+import {
+  SEARCH_PLACEHOLDER } from '../src/modules/Home/constants';
 import type { HomeFeedDTO } from '../src/modules/Home/types';
 
 declare const process: { env: Record<string, string | undefined> };
@@ -101,10 +103,164 @@ const quoteEvent = (over: Record<string, unknown> = {}) =>
         quoteCount: 3,
         lowestQuote: 625000,
         highestQuote: 742000,
+        sentToCount: 4,
+        closesInDays: 4,
+        quotes: [
+          {
+            id: 'q1',
+            organizer: { id: 'o1', name: 'Venkat Decor & Events', initials: 'VD', avatarColor: '#1d9e75' },
+            total: 625000,
+            lineItemCount: 7,
+            repliedAt: '2026-09-04T12:00:00.000Z',
+          },
+          {
+            id: 'q2',
+            organizer: { id: 'o2', name: 'Mahendra Events', initials: 'ME', avatarColor: '#e8633a' },
+            total: 684000,
+            lineItemCount: 7,
+            repliedAt: '2026-09-04T09:00:00.000Z',
+          },
+        ],
+        awaiting: [
+          { id: 'o4', name: 'Sreeja Wedding Co.', initials: 'SW', avatarColor: '#6d5bd0' },
+        ],
         ...over,
       } as HomeFeedDTO['currentEvent'],
     }),
   )!;
+
+/** One live brief, as the server sends it inside `otherEvents`. */
+const briefDTO = (over: Record<string, unknown> = {}) =>
+  ({
+    stage: 'quotes_received',
+    refId: 'req9',
+    title: 'Anniversary',
+    occasion: 'Anniversary',
+    when: '5 Sep 2026',
+    where: 'Kukatpally',
+    guests: '150 guests',
+    source: 'quote',
+    progress: 40,
+    daysToGo: null,
+    quoteCount: 3,
+    lowestQuote: 625000,
+    highestQuote: 742000,
+    sentToCount: 4,
+    closesInDays: 4,
+    quotes: [],
+    awaiting: [],
+    ...over,
+  }) as NonNullable<HomeFeedDTO['currentEvent']>;
+
+describe('occasion tiles with and without a photo', () => {
+  const tiles = (over: Record<string, unknown> = {}) =>
+    mapOccasions(
+      feed({
+        occasions: [
+          { id: 'wedding', label: 'Wedding', art: 'wedding', fromPrice: 0, mostPlanned: false, ...over },
+        ],
+      } as unknown as HomeFeedDTO),
+    )!;
+
+  it('carries an uploaded photo through, made absolute', () => {
+    // The server sends a root-relative path; React Native cannot fetch one.
+    const [tile] = tiles({ imageUrl: '/api/upload/file/categoryImage/x.png' }).items;
+    expect(tile.photoUrl).toBe('http://localhost:3000/api/upload/file/categoryImage/x.png');
+  });
+
+  it('reports no photo as no photo, so the tile draws its illustration', () => {
+    // '' is the ordinary state for every tile that has never been photographed.
+    expect(tiles().items[0].photoUrl).toBe('');
+    expect(tiles({ imageUrl: '' }).items[0].photoUrl).toBe('');
+  });
+
+  it('still keeps the illustration key alongside the photo', () => {
+    // The gradient is painted underneath either way, so a failed image never
+    // leaves a blank rectangle.
+    const [tile] = tiles({ imageUrl: '/api/upload/file/categoryImage/x.png' }).items;
+    expect(tile.art).toBe('wedding');
+  });
+});
+
+describe('mapOtherEvents', () => {
+  /*
+   * The bug these are about: a customer with a confirmed booking for one event
+   * and a brief still collecting quotes for another saw only the booking. The
+   * brief was in the database the whole time — Home ranked it below the
+   * booking and then showed one card.
+   */
+  it('maps a second live event the same way as the first', () => {
+    const [brief] = mapOtherEvents(feed({ otherEvents: [briefDTO()] }));
+    expect(brief.title).toBe('Anniversary');
+    expect(brief.stage).toBe('quotes_received');
+    // Mapped by the same function, so it gets a counted CTA, not a lesser one.
+    expect(brief.ctaLabel).toBe('Compare 3 quotes');
+  });
+
+  it('keeps the order the server ranked them in', () => {
+    const events = mapOtherEvents(
+      feed({
+        otherEvents: [briefDTO({ refId: 'a', title: 'Anniversary' }), briefDTO({ refId: 'b', title: 'Naming' })],
+      }),
+    );
+    expect(events.map((e) => e.title)).toEqual(['Anniversary', 'Naming']);
+  });
+
+  it('is empty for the ordinary account with one event', () => {
+    expect(mapOtherEvents(feed({ otherEvents: [] }))).toEqual([]);
+    // Older payloads predate the field; Home must not crash on them.
+    expect(mapOtherEvents(feed({}))).toEqual([]);
+  });
+});
+
+describe('a brief with only one quote', () => {
+  /*
+   * The real shape of this account's Anniversary brief: quoted, one reply, and
+   * no recorded recipients. Every line below read as a comparison the customer
+   * could not yet make, because the three-quote mock never exercised it.
+   */
+  const single = () =>
+    quoteEvent({
+      quoteCount: 1,
+      lowestQuote: 185000,
+      highestQuote: 185000,
+      sentToCount: 0,
+      awaiting: [],
+      quotes: [
+        {
+          id: 'q1',
+          organizer: { id: 'o1', name: 'Mahendra Events', initials: 'ME', avatarColor: '#e8633a' },
+          total: 185000,
+          lineItemCount: 5,
+          repliedAt: '2026-09-11T09:00:00.000Z',
+        },
+      ],
+    });
+
+  it('does not offer to compare a single quote', () => {
+    // "Compare 1 quote" promises a comparison the screen cannot perform.
+    expect(single().ctaLabel).toBe('See the quote');
+    expect(quoteEvent().ctaLabel).toBe('Compare 3 quotes');
+  });
+
+  it('shows no price range when there is only one price', () => {
+    // "Lowest ₹1,85,000 · highest ₹1,85,000" is one number twice.
+    expect(single().spreadLabel).toBe('');
+    expect(quoteEvent().spreadLabel).toBe('Lowest ₹6,25,000 · highest ₹7,42,000');
+  });
+
+  it('does not tag the only quote as the lowest', () => {
+    // Lowest of one is not a finding.
+    expect(single().quoteRows[0].deltaLabel).toBe('');
+    expect(single().quoteRows[0].isLowest).toBe(false);
+    expect(quoteEvent().quoteRows[0].deltaLabel).toBe('Lowest');
+  });
+
+  it('makes the verb agree with one organizer', () => {
+    expect(single().quotedLabel).toBe('1 organizer has quoted');
+    expect(quoteEvent().quotedLabel).toBe('3 organizers have quoted');
+  });
+});
 
 describe('formatCompactINR', () => {
   it('uses Indian units so a price fits the corner it sits in', () => {
@@ -140,7 +296,7 @@ describe('mapCurrentEvent', () => {
      * "3 of 4 quotes in" would be a denominator this system cannot produce.
      */
     expect(quoteEvent().quotedLabel).toBe('3 organizers have quoted');
-    expect(quoteEvent({ quoteCount: 1 }).quotedLabel).toBe('1 organizer have quoted');
+    expect(quoteEvent({ quoteCount: 1 }).quotedLabel).toBe('1 organizer has quoted');
     expect(quoteEvent({ quoteCount: 0 }).quotedLabel).toBe('');
   });
 });
@@ -319,53 +475,80 @@ describe('mapPackages', () => {
 });
 
 describe('EventHero', () => {
-  it('shows the stage, the facts and the spread', () => {
-    const text = textOf(
-      render(
-        <EventHero
-          event={quoteEvent()}
-          ctaLabel={CURRENT_EVENT_CTA.quotes_received}
-          onPressCta={noop}
-          onPressDetails={noop}
-        />,
-      ),
-    );
+  const hero = (over: Record<string, unknown> = {}) => (
+    <EventHero
+      event={quoteEvent(over)}
+      ctaLabel={quoteEvent(over).ctaLabel}
+      onPressCta={noop}
+      onPressDetails={noop}
+    />
+  );
+
+  it('shows the stage, the facts, and who the brief reached', () => {
+    const text = textOf(render(hero()));
 
     expect(text).toContain('Quotes received');
     expect(text).toContain('Naming ceremony');
     expect(text).toContain('5 Sep 2026 · Kukatpally · 150 guests');
-    expect(text).toContain('3 quotes in');
-    expect(text).toContain('3 organizers have quoted');
-    expect(text).toContain('Lowest ₹6,25,000 · highest ₹7,42,000');
-    expect(text).toContain('Compare quotes');
+    expect(text).toContain('Your request went to 4 organizers · 3 have replied');
+    expect(text).toContain('Closes in 4 days');
   });
 
-  it('drops the quote panel before any organizer has replied', () => {
+  it('lists each reply with what it costs against the cheapest', () => {
+    // Three totals in a column leaves the customer subtracting; the delta is
+    // the whole reason the rows are a comparison.
+    const text = textOf(render(hero()));
+
+    expect(text).toContain('Venkat Decor & Events');
+    expect(text).toContain('₹6,25,000');
+    expect(text).toContain('Lowest');
+    expect(text).toContain('Mahendra Events');
+    expect(text).toContain('₹6,84,000');
+    expect(text).toContain('+₹59,000');
+    expect(text).toContain('7 line items');
+  });
+
+  it('names the organizer who has not replied', () => {
+    // "One organizer hasn't replied" is not something a customer can act on.
+    expect(textOf(render(hero()))).toContain("Sreeja Wedding Co. hasn't replied yet");
+  });
+
+  it('counts the quotes on the button, so the tap says what it gets', () => {
+    expect(textOf(render(hero()))).toContain('Compare 3 quotes');
+  });
+
+  it('will not claim a denominator a brief never recorded', () => {
+    // Briefs from before recipients were stored went to everybody and kept no
+    // list — "3 of 4" would be a number this app made up.
+    const text = textOf(render(hero({ sentToCount: 0, awaiting: [] })));
+    expect(text).toContain('3 organizers have replied');
+    expect(text).not.toContain('went to');
+  });
+
+  it('falls back to progress before anyone has replied', () => {
     const text = textOf(
-      render(
-        <EventHero
-          event={quoteEvent({ quoteCount: 0, lowestQuote: 0, highestQuote: 0 })}
-          ctaLabel={CURRENT_EVENT_CTA.submitted}
-          onPressCta={noop}
-          onPressDetails={noop}
-        />,
-      ),
+      render(hero({ quoteCount: 0, lowestQuote: 0, highestQuote: 0, quotes: [], awaiting: [] })),
     );
-
-    expect(text).not.toContain('have quoted');
-    expect(text).not.toContain('quotes in');
+    expect(text).not.toContain('Lowest');
+    expect(text).not.toContain('line items');
   });
 
-  it('is two controls: the action and the details link', () => {
+  it('is two controls while the rows are not tappable', () => {
+    expect(drawnButtons(render(hero()))).toHaveLength(2);
+  });
+
+  it('makes each reply a control when there is somewhere to open it', () => {
     const tree = render(
       <EventHero
         event={quoteEvent()}
-        ctaLabel={CURRENT_EVENT_CTA.quotes_received}
+        ctaLabel={quoteEvent().ctaLabel}
         onPressCta={noop}
         onPressDetails={noop}
+        onPressQuote={noop}
       />,
     );
-    expect(drawnButtons(tree)).toHaveLength(2);
+    // Two quotes plus the action and the details link.
+    expect(drawnButtons(tree)).toHaveLength(4);
   });
 });
 
@@ -490,9 +673,10 @@ describe('render dump', () => {
               />
               <EventHero
                 event={quoteEvent()}
-                ctaLabel={CURRENT_EVENT_CTA.quotes_received}
+                ctaLabel={quoteEvent().ctaLabel}
                 onPressCta={noop}
                 onPressDetails={noop}
+                onPressQuote={noop}
               />
               <Offers data={offers} onPressOffer={noop} />
             </>,

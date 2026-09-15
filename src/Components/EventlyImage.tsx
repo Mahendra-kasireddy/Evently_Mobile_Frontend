@@ -18,7 +18,20 @@ export function EventlyImage({ source, style, fallbackIconName = 'image-off-outl
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  if (!source || hasError) {
+  /*
+   * `{ uri: '' }` is an object, so it is truthy, so it used to be handed
+   * straight to <Image> — which then failed to load and painted the
+   * broken-image placeholder. A record that simply carries no photo is not a
+   * broken photo, and every screen that passed one said otherwise.
+   */
+  const hasUri =
+    !source ||
+    typeof source !== 'object' ||
+    Array.isArray(source) ||
+    !('uri' in source) ||
+    Boolean((source as { uri?: string }).uri?.trim());
+
+  if (!source || !hasUri || hasError) {
     return (
       <View style={[eventlyImageStyles.fallback, style]}>
         <EventlyIcon name={fallbackIconName} size={24} color={colors.textMuted} />

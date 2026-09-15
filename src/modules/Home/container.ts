@@ -12,6 +12,7 @@ const EMPTY_VIEW_MODEL: HomeViewModel = {
   banner: null,
   bookedEvent: null,
   currentEvent: null,
+  otherEvents: [],
   categories: null,
   occasions: null,
   offers: null,
@@ -103,11 +104,25 @@ export function useHomeContainer(): HomeContainerResult {
     if (!heroDraft) return;
     requestQuotesCall
       .execute(heroDraft)
-      .then(() => setQuotesRequested(true))
+      .then(() => {
+        setQuotesRequested(true);
+        /*
+         * Re-read the feed, so the brief the customer just sent replaces the
+         * hero they sent it from.
+         *
+         * Without this the request exists on the server and nothing on screen
+         * says so until Home happens to lose and regain focus — which, since
+         * Home is the tab they are already on, may not happen for a long time.
+         * The single-organizer path below has always done this; the broadcast
+         * path had not, which is why a brief sent from the hero appeared to
+         * vanish.
+         */
+        refetch();
+      })
       .catch(() => {
         // error already captured in requestQuotesCall.error
       });
-  }, [heroDraft, requestQuotesCall]);
+  }, [heroDraft, refetch, requestQuotesCall]);
 
   const resetQuotesRequest = useCallback(() => setQuotesRequested(false), []);
 

@@ -9,6 +9,8 @@ interface QuoteCardViewProps {
   quote: QuoteCard;
   /** True once any quote on this request has been accepted. */
   decided: boolean;
+  /** True when this is the only quote — nothing else is declined by accepting. */
+  isOnly: boolean;
   isAccepting: boolean;
   onAccept: () => void;
 }
@@ -25,8 +27,9 @@ interface QuoteCardViewProps {
  * a booking and declines the others, and there is no undo — that belongs on
  * the button, not in a toast afterwards.
  */
-export function QuoteCardView({ quote, decided, isAccepting, onAccept }: QuoteCardViewProps) {
+export function QuoteCardView({ quote, decided, isOnly, isAccepting, onAccept }: QuoteCardViewProps) {
   const [open, setOpen] = useState(false);
+  const acceptNote = isOnly ? COPY.acceptNoteOnly : COPY.acceptNote;
   const badge = quote.isAccepted ? COPY.accepted : quote.isLowest ? COPY.lowest : '';
 
   return (
@@ -146,14 +149,14 @@ export function QuoteCardView({ quote, decided, isAccepting, onAccept }: QuoteCa
             disabled={isAccepting}
             onPress={onAccept}
             accessibilityRole="button"
-            accessibilityLabel={`${COPY.accept} from ${quote.organizerName}, ${quote.totalLabel}. ${COPY.acceptNote}`}
+            accessibilityLabel={`${COPY.accept} from ${quote.organizerName}, ${quote.totalLabel}. ${acceptNote}`}
           >
             <EventlyText variant="subtitle" style={s.acceptText}>
               {isAccepting ? COPY.accepting : COPY.accept}
             </EventlyText>
           </TouchableOpacity>
           <EventlyText variant="caption" style={s.acceptNote}>
-            {COPY.acceptNote}
+            {acceptNote}
           </EventlyText>
         </>
       )}

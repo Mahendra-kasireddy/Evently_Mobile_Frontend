@@ -18,6 +18,8 @@ export interface CompareContainerResult {
 export function useCompareContainer(
   requestId: string,
   fallbackTitle: string,
+  /** Called once a quote is accepted, so the screen can send them to pay. */
+  onAccepted?: (quotationId: string) => void,
 ): CompareContainerResult {
   const { data, loading, error, refetch } = useQuoteRequest(requestId);
   const acceptCall = useAcceptQuotation();
@@ -30,12 +32,12 @@ export function useCompareContainer(
   );
 
   /*
-   * Refetched rather than patched locally.
+   * Refetched rather than patched locally, and the caller is told.
    *
-   * Accepting one quote declines the rest and creates a booking, so the whole
-   * screen changes state at once. Re-reading it is the only way to be sure the
-   * screen shows what the server actually did — guessing at the outcome would
-   * risk showing an accepted booking that failed to create.
+   * Accepting one quote declines the rest, so the whole screen changes state
+   * at once and re-reading it is the only way to be sure it shows what the
+   * server actually did. It does not create a booking: nothing is booked until
+   * the advance is paid, which is where `onAccepted` sends the customer.
    */
   const accept = useCallback(
     (quotationId: string) => {
@@ -43,11 +45,14 @@ export function useCompareContainer(
       setAcceptingId(quotationId);
       acceptCall
         .execute(quotationId)
-        .then(() => refetch())
+        .then(() => {
+          refetch();
+          onAccepted?.(quotationId);
+        })
         .catch((err: { message?: string }) => setAcceptError(err?.message ?? null))
         .finally(() => setAcceptingId(null));
     },
-    [acceptCall, refetch],
+    [acceptCall, onAccepted, refetch],
   );
 
   return {

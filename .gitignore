@@ -73,3 +73,6 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Render dumps written by the test harness (EVENTLY_RENDER_OUT)
+__tests__/.out-*.html

@@ -1,16 +1,21 @@
 import { isNonEmptyArray } from '../../utils/guards';
 import { absoluteFileUrl } from '../../services/urls';
-import { CURRENT_EVENT_STAGE_LABEL, OCCASION_TILE_ICON } from './constants';
+import { CURRENT_EVENT_CTA, CURRENT_EVENT_STAGE_LABEL, OCCASION_TILE_ICON } from './constants';
 import type {
   BannerViewModel,
   BookedEventStatus,
   BookedEventViewModel,
   CategoriesViewModel,
+  CurrentEventDTO,
   CurrentEventViewModel,
   OccasionArtKey,
   OccasionsViewModel,
   ClaimableCouponDTO,
   CouponsViewModel,
+  CurrentEventStage,
+  QuoteOrganizerRefDTO,
+  QuoteRow,
+  QuoteRowDTO,
   PackagesViewModel,
   HomeFeedDTO,
   HomeViewModel,
@@ -173,9 +178,20 @@ export function factsLineOf(when: string, where: string, guests: string): string
 
 /** the customer's in-progress event, shown as its own section. Hidden if there is none. */
 export function mapCurrentEvent(feed: HomeFeedDTO): CurrentEventViewModel | null {
-  if (!feed.currentEvent) return null;
+  return feed.currentEvent ? mapEvent(feed.currentEvent) : null;
+}
 
-  const e = feed.currentEvent;
+/**
+ * The customer's other live events, in the order the server ranked them.
+ *
+ * Each is mapped exactly like the leading one, because each is rendered by the
+ * same hero — a second event is not a lesser kind of event.
+ */
+export function mapOtherEvents(feed: HomeFeedDTO): CurrentEventViewModel[] {
+  return (feed.otherEvents ?? []).map(mapEvent);
+}
+
+function mapEvent(e: CurrentEventDTO): CurrentEventViewModel {
   return {
     refId: e.refId,
     title: e.title,
@@ -193,18 +209,139 @@ export function mapCurrentEvent(feed: HomeFeedDTO): CurrentEventViewModel | null
     stageLabel: CURRENT_EVENT_STAGE_LABEL[e.stage] ?? '',
     quoteCount: e.quoteCount ?? 0,
     /*
-     * Both figures or neither. A lone "lowest ₹6,25,000" reads as the price,
-     * and the whole point of the line is that there is a range to compare.
+     * Both figures or neither, and only when they differ.
+     *
+     * A lone "lowest ₹6,25,000" reads as the price, and the whole point of the
+     * line is that there is a range to compare. One quote has no range:
+     * "Lowest ₹1,85,000 · highest ₹1,85,000" is the same number twice, dressed
+     * up as a comparison the customer cannot make yet.
      */
     spreadLabel:
-      e.lowestQuote > 0 && e.highestQuote > 0
+      e.lowestQuote > 0 && e.highestQuote > 0 && e.highestQuote !== e.lowestQuote
         ? `Lowest ${formatINR(e.lowestQuote)} · highest ${formatINR(e.highestQuote)}`
         : '',
     quotedLabel:
       (e.quoteCount ?? 0) > 0
-        ? `${e.quoteCount} organizer${e.quoteCount === 1 ? '' : 's'} have quoted`
+        ? `${e.quoteCount} organizer${e.quoteCount === 1 ? ' has' : 's have'} quoted`
         : '',
+    reachLine: reachLine(e.sentToCount ?? 0, e.quoteCount ?? 0),
+    closesLabel: closesLabel(e.closesInDays),
+    quoteRows: quoteRows(e.quotes ?? []),
+    awaitingLabel: awaitingLabel(e.awaiting ?? []),
+    ctaLabel: ctaLabel(e.stage, e.quoteCount ?? 0),
   };
+}
+
+/**
+ * The main button's words, counted where there is something to count.
+ *
+ * "Compare 3 quotes" says what the tap gets you; "Compare quotes" leaves the
+ * customer to scroll back up and work out whether it is worth the tap.
+ *
+ * One quote is not compared, it is read. Offering "Compare 1 quote" promises a
+ * comparison the screen cannot perform and the customer cannot act on.
+ */
+function ctaLabel(stage: CurrentEventStage, quoteCount: number): string {
+  const base = CURRENT_EVENT_CTA[stage] ?? '';
+  if (stage !== 'quotes_received' || quoteCount <= 0) return base;
+  return quoteCount === 1 ? 'See the quote' : `Compare ${quoteCount} quotes`;
+}
+
+/**
+ * "Your request went to 4 organizers · 3 have replied".
+ *
+ * The denominator is only stated when the brief recorded who it went to.
+ * Older briefs were broadcast to everyone and kept no list, so they report the
+ * replies alone — "3 organizers have replied" is true of them; "3 of 4" would
+ * be a number this app made up.
+ */
+function reachLine(sentToCount: number, quoteCount: number): string {
+  if (sentToCount > 0) {
+    const sent = `Your request went to ${sentToCount} organizer${sentToCount === 1 ? '' : 's'}`;
+    return quoteCount > 0 ? `${sent} · ${quoteCount} ${quoteCount === 1 ? 'has' : 'have'} replied` : sent;
+  }
+  if (quoteCount > 0) {
+    return `${quoteCount} organizer${quoteCount === 1 ? '' : 's'} ${quoteCount === 1 ? 'has' : 'have'} replied`;
+  }
+  return '';
+}
+
+/** "Closes in 4 days" — and on the last day, the day itself. */
+function closesLabel(days: number | null | undefined): string {
+  if (days === null || days === undefined) return '';
+  if (days <= 0) return 'Closes today';
+  return days === 1 ? 'Closes tomorrow' : `Closes in ${days} days`;
+}
+
+/**
+ * The replies, cheapest first, each priced against the cheapest.
+ *
+ * The delta is what makes the list a comparison: three totals in a column
+ * leaves the customer subtracting, and the whole reason they are here is to
+ * see what the difference costs them.
+ */
+function quoteRows(rows: QuoteRowDTO[]): QuoteRow[] {
+  if (!isNonEmptyArray(rows)) return [];
+  const lowest = Math.min(...rows.map((row) => row.total ?? 0));
+  /* "Lowest" on the only quote that arrived says nothing — it is lowest of
+     one. The tag is a comparison, so it needs something to compare against. */
+  const comparable = rows.length > 1;
+
+  return rows.map((row) => {
+    const total = row.total ?? 0;
+    const delta = total - lowest;
+    return {
+      id: row.id,
+      organizerName: row.organizer?.name ?? 'An organizer',
+      initials: row.organizer?.initials || '·',
+      avatarColor: row.organizer?.avatarColor || '#1a2e5a',
+      totalLabel: formatINR(total),
+      metaLabel: [
+        row.lineItemCount > 0
+          ? `${row.lineItemCount} line item${row.lineItemCount === 1 ? '' : 's'}`
+          : '',
+        agoLabel(row.repliedAt),
+      ]
+        .filter(Boolean)
+        .join(' · '),
+      deltaLabel: !comparable ? '' : delta <= 0 ? 'Lowest' : `+${formatINR(delta)}`,
+      isLowest: comparable && delta <= 0,
+    };
+  });
+}
+
+/** "2h ago", "yesterday", "3 Sep" — how long ago the quote landed. */
+function agoLabel(iso: string | null | undefined, now = new Date()): string {
+  if (!iso) return '';
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '';
+
+  const elapsed = now.getTime() - date.getTime();
+  const minutes = Math.floor(elapsed / 60_000);
+  if (minutes < 1) return 'just now';
+  if (minutes < 60) return `${minutes}m ago`;
+
+  const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const days = Math.round((startOfDay(now) - startOfDay(date)) / 86_400_000);
+  if (days <= 0) return `${Math.max(1, Math.floor(elapsed / 3_600_000))}h ago`;
+  if (days === 1) return 'yesterday';
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+
+/**
+ * Who has not answered, by name.
+ *
+ * Named rather than counted, because "one organizer hasn't replied" is not
+ * something a customer can act on and "Sreeja Wedding Co. hasn't replied yet"
+ * is. Past two, the names stop being a list and become a paragraph.
+ */
+function awaitingLabel(awaiting: QuoteOrganizerRefDTO[]): string {
+  if (!isNonEmptyArray(awaiting)) return '';
+  const names = awaiting.map((o) => o.name).filter(Boolean);
+  if (names.length === 0) return '';
+  if (names.length === 1) return `${names[0]} hasn't replied yet`;
+  if (names.length === 2) return `${names[0]} and ${names[1]} haven't replied yet`;
+  return `${names.length} organizers haven't replied yet`;
 }
 
 /**
@@ -229,6 +366,7 @@ export function mapOccasions(feed: HomeFeedDTO): OccasionsViewModel | null {
       label: tile.label,
       icon: OCCASION_TILE_ICON[tile.art] ?? 'sparkles',
       note: tile.mostPlanned ? 'Most planned' : tile.fromPrice > 0 ? `From ${formatINR(tile.fromPrice)}` : '',
+      photoUrl: absoluteFileUrl(tile.imageUrl),
     })),
   };
 }
@@ -485,6 +623,7 @@ export function mapHomeFeed(feed: HomeFeedDTO): HomeViewModel {
     banner: mapBanner(feed),
     bookedEvent: mapBookedEvent(feed),
     currentEvent: mapCurrentEvent(feed),
+    otherEvents: mapOtherEvents(feed),
     categories: mapCategories(feed),
     occasions: mapOccasions(feed),
     offers: mapCoupons(feed),

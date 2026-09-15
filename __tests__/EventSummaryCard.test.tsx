@@ -51,6 +51,12 @@ const fullEvent: CurrentEventViewModel = {
   quoteCount: 0,
   spreadLabel: '',
   quotedLabel: '',
+  // A booking has no replies left to compare and nothing still to close.
+  reachLine: '',
+  closesLabel: '',
+  quoteRows: [],
+  awaitingLabel: '',
+  ctaLabel: 'Open workspace',
 };
 
 // An older booking raised outside the quote flow: a fixed date and venue, but
