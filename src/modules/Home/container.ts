@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { useEnsureLocation } from '../../hooks/useEnsureLocation';
-import { selectLocationStatus } from '../../store/locationSlice';
+import { selectLocationPlace, selectLocationStatus } from '../../store/locationSlice';
 import { useAppSelector } from '../../store/hooks';
 import { useSavedPackageIds } from './hooks';
 import { useHomeFeed, useRequestQuotes, useRequestQuoteFromOrganizer } from './hooks';
@@ -79,6 +79,7 @@ export function useHomeContainer(): HomeContainerResult {
   // re-requested on every Home render.
   useEnsureLocation();
   const locationStatus = useAppSelector(selectLocationStatus);
+  const locationPlace = useAppSelector(selectLocationPlace);
 
   const viewModel = useMemo<HomeViewModel>(() => (data ? mapHomeFeed(data) : EMPTY_VIEW_MODEL), [data]);
 
@@ -169,16 +170,23 @@ export function useHomeContainer(): HomeContainerResult {
       unreadCount: data?.unreadCount ?? 0,
       savedCount: data?.savedPackageCount ?? 0,
       /*
-       * The account's own city, which is what "organizers near you" matches
-       * on — not a reverse-geocoded street. Nothing in this system turns
-       * coordinates into a locality name, so naming one would be a guess about
-       * where the customer is standing.
+       * The account's own city first, the detected one second.
+       *
+       * Both name a city, but they answer different questions. The account's
+       * city is a decision the customer made about where they want events —
+       * somebody planning a wedding back home browses from another state and
+       * still means home. The detected city is only where the phone is right
+       * now. So travelling never silently repoints the feed; detection fills
+       * the gap for an account that has not set a city yet, which is the case
+       * where the alternative was the unhelpful 'Set your city'.
        */
       locationLabel:
         data?.user?.location?.trim() ||
+        locationPlace?.locality ||
+        locationPlace?.label ||
         (locationStatus === 'error' ? 'Location unavailable' : 'Set your city'),
     }),
-    [data, locationStatus],
+    [data, locationStatus, locationPlace],
   );
 
   return {

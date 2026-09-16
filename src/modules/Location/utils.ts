@@ -20,10 +20,11 @@ export function getStatusCopy(errorCode: LocationErrorCode | null): LocationStat
         actionLabel: 'Open Settings',
         action: 'openSettings',
       };
-    case 'services_disabled':
+    case 'position_unavailable':
       return {
-        title: 'Location services are off',
-        message: 'Turn on location services on your device to see your current location.',
+        title: "Couldn't get your location",
+        message:
+          'No position is available right now. Check that location is on, and try again — indoors it can help to move near a window.',
         actionLabel: 'Try again',
         action: 'retry',
       };

@@ -114,7 +114,7 @@ describe('failures', () => {
 
   it('reads an unavailable position as location services being off', async () => {
     failsWith(2);
-    await expect(getCurrentLocation()).rejects.toMatchObject({ code: 'services_disabled' });
+    await expect(getCurrentLocation()).rejects.toMatchObject({ code: 'position_unavailable' });
   });
 
   it('reports anything else without pretending to know what it was', async () => {
@@ -122,5 +122,67 @@ describe('failures', () => {
     const error = await getCurrentLocation().catch((e: unknown) => e);
     expect(error).toBeInstanceOf(LocationServiceError);
     expect((error as LocationServiceError).code).toBe('unknown');
+  });
+});
+
+/*
+ * The Android Play Services path in @react-native-community/geolocation neither
+ * applies the `timeout` option nor attaches a failure listener to its
+ * getLastLocation() call. A read that goes wrong there invokes no callback at
+ * all, so nothing on the native side can end the wait — which reaches the
+ * customer as a spinner that runs until they close the screen.
+ */
+describe('a native read that never calls back', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  /** The native module accepting the call and then doing nothing, forever. */
+  function neverAnswers() {
+    geo.getCurrentPosition.mockImplementation(() => {});
+  }
+
+  it('gives up rather than hanging', async () => {
+    neverAnswers();
+
+    const reading = getCurrentLocation({ fresh: true });
+    const settled = jest.fn();
+    reading.catch(settled);
+
+    await jest.advanceTimersByTimeAsync(120_000);
+
+    expect(settled).toHaveBeenCalled();
+    await expect(reading).rejects.toBeInstanceOf(LocationServiceError);
+  });
+
+  it('tries the other provider before giving up', async () => {
+    neverAnswers();
+
+    getCurrentLocation({ fresh: true }).catch(() => {});
+    await jest.advanceTimersByTimeAsync(120_000);
+
+    const providers = geo.setRNConfiguration.mock.calls.map(
+      (call) => (call[0] as { locationProvider: string }).locationProvider,
+    );
+    expect(providers).toContain('android');
+  });
+
+  it('falls through to a provider that can answer', async () => {
+    let call = 0;
+    geo.getCurrentPosition.mockImplementation((success: (p: unknown) => void) => {
+      call += 1;
+      // The fused provider hangs; the legacy one answers.
+      if (call < 3) return;
+      success({ coords: { latitude: 17.385, longitude: 78.4867 }, timestamp: 0 });
+    });
+
+    const reading = getCurrentLocation({ fresh: true });
+    await jest.advanceTimersByTimeAsync(120_000);
+
+    await expect(reading).resolves.toEqual({ latitude: 17.385, longitude: 78.4867 });
   });
 });

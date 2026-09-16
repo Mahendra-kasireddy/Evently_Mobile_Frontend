@@ -33,10 +33,10 @@ function Badge({ count }: { count: number }) {
  * The bar above everything: where the customer is, what is waiting for them,
  * and the way into search.
  *
- * The location is the account's own city rather than a reverse-geocoded
- * street — nothing here turns coordinates into a locality name, and naming one
- * would be a guess about where somebody is standing. Both badges are real
- * counts and disappear at zero.
+ * The location is the account's own city where one is set, falling back to the
+ * city reverse-geocoded from the device's position — never a street, which
+ * would name where somebody is standing rather than where they want events.
+ * Both badges are real counts and disappear at zero.
  *
  * The search field is a button drawn to look like an input. Typing happens on
  * the search screen, where the results and the filters live; a field here that

@@ -6,6 +6,10 @@ export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
   loadingText: { color: colors.textMuted, marginTop: spacing.md },
+  /** DIAGNOSTIC — remove with the block in LocationScreen. */
+  trace: { paddingHorizontal: spacing.lg, paddingBottom: spacing.lg },
+  /** DIAGNOSTIC — remove with the block in LocationScreen. */
+  traceLine: { color: colors.textMuted, fontSize: 11, lineHeight: 16 },
 });
 
 export const locationDetailsStyles = StyleSheet.create({
