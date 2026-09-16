@@ -1,13 +1,12 @@
 import { useCallback, useEffect } from 'react';
 import { reverseGeocode } from '../services/geocoding';
-import { getCurrentLocation, getLocationTrace, LocationServiceError } from '../services/location';
+import { getCurrentLocation, LocationServiceError } from '../services/location';
 import {
   locationFailed,
   locationRequested,
   locationSucceeded,
   placeResolved,
   selectLocationStatus,
-  traceRecorded,
 } from '../store/locationSlice';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 
@@ -32,7 +31,6 @@ export function useEnsureLocation() {
       dispatch(locationRequested());
       getCurrentLocation({ fresh })
         .then((coordinates) => {
-          dispatch(traceRecorded(getLocationTrace()));
           dispatch(locationSucceeded(coordinates));
 
           /*
@@ -52,7 +50,6 @@ export function useEnsureLocation() {
           const code = error instanceof LocationServiceError ? error.code : 'unknown';
           const detail = error instanceof LocationServiceError ? error.detail : undefined;
           const message = error instanceof Error ? error.message : 'Could not get your location.';
-          dispatch(traceRecorded(getLocationTrace()));
           dispatch(locationFailed({ code, message: detail ? `${message} (${detail})` : message }));
         });
     },

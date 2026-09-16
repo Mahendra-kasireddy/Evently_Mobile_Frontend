@@ -8,7 +8,6 @@ import {
   selectLocationErrorMessage,
   selectLocationPlace,
   selectLocationStatus,
-  selectLocationTrace,
 } from '../../store/locationSlice';
 import { useAppSelector } from '../../store/hooks';
 import type { Place } from '../../services/geocoding';
@@ -18,7 +17,6 @@ export interface LocationContainerResult {
   status: LocationStatus;
   coordinates: LocationCoordinates | null;
   place: Place | null;
-  trace: string[];
   errorCode: LocationErrorCode | null;
   errorMessage: string | null;
   retry: () => void;
@@ -34,7 +32,6 @@ export function useLocationContainer(): LocationContainerResult {
   const status = useAppSelector(selectLocationStatus);
   const coordinates = useAppSelector(selectLocationCoordinates);
   const place = useAppSelector(selectLocationPlace);
-  const trace = useAppSelector(selectLocationTrace);
   const errorCode = useAppSelector(selectLocationErrorCode);
   const errorMessage = useAppSelector(selectLocationErrorMessage);
   const { retry } = useEnsureLocation();
@@ -59,5 +56,5 @@ export function useLocationContainer(): LocationContainerResult {
     });
   }, []);
 
-  return { status, coordinates, place, trace, errorCode, errorMessage, retry, openSettings };
+  return { status, coordinates, place, errorCode, errorMessage, retry, openSettings };
 }

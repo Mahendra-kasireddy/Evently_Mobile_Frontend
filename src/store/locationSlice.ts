@@ -19,8 +19,6 @@ interface LocationState {
    * rather than the screen.
    */
   place: Place | null;
-  /** What the last read did, step by step. Diagnostic; see getLocationTrace. */
-  trace: string[];
 }
 
 const initialState: LocationState = {
@@ -29,7 +27,6 @@ const initialState: LocationState = {
   errorCode: null,
   errorMessage: null,
   place: null,
-  trace: [],
 };
 
 const locationSlice = createSlice({
@@ -54,9 +51,6 @@ const locationSlice = createSlice({
     placeResolved(state, action: PayloadAction<Place | null>) {
       state.place = action.payload;
     },
-    traceRecorded(state, action: PayloadAction<string[]>) {
-      state.trace = action.payload;
-    },
     locationFailed(state, action: PayloadAction<{ code: LocationErrorCode; message: string }>) {
       state.status = 'error';
       state.errorCode = action.payload.code;
@@ -65,13 +59,8 @@ const locationSlice = createSlice({
   },
 });
 
-export const {
-  locationRequested,
-  locationSucceeded,
-  locationFailed,
-  placeResolved,
-  traceRecorded,
-} = locationSlice.actions;
+export const { locationRequested, locationSucceeded, locationFailed, placeResolved } =
+  locationSlice.actions;
 
 interface RootStateSlice {
   location: LocationState;
@@ -82,6 +71,5 @@ export const selectLocationCoordinates = (state: RootStateSlice): LocationCoordi
 export const selectLocationErrorCode = (state: RootStateSlice): LocationErrorCode | null => state.location.errorCode;
 export const selectLocationErrorMessage = (state: RootStateSlice): string | null => state.location.errorMessage;
 export const selectLocationPlace = (state: RootStateSlice): Place | null => state.location.place;
-export const selectLocationTrace = (state: RootStateSlice): string[] => state.location.trace;
 
 export default locationSlice.reducer;

@@ -292,12 +292,15 @@ function isWorthRetrying(error: unknown): boolean {
 /*
  * What the last read actually did, step by step.
  *
- * A release build forwards no console output anywhere a developer can read it,
- * and every failure this module can produce looks the same from the outside: a
- * screen that does not show a position. The trace is the difference between
- * knowing which of the attempts below was reached and guessing — it is read
- * back by the Location screen so a device that fails in someone else's hands
- * can still say why.
+ * Kept after the bug it was written to find, because the thing that made that
+ * bug expensive is permanent: a release build forwards no console output
+ * anywhere a developer can read it, the handset is not always on a cable, and
+ * every failure in this file looks identical from outside — a screen with no
+ * position on it. Reading this back beats inferring which attempt was reached,
+ * and it costs one array per read.
+ *
+ * Nothing renders it today. Surface it behind a debug gate, or log it from a
+ * catch, when a device is misbehaving in someone else's hands.
  */
 let lastTrace: string[] = [];
 
@@ -322,7 +325,14 @@ async function readPosition(fresh: boolean): Promise<LocationCoordinates> {
   trace.push(`platform ${Platform.OS} ${String(Platform.Version)}`);
 
   try {
-    await ensurePermission();
+    /*
+     * The permission check gets a deadline of its own, because it is the one
+     * step whose stalling would leave nothing to show. Everything after it is
+     * traced as it happens, but a check() or request() that never resolves
+     * takes the whole read down before the first line is written — which is
+     * indistinguishable, on screen, from the app having never tried.
+     */
+    await withDeadline(ensurePermission(), 15_000);
     trace.push(`${at()} permission ok`);
   } catch (error) {
     trace.push(`${at()} permission FAILED — ${describe(error)}`);

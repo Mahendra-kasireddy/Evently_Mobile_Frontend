@@ -8,8 +8,7 @@ import { LocationErrorState } from './sections/LocationErrorState';
 import { styles } from './styles';
 
 export function LocationScreen() {
-  const { status, coordinates, place, trace, errorCode, retry, openSettings } =
-    useLocationContainer();
+  const { status, coordinates, place, errorCode, retry, openSettings } = useLocationContainer();
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -42,26 +41,6 @@ export function LocationScreen() {
       {((status === 'success' && !coordinates) || status === 'error') && (
         <LocationErrorState errorCode={errorCode} onRetry={retry} onOpenSettings={openSettings} />
       )}
-
-      {/*
-        DIAGNOSTIC — delete this block, `trace` in the slice, and getLocationTrace
-        once the Android read is understood.
-
-        Every way this screen can fail looks identical from outside: no position.
-        A release build forwards no console output anywhere readable, and the
-        device under test is not always on a USB cable, so the screen is the only
-        channel that reaches a developer. Shown in every state, because the state
-        it fails in is itself the thing in question.
-      */}
-      {trace.length > 0 ? (
-        <View style={styles.trace}>
-          {trace.map((line, index) => (
-            <EventlyText key={`${index}-${line}`} variant="caption" style={styles.traceLine}>
-              {line}
-            </EventlyText>
-          ))}
-        </View>
-      ) : null}
     </SafeAreaView>
   );
 }
