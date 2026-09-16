@@ -9,6 +9,8 @@ import type { LocationCoordinates } from '../types';
 interface LocationDetailsProps {
   coordinates: LocationCoordinates;
   place: Place | null;
+  /** A read is running behind this card, which is still showing the last one. */
+  isRefreshing: boolean;
   onRefresh: () => void;
 }
 
@@ -21,7 +23,12 @@ interface LocationDetailsProps {
  * numbers fall in, and a customer who is somewhere the geocoder gets wrong
  * needs to be able to see that the position itself is correct.
  */
-export function LocationDetails({ coordinates, place, onRefresh }: LocationDetailsProps) {
+export function LocationDetails({
+  coordinates,
+  place,
+  isRefreshing,
+  onRefresh,
+}: LocationDetailsProps) {
   return (
     <View style={locationDetailsStyles.card}>
       <View style={locationDetailsStyles.iconBadge}>
@@ -34,7 +41,13 @@ export function LocationDetails({ coordinates, place, onRefresh }: LocationDetai
         {formatCoordinates(coordinates.latitude, coordinates.longitude)}
       </EventlyText>
 
-      <EventlyButton title="Refresh" onPress={onRefresh} variant="outline" style={locationDetailsStyles.refreshButton} />
+      <EventlyButton
+        title={isRefreshing ? 'Updating…' : 'Refresh'}
+        onPress={onRefresh}
+        disabled={isRefreshing}
+        variant="outline"
+        style={locationDetailsStyles.refreshButton}
+      />
     </View>
   );
 }

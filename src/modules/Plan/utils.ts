@@ -1,4 +1,9 @@
-import { CATEGORY_ICON_NAME, DEFAULT_OCCASION_ICON, OCCASION_ICON_NAME } from './constants';
+import {
+  CATEGORY_ICON_NAME,
+  DEFAULT_OCCASION_ICON,
+  OCCASION_ICON_NAME,
+  REQUIRE_PLAN_CITY,
+} from './constants';
 import type { NormalizedApiError } from '../../services/errors';
 import type {
   PlanCategoryDTO,
@@ -77,7 +82,10 @@ export function isMeaningful(draft: PlanDraft): boolean {
 /** Per-step gate for advancing: returns a reason string when the step is incomplete. */
 export function blockReasonFor(step: number, indices: StepIndices, draft: PlanDraft): string | undefined {
   if (step === indices.detailsIndex) {
-    if (!draft.city.trim()) return 'Add your event city to continue.';
+    /* REQUIRE_PLAN_CITY is temporarily false — see the note on it in
+       ./constants. The condition is left intact so restoring the requirement
+       is one boolean, not a rewrite of this gate. */
+    if (REQUIRE_PLAN_CITY && !draft.city.trim()) return 'Add your event city to continue.';
     if (!draft.guests) return 'Choose a guest count to continue.';
   }
   if (step === indices.categoriesIndex && draft.categories.length === 0) {

@@ -186,3 +186,74 @@ describe('a native read that never calls back', () => {
     await expect(reading).resolves.toEqual({ latitude: 17.385, longitude: 78.4867 });
   });
 });
+
+/*
+ * The screen renders on what it has, not on what the read is doing. This is the
+ * behaviour that stops an unhelpful moment of hardware from blanking a screen
+ * that was already showing an answer.
+ */
+describe('a position already on screen', () => {
+  const reducer = require('../src/store/locationSlice').default;
+  const { locationRequested, locationSucceeded, locationFailed, placeResolved } =
+    require('../src/store/locationSlice');
+
+  const HERE = { latitude: 17.4469, longitude: 78.3808 };
+  const PLACE = { locality: 'Hyderabad', region: 'Telangana', label: 'Hyderabad, Telangana' };
+
+  it('survives a refresh that is still running', () => {
+    let state = reducer(undefined, locationSucceeded(HERE));
+    state = reducer(state, locationRequested());
+
+    expect(state.status).toBe('loading');
+    expect(state.coordinates).toEqual(HERE);
+  });
+
+  it('survives a refresh that fails outright', () => {
+    let state = reducer(undefined, locationSucceeded(HERE));
+    state = reducer(state, locationFailed({ code: 'position_unavailable', message: 'no' }));
+
+    expect(state.status).toBe('error');
+    expect(state.coordinates).toEqual(HERE);
+  });
+
+  it('keeps its name when a read lands on the same spot', () => {
+    let state = reducer(undefined, locationSucceeded(HERE));
+    state = reducer(state, placeResolved(PLACE));
+    state = reducer(state, locationSucceeded(HERE));
+
+    // Refresh must not blank the title it is about to re-fetch identically.
+    expect(state.place).toEqual(PLACE);
+  });
+
+  it('drops its name when the position actually moves', () => {
+    let state = reducer(undefined, locationSucceeded(HERE));
+    state = reducer(state, placeResolved(PLACE));
+    state = reducer(state, locationSucceeded({ latitude: 12.9716, longitude: 77.5946 }));
+
+    expect(state.place).toBeNull();
+  });
+});
+
+describe('a remembered position', () => {
+  const reducer = require('../src/store/locationSlice').default;
+  const { locationHydrated, locationSucceeded } = require('../src/store/locationSlice');
+
+  const REMEMBERED = { latitude: 17.4469, longitude: 78.3808 };
+  const LIVE = { latitude: 12.9716, longitude: 77.5946 };
+
+  it('shows without claiming a read has happened', () => {
+    const state = reducer(undefined, locationHydrated({ coordinates: REMEMBERED, place: null }));
+
+    // Status must stay 'idle', or useEnsureLocation never starts the real read
+    // and the customer is left on last week's position forever.
+    expect(state.status).toBe('idle');
+    expect(state.coordinates).toEqual(REMEMBERED);
+  });
+
+  it('never displaces a live read that got there first', () => {
+    let state = reducer(undefined, locationSucceeded(LIVE));
+    state = reducer(state, locationHydrated({ coordinates: REMEMBERED, place: null }));
+
+    expect(state.coordinates).toEqual(LIVE);
+  });
+});

@@ -12,6 +12,24 @@ export const REQUEST_QUOTE_FROM_ORGANIZER_ENDPOINT = '/quote/requestQuoteFromOrg
 /** Matches web's usePlan.ts debounce window exactly. */
 export const AUTOSAVE_DEBOUNCE_MS = 800;
 
+/**
+ * TEMPORARY — set back to `true` to restore the city requirement.
+ *
+ * Whether the details step refuses to advance without a city. This is the only
+ * place in plan creation where location gates anything: `area` is optional free
+ * text, and both fields are already `@IsOptional()` on the server's
+ * UpsertPlanDto, so the rest of the flow tolerates their absence without
+ * further change. A plan saved while this is false carries an empty `city`, and
+ * the organizer lookup it feeds maps an empty city to `undefined` — no filter,
+ * rather than no matches.
+ *
+ * It exists so the remainder of plan creation can be walked end to end while
+ * the address flow the city will eventually come from is still being built.
+ * Flipping it back restores the gate with no other edit, which is the point of
+ * a flag rather than a deletion — see `blockReasonFor` in ./utils.
+ */
+export const REQUIRE_PLAN_CITY = false;
+
 // Web's actual brand palette (evently-FrontEnd/src/index.css :root) — the
 // whole web app's identity (navy/orange/cream), not the mobile app's generic
 // indigo theme. Home's Hero/Categories/HowItWorks already port these same

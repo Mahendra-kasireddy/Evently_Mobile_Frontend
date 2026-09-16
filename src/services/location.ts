@@ -111,7 +111,33 @@ async function hasCoarseFallback(): Promise<boolean> {
   return isGranted(await check(COARSE_FALLBACK));
 }
 
-async function ensurePermission(): Promise<void> {
+/*
+ * The permission exchange in progress, if any.
+ *
+ * request() is not reentrant. Android delivers its answer through a single
+ * Activity callback, and react-native-permissions matches that answer to the
+ * request it believes is outstanding — so a second request() raised while a
+ * dialog is already up is resolved with the first one's result, or left
+ * unresolved when that result has already been consumed. Both look like a
+ * permission the customer plainly granted failing to take effect.
+ *
+ * Several things can reach this at once: two screens mounting the location
+ * hook in one commit, or a focus check landing while the first dialog is still
+ * on screen. They share the one exchange and get the one answer.
+ */
+let pendingPermission: Promise<void> | null = null;
+
+function ensurePermission(): Promise<void> {
+  if (pendingPermission) return pendingPermission;
+
+  const exchange = resolvePermission().finally(() => {
+    if (pendingPermission === exchange) pendingPermission = null;
+  });
+  pendingPermission = exchange;
+  return exchange;
+}
+
+async function resolvePermission(): Promise<void> {
   const status = await check(LOCATION_PERMISSION);
 
   if (isGranted(status)) return;
@@ -150,6 +176,15 @@ async function ensurePermission(): Promise<void> {
  * see `fresh` below.
  */
 const CACHE_MAX_AGE_MS = 60_000;
+
+/**
+ * How old a fix may be for a read the customer asked for.
+ *
+ * Short enough that somebody who has walked somewhere gets a new position,
+ * long enough that the device can answer from what it already has. See the
+ * note at its use site for why this is not zero.
+ */
+const FRESH_MAX_AGE_MS = 15_000;
 
 function getCurrentPosition(fresh: boolean): Promise<LocationCoordinates> {
   return new Promise((resolve, reject) => {
@@ -204,7 +239,23 @@ function getCurrentPosition(fresh: boolean): Promise<LocationCoordinates> {
          */
         enableHighAccuracy: fresh,
         timeout: fresh ? 30_000 : 15_000,
-        maximumAge: fresh ? 0 : CACHE_MAX_AGE_MS,
+        /*
+         * Seconds old, not zero.
+         *
+         * Zero reads as "no existing fix will do", and the Play Services
+         * manager honours that literally: every stored position fails its
+         * age test, so the request always falls through to asking the GPS
+         * chip for a cold lock at high accuracy. Indoors that never arrives,
+         * the native layer never calls back, and the watchdog is what ends
+         * the wait — so a Refresh cost twenty seconds and then displayed the
+         * same coordinates the fallback had all along.
+         *
+         * Fifteen seconds is the honest reading of what Refresh is for. It
+         * still refuses the minute-old fix a passive read would accept, so
+         * somebody who has moved gets a new position; it just does not insist
+         * on a satellite lock to tell them they are still in Hyderabad.
+         */
+        maximumAge: fresh ? FRESH_MAX_AGE_MS : CACHE_MAX_AGE_MS,
       },
     );
   });
@@ -326,13 +377,28 @@ async function readPosition(fresh: boolean): Promise<LocationCoordinates> {
 
   try {
     /*
-     * The permission check gets a deadline of its own, because it is the one
-     * step whose stalling would leave nothing to show. Everything after it is
-     * traced as it happens, but a check() or request() that never resolves
-     * takes the whole read down before the first line is written — which is
-     * indistinguishable, on screen, from the app having never tried.
+     * Deliberately not on a deadline.
+     *
+     * On a first run this call puts the system permission dialog on screen and
+     * then waits for a person to read it and decide. That wait is not the app
+     * being slow, and a clock against it measures how fast somebody taps — so a
+     * customer who reads the dialog, or who gets it while the app is still
+     * settling, is recorded as a failure and then grants permission a moment
+     * later into a screen that has already given up.
+     *
+     * The abandoned request is the worse half. react-native-permissions settles
+     * a request from the Activity's permission result, and dropping ours mid
+     * flight leaves that bookkeeping holding a promise nobody is waiting on;
+     * the next request() can then be answered with the previous, stale result
+     * or not answered at all. That is the difference between "Refresh fixes it"
+     * and "Refresh does nothing", which is exactly how this failed
+     * intermittently rather than always.
+     *
+     * Stalling is guarded by ensurePermission being single-flight instead: the
+     * dialog is only ever asked for once at a time, so there is nothing to
+     * abandon and nothing to collide with.
      */
-    await withDeadline(ensurePermission(), 15_000);
+    await ensurePermission();
     trace.push(`${at()} permission ok`);
   } catch (error) {
     trace.push(`${at()} permission FAILED — ${describe(error)}`);
@@ -406,5 +472,16 @@ export function getCurrentLocation(
 
   return entry.promise.finally(() => {
     if (pendingRead === entry) pendingRead = null;
+
+    /*
+     * One line per read, in development only.
+     *
+     * The trace already records every step this file takes — the permission
+     * result, each provider attempt, its budget, what it returned and when — so
+     * printing it costs nothing extra and replaces the scattered logging that
+     * would otherwise be added and forgotten. It stays out of release builds
+     * because it carries the customer's coordinates.
+     */
+    if (__DEV__) console.log('[location]', lastTrace.join(' | '));
   });
 }
