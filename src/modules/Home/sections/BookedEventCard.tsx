@@ -31,22 +31,34 @@ interface BookedEventCardProps {
  * open the workspace, message the organizer — and collapsing them into a
  * single control would mean one of them could not be reached.
  */
-export function BookedEventCard({ data, onPress, onMessageOrganizer }: BookedEventCardProps) {
-  const nextIndex = data.steps.findIndex((step) => !step.done);
+export function BookedEventCard({
+  data,
+  onPress,
+  onMessageOrganizer,
+}: BookedEventCardProps) {
+  const nextIndex = data.steps.findIndex(step => !step.done);
 
   return (
     <View style={s.section}>
       <View style={s.card}>
         <View style={s.topRow}>
           <View style={s.statusPill}>
-            <EventlyIcon name="check" size={13} color={BOOKED_STEP_DONE_COLOR} />
+            <EventlyIcon
+              name="check"
+              size={13}
+              color={BOOKED_STEP_DONE_COLOR}
+            />
             <EventlyText variant="caption" style={s.statusText}>
               {BOOKED_STATUS_LABEL[data.status]}
             </EventlyText>
           </View>
-          <EventlyText variant="caption" style={s.ref} numberOfLines={1}>
-            {data.ref}
-          </EventlyText>
+          {/* Decoration, and optional: an older booking row has no reference,
+              and that is not a reason to leave a gap where one would sit. */}
+          {data.ref ? (
+            <EventlyText variant="caption" style={s.ref} numberOfLines={1}>
+              {data.ref}
+            </EventlyText>
+          ) : null}
           {/* "Today" carries no trailing word — a countdown of nothing does not
               need the units it is not counting. */}
           <View style={s.days}>
@@ -74,16 +86,26 @@ export function BookedEventCard({ data, onPress, onMessageOrganizer }: BookedEve
         ) : null}
 
         <View style={s.organizer}>
-          <View style={[s.avatar, { backgroundColor: data.organizerAvatarColor }]}>
+          <View
+            style={[s.avatar, { backgroundColor: data.organizerAvatarColor }]}
+          >
             <EventlyText variant="subtitle" style={s.avatarText}>
               {data.organizerInitials}
             </EventlyText>
           </View>
           <View style={s.organizerText}>
-            <EventlyText variant="subtitle" style={s.organizerName} numberOfLines={1}>
+            <EventlyText
+              variant="subtitle"
+              style={s.organizerName}
+              numberOfLines={1}
+            >
               {data.organizerName}
             </EventlyText>
-            <EventlyText variant="caption" style={s.organizerNote} numberOfLines={1}>
+            <EventlyText
+              variant="caption"
+              style={s.organizerNote}
+              numberOfLines={1}
+            >
               {data.organizerNote}
             </EventlyText>
           </View>
@@ -95,7 +117,11 @@ export function BookedEventCard({ data, onPress, onMessageOrganizer }: BookedEve
               accessibilityRole="button"
               accessibilityLabel={`Message ${data.organizerName}`}
             >
-              <EventlyIcon name="chat-outline" size={19} color={HERO_ACCENT_COLOR} />
+              <EventlyIcon
+                name="chat-outline"
+                size={19}
+                color={HERO_ACCENT_COLOR}
+              />
             </TouchableOpacity>
           ) : null}
         </View>
@@ -128,7 +154,9 @@ export function BookedEventCard({ data, onPress, onMessageOrganizer }: BookedEve
                   <View
                     key={step.label}
                     style={s.step}
-                    accessibilityLabel={`${step.label}: ${step.done ? 'done' : 'not yet'}`}
+                    accessibilityLabel={`${step.label}: ${
+                      step.done ? 'done' : 'not yet'
+                    }`}
                   >
                     <View
                       style={[

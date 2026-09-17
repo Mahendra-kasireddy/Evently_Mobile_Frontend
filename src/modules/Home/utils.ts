@@ -1,6 +1,10 @@
 import { isNonEmptyArray } from '../../utils/guards';
 import { absoluteFileUrl } from '../../services/urls';
-import { CURRENT_EVENT_CTA, CURRENT_EVENT_STAGE_LABEL, OCCASION_TILE_ICON } from './constants';
+import {
+  CURRENT_EVENT_CTA,
+  CURRENT_EVENT_STAGE_LABEL,
+  OCCASION_TILE_ICON,
+} from './constants';
 import type {
   BannerViewModel,
   BookedEventStatus,
@@ -29,7 +33,8 @@ export function mapBanner(feed: HomeFeedDTO): BannerViewModel | null {
   const hero = feed.content?.hero;
   if (!hero) return null;
 
-  const firstName = feed.user?.name?.split(' ')[0] || feed.user?.name || 'there';
+  const firstName =
+    feed.user?.name?.split(' ')[0] || feed.user?.name || 'there';
 
   return {
     greeting: hero.greetingTemplate.replace('{name}', firstName),
@@ -40,7 +45,9 @@ export function mapBanner(feed: HomeFeedDTO): BannerViewModel | null {
     draftLabel: hero.draftLabel,
     defaultDraft: hero.defaultDraft,
     options: hero.options,
-    trust: isNonEmptyArray(hero.trust) ? hero.trust.map((t) => ({ icon: t.icon, label: t.label })) : [],
+    trust: isNonEmptyArray(hero.trust)
+      ? hero.trust.map(t => ({ icon: t.icon, label: t.label }))
+      : [],
   };
 }
 
@@ -78,27 +85,43 @@ function initialsOf(name: string): string {
 function organizerNote(confirmed: boolean, vendorCount: number): string {
   if (!confirmed) return 'Confirming your booking';
   if (vendorCount === 0) return 'Managing your event';
-  return `Managing ${vendorCount} vendor${vendorCount === 1 ? '' : 's'} for you`;
+  return `Managing ${vendorCount} vendor${
+    vendorCount === 1 ? '' : 's'
+  } for you`;
 }
 
 export function mapBookedEvent(feed: HomeFeedDTO): BookedEventViewModel | null {
   const b = feed.booking;
-  // The card's whole action is opening this booking's workspace, so a record
-  // with no id cannot be drawn as one — nor can one with no reference or
-  // title be drawn as a booking at all.
-  if (!b || !b.id || !b.ref || !b.title) return null;
+  /*
+   * The card's whole action is opening this booking's workspace, so a record
+   * with no id cannot be drawn as one, and one with no title has nothing to
+   * put on it.
+   *
+   * `ref` used to be required too, and it is decoration — a booking reference
+   * printed in the corner. An older row with an empty one made the entire
+   * booked card vanish from Home, which is how a customer ends up believing a
+   * confirmed booking was lost. It is rendered when present and omitted when
+   * not.
+   */
+  if (!b || !b.id || !b.title) return null;
 
   const steps = isNonEmptyArray(b.steps)
-    ? b.steps.filter((s) => !!s?.label).map((s) => ({ label: s.label, done: s.done === true }))
+    ? b.steps
+        .filter(s => !!s?.label)
+        .map(s => ({ label: s.label, done: s.done === true }))
     : [];
-  const daysToGo = Number.isFinite(b.daysToGo) ? Math.max(0, Math.trunc(b.daysToGo)) : 0;
+  const daysToGo = Number.isFinite(b.daysToGo)
+    ? Math.max(0, Math.trunc(b.daysToGo))
+    : 0;
   const confirmed = b.organizerConfirmed !== false;
   const organizerName = b.organizerName || 'Your organizer';
-  const vendorCount = Number.isFinite(b.vendorCount) ? Math.max(0, Math.trunc(b.vendorCount)) : 0;
+  const vendorCount = Number.isFinite(b.vendorCount)
+    ? Math.max(0, Math.trunc(b.vendorCount))
+    : 0;
 
   return {
     id: b.id,
-    ref: b.ref,
+    ref: b.ref ?? '',
     title: b.title,
     description: b.description ?? '',
     /*
@@ -107,11 +130,12 @@ export function mapBookedEvent(feed: HomeFeedDTO): BookedEventViewModel | null {
      * worse than one that stops after the venue.
      */
     factsLine: [b.dateLabel, b.location, b.guests ? `${b.guests} guests` : '']
-      .map((part) => (part ?? '').trim())
+      .map(part => (part ?? '').trim())
       .filter(Boolean)
       .join(' · '),
     daysToGoValue: daysToGo === 0 ? 'Today' : String(daysToGo),
-    daysToGoLabel: daysToGo === 0 ? '' : daysToGo === 1 ? 'day to go' : 'days to go',
+    daysToGoLabel:
+      daysToGo === 0 ? '' : daysToGo === 1 ? 'day to go' : 'days to go',
     progress: clampPercent(b.progress),
     daysToGo,
     status: BOOKED_STATUSES.includes(b.status) ? b.status : 'confirmed',
@@ -123,7 +147,9 @@ export function mapBookedEvent(feed: HomeFeedDTO): BookedEventViewModel | null {
     organizerInitials: b.organizerInitials || initialsOf(organizerName),
     organizerAvatarColor: b.organizerAvatarColor || '#1a2e5a',
     organizerNote: organizerNote(confirmed, vendorCount),
-    stepsDoneLabel: `${steps.filter((s) => s.done).length} of ${steps.length} steps done`,
+    stepsDoneLabel: `${steps.filter(s => s.done).length} of ${
+      steps.length
+    } steps done`,
     steps,
   };
 }
@@ -172,12 +198,73 @@ export function formatINR(amount: number | undefined | null): string {
  * yet reads "5 Sep 2026 · 150 guests" rather than showing an empty slot the
  * customer would read as missing information about their own event.
  */
-export function factsLineOf(when: string, where: string, guests: string): string {
-  return [when, where, guests].map((v) => (v ?? '').trim()).filter(Boolean).join(' · ');
+export function factsLineOf(
+  when: string,
+  where: string,
+  guests: string,
+): string {
+  return [when, where, guests]
+    .map(v => (v ?? '').trim())
+    .filter(Boolean)
+    .join(' · ');
+}
+
+/**
+ * One date format, whatever the server sent.
+ *
+ * `when` used to be passed through untouched, and the two server paths that
+ * compose an event do not agree: the request path emits "2026-09-21", the
+ * booking path emits "21 September 2026". The customer saw both, on two cards
+ * about the same event, and had no way to tell they were the same day.
+ *
+ * Only a bare ISO date is rewritten. Anything else — a range, a "TBC", a date
+ * the backend already spelled out — is left exactly as it arrived, because
+ * guessing at a format Home does not recognise is how a real value becomes
+ * "Invalid Date".
+ */
+export function normalizeWhen(when: string): string {
+  const raw = (when ?? '').trim();
+  const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw);
+  if (!iso) return raw;
+
+  const [, year, month, day] = iso;
+  const date = new Date(Number(year), Number(month) - 1, Number(day));
+  if (Number.isNaN(date.getTime())) return raw;
+
+  // The spelling every other screen uses — Workspace, Chat and Invitation all
+  // format their dates this way.
+  return date.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
+/**
+ * What makes two feed entries the same event.
+ *
+ * `refId` is the honest answer and is tried first, but it does not catch the
+ * duplicate that actually reached customers: one event resolved from two
+ * different records — the quote request and the plan behind it — carries two
+ * different ids under two different `source` values. What it cannot vary is
+ * the event itself, so the fallback is everything the customer reads on the
+ * card: its name, its occasion, its day and its place. All four, because two
+ * genuinely different events on one date at one venue are a real thing a
+ * customer can have, and collapsing those would hide one of them.
+ */
+function eventIdentity(e: CurrentEventDTO): string {
+  const facts = [e.title, e.occasion, normalizeWhen(e.when ?? ''), e.where]
+    .map(v => (v ?? '').trim().toLowerCase())
+    .join('|');
+  // Nothing to compare on: fall back to the id rather than matching every
+  // other blank event.
+  return facts.replace(/\|/g, '') === '' ? `ref:${e.refId}` : `facts:${facts}`;
 }
 
 /** the customer's in-progress event, shown as its own section. Hidden if there is none. */
-export function mapCurrentEvent(feed: HomeFeedDTO): CurrentEventViewModel | null {
+export function mapCurrentEvent(
+  feed: HomeFeedDTO,
+): CurrentEventViewModel | null {
   return feed.currentEvent ? mapEvent(feed.currentEvent) : null;
 }
 
@@ -186,9 +273,34 @@ export function mapCurrentEvent(feed: HomeFeedDTO): CurrentEventViewModel | null
  *
  * Each is mapped exactly like the leading one, because each is rendered by the
  * same hero — a second event is not a lesser kind of event.
+ *
+ * What is dropped is anything the card above is already about. The DTO's
+ * contract says `otherEvents` never repeats `currentEvent`, and the server
+ * broke it: one Corporate request came back as both, and Home stacked the same
+ * event on itself. A promise the client can check cheaply is one the client
+ * should check — a customer seeing their single event twice cannot tell
+ * whether they created it twice.
  */
 export function mapOtherEvents(feed: HomeFeedDTO): CurrentEventViewModel[] {
-  return (feed.otherEvents ?? []).map(mapEvent);
+  const seen = new Set<string>();
+  for (const leading of [feed.currentEvent]) {
+    if (leading) {
+      seen.add(`ref:${leading.refId}`);
+      seen.add(eventIdentity(leading));
+    }
+  }
+  if (feed.booking?.id) seen.add(`ref:${feed.booking.id}`);
+
+  return (feed.otherEvents ?? [])
+    .filter(e => {
+      const byRef = `ref:${e.refId}`;
+      const byFacts = eventIdentity(e);
+      if (seen.has(byRef) || seen.has(byFacts)) return false;
+      seen.add(byRef);
+      seen.add(byFacts);
+      return true;
+    })
+    .map(mapEvent);
 }
 
 function mapEvent(e: CurrentEventDTO): CurrentEventViewModel {
@@ -198,14 +310,18 @@ function mapEvent(e: CurrentEventDTO): CurrentEventViewModel {
     // Each of these is passed through untouched: a value the backend left
     // blank stays blank, so the card can say "not set" instead of guessing.
     occasion: e.occasion ?? '',
-    when: e.when ?? '',
+    when: normalizeWhen(e.when ?? ''),
     where: e.where ?? '',
     guests: e.guests ?? '',
     source: e.source ?? 'plan',
     progress: e.progress,
     daysToGo: e.daysToGo,
     stage: e.stage,
-    factsLine: factsLineOf(e.when ?? '', e.where ?? '', e.guests ?? ''),
+    factsLine: factsLineOf(
+      normalizeWhen(e.when ?? ''),
+      e.where ?? '',
+      e.guests ?? '',
+    ),
     stageLabel: CURRENT_EVENT_STAGE_LABEL[e.stage] ?? '',
     quoteCount: e.quoteCount ?? 0,
     /*
@@ -217,12 +333,18 @@ function mapEvent(e: CurrentEventDTO): CurrentEventViewModel {
      * up as a comparison the customer cannot make yet.
      */
     spreadLabel:
-      e.lowestQuote > 0 && e.highestQuote > 0 && e.highestQuote !== e.lowestQuote
-        ? `Lowest ${formatINR(e.lowestQuote)} · highest ${formatINR(e.highestQuote)}`
+      e.lowestQuote > 0 &&
+      e.highestQuote > 0 &&
+      e.highestQuote !== e.lowestQuote
+        ? `Lowest ${formatINR(e.lowestQuote)} · highest ${formatINR(
+            e.highestQuote,
+          )}`
         : '',
     quotedLabel:
       (e.quoteCount ?? 0) > 0
-        ? `${e.quoteCount} organizer${e.quoteCount === 1 ? ' has' : 's have'} quoted`
+        ? `${e.quoteCount} organizer${
+            e.quoteCount === 1 ? ' has' : 's have'
+          } quoted`
         : '',
     reachLine: reachLine(e.sentToCount ?? 0, e.quoteCount ?? 0),
     closesLabel: closesLabel(e.closesInDays),
@@ -257,11 +379,17 @@ function ctaLabel(stage: CurrentEventStage, quoteCount: number): string {
  */
 function reachLine(sentToCount: number, quoteCount: number): string {
   if (sentToCount > 0) {
-    const sent = `Your request went to ${sentToCount} organizer${sentToCount === 1 ? '' : 's'}`;
-    return quoteCount > 0 ? `${sent} · ${quoteCount} ${quoteCount === 1 ? 'has' : 'have'} replied` : sent;
+    const sent = `Your request went to ${sentToCount} organizer${
+      sentToCount === 1 ? '' : 's'
+    }`;
+    return quoteCount > 0
+      ? `${sent} · ${quoteCount} ${quoteCount === 1 ? 'has' : 'have'} replied`
+      : sent;
   }
   if (quoteCount > 0) {
-    return `${quoteCount} organizer${quoteCount === 1 ? '' : 's'} ${quoteCount === 1 ? 'has' : 'have'} replied`;
+    return `${quoteCount} organizer${quoteCount === 1 ? '' : 's'} ${
+      quoteCount === 1 ? 'has' : 'have'
+    } replied`;
   }
   return '';
 }
@@ -282,12 +410,12 @@ function closesLabel(days: number | null | undefined): string {
  */
 function quoteRows(rows: QuoteRowDTO[]): QuoteRow[] {
   if (!isNonEmptyArray(rows)) return [];
-  const lowest = Math.min(...rows.map((row) => row.total ?? 0));
+  const lowest = Math.min(...rows.map(row => row.total ?? 0));
   /* "Lowest" on the only quote that arrived says nothing — it is lowest of
      one. The tag is a comparison, so it needs something to compare against. */
   const comparable = rows.length > 1;
 
-  return rows.map((row) => {
+  return rows.map(row => {
     const total = row.total ?? 0;
     const delta = total - lowest;
     return {
@@ -298,13 +426,19 @@ function quoteRows(rows: QuoteRowDTO[]): QuoteRow[] {
       totalLabel: formatINR(total),
       metaLabel: [
         row.lineItemCount > 0
-          ? `${row.lineItemCount} line item${row.lineItemCount === 1 ? '' : 's'}`
+          ? `${row.lineItemCount} line item${
+              row.lineItemCount === 1 ? '' : 's'
+            }`
           : '',
         agoLabel(row.repliedAt),
       ]
         .filter(Boolean)
         .join(' · '),
-      deltaLabel: !comparable ? '' : delta <= 0 ? 'Lowest' : `+${formatINR(delta)}`,
+      deltaLabel: !comparable
+        ? ''
+        : delta <= 0
+        ? 'Lowest'
+        : `+${formatINR(delta)}`,
       isLowest: comparable && delta <= 0,
     };
   });
@@ -321,7 +455,8 @@ function agoLabel(iso: string | null | undefined, now = new Date()): string {
   if (minutes < 1) return 'just now';
   if (minutes < 60) return `${minutes}m ago`;
 
-  const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const startOfDay = (d: Date) =>
+    new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
   const days = Math.round((startOfDay(now) - startOfDay(date)) / 86_400_000);
   if (days <= 0) return `${Math.max(1, Math.floor(elapsed / 3_600_000))}h ago`;
   if (days === 1) return 'yesterday';
@@ -337,10 +472,11 @@ function agoLabel(iso: string | null | undefined, now = new Date()): string {
  */
 function awaitingLabel(awaiting: QuoteOrganizerRefDTO[]): string {
   if (!isNonEmptyArray(awaiting)) return '';
-  const names = awaiting.map((o) => o.name).filter(Boolean);
+  const names = awaiting.map(o => o.name).filter(Boolean);
   if (names.length === 0) return '';
   if (names.length === 1) return `${names[0]} hasn't replied yet`;
-  if (names.length === 2) return `${names[0]} and ${names[1]} haven't replied yet`;
+  if (names.length === 2)
+    return `${names[0]} and ${names[1]} haven't replied yet`;
   return `${names.length} organizers haven't replied yet`;
 }
 
@@ -358,14 +494,18 @@ export function mapOccasions(feed: HomeFeedDTO): OccasionsViewModel | null {
   return {
     title: feed.content?.planSection?.title ?? 'Plan something new',
     subtitle: feed.content?.planSection?.subtitle ?? '',
-    items: tiles.map((tile) => ({
+    items: tiles.map(tile => ({
       id: tile.id,
       art: PACKAGE_ART_KEYS.includes(tile.art as OccasionArtKey)
         ? (tile.art as OccasionArtKey)
         : 'wedding',
       label: tile.label,
       icon: OCCASION_TILE_ICON[tile.art] ?? 'sparkles',
-      note: tile.mostPlanned ? 'Most planned' : tile.fromPrice > 0 ? `From ${formatINR(tile.fromPrice)}` : '',
+      note: tile.mostPlanned
+        ? 'Most planned'
+        : tile.fromPrice > 0
+        ? `From ${formatINR(tile.fromPrice)}`
+        : '',
       photoUrl: absoluteFileUrl(tile.imageUrl),
     })),
   };
@@ -398,8 +538,10 @@ function endsOn(iso: string | null, style: 'short' | 'long' = 'long'): string {
 
 /** "10% off", "10% off up to ₹5,000", "₹2,000 off". */
 function discountLine(coupon: ClaimableCouponDTO): string {
-  if (coupon.discountType === 'fixed') return `${formatINR(coupon.discountValue)} off`;
-  const cap = coupon.maxDiscount > 0 ? ` up to ${formatINR(coupon.maxDiscount)}` : '';
+  if (coupon.discountType === 'fixed')
+    return `${formatINR(coupon.discountValue)} off`;
+  const cap =
+    coupon.maxDiscount > 0 ? ` up to ${formatINR(coupon.maxDiscount)}` : '';
   return `${coupon.discountValue}% off${cap}`;
 }
 
@@ -424,7 +566,9 @@ function termsLine(coupon: ClaimableCouponDTO): string {
     /* Terser once something precedes it — "on bookings over" reads fine as an
        opener and as padding after an organizer's name. */
     const amount = formatINR(coupon.minBookingAmount);
-    parts.push(parts.length > 0 ? `over ${amount}` : `On bookings over ${amount}`);
+    parts.push(
+      parts.length > 0 ? `over ${amount}` : `On bookings over ${amount}`,
+    );
   }
   const ends = endsOn(coupon.endsAt, 'short');
   if (ends) parts.push(parts.length > 0 ? `ends ${ends}` : `Ends ${ends}`);
@@ -479,7 +623,12 @@ export function mapCoupons(feed: HomeFeedDTO): CouponsViewModel | null {
           ? [{ label: 'Works with', value: coupon.organizerName }]
           : []),
         ...(coupon.minBookingAmount > 0
-          ? [{ label: 'Minimum booking', value: formatINR(coupon.minBookingAmount) }]
+          ? [
+              {
+                label: 'Minimum booking',
+                value: formatINR(coupon.minBookingAmount),
+              },
+            ]
           : []),
         { label: 'Valid until', value: endsOn(coupon.endsAt) || 'No end date' },
         { label: 'You can use it', value: usesLeftLine(coupon) },
@@ -496,7 +645,13 @@ export function mapCategories(feed: HomeFeedDTO): CategoriesViewModel | null {
   return {
     title: section.title,
     subtitle: section.subtitle,
-    items: section.occasions.map((o) => ({ id: o.id, icon: o.icon, art: o.art, label: o.label, cta: o.cta })),
+    items: section.occasions.map(o => ({
+      id: o.id,
+      icon: o.icon,
+      art: o.art,
+      label: o.label,
+      cta: o.cta,
+    })),
   };
 }
 
@@ -517,7 +672,7 @@ export function mapPackages(feed: HomeFeedDTO): PackagesViewModel | null {
     title: feed.content?.packages?.title ?? 'Curated packages by budget',
     subtitle: feed.content?.packages?.subtitle ?? '',
     buildLabel: feed.content?.packages?.buildLabel ?? null,
-    items: feed.packages.map((p) => ({
+    items: feed.packages.map(p => ({
       id: p.id,
       badge: p.badge,
       title: p.title,
@@ -551,7 +706,9 @@ export function mapPackages(feed: HomeFeedDTO): PackagesViewModel | null {
 }
 
 /** top organizers -> recommended events. Hidden if there are none. */
-export function mapTopOrganizers(feed: HomeFeedDTO): TopOrganizersViewModel | null {
+export function mapTopOrganizers(
+  feed: HomeFeedDTO,
+): TopOrganizersViewModel | null {
   if (!isNonEmptyArray(feed.topOrganizers)) return null;
 
   const scope = feed.topOrganizersScope === 'city' ? 'city' : 'all';
@@ -565,14 +722,14 @@ export function mapTopOrganizers(feed: HomeFeedDTO): TopOrganizersViewModel | nu
       scope === 'city'
         ? ''
         : city
-          ? `No organizers listed in ${city} yet — these serve other cities. Change your city.`
-          : ('These organizers serve other cities. Set your city to see local ones.' as string),
+        ? `No organizers listed in ${city} yet — these serve other cities. Change your city.`
+        : ('These organizers serve other cities. Set your city to see local ones.' as string),
     // 'all' means nothing local matched and these come from further afield.
     // Defaulted to 'all' so an older payload caveats itself rather than
     // claiming a locality it never asserted.
     scope,
     city,
-    items: feed.topOrganizers.map((o) => ({
+    items: feed.topOrganizers.map(o => ({
       id: o.id,
       name: o.name,
       initials: o.initials,
@@ -589,7 +746,9 @@ export function mapTopOrganizers(feed: HomeFeedDTO): TopOrganizersViewModel | nu
       fromLabel: formatCompactINR(o.basePrice),
       repliesLabel: o.responseHours > 0 ? `Replies in ${o.responseHours}h` : '',
       bookedLabel:
-        (o.bookedThisMonth ?? 0) > 0 ? `${o.bookedThisMonth} booked this month` : '',
+        (o.bookedThisMonth ?? 0) > 0
+          ? `${o.bookedThisMonth} booked this month`
+          : '',
     })),
   };
 }
@@ -602,7 +761,12 @@ export function mapHowItWorks(feed: HomeFeedDTO): HowItWorksViewModel | null {
   return {
     title: section.title,
     subtitle: section.subtitle,
-    steps: section.steps.map((s) => ({ num: s.num, icon: s.icon, title: s.title, description: s.description })),
+    steps: section.steps.map(s => ({
+      num: s.num,
+      icon: s.icon,
+      title: s.title,
+      description: s.description,
+    })),
   };
 }
 
@@ -614,7 +778,12 @@ export function mapTools(feed: HomeFeedDTO): ToolsViewModel | null {
   return {
     title: section.title,
     subtitle: section.subtitle,
-    tools: section.tools.map((t) => ({ id: t.id, icon: t.icon, title: t.title, description: t.description })),
+    tools: section.tools.map(t => ({
+      id: t.id,
+      icon: t.icon,
+      title: t.title,
+      description: t.description,
+    })),
   };
 }
 

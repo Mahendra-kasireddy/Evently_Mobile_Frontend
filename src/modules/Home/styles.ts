@@ -10,6 +10,7 @@ import {
   HERO_BACKGROUND_COLOR,
   HERO_DECOR_CIRCLE_COLOR,
   HERO_FIELD_ICON_BG,
+  HOME_ACCENT_SOFT,
   HOME_CANVAS,
   HOME_GREEN,
   HOME_GREEN_SOFT,
@@ -24,16 +25,34 @@ export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: HOME_CANVAS },
   scroll: { flex: 1 },
   content: { paddingBottom: spacing.xl },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.lg,
+  },
   loadingText: { color: colors.textMuted, marginTop: spacing.md },
   errorText: { color: colors.danger, textAlign: 'center' },
 });
 
 export const homeHeaderStyles = StyleSheet.create({
-  container: { paddingHorizontal: spacing.md, paddingTop: spacing.xs, paddingBottom: spacing.sm },
-  topRow: { ...globalStyles.row, justifyContent: 'space-between', gap: spacing.sm },
+  container: {
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.xs,
+    paddingBottom: spacing.sm,
+  },
+  topRow: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
   locationButton: { ...globalStyles.row, flexShrink: 1, gap: 6 },
-  locationLabel: { color: HOME_NAVY, fontSize: 17, fontWeight: '700', flexShrink: 1 },
+  locationLabel: {
+    color: HOME_NAVY,
+    fontSize: 17,
+    fontWeight: '700',
+    flexShrink: 1,
+  },
   actions: { ...globalStyles.row, gap: spacing.md },
   iconButton: { padding: 2 },
   badge: {
@@ -48,7 +67,12 @@ export const homeHeaderStyles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 4,
   },
-  badgeText: { color: colors.onPrimary, fontSize: 10, fontWeight: '700', lineHeight: 13 },
+  badgeText: {
+    color: colors.onPrimary,
+    fontSize: 10,
+    fontWeight: '700',
+    lineHeight: 13,
+  },
 
   searchRow: { ...globalStyles.row, gap: 10, marginTop: 14 },
   /** A button that looks like a field: tapping it opens the search screen. */
@@ -92,8 +116,22 @@ export const bannerStyles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: HERO_DECOR_CIRCLE_COLOR,
   },
-  decorConfetti: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.25 },
-  decorGarland: { position: 'absolute', top: -12, right: -46, width: 150, height: 130, opacity: 0.8 },
+  decorConfetti: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    opacity: 0.25,
+  },
+  decorGarland: {
+    position: 'absolute',
+    top: -12,
+    right: -46,
+    width: 150,
+    height: 130,
+    opacity: 0.8,
+  },
   content: { position: 'relative' },
   greeting: { color: colors.onPrimaryMuted },
   heading: { color: colors.onPrimary, marginTop: spacing.xs },
@@ -123,8 +161,16 @@ export const bannerStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   searchTextWrap: { flex: 1, marginLeft: spacing.sm },
-  searchLabel: { color: colors.textMuted, letterSpacing: 0.5, textTransform: 'uppercase' },
-  searchSummary: { color: CATEGORY_ICON_BADGE_COLOR, marginTop: 2, fontWeight: '700' },
+  searchLabel: {
+    color: colors.textMuted,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  searchSummary: {
+    color: CATEGORY_ICON_BADGE_COLOR,
+    marginTop: 2,
+    fontWeight: '700',
+  },
   searchArrowButton: {
     width: 34,
     height: 34,
@@ -142,11 +188,27 @@ export const bannerStyles = StyleSheet.create({
     alignItems: 'center',
     marginTop: spacing.lg,
   },
-  successText: { color: colors.onPrimary, textAlign: 'center', marginTop: spacing.xs },
-  successEdit: { color: HERO_ACCENT_WARM_COLOR, marginTop: spacing.sm, textDecorationLine: 'underline' },
-  formErrorText: { color: colors.danger, marginTop: spacing.sm, textAlign: 'center' },
+  successText: {
+    color: colors.onPrimary,
+    textAlign: 'center',
+    marginTop: spacing.xs,
+  },
+  successEdit: {
+    color: HERO_ACCENT_WARM_COLOR,
+    marginTop: spacing.sm,
+    textDecorationLine: 'underline',
+  },
+  formErrorText: {
+    color: colors.danger,
+    marginTop: spacing.sm,
+    textAlign: 'center',
+  },
   // Bottom sheet — chip pickers for all four fields plus the submit button.
-  sheetBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
+  sheetBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'flex-end',
+  },
   sheetContainer: {
     backgroundColor: colors.background,
     borderTopLeftRadius: 24,
@@ -155,7 +217,11 @@ export const bannerStyles = StyleSheet.create({
     maxHeight: '82%',
   },
   sheetTitle: { color: colors.text },
-  sheetSubtitle: { color: colors.textMuted, marginTop: spacing.xs, marginBottom: spacing.sm },
+  sheetSubtitle: {
+    color: colors.textMuted,
+    marginTop: spacing.xs,
+    marginBottom: spacing.sm,
+  },
   chipGroup: { marginTop: spacing.md },
   chipGroupHeader: { ...globalStyles.row, marginBottom: spacing.sm },
   chipGroupIconChip: {
@@ -180,7 +246,10 @@ export const bannerStyles = StyleSheet.create({
     paddingVertical: spacing.sm,
     marginRight: spacing.sm,
   },
-  chipActive: { backgroundColor: CATEGORY_ICON_BADGE_COLOR, borderColor: CATEGORY_ICON_BADGE_COLOR },
+  chipActive: {
+    backgroundColor: CATEGORY_ICON_BADGE_COLOR,
+    borderColor: CATEGORY_ICON_BADGE_COLOR,
+  },
   chipText: { color: colors.text },
   chipTextActive: { color: colors.onPrimary, fontWeight: '700' },
   getQuotesButton: { marginTop: spacing.lg },
@@ -239,7 +308,12 @@ export const eventSummaryStyles = StyleSheet.create({
     textTransform: 'uppercase',
     fontWeight: '700',
   },
-  rowValue: { color: CATEGORY_ICON_BADGE_COLOR, marginTop: 1, fontSize: 16, fontWeight: '700' },
+  rowValue: {
+    color: CATEGORY_ICON_BADGE_COLOR,
+    marginTop: 1,
+    fontSize: 16,
+    fontWeight: '700',
+  },
   rowValueEmpty: { color: colors.textMuted, fontSize: 15, fontWeight: '400' },
 
   cta: {
@@ -255,7 +329,11 @@ export const eventSummaryStyles = StyleSheet.create({
   ctaText: { color: colors.onPrimary, fontSize: 16, fontWeight: '700' },
 
   // Neither a real event nor a draft to fall back on.
-  emptyBody: { paddingHorizontal: spacing.md, paddingVertical: spacing.lg, alignItems: 'center' },
+  emptyBody: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.lg,
+    alignItems: 'center',
+  },
   emptyIconChip: {
     width: 52,
     height: 52,
@@ -265,18 +343,47 @@ export const eventSummaryStyles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: spacing.sm,
   },
-  emptyTitle: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 17, fontWeight: '700' },
-  emptyText: { color: colors.textMuted, textAlign: 'center', marginTop: spacing.xs },
+  emptyTitle: {
+    color: CATEGORY_ICON_BADGE_COLOR,
+    fontSize: 17,
+    fontWeight: '700',
+  },
+  emptyText: {
+    color: colors.textMuted,
+    textAlign: 'center',
+    marginTop: spacing.xs,
+  },
 
   // Loading — four grey bars in the geometry of the four real rows, so the
   // card does not resize when the feed arrives.
-  skeletonChip: { width: 38, height: 38, borderRadius: 12, backgroundColor: colors.surface, marginRight: spacing.sm },
-  skeletonLabel: { width: 64, height: 9, borderRadius: 5, backgroundColor: colors.surface },
-  skeletonValue: { width: '62%', height: 13, borderRadius: 6, backgroundColor: colors.surface, marginTop: spacing.xs },
+  skeletonChip: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: colors.surface,
+    marginRight: spacing.sm,
+  },
+  skeletonLabel: {
+    width: 64,
+    height: 9,
+    borderRadius: 5,
+    backgroundColor: colors.surface,
+  },
+  skeletonValue: {
+    width: '62%',
+    height: 13,
+    borderRadius: 6,
+    backgroundColor: colors.surface,
+    marginTop: spacing.xs,
+  },
 
   errorBody: { padding: spacing.lg, alignItems: 'center' },
   errorTitle: { color: colors.text, fontWeight: '700', marginTop: spacing.sm },
-  errorText: { color: colors.textMuted, textAlign: 'center', marginTop: spacing.xs },
+  errorText: {
+    color: colors.textMuted,
+    textAlign: 'center',
+    marginTop: spacing.xs,
+  },
   retryButton: {
     ...globalStyles.row,
     gap: spacing.xs,
@@ -292,7 +399,12 @@ export const eventSummaryStyles = StyleSheet.create({
 
 // The trust strip under the card - "quotes in under a day", and so on.
 export const heroTrustStyles = StyleSheet.create({
-  wrap: { flexDirection: 'row', flexWrap: 'wrap', marginTop: spacing.md, rowGap: spacing.sm },
+  wrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: spacing.md,
+    rowGap: spacing.sm,
+  },
   item: { ...globalStyles.row, marginRight: spacing.md, gap: spacing.xs },
   label: { color: colors.onPrimaryMuted },
 });
@@ -331,10 +443,21 @@ export const bookedEventStyles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.8,
   },
-  ref: { color: colors.textMuted, fontSize: 13, letterSpacing: 0.4, flexShrink: 1 },
+  ref: {
+    color: colors.textMuted,
+    fontSize: 13,
+    letterSpacing: 0.4,
+    flexShrink: 1,
+  },
   /* Pushed right on its own, so the reference can be any length without the
      countdown drifting off the edge. */
-  days: { ...globalStyles.row, alignItems: 'baseline', gap: 5, marginLeft: 'auto', flexShrink: 0 },
+  days: {
+    ...globalStyles.row,
+    alignItems: 'baseline',
+    gap: 5,
+    marginLeft: 'auto',
+    flexShrink: 0,
+  },
   daysCount: { color: HOME_NAVY_DEEP, fontSize: 17, fontWeight: '800' },
   daysLabel: { color: colors.textMuted, fontSize: 13 },
 
@@ -345,7 +468,12 @@ export const bookedEventStyles = StyleSheet.create({
     letterSpacing: -0.4,
     marginTop: 12,
   },
-  facts: { color: colors.textMuted, fontSize: 14, marginTop: 5, lineHeight: 20 },
+  facts: {
+    color: colors.textMuted,
+    fontSize: 14,
+    marginTop: 5,
+    lineHeight: 20,
+  },
 
   /* The organizer sits in their own panel: they are a party to the event, not
      another fact about it. */
@@ -384,7 +512,11 @@ export const bookedEventStyles = StyleSheet.create({
 
   progressHead: { ...globalStyles.row, alignItems: 'center', marginTop: 18 },
   progressTitle: { color: HOME_NAVY_DEEP, fontSize: 15.5, fontWeight: '700' },
-  progressCount: { color: colors.textMuted, fontSize: 13.5, marginLeft: 'auto' },
+  progressCount: {
+    color: colors.textMuted,
+    fontSize: 13.5,
+    marginLeft: 'auto',
+  },
   track: {
     height: 6,
     borderRadius: 999,
@@ -398,10 +530,20 @@ export const bookedEventStyles = StyleSheet.create({
      above them rather than bunching under the longest label. */
   steps: { flexDirection: 'row', marginTop: 12 },
   step: { flex: 1, paddingRight: 8 },
-  stepDot: { width: 8, height: 8, borderRadius: 999, backgroundColor: BOOKED_STEP_PENDING_COLOR },
+  stepDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 999,
+    backgroundColor: BOOKED_STEP_PENDING_COLOR,
+  },
   stepDotDone: { backgroundColor: BOOKED_STEP_DONE_COLOR },
   stepDotNext: { backgroundColor: HERO_ACCENT_COLOR },
-  stepLabel: { color: colors.textMuted, fontSize: 12.5, marginTop: 7, lineHeight: 16 },
+  stepLabel: {
+    color: colors.textMuted,
+    fontSize: 12.5,
+    marginTop: 7,
+    lineHeight: 16,
+  },
   stepLabelDone: { color: HOME_NAVY_DEEP },
   /* The one still to do is the only thing on this card worth acting on, so it
      is the only label in the accent colour. */
@@ -444,7 +586,11 @@ export const currentEventStyles = StyleSheet.create({
   },
   stageDot: { width: 6, height: 6, borderRadius: 3 },
   stageText: { fontWeight: '700' },
-  footerRow: { ...globalStyles.row, justifyContent: 'space-between', marginTop: spacing.sm },
+  footerRow: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    marginTop: spacing.sm,
+  },
   daysToGoBadge: {
     backgroundColor: colors.surface,
     borderRadius: 999,
@@ -459,7 +605,11 @@ export const currentEventStyles = StyleSheet.create({
     marginTop: spacing.md,
     overflow: 'hidden',
   },
-  progressFill: { height: '100%', backgroundColor: colors.primary, borderRadius: 4 },
+  progressFill: {
+    height: '100%',
+    backgroundColor: colors.primary,
+    borderRadius: 4,
+  },
   progressLabel: { color: colors.textMuted },
 });
 
@@ -516,7 +666,13 @@ export const categoriesStyles = StyleSheet.create({
     marginRight: CATEGORY_CARD_SPACING,
     overflow: 'hidden',
   },
-  cardBackground: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
+  cardBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   confettiLayer: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
   artLayer: {
     position: 'absolute',
@@ -562,7 +718,9 @@ export const PACKAGE_BANNER_HEIGHT = 168;
  * reads as scrollable without needing a scrollbar. The snap interval below is
  * derived from these two, so they cannot drift apart.
  */
-export const PACKAGE_CARD_WIDTH = Math.round(Dimensions.get('window').width * 0.84);
+export const PACKAGE_CARD_WIDTH = Math.round(
+  Dimensions.get('window').width * 0.84,
+);
 export const PACKAGE_CARD_SPACING = spacing.md;
 export const PACKAGE_SNAP_INTERVAL = PACKAGE_CARD_WIDTH + PACKAGE_CARD_SPACING;
 
@@ -587,7 +745,12 @@ export const packagesStyles = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   list: { paddingHorizontal: spacing.md, paddingTop: spacing.md },
-  dots: { ...globalStyles.row, justifyContent: 'center', gap: 6, marginTop: spacing.md },
+  dots: {
+    ...globalStyles.row,
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: spacing.md,
+  },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.border },
   dotOn: { width: 18, backgroundColor: HERO_ACCENT_COLOR },
   headText: { flex: 1, paddingRight: spacing.sm },
@@ -603,7 +766,11 @@ export const packagesStyles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
   },
-  banner: { height: PACKAGE_BANNER_HEIGHT, justifyContent: 'center', alignItems: 'center' },
+  banner: {
+    height: PACKAGE_BANNER_HEIGHT,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   bannerLayer: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
   bannerConfetti: { opacity: 0.35 },
   bannerArt: { width: 150, height: 120 },
@@ -625,12 +792,31 @@ export const packagesStyles = StyleSheet.create({
   },
 
   body: { padding: spacing.md },
-  titleRow: { ...globalStyles.row, justifyContent: 'space-between', gap: spacing.sm },
-  packageTitle: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 18, fontWeight: '800', flexShrink: 1 },
+  titleRow: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  packageTitle: {
+    color: CATEGORY_ICON_BADGE_COLOR,
+    fontSize: 18,
+    fontWeight: '800',
+    flexShrink: 1,
+  },
   guests: { color: colors.textMuted },
-  budget: { color: HERO_ACCENT_COLOR, fontSize: 21, fontWeight: '800', marginTop: spacing.xs },
+  budget: {
+    color: HERO_ACCENT_COLOR,
+    fontSize: 21,
+    fontWeight: '800',
+    marginTop: spacing.xs,
+  },
 
-  tagRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: spacing.sm + 2, gap: spacing.sm },
+  tagRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: spacing.sm + 2,
+    gap: spacing.sm,
+  },
   tag: {
     color: colors.textMuted,
     backgroundColor: colors.surface,
@@ -696,13 +882,27 @@ export const topOrganizersStyles = StyleSheet.create({
   },
   tierBadgeText: { fontWeight: '700' },
 
-  ratingRow: { ...globalStyles.row, gap: 2, marginTop: spacing.md, flexWrap: 'wrap' },
-  ratingValue: { color: CATEGORY_ICON_BADGE_COLOR, fontWeight: '800', marginLeft: spacing.xs },
+  ratingRow: {
+    ...globalStyles.row,
+    gap: 2,
+    marginTop: spacing.md,
+    flexWrap: 'wrap',
+  },
+  ratingValue: {
+    color: CATEGORY_ICON_BADGE_COLOR,
+    fontWeight: '800',
+    marginLeft: spacing.xs,
+  },
   ratingMuted: { color: colors.textMuted, marginLeft: 3 },
   // Stands in for the rating line when nobody has reviewed this organizer yet.
   noRating: { color: colors.textMuted, marginTop: spacing.md },
 
-  tagRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: spacing.sm, gap: spacing.xs },
+  tagRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: spacing.sm,
+    gap: spacing.xs,
+  },
   tag: {
     color: colors.textMuted,
     backgroundColor: colors.surface,
@@ -720,8 +920,16 @@ export const topOrganizersStyles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 12,
   },
-  viewButton: { borderWidth: 1, borderColor: colors.border, backgroundColor: colors.background },
-  viewButtonText: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 15, fontWeight: '700' },
+  viewButton: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.background,
+  },
+  viewButtonText: {
+    color: CATEGORY_ICON_BADGE_COLOR,
+    fontSize: 15,
+    fontWeight: '700',
+  },
   quoteButton: { backgroundColor: HERO_ACCENT_COLOR },
   quoteButtonText: { color: colors.onPrimary, fontSize: 15, fontWeight: '700' },
   quoteButtonBusy: { opacity: 0.7 },
@@ -750,8 +958,16 @@ export const topOrganizersStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  emptyTitle: { color: CATEGORY_ICON_BADGE_COLOR, fontWeight: '700', marginTop: spacing.sm },
-  emptyBody: { color: colors.textMuted, textAlign: 'center', marginTop: spacing.xs },
+  emptyTitle: {
+    color: CATEGORY_ICON_BADGE_COLOR,
+    fontWeight: '700',
+    marginTop: spacing.sm,
+  },
+  emptyBody: {
+    color: colors.textMuted,
+    textAlign: 'center',
+    marginTop: spacing.xs,
+  },
   emptyCta: {
     ...globalStyles.row,
     gap: spacing.xs,
@@ -768,7 +984,11 @@ export const topOrganizersStyles = StyleSheet.create({
 // The "View Profile" sheet. Mobile has no organizer route of its own yet, so
 // the profile opens over Home rather than the button leading nowhere.
 export const organizerSheetStyles = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
+  backdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'flex-end',
+  },
   container: {
     backgroundColor: colors.background,
     borderTopLeftRadius: 24,
@@ -787,13 +1007,23 @@ export const organizerSheetStyles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   head: { ...globalStyles.row, gap: spacing.md },
-  avatar: { width: 56, height: 56, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  avatar: {
+    width: 56,
+    height: 56,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   avatarText: { color: colors.onPrimary, fontSize: 18, fontWeight: '800' },
   headText: { flex: 1 },
   name: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 19, fontWeight: '800' },
   meta: { color: colors.textMuted, marginTop: 2 },
   centered: { alignItems: 'center', paddingVertical: spacing.xl },
-  errorText: { color: colors.danger, textAlign: 'center', marginTop: spacing.sm },
+  errorText: {
+    color: colors.danger,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+  },
 
   factRow: {
     ...globalStyles.row,
@@ -803,10 +1033,20 @@ export const organizerSheetStyles = StyleSheet.create({
     borderTopColor: colors.border,
   },
   factLabel: { color: colors.textMuted },
-  factValue: { color: CATEGORY_ICON_BADGE_COLOR, fontWeight: '700', flexShrink: 1, textAlign: 'right' },
+  factValue: {
+    color: CATEGORY_ICON_BADGE_COLOR,
+    fontWeight: '700',
+    flexShrink: 1,
+    textAlign: 'right',
+  },
   facts: { marginTop: spacing.lg },
 
-  tagRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: spacing.md, gap: spacing.xs },
+  tagRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: spacing.md,
+    gap: spacing.xs,
+  },
   tag: {
     color: colors.textMuted,
     backgroundColor: colors.surface,
@@ -847,7 +1087,11 @@ export const organizerSheetStyles = StyleSheet.create({
     marginTop: spacing.lg,
   },
   requestedText: { color: HOME_GREEN, fontWeight: '600' },
-  requestError: { color: colors.danger, textAlign: 'center', marginTop: spacing.sm },
+  requestError: {
+    color: colors.danger,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+  },
 });
 
 export const howItWorksStyles = StyleSheet.create({
@@ -880,7 +1124,12 @@ export const howItWorksStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   numberBadgeText: { fontWeight: '700', fontSize: 10, lineHeight: 12 },
-  connector: { width: 2, flex: 1, marginTop: spacing.xs, marginBottom: spacing.xs },
+  connector: {
+    width: 2,
+    flex: 1,
+    marginTop: spacing.xs,
+    marginBottom: spacing.xs,
+  },
   stepContent: { flex: 1, paddingLeft: spacing.md, paddingBottom: spacing.xl },
   cardTitle: { color: colors.text, marginBottom: spacing.xs },
   cardDesc: { color: colors.textMuted },
@@ -928,7 +1177,13 @@ export const sectionStyles = StyleSheet.create({
     gap: spacing.sm,
     paddingHorizontal: spacing.md,
   },
-  title: { color: HOME_NAVY, fontSize: 21, fontWeight: '700', letterSpacing: -0.3, flexShrink: 1 },
+  title: {
+    color: HOME_NAVY,
+    fontSize: 21,
+    fontWeight: '700',
+    letterSpacing: -0.3,
+    flexShrink: 1,
+  },
   action: { color: HERO_ACCENT_COLOR, fontSize: 15, fontWeight: '600' },
   subtitle: {
     color: colors.textMuted,
@@ -937,7 +1192,55 @@ export const sectionStyles = StyleSheet.create({
     marginTop: 4,
     paddingHorizontal: spacing.md,
   },
-  greeting: { color: colors.textMuted, fontSize: 15, paddingHorizontal: spacing.md, marginTop: 4 },
+});
+
+/**
+ * The compact row every event after the leading one uses.
+ *
+ * Light, not navy: a screen of navy cards is what made ten events unreadable,
+ * and the contrast is what tells the customer which one Home thinks is urgent.
+ */
+export const eventRowStyles = StyleSheet.create({
+  row: {
+    ...globalStyles.row,
+    gap: spacing.sm,
+    backgroundColor: colors.background,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: HOME_HAIRLINE,
+    paddingVertical: spacing.sm + 2,
+    paddingHorizontal: spacing.md,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.sm,
+  },
+  body: { flex: 1, gap: 2 },
+  stageRow: { ...globalStyles.row, gap: 6 },
+  stageDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: HOME_GREEN,
+  },
+  stageText: {
+    color: colors.textMuted,
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+    flexShrink: 1,
+  },
+  title: { color: HOME_NAVY, fontSize: 16, fontWeight: '700' },
+  facts: { color: colors.textMuted },
+  countPill: {
+    minWidth: 26,
+    height: 26,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 7,
+    backgroundColor: HOME_ACCENT_SOFT,
+  },
+  countText: { color: HERO_ACCENT_COLOR, fontWeight: '700', fontSize: 12 },
 });
 
 export const eventHeroStyles = StyleSheet.create({
@@ -959,10 +1262,21 @@ export const eventHeroStyles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: 'rgba(255,255,255,0.05)',
   },
-  decorArt: { position: 'absolute', top: -18, right: -4, width: 150, height: 130 },
+  decorArt: {
+    position: 'absolute',
+    top: -18,
+    right: -4,
+    width: 150,
+    height: 130,
+  },
 
   stageRow: { ...globalStyles.row, gap: 7 },
-  stageDot: { width: 8, height: 8, borderRadius: 999, backgroundColor: HOME_GREEN },
+  stageDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 999,
+    backgroundColor: HOME_GREEN,
+  },
   stageText: {
     color: 'rgba(255,255,255,0.62)',
     fontSize: 11.5,
@@ -978,7 +1292,12 @@ export const eventHeroStyles = StyleSheet.create({
     letterSpacing: -0.5,
     marginTop: 10,
   },
-  facts: { color: 'rgba(255,255,255,0.66)', fontSize: 14.5, marginTop: 6, lineHeight: 20 },
+  facts: {
+    color: 'rgba(255,255,255,0.66)',
+    fontSize: 14.5,
+    marginTop: 6,
+    lineHeight: 20,
+  },
 
   progressRow: { ...globalStyles.row, gap: 14, marginTop: 18 },
   track: {
@@ -989,7 +1308,11 @@ export const eventHeroStyles = StyleSheet.create({
     overflow: 'hidden',
   },
   fill: { height: '100%', borderRadius: 3, backgroundColor: HERO_ACCENT_COLOR },
-  progressLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 13.5, fontWeight: '500' },
+  progressLabel: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 13.5,
+    fontWeight: '500',
+  },
 
   /** "Closes in 4 days" — the one thing on this card with a clock on it. */
   closesPill: {
@@ -1037,7 +1360,12 @@ export const eventHeroStyles = StyleSheet.create({
 
   /* The organizers still to answer, drawn as an empty seat rather than a row
      — there is nothing to compare yet, and it should not look like there is. */
-  awaitingRow: { ...globalStyles.row, alignItems: 'center', gap: 12, marginTop: 14 },
+  awaitingRow: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 14,
+  },
   awaitingSlot: {
     width: 46,
     height: 46,
@@ -1067,8 +1395,18 @@ export const eventHeroStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   panelText: { flex: 1 },
-  panelTitle: { color: colors.onPrimary, fontSize: 15.5, fontWeight: '600', lineHeight: 21 },
-  panelBody: { color: 'rgba(255,255,255,0.62)', fontSize: 13.5, marginTop: 2, lineHeight: 19 },
+  panelTitle: {
+    color: colors.onPrimary,
+    fontSize: 15.5,
+    fontWeight: '600',
+    lineHeight: 21,
+  },
+  panelBody: {
+    color: 'rgba(255,255,255,0.62)',
+    fontSize: 13.5,
+    marginTop: 2,
+    lineHeight: 19,
+  },
 
   cta: {
     alignItems: 'center',
@@ -1103,8 +1441,19 @@ export const offersStyles = StyleSheet.create({
     letterSpacing: 1,
     textTransform: 'uppercase',
   },
-  title: { color: colors.onPrimary, fontSize: 19, fontWeight: '700', marginTop: 6, lineHeight: 24 },
-  terms: { color: 'rgba(255,255,255,0.75)', fontSize: 13, marginTop: 6, lineHeight: 17 },
+  title: {
+    color: colors.onPrimary,
+    fontSize: 19,
+    fontWeight: '700',
+    marginTop: 6,
+    lineHeight: 24,
+  },
+  terms: {
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: 13,
+    marginTop: 6,
+    lineHeight: 17,
+  },
   ctaRow: { ...globalStyles.row, gap: 5, marginTop: 'auto', paddingTop: 10 },
   ctaText: { color: colors.onPrimary, fontSize: 14, fontWeight: '600' },
 });
@@ -1135,7 +1484,13 @@ export const couponSheetStyles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 1.2,
   },
-  title: { color: HOME_NAVY, fontSize: 22, fontWeight: '700', marginTop: 4, lineHeight: 28 },
+  title: {
+    color: HOME_NAVY,
+    fontSize: 22,
+    fontWeight: '700',
+    marginTop: 4,
+    lineHeight: 28,
+  },
   close: {
     width: 34,
     height: 34,
@@ -1145,7 +1500,12 @@ export const couponSheetStyles = StyleSheet.create({
     justifyContent: 'center',
     flexShrink: 0,
   },
-  description: { color: '#414b5c', fontSize: 14.5, marginTop: 10, lineHeight: 21 },
+  description: {
+    color: '#414b5c',
+    fontSize: 14.5,
+    marginTop: 10,
+    lineHeight: 21,
+  },
   rows: { marginTop: 18, borderTopWidth: 1, borderTopColor: '#efe9e5' },
   row: {
     ...globalStyles.row,
@@ -1156,8 +1516,19 @@ export const couponSheetStyles = StyleSheet.create({
     borderBottomColor: '#efe9e5',
   },
   rowLabel: { color: colors.textMuted, fontSize: 14 },
-  rowValue: { color: HOME_NAVY, fontSize: 14.5, fontWeight: '600', flexShrink: 1, textAlign: 'right' },
-  note: { ...globalStyles.row, alignItems: 'flex-start', gap: 8, marginTop: 16 },
+  rowValue: {
+    color: HOME_NAVY,
+    fontSize: 14.5,
+    fontWeight: '600',
+    flexShrink: 1,
+    textAlign: 'right',
+  },
+  note: {
+    ...globalStyles.row,
+    alignItems: 'flex-start',
+    gap: 8,
+    marginTop: 16,
+  },
   noteText: { color: '#5b6470', fontSize: 13, lineHeight: 19, flex: 1 },
 });
 
@@ -1185,7 +1556,12 @@ export const occasionGridStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  label: { color: colors.onPrimary, fontSize: 18, fontWeight: '700', letterSpacing: -0.2 },
+  label: {
+    color: colors.onPrimary,
+    fontSize: 18,
+    fontWeight: '700',
+    letterSpacing: -0.2,
+  },
   note: { color: 'rgba(255,255,255,0.7)', fontSize: 13, marginTop: 2 },
 });
 
@@ -1200,8 +1576,21 @@ export const packageCardStyles = StyleSheet.create({
   },
   banner: { height: 148, justifyContent: 'flex-end' },
   bannerLayer: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
-  bannerArt: { position: 'absolute', top: 8, right: 8, width: 118, height: 100, opacity: 0.85 },
-  bannerScrim: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 74 },
+  bannerArt: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 118,
+    height: 100,
+    opacity: 0.85,
+  },
+  bannerScrim: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 74,
+  },
   bannerNote: {
     color: 'rgba(255,255,255,0.88)',
     fontSize: 12.5,
@@ -1242,11 +1631,25 @@ export const packageCardStyles = StyleSheet.create({
   rating: { color: HOME_NAVY, fontSize: 13.5, fontWeight: '600' },
   reviews: { color: colors.textMuted, fontSize: 13 },
   priceRow: { ...globalStyles.row, gap: 8, marginTop: 8 },
-  price: { color: HOME_NAVY, fontSize: 20, fontWeight: '700', letterSpacing: -0.3 },
-  listPrice: { color: colors.textMuted, fontSize: 13.5, textDecorationLine: 'line-through' },
+  price: {
+    color: HOME_NAVY,
+    fontSize: 20,
+    fontWeight: '700',
+    letterSpacing: -0.3,
+  },
+  listPrice: {
+    color: colors.textMuted,
+    fontSize: 13.5,
+    textDecorationLine: 'line-through',
+  },
   booked: { color: HERO_ACCENT_COLOR, fontSize: 13, marginTop: 8 },
   tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10 },
-  tag: { borderRadius: 999, backgroundColor: HOME_TRACK, paddingHorizontal: 9, paddingVertical: 3 },
+  tag: {
+    borderRadius: 999,
+    backgroundColor: HOME_TRACK,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+  },
   tagText: { color: '#5b6470', fontSize: 11.5 },
 });
 
@@ -1271,7 +1674,12 @@ export const organizerRowStyles = StyleSheet.create({
   },
   avatarText: { color: colors.onPrimary, fontSize: 16, fontWeight: '700' },
   text: { flex: 1 },
-  name: { color: HOME_NAVY, fontSize: 15.5, fontWeight: '700', letterSpacing: 0.2 },
+  name: {
+    color: HOME_NAVY,
+    fontSize: 15.5,
+    fontWeight: '700',
+    letterSpacing: 0.2,
+  },
   metaRow: { ...globalStyles.row, gap: 5, marginTop: 3 },
   rating: { color: HOME_NAVY, fontSize: 13.5, fontWeight: '600' },
   reviews: { color: colors.textMuted, fontSize: 13 },
@@ -1286,13 +1694,28 @@ export const organizerRowStyles = StyleSheet.create({
     letterSpacing: 0.6,
     textTransform: 'uppercase',
   },
-  fromValue: { color: HOME_NAVY, fontSize: 18, fontWeight: '700', marginTop: 1 },
+  fromValue: {
+    color: HOME_NAVY,
+    fontSize: 18,
+    fontWeight: '700',
+    marginTop: 1,
+  },
   replies: { color: HOME_GREEN, fontSize: 12.5, marginTop: 3 },
-  emptyText: { color: colors.textMuted, paddingHorizontal: spacing.md, marginTop: 12, lineHeight: 20 },
+  emptyText: {
+    color: colors.textMuted,
+    paddingHorizontal: spacing.md,
+    marginTop: 12,
+    lineHeight: 20,
+  },
 });
 
 export const trustStripStyles = StyleSheet.create({
-  row: { flexDirection: 'row', gap: 10, paddingHorizontal: spacing.md, marginTop: spacing.lg },
+  row: {
+    flexDirection: 'row',
+    gap: 10,
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.lg,
+  },
   card: {
     flex: 1,
     borderRadius: 14,

@@ -47,7 +47,7 @@ const read = (...parts: string[]): string =>
  * the question here is only which names they register.
  */
 const routeNamesIn = (source: string): string[] =>
-  [...source.matchAll(/name="([A-Za-z]+)"/g)].map((m) => m[1]);
+  [...source.matchAll(/name="([A-Za-z]+)"/g)].map(m => m[1]);
 
 describe('one screen, one route', () => {
   /*
@@ -56,11 +56,15 @@ describe('one screen, one route', () => {
    * loop possible — the customer could not tell which copy they were on.
    */
   it('registers the events list once, as a tab', () => {
-    expect(routeNamesIn(read('navigation', 'MainTabNavigator.tsx'))).toContain('Events');
+    expect(routeNamesIn(read('navigation', 'MainTabNavigator.tsx'))).toContain(
+      'Events',
+    );
   });
 
   it('has no pushed duplicate of the events list', () => {
-    expect(routeNamesIn(read('navigation', 'RootNavigator.tsx'))).not.toContain('Bookings');
+    expect(routeNamesIn(read('navigation', 'RootNavigator.tsx'))).not.toContain(
+      'Bookings',
+    );
   });
 
   it('puts no screen in both navigators', () => {
@@ -74,12 +78,12 @@ describe('one screen, one route', () => {
      * they recognise.
      */
     const componentsIn = (source: string): string[] =>
-      [...source.matchAll(/component=\{([A-Za-z]+)\}/g)].map((m) => m[1]);
+      [...source.matchAll(/component=\{([A-Za-z]+)\}/g)].map(m => m[1]);
 
     const tabs = componentsIn(read('navigation', 'MainTabNavigator.tsx'));
     const stack = componentsIn(read('navigation', 'RootNavigator.tsx'));
 
-    expect(tabs.filter((c) => stack.includes(c))).toEqual([]);
+    expect(tabs.filter(c => stack.includes(c))).toEqual([]);
   });
 
   it('does not keep a Bookings route in the param list', () => {
@@ -99,6 +103,47 @@ describe('the workspace back arrow', () => {
 
     expect(source).not.toContain('replace(');
     expect(source).toContain('navigation.goBack()');
+  });
+});
+
+describe("the home card's buttons", () => {
+  /*
+   * "See your request" opened the Plan wizard.
+   *
+   * The old routing turned on the stage: quotes_received with at least one
+   * quote went to CompareQuotes, a booking went to the Events tab, and
+   * everything else — including a submitted request nobody had replied to yet
+   * — fell through to `navigate('Plan')`. So the commonest state of a brand
+   * new request, the one the label is written for, opened a blank new plan.
+   */
+  const home = () => read('modules', 'Home', 'HomeScreen.tsx');
+
+  it('opens a request on its own screen, replied to or not', () => {
+    // CompareQuotes loads one request and every quote on it. None is still a
+    // number of quotes, and the brief is on that screen either way.
+    const source = home();
+    expect(source).toMatch(
+      /source === 'quote'[\s\S]{0,160}navigate\('CompareQuotes'/,
+    );
+  });
+
+  it('no longer gates that on a quote having arrived', () => {
+    expect(home()).not.toContain(
+      "stage === 'quotes_received' && event.quoteCount > 0",
+    );
+  });
+
+  it('opens a booking at its workspace, not at the events list', () => {
+    const source = home();
+    expect(source).toMatch(
+      /source === 'booking'[\s\S]{0,160}navigate\('Workspace'/,
+    );
+  });
+
+  it('sends only a draft back to the wizard', () => {
+    // One `navigate('Plan')`, in the fall-through — the case that genuinely
+    // has nothing else to open.
+    expect(home().match(/navigate\('Plan'\)/g) ?? []).toHaveLength(1);
   });
 });
 
@@ -139,10 +184,12 @@ describe('the routes the app can reach', () => {
       });
 
     const used = new Set<string>();
-    for (const file of walk(SRC).filter((f) => /\.tsx?$/.test(f))) {
+    for (const file of walk(SRC).filter(f => /\.tsx?$/.test(f))) {
       const text = fs.readFileSync(file, 'utf8');
-      for (const m of text.matchAll(/navigate\(\s*'([A-Z][A-Za-z]*)'/g)) used.add(m[1]);
-      for (const m of text.matchAll(/replace\(\s*'([A-Z][A-Za-z]*)'/g)) used.add(m[1]);
+      for (const m of text.matchAll(/navigate\(\s*'([A-Z][A-Za-z]*)'/g))
+        used.add(m[1]);
+      for (const m of text.matchAll(/replace\(\s*'([A-Z][A-Za-z]*)'/g))
+        used.add(m[1]);
     }
 
     const registered = new Set([
@@ -150,6 +197,6 @@ describe('the routes the app can reach', () => {
       ...routeNamesIn(read('navigation', 'RootNavigator.tsx')),
     ]);
 
-    expect([...used].filter((name) => !registered.has(name))).toEqual([]);
+    expect([...used].filter(name => !registered.has(name))).toEqual([]);
   });
 });

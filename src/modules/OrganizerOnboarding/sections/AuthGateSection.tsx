@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, View } from 'react-native';
-import { EventlyButton, EventlyIcon, EventlyText, EventlyTextInput } from '../../../Components';
+import { ScrollView, TouchableOpacity, View } from 'react-native';
+import {
+  EventlyButton,
+  EventlyIcon,
+  EventlyText,
+  EventlyTextInput,
+  KeyboardAvoider,
+} from '../../../Components';
 import { isValidMobile, isValidOtpCode } from '../../Login/utils';
 import { useSendOtp, useVerifyOtp } from '../../Login/hooks';
 import { setToken } from '../../../store/authSlice';
@@ -29,16 +35,17 @@ export function AuthGateSection() {
 
   const isPhoneValid = isValidMobile(phone);
   const isCodeValid = isValidOtpCode(code);
-  const errorMessage = sendOtpCall.error?.message ?? verifyOtpCall.error?.message ?? null;
+  const errorMessage =
+    sendOtpCall.error?.message ?? verifyOtpCall.error?.message ?? null;
 
   useEffect(() => {
     if (step !== 'otp' || resendSeconds <= 0) return undefined;
-    const id = setTimeout(() => setResendSeconds((s) => s - 1), 1000);
+    const id = setTimeout(() => setResendSeconds(s => s - 1), 1000);
     return () => clearTimeout(id);
   }, [step, resendSeconds]);
 
   const requestOtp = () =>
-    sendOtpCall.execute(phone).then((response) => {
+    sendOtpCall.execute(phone).then(response => {
       setRequestId(response.requestId);
       setSentTo(response.sentTo);
       setDevCode(response.devCode ?? null);
@@ -65,7 +72,7 @@ export function AuthGateSection() {
     if (!requestId || !isCodeValid) return;
     verifyOtpCall
       .execute(requestId, code)
-      .then((response) => {
+      .then(response => {
         dispatch(setToken(response.token));
         // No manual navigation — RootNavigator swaps to the authenticated stack,
         // which still contains this same screen name, so the wizard renders next.
@@ -93,10 +100,17 @@ export function AuthGateSection() {
   };
 
   return (
-    <KeyboardAvoidingView style={authGateStyles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={authGateStyles.content} keyboardShouldPersistTaps="handled">
+    <KeyboardAvoider style={authGateStyles.flex}>
+      <ScrollView
+        contentContainerStyle={authGateStyles.content}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={authGateStyles.badge}>
-          <EventlyIcon name="shield-check-outline" size={26} color={ORG_ACCENT} />
+          <EventlyIcon
+            name="shield-check-outline"
+            size={26}
+            color={ORG_ACCENT}
+          />
         </View>
         <EventlyText variant="h1" style={authGateStyles.title}>
           {ONB_COPY.authTitle}
@@ -140,7 +154,11 @@ export function AuthGateSection() {
           </View>
         ) : (
           <View style={authGateStyles.form}>
-            <TouchableOpacity onPress={changeNumber} style={authGateStyles.backRow} accessibilityLabel="Change mobile number">
+            <TouchableOpacity
+              onPress={changeNumber}
+              style={authGateStyles.backRow}
+              accessibilityLabel="Change mobile number"
+            >
               <EventlyIcon name="arrow-left" size={15} color={ORG_ACCENT} />
               <EventlyText variant="body" style={authGateStyles.backText}>
                 Change number
@@ -154,14 +172,17 @@ export function AuthGateSection() {
               {digits.map((digit, index) => (
                 <EventlyTextInput
                   key={index}
-                  ref={(el) => {
+                  ref={el => {
                     boxRefs.current[index] = el;
                   }}
-                  style={[authGateStyles.otpBox, digit ? authGateStyles.otpBoxFilled : null]}
+                  style={[
+                    authGateStyles.otpBox,
+                    digit ? authGateStyles.otpBoxFilled : null,
+                  ]}
                   keyboardType="number-pad"
                   maxLength={1}
                   value={digit}
-                  onChangeText={(value) => setDigit(index, value)}
+                  onChangeText={value => setDigit(index, value)}
                   autoFocus={index === 0}
                 />
               ))}
@@ -193,8 +214,14 @@ export function AuthGateSection() {
                 Resend code in 0:{String(resendSeconds).padStart(2, '0')}
               </EventlyText>
             ) : (
-              <TouchableOpacity onPress={resendCode} accessibilityLabel="Resend code">
-                <EventlyText variant="body" style={[authGateStyles.resendActive, { color: ORG_GREEN }]}>
+              <TouchableOpacity
+                onPress={resendCode}
+                accessibilityLabel="Resend code"
+              >
+                <EventlyText
+                  variant="body"
+                  style={[authGateStyles.resendActive, { color: ORG_GREEN }]}
+                >
                   Resend code
                 </EventlyText>
               </TouchableOpacity>
@@ -202,7 +229,7 @@ export function AuthGateSection() {
           </View>
         )}
       </ScrollView>
-    </KeyboardAvoidingView>
+    </KeyboardAvoider>
   );
 }
 

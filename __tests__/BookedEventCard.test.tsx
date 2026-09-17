@@ -20,7 +20,15 @@ import ReactTestRenderer from 'react-test-renderer';
 
 jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
   const { Text } = require('react-native');
-  return function MockIcon({ name, size, color }: { name: string; size?: number; color?: string }) {
+  return function MockIcon({
+    name,
+    size,
+    color,
+  }: {
+    name: string;
+    size?: number;
+    color?: string;
+  }) {
     return <Text style={{ fontSize: size, color }}>{` icon:${name}`}</Text>;
   };
 });
@@ -29,11 +37,16 @@ import { page, toHtml } from '../test-utils/rn-to-html';
 import { BookedEventCard } from '../src/modules/Home/sections/BookedEventCard';
 import { mapBookedEvent } from '../src/modules/Home/utils';
 import { bookedEventStyles } from '../src/modules/Home/styles';
-import type { BookedEventViewModel, HomeFeedDTO } from '../src/modules/Home/types';
+import type {
+  BookedEventViewModel,
+  HomeFeedDTO,
+} from '../src/modules/Home/types';
 
 declare const process: { env: Record<string, string | undefined> };
-const fs: { writeFileSync(p: string, d: string, e: string): void; existsSync(p: string): boolean } =
-  require('fs');
+const fs: {
+  writeFileSync(p: string, d: string, e: string): void;
+  existsSync(p: string): boolean;
+} = require('fs');
 
 /** A whole booking as the server sends it, so the mapper is exercised too. */
 const dto = (over: Record<string, unknown> = {}) => ({
@@ -121,7 +134,8 @@ function stylesOf(tree: ReactTestRenderer.ReactTestRenderer): any[] {
       n.forEach(walk);
       return;
     }
-    if (n.props?.style) out.push(Object.assign({}, ...[n.props.style].flat(4).filter(Boolean)));
+    if (n.props?.style)
+      out.push(Object.assign({}, ...[n.props.style].flat(4).filter(Boolean)));
     walk(n.children);
   };
   walk(tree.toJSON());
@@ -139,15 +153,19 @@ function pressables(tree: ReactTestRenderer.ReactTestRenderer) {
   const seen = new Set<unknown>();
   return tree.root
     .findAllByProps({ accessibilityRole: 'button' })
-    .filter((node) => typeof node.props.onPress === 'function')
-    .filter((node) => (seen.has(node.props.onPress) ? false : seen.add(node.props.onPress)));
+    .filter(node => typeof node.props.onPress === 'function')
+    .filter(node =>
+      seen.has(node.props.onPress) ? false : seen.add(node.props.onPress),
+    );
 }
 
 const noop = () => {};
 
 describe('BookedEventCard', () => {
   it('states the booking, the event and the countdown', () => {
-    const text = textOf(render(<BookedEventCard data={booked} onPress={noop} />));
+    const text = textOf(
+      render(<BookedEventCard data={booked} onPress={noop} />),
+    );
 
     expect(text).toContain('BOOKED');
     expect(text).toContain('EVT-2026-1977');
@@ -159,7 +177,9 @@ describe('BookedEventCard', () => {
   });
 
   it('names the organizer and what they are doing', () => {
-    const text = textOf(render(<BookedEventCard data={booked} onPress={noop} />));
+    const text = textOf(
+      render(<BookedEventCard data={booked} onPress={noop} />),
+    );
     expect(text).toContain('Mahendra Events');
     expect(text).toContain('ME');
     expect(text).toContain('Managing 6 vendors for you');
@@ -168,39 +188,58 @@ describe('BookedEventCard', () => {
   it('draws the bar at exactly the progress the milestones report', () => {
     const tree = render(<BookedEventCard data={booked} onPress={noop} />);
     const fill = stylesOf(tree).find(
-      (s) => s.backgroundColor === bookedEventStyles.fill.backgroundColor && s.width !== undefined,
+      s =>
+        s.backgroundColor === bookedEventStyles.fill.backgroundColor &&
+        s.width !== undefined,
     );
     expect(fill.width).toBe('25%');
 
     // …and the count beside it agrees, from the same milestones.
     expect(textOf(tree)).toContain('1 of 4 steps done');
-    const done = booked.steps.filter((s) => s.done).length;
-    expect(Math.round((done / booked.steps.length) * 100)).toBe(booked.progress);
+    const done = booked.steps.filter(s => s.done).length;
+    expect(Math.round((done / booked.steps.length) * 100)).toBe(
+      booked.progress,
+    );
   });
 
   it('marks the next milestone, not just the finished ones', () => {
     // Done / next / not yet, told apart by the dot and the label together —
     // the whole point of the row is showing what happens next.
     const tree = render(<BookedEventCard data={booked} onPress={noop} />);
-    const dots = stylesOf(tree).filter((s) => s.borderRadius === 999 && s.width === 8);
+    const dots = stylesOf(tree).filter(
+      s => s.borderRadius === 999 && s.width === 8,
+    );
     expect(dots).toHaveLength(4);
-    expect(dots[0].backgroundColor).toBe(bookedEventStyles.stepDotDone.backgroundColor);
-    expect(dots[1].backgroundColor).toBe(bookedEventStyles.stepDotNext.backgroundColor);
-    expect(dots[2].backgroundColor).toBe(bookedEventStyles.stepDot.backgroundColor);
+    expect(dots[0].backgroundColor).toBe(
+      bookedEventStyles.stepDotDone.backgroundColor,
+    );
+    expect(dots[1].backgroundColor).toBe(
+      bookedEventStyles.stepDotNext.backgroundColor,
+    );
+    expect(dots[2].backgroundColor).toBe(
+      bookedEventStyles.stepDot.backgroundColor,
+    );
   });
 
   it('marks nothing as next once everything is done', () => {
     const tree = render(<BookedEventCard data={underway} onPress={noop} />);
-    const dots = stylesOf(tree).filter((s) => s.borderRadius === 999 && s.width === 8);
-    expect(dots.every((d) => d.backgroundColor === bookedEventStyles.stepDotDone.backgroundColor)).toBe(
-      true,
+    const dots = stylesOf(tree).filter(
+      s => s.borderRadius === 999 && s.width === 8,
     );
+    expect(
+      dots.every(
+        d =>
+          d.backgroundColor === bookedEventStyles.stepDotDone.backgroundColor,
+      ),
+    ).toBe(true);
   });
 
   it('still reads BOOKED before the organizer has confirmed', () => {
     // The customer has chosen an organizer and paid; what is outstanding is the
     // organizer's acceptance, which the organizer line states outright.
-    const text = textOf(render(<BookedEventCard data={awaiting} onPress={noop} />));
+    const text = textOf(
+      render(<BookedEventCard data={awaiting} onPress={noop} />),
+    );
     expect(text).toContain('BOOKED');
     expect(text).toContain('Confirming your booking');
     expect(text).toContain('day to go');
@@ -208,7 +247,9 @@ describe('BookedEventCard', () => {
   });
 
   it('switches the badge once the event is underway, and drops the units on the day', () => {
-    const text = textOf(render(<BookedEventCard data={underway} onPress={noop} />));
+    const text = textOf(
+      render(<BookedEventCard data={underway} onPress={noop} />),
+    );
     expect(text).toContain('IN PROGRESS');
     expect(text).toContain('Today');
     // A countdown of nothing does not need the units it is not counting.
@@ -219,14 +260,22 @@ describe('BookedEventCard', () => {
     const onPress = jest.fn();
     const onMessage = jest.fn();
     const tree = render(
-      <BookedEventCard data={booked} onPress={onPress} onMessageOrganizer={onMessage} />,
+      <BookedEventCard
+        data={booked}
+        onPress={onPress}
+        onMessageOrganizer={onMessage}
+      />,
     );
 
     const drawn = pressables(tree);
     expect(drawn).toHaveLength(2);
 
-    const message = drawn.find((n) => n.props.accessibilityLabel.startsWith('Message'))!;
-    const workspace = drawn.find((n) => n.props.accessibilityLabel.startsWith('Open workspace'))!;
+    const message = drawn.find(n =>
+      n.props.accessibilityLabel.startsWith('Message'),
+    )!;
+    const workspace = drawn.find(n =>
+      n.props.accessibilityLabel.startsWith('Open workspace'),
+    )!;
     expect(message.props.accessibilityLabel).toBe('Message Mahendra Events');
 
     ReactTestRenderer.act(() => message.props.onPress());
@@ -243,10 +292,22 @@ describe('BookedEventCard', () => {
 });
 
 describe('mapBookedEvent', () => {
-  it('refuses to draw a booking with no reference or title', () => {
+  it('refuses to draw a booking with nothing to draw', () => {
+    // No record, or a record with no name — there is no card to make.
     expect(mapBookedEvent(feed(null))).toBeNull();
-    expect(mapBookedEvent(feed(dto({ ref: '' })))).toBeNull();
     expect(mapBookedEvent(feed(dto({ title: '' })))).toBeNull();
+  });
+
+  it('still draws a booking whose reference is missing', () => {
+    /*
+     * `ref` is decoration — a booking reference printed in the card's corner.
+     * Requiring it made a confirmed booking with an empty one vanish from Home
+     * entirely, which reads to the customer as a booking that was lost.
+     */
+    const booking = mapBookedEvent(feed(dto({ ref: '' })));
+    expect(booking).not.toBeNull();
+    expect(booking?.title).toBe('Naming ceremony');
+    expect(booking?.ref).toBe('');
   });
 
   it('refuses to draw a booking it could not open', () => {
@@ -261,21 +322,27 @@ describe('mapBookedEvent', () => {
     // "5 Sep 2026 · Kukatpally · guests" is worse than one that stops early.
     expect(model({ guests: '' }).factsLine).toBe('5 Sep 2026 · Kukatpally');
     expect(model({ guests: '', location: '' }).factsLine).toBe('5 Sep 2026');
-    expect(model({ guests: '', location: '', dateLabel: '' }).factsLine).toBe('');
+    expect(model({ guests: '', location: '', dateLabel: '' }).factsLine).toBe(
+      '',
+    );
   });
 
   it('will not say "managing 0 vendors"', () => {
     // A fresh booking has no tasks; quoting a count of none is the kind of
     // line that makes a customer stop believing the rest of the card.
     expect(model({ vendorCount: 0 }).organizerNote).toBe('Managing your event');
-    expect(model({ vendorCount: 1 }).organizerNote).toBe('Managing 1 vendor for you');
-    expect(model({ vendorCount: 6 }).organizerNote).toBe('Managing 6 vendors for you');
+    expect(model({ vendorCount: 1 }).organizerNote).toBe(
+      'Managing 1 vendor for you',
+    );
+    expect(model({ vendorCount: 6 }).organizerNote).toBe(
+      'Managing 6 vendors for you',
+    );
   });
 
   it('says what is true before the organizer has accepted', () => {
-    expect(model({ organizerConfirmed: false, vendorCount: 4 }).organizerNote).toBe(
-      'Confirming your booking',
-    );
+    expect(
+      model({ organizerConfirmed: false, vendorCount: 4 }).organizerNote,
+    ).toBe('Confirming your booking');
   });
 
   it('counts the steps done the same way the bar measures them', () => {
@@ -285,7 +352,11 @@ describe('mapBookedEvent', () => {
 
   it('drops milestones with no label rather than drawing blank dots', () => {
     const vm = model({
-      steps: [{ label: 'Organizer booked', done: true }, { label: '', done: false }, {}],
+      steps: [
+        { label: 'Organizer booked', done: true },
+        { label: '', done: false },
+        {},
+      ],
     });
     expect(vm.steps).toEqual([{ label: 'Organizer booked', done: true }]);
   });
@@ -298,14 +369,24 @@ describe('mapBookedEvent', () => {
 
   it('falls back to initials it can derive when the server sent none', () => {
     expect(model({ organizerInitials: '' }).organizerInitials).toBe('ME');
-    expect(model({ organizerInitials: '', organizerName: 'Sruthi' }).organizerInitials).toBe('SR');
+    expect(
+      model({ organizerInitials: '', organizerName: 'Sruthi' })
+        .organizerInitials,
+    ).toBe('SR');
   });
 
   it('treats a record predating organizerConfirmed as confirmed', () => {
     // Claiming "awaiting confirmation" for an old row would be a scarier
     // statement than the truth.
     const vm = mapBookedEvent(
-      feed({ id: 'b', ref: 'EVT-1', title: 'T', progress: 10, daysToGo: 1, steps: [] }),
+      feed({
+        id: 'b',
+        ref: 'EVT-1',
+        title: 'T',
+        progress: 10,
+        daysToGo: 1,
+        steps: [],
+      }),
     );
     expect(vm?.organizerConfirmed).toBe(true);
     expect(vm?.organizerName).toBe('Your organizer');
@@ -327,7 +408,11 @@ describe('render dump', () => {
       label,
       toHtml(
         render(
-          <BookedEventCard data={data} onPress={noop} onMessageOrganizer={noop} />,
+          <BookedEventCard
+            data={data}
+            onPress={noop}
+            onMessageOrganizer={noop}
+          />,
         ).toJSON(),
       ),
     ]);
@@ -336,7 +421,12 @@ describe('render dump', () => {
     // edges, so the review panel has no padding of its own.
     fs.writeFileSync(
       out,
-      page(panels, { title: 'BookedEventCard', width: 390, background: '#faf8f7', padding: 0 }),
+      page(panels, {
+        title: 'BookedEventCard',
+        width: 390,
+        background: '#faf8f7',
+        padding: 0,
+      }),
       'utf8',
     );
     expect(fs.existsSync(out)).toBe(true);

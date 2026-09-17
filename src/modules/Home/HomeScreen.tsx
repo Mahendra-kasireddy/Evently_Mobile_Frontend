@@ -3,16 +3,30 @@ import type { CompositeNavigationProp } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ActivityIndicator, RefreshControl, ScrollView, View } from 'react-native';
+import {
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EventlyText } from '../../Components';
-import type { MainTabParamList, RootStackParamList } from '../../navigation/types';
+import type {
+  MainTabParamList,
+  RootStackParamList,
+} from '../../navigation/types';
 import type { CouponOffer, CurrentEventViewModel } from './types';
 import { NameGateSheet } from '../NameCapture';
-import { HERO_ACCENT_COLOR, SEARCH_PLACEHOLDER } from './constants';
+import {
+  HERO_ACCENT_COLOR,
+  OTHER_EVENTS_ON_HOME,
+  SEARCH_PLACEHOLDER,
+} from './constants';
 import { useOpenWithOrganizer } from '../Chat';
 import { useHomeContainer } from './container';
 import { BookedEventCard } from './sections/BookedEventCard';
+import { EventRow } from './sections/EventRow';
 import { EventHero } from './sections/EventHero';
 import { HomeHeader } from './sections/HomeHeader';
 import { OccasionGrid } from './sections/OccasionGrid';
@@ -48,8 +62,11 @@ export function HomeScreen() {
       if (openThread.loading) return;
       openThread
         .execute(organizerId)
-        .then((conversation) =>
-          navigation.navigate('Conversation', { conversationId: conversation.id, withName }),
+        .then(conversation =>
+          navigation.navigate('Conversation', {
+            conversationId: conversation.id,
+            withName,
+          }),
         )
         .catch(() => {
           // The failure is already captured in openThread.error; a booked
@@ -76,8 +93,21 @@ export function HomeScreen() {
     refetch,
   } = useHomeContainer();
 
+  /*
+   * Home shows at most three of the other events. It is a display cap, not a
+   * filter: the count on the link is the real total, and the Events tab holds
+   * all of them.
+   */
+  const visibleOtherEvents = otherEvents.slice(0, OTHER_EVENTS_ON_HOME);
+  const hiddenEventCount = otherEvents.length - visibleOtherEvents.length;
+
   const hasAnyContent = Boolean(
-    bookedEvent || currentEvent || occasions || offers || packages || topOrganizers,
+    bookedEvent ||
+      currentEvent ||
+      occasions ||
+      offers ||
+      packages ||
+      topOrganizers,
   );
 
   const headerProps = {
@@ -93,18 +123,25 @@ export function HomeScreen() {
   };
 
   /**
-   * Where the hero's button goes, by the stage the event has reached.
+   * Where the hero's buttons go — decided by which record the event is, not by
+   * how far along it is.
    *
-   * Each destination is a screen that exists and shows the thing the label
-   * promises — comparing quotes opens the quotes, opening a workspace opens
-   * the booking. A stage with nothing built behind it falls back to the plan
-   * it came from rather than to a dead end.
+   * It used to turn on the stage, and a submitted request with no quotes yet
+   * matched no branch and fell through to the Plan wizard: a button reading
+   * "See your request" opened a blank new plan. The request's own screen is
+   * CompareQuotes, which loads one request and every quote on it — none is
+   * still a number of quotes, and the brief is on it either way. So a request
+   * opens there whether or not anyone has replied, and only a draft, which
+   * genuinely has nothing else to open, goes back to the wizard.
    */
-  const handlePressHeroCta = (event: CurrentEventViewModel) => {
+  const openEvent = (event: CurrentEventViewModel) => {
     if (event.source === 'booking') {
-      return navigation.navigate('Main', { screen: 'Events' });
+      return navigation.navigate('Workspace', {
+        bookingId: event.refId,
+        workspaceName: event.title,
+      });
     }
-    if (event.stage === 'quotes_received' && event.quoteCount > 0) {
+    if (event.source === 'quote') {
       return navigation.navigate('CompareQuotes', {
         requestId: event.refId,
         title: event.title,
@@ -113,10 +150,10 @@ export function HomeScreen() {
     return navigation.navigate('Plan');
   };
 
-  const handlePressHeroDetails = (event: CurrentEventViewModel) =>
-    event.source === 'booking'
-      ? navigation.navigate('Main', { screen: 'Events' })
-      : navigation.navigate('Plan');
+  const handlePressHeroCta = openEvent;
+
+  /* "See all quotes & your brief" promises the same screen the button opens. */
+  const handlePressHeroDetails = openEvent;
 
   /**
    * One event's hero.
@@ -182,14 +219,10 @@ export function HomeScreen() {
         style={styles.scroll}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
+        refreshControl={
+          <RefreshControl refreshing={isLoading} onRefresh={refetch} />
+        }
       >
-        {banner?.greeting ? (
-          <EventlyText variant="body" style={sectionStyles.greeting} numberOfLines={1}>
-            {banner.greeting}
-          </EventlyText>
-        ) : null}
-
         {/*
           The booked card replaces the hero for the booking itself — the two are
           two renderings of one event, and stacking them would summarise it
@@ -211,7 +244,11 @@ export function HomeScreen() {
                fails on tap. */
             onMessageOrganizer={
               bookedEvent.organizerId
-                ? () => messageOrganizer(bookedEvent.organizerId, bookedEvent.organizerName)
+                ? () =>
+                    messageOrganizer(
+                      bookedEvent.organizerId,
+                      bookedEvent.organizerName,
+                    )
                 : undefined
             }
           />
@@ -219,8 +256,48 @@ export function HomeScreen() {
           renderHero(currentEvent)
         ) : null}
 
-        {/* The live events the card above is not about. Usually none. */}
-        {otherEvents.map(renderHero)}
+        {/*
+          Every other live event, one row each.
+
+          These used to be full heroes, and ten events meant ten screens of
+          navy card before anything else on Home. Only the leading event needs
+          that weight; the rest need telling apart, which a row does. Three of
+          them, then a link — Home stays the same length whether the customer
+          has four events or forty, and the Events tab is already the full list.
+        */}
+        {visibleOtherEvents.length ? (
+          <View style={sectionStyles.block}>
+            <View style={sectionStyles.headRow}>
+              <EventlyText variant="h2" style={sectionStyles.title}>
+                Your other events
+              </EventlyText>
+              {hiddenEventCount > 0 ? (
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('Main', { screen: 'Events' })
+                  }
+                  accessibilityRole="button"
+                  accessibilityLabel={`See all ${
+                    otherEvents.length + 1
+                  } events`}
+                  testID="see-all-events"
+                >
+                  <EventlyText variant="subtitle" style={sectionStyles.action}>
+                    See all {otherEvents.length + 1}
+                  </EventlyText>
+                </TouchableOpacity>
+              ) : null}
+            </View>
+
+            {visibleOtherEvents.map(event => (
+              <EventRow
+                key={`${event.source}:${event.refId}`}
+                event={event}
+                onPress={() => openEvent(event)}
+              />
+            ))}
+          </View>
+        ) : null}
 
         {offers && (
           <View style={sectionStyles.block}>
@@ -241,7 +318,9 @@ export function HomeScreen() {
           <View style={sectionStyles.block}>
             <OccasionGrid
               data={occasions}
-              onPressOccasion={(occasionId) => navigation.navigate('Plan', { occasionId })}
+              onPressOccasion={occasionId =>
+                navigation.navigate('Plan', { occasionId })
+              }
             />
           </View>
         )}
@@ -252,8 +331,12 @@ export function HomeScreen() {
               data={packages}
               // A package's art key is its occasion id, so opening one lands
               // the planner on that occasion rather than a blank first step.
-              onPressPackage={(item) => navigation.navigate('Plan', { occasionId: item.art })}
-              onPressSeeAll={() => navigation.navigate('Search', { kind: 'packages' })}
+              onPressPackage={item =>
+                navigation.navigate('Plan', { occasionId: item.art })
+              }
+              onPressSeeAll={() =>
+                navigation.navigate('Search', { kind: 'packages' })
+              }
               savedIds={savedPackageIds}
               onToggleSaved={toggleSavedPackage}
             />
@@ -267,8 +350,12 @@ export function HomeScreen() {
               // The full profile screen, not the old sheet: a sheet was the
               // right size for four facts and the wrong size for a portfolio,
               // a service list and a body of reviews.
-              onPressOrganizer={(organizerId) => navigation.navigate('Organizer', { organizerId })}
-              onPressSeeAll={() => navigation.navigate('Search', { kind: 'organizers' })}
+              onPressOrganizer={organizerId =>
+                navigation.navigate('Organizer', { organizerId })
+              }
+              onPressSeeAll={() =>
+                navigation.navigate('Search', { kind: 'organizers' })
+              }
               onPressChangeCity={() => navigation.navigate('Location')}
             />
           </View>

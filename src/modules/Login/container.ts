@@ -1,15 +1,21 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { setActiveView, setToken } from '../../store/authSlice';
 import { useAppDispatch } from '../../store/hooks';
 import { setHasSeenOnboarding } from '../../store/onboardingSlice';
-import { RESEND_COOLDOWN_SECONDS } from './constants';
+import {
+  DIAL_CODE,
+  MOBILE_LENGTH,
+  OTP_LENGTH,
+  RESEND_COOLDOWN_SECONDS,
+} from './constants';
 import { useSendOtp, useVerifyOtp } from './hooks';
-import { isValidMobile, isValidOtpCode } from './utils';
+import { isValidMobile, isValidOtpCode, sanitizeDigits } from './utils';
 import type { LoginStep } from './types';
 
 export interface LoginContainerResult {
   step: LoginStep;
   phone: string;
+  dialCode: string;
   code: string;
   sentTo: string | null;
   devCode: string | null;
@@ -21,6 +27,7 @@ export interface LoginContainerResult {
   resendSeconds: number;
   canResend: boolean;
   setPhone: (value: string) => void;
+  setDialCode: (value: string) => void;
   setCode: (value: string) => void;
   submitPhone: () => void;
   submitCode: () => void;
@@ -33,11 +40,13 @@ export interface LoginContainerResult {
  * the resend-code cooldown (matches web's 30s window), and dispatching the
  * resulting token into the store on success. LoginScreen only renders
  * whichever step this returns.
+ *
  */
 export function useLoginContainer(): LoginContainerResult {
   const dispatch = useAppDispatch();
   const [step, setStep] = useState<LoginStep>('phone');
   const [phone, setPhone] = useState('');
+  const [dialCode, setDialCode] = useState<string>(DIAL_CODE);
   const [code, setCode] = useState('');
   const [requestId, setRequestId] = useState<string | null>(null);
   const [sentTo, setSentTo] = useState<string | null>(null);
@@ -52,12 +61,12 @@ export function useLoginContainer(): LoginContainerResult {
 
   useEffect(() => {
     if (step !== 'otp' || resendSeconds <= 0) return undefined;
-    const id = setTimeout(() => setResendSeconds((s) => s - 1), 1000);
+    const id = setTimeout(() => setResendSeconds(s => s - 1), 1000);
     return () => clearTimeout(id);
   }, [step, resendSeconds]);
 
   const requestOtp = useCallback(() => {
-    return sendOtpCall.execute(phone).then((response) => {
+    return sendOtpCall.execute(phone).then(response => {
       setRequestId(response.requestId);
       setSentTo(response.sentTo);
       setDevCode(response.devCode ?? null);
@@ -89,7 +98,7 @@ export function useLoginContainer(): LoginContainerResult {
     if (!requestId || !isCodeValid) return;
     verifyOtpCall
       .execute(requestId, code)
-      .then((response) => {
+      .then(response => {
         dispatch(setToken(response.token));
         // This screen is the customer entry point, so land in the customer app
         // even for an account that also holds the organizer role. Organizers
@@ -102,6 +111,34 @@ export function useLoginContainer(): LoginContainerResult {
       });
   }, [requestId, isCodeValid, code, verifyOtpCall, dispatch]);
 
+  /*
+   * Submit as soon as the sixth digit lands, typed or autofilled — making
+   * someone tap "Verify" after entering a code they were told to enter is a
+   * step with no decision in it.
+   *
+   * The ref is what stops it from firing twice for one code: `submitCode` is a
+   * new function on every render, so without it the effect would re-run on the
+   * render caused by its own request starting. A wrong code stays recorded, so
+   * a retry needs a changed digit — which is exactly what a retry is.
+   */
+  const autoSubmitted = useRef<string | null>(null);
+  useEffect(() => {
+    if (step !== 'otp' || !requestId || !isCodeValid) return;
+    if (autoSubmitted.current === code) return;
+    autoSubmitted.current = code;
+    submitCode();
+  }, [step, requestId, isCodeValid, code, submitCode]);
+
+  /* Both setters sanitize rather than trust the field: an autofill or a paste
+     can deliver "Your code is 445 912", and only digits may reach the API. */
+  const setPhoneSafely = useCallback((value: string) => {
+    setPhone(sanitizeDigits(value, MOBILE_LENGTH));
+  }, []);
+
+  const setCodeSafely = useCallback((value: string) => {
+    setCode(sanitizeDigits(value, OTP_LENGTH));
+  }, []);
+
   const changeNumber = useCallback(() => {
     setStep('phone');
     setCode('');
@@ -109,11 +146,13 @@ export function useLoginContainer(): LoginContainerResult {
     setSentTo(null);
     setDevCode(null);
     setResendSeconds(0);
+    autoSubmitted.current = null;
   }, []);
 
   return {
     step,
     phone,
+    dialCode,
     code,
     sentTo,
     devCode,
@@ -121,11 +160,13 @@ export function useLoginContainer(): LoginContainerResult {
     isCodeValid,
     isSubmittingPhone: sendOtpCall.loading,
     isSubmittingCode: verifyOtpCall.loading,
-    errorMessage: sendOtpCall.error?.message ?? verifyOtpCall.error?.message ?? null,
+    errorMessage:
+      sendOtpCall.error?.message ?? verifyOtpCall.error?.message ?? null,
     resendSeconds,
     canResend: resendSeconds <= 0,
-    setPhone,
-    setCode,
+    setPhone: setPhoneSafely,
+    setDialCode,
+    setCode: setCodeSafely,
     submitPhone,
     submitCode,
     resendCode,

@@ -3,53 +3,70 @@ export const VERIFY_OTP_ENDPOINT = '/auth/verifyOtp';
 
 export const MOBILE_PATTERN = /^\d{10}$/;
 export const OTP_CODE_PATTERN = /^\d{6}$/;
+export const MOBILE_LENGTH = 10;
 export const OTP_LENGTH = 6;
 export const DIAL_CODE = '+91';
 
 /** Matches web's OtpForm.tsx resend cooldown exactly. */
 export const RESEND_COOLDOWN_SECONDS = 30;
 
-// Web's actual brand palette (evently-FrontEnd/src/index.css :root) — the
-// same navy/orange/cream identity Home/Plan already port. Scoped to this
-// module only, not applied app-wide.
-export const LOGIN_BG = '#f8f8f6'; // --color-bg
-export const LOGIN_NAVY = '#1a2e5a'; // --color-navy / --color-text
-export const LOGIN_NAVY_DEEP = '#0e1a33'; // --color-navy-deep
-export const LOGIN_ACCENT = '#e8633a'; // --color-primary
-export const LOGIN_ACCENT_WARM = '#ff8b5e'; // --color-accent-warm
-export const LOGIN_BORDER = '#ebebeb'; // --color-border
-export const LOGIN_TEXT_MUTED = '#5b6675'; // --color-text-muted
-// A soft warm-orange glow behind the wordmark — low opacity so it reads as a
-// subtle tint against the navy, not a solid muddy shape.
-export const LOGIN_DECOR_CIRCLE_COLOR = 'rgba(255,139,94,0.14)';
+/**
+ * The only region Evently onboards today — the backend validates a bare
+ * 10-digit Indian mobile and GST registration is India-only, so offering a
+ * second dial code here would be a promise the rest of the stack cannot keep.
+ * The picker exists so adding one is a line in this array, not a redesign.
+ */
+export const DIAL_CODES = [
+  { code: '+91', country: 'India', flag: '🇮🇳' },
+] as const;
 
-// Trimmed to just the wordmark + a one-line tagline (same line Splash uses)
-// per explicit feedback that the full web promo panel (badge/description/
-// features/proof) reads as too much content for a mobile login screen.
 export const LOGIN_TAGLINE = 'Effortless celebrations, planned beautifully.';
 
-// "Sign up" is a distinct, separate flow ONLY for organizer/sub-vendor
-// business accounts on web (the /join role picker → business onboarding
-// wizards) — confirmed by reading evently-FrontEnd's actual /join + onboarding
-// routes. A regular customer on web has no signup form at all: phone+OTP
-// verification both logs in AND silently creates the account on first use,
-// exactly like mobile already does. So this screen never says "sign up" —
-// there's nothing separate to sign up for on the customer app.
-export const LOGIN_FORM_COPY = {
-  title: 'Welcome to Evently',
-  subtitle: "Enter your mobile number to continue. We'll text you a one-time code to verify it's you.",
-  mobileLabel: 'Mobile number',
-  placeholder: '98765 43210',
-  sendCta: 'Send OTP',
+/** The three promises the hero makes. Each is checkable, so none of them is marketing. */
+export const LOGIN_TRUST_CHIPS = [
+  'Verified organizers',
+  'Itemised quotes',
+  'Free to compare',
+] as const;
+
+/**
+ * A customer has no separate sign-up: verifying a number both signs them in
+ * and, on a first use, creates the account. So this screen never says "sign
+ * up" — there is nothing for a customer to sign up to.
+ */
+export const PHONE_COPY = {
+  placeholder: 'Mobile number',
+  ctaIdle: `Enter ${MOBILE_LENGTH} digits`,
+  ctaReady: 'Continue',
+  a11yField: 'Mobile number',
 } as const;
 
-export const LOGIN_TRUST_NOTE = "Your number is only used to verify it's you.";
+/**
+ * The one entry point to the business side. Worded so a customer reads it and
+ * moves on: the second line says outright that an existing business account
+ * signs in with the field above, which is the mistake this card used to cause.
+ */
+export const BUSINESS_ENTRY_COPY = {
+  title: 'Organizer or sub-vendor?',
+  body: 'Register a business profile · already registered? Just sign in above',
+} as const;
 
-// Deliberately scoped to organizers/sub-vendors, not customers — a regular
-// customer never needs this (entering their number above already logs them
-// in or signs them up). Worded explicitly so a customer doesn't mistake this
-// for "the signup button" and gets confused about which path is theirs.
-export const JOIN_LINK_COPY = {
-  label: 'Organizer or sub-vendor?',
-  cta: 'Create a business account',
+export const TERMS_COPY = {
+  lead: "By continuing you agree to Evently's",
+  terms: 'Terms',
+  conjunction: '&',
+  privacy: 'Privacy Policy',
+} as const;
+
+export const OTP_COPY = {
+  title: 'Verify number',
+  sentToPrefix: 'OTP sent to',
+  edit: 'Edit',
+  label: 'Enter OTP',
+  retryLead: "Didn't receive OTP? Retry via",
+  retryChannel: 'SMS',
+  ctaIdle: `Enter ${OTP_LENGTH} digits`,
+  ctaReady: 'Verify',
+  /** Deliberately blunt. OTP phishing scripts ask people to read the code aloud. */
+  safetyNote: 'Never share your code with anyone.',
 } as const;

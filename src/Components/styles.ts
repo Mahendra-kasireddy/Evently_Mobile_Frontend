@@ -34,9 +34,17 @@ export const eventlyButtonStyles = StyleSheet.create({
   disabled: { opacity: 0.5 },
   primary: { backgroundColor: colors.primary },
   primaryText: { color: colors.onPrimary },
-  outline: { borderWidth: 1, borderColor: colors.primary, backgroundColor: colors.background },
+  outline: {
+    borderWidth: 1,
+    borderColor: colors.primary,
+    backgroundColor: colors.background,
+  },
   outlineText: { color: colors.primary },
-  danger: { borderWidth: 1, borderColor: colors.danger, backgroundColor: colors.background },
+  danger: {
+    borderWidth: 1,
+    borderColor: colors.danger,
+    backgroundColor: colors.background,
+  },
   dangerText: { color: colors.danger },
 });
 
@@ -59,7 +67,11 @@ export const eventlyTextInputStyles = StyleSheet.create({
 export const eventlyImageStyles = StyleSheet.create({
   wrapper: { position: 'relative' },
   image: { width: '100%', height: '100%' },
-  fallback: { backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
+  fallback: {
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   loadingOverlay: {
     position: 'absolute',
     top: 0,

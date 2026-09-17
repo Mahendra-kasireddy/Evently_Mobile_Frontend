@@ -1,7 +1,6 @@
-import { TouchableOpacity, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
-import { colors } from '../../../theme';
-import { JOIN_NAVY } from '../constants';
+import { brand } from '../../../theme';
 import { roleCardStyles } from '../styles';
 import type { RoleCardData } from '../types';
 
@@ -12,41 +11,42 @@ interface RoleCardProps {
 
 export function RoleCard({ data, onPress }: RoleCardProps) {
   return (
-    <TouchableOpacity
-      style={roleCardStyles.card}
+    <Pressable
+      style={({ pressed }) => [
+        roleCardStyles.card,
+        pressed && roleCardStyles.cardPressed,
+      ]}
       onPress={() => onPress(data.key)}
-      activeOpacity={0.85}
       accessibilityRole="button"
-      accessibilityLabel={data.title}
+      accessibilityLabel={`${data.title}. ${data.description} ${data.requirement}.`}
+      testID={`role-card-${data.key}`}
     >
-      <View style={[roleCardStyles.decorBlob, { backgroundColor: data.accentSoft }]} pointerEvents="none" />
+      <View
+        style={[
+          roleCardStyles.iconTile,
+          { backgroundColor: data.iconBackground },
+        ]}
+      >
+        <EventlyIcon name={data.icon} size={20} color={data.iconColor} />
+      </View>
 
-      <View style={roleCardStyles.headerRow}>
-        <View style={[roleCardStyles.iconCircle, { backgroundColor: data.accent }]}>
-          <EventlyIcon name={data.icon} size={26} color={colors.onPrimary} />
-        </View>
-        <View style={[roleCardStyles.badge, { backgroundColor: data.badgeSoft }]}>
-          <EventlyIcon name={data.badgeIcon} size={13} color={JOIN_NAVY} />
-          <EventlyText variant="caption" style={roleCardStyles.badgeText}>
-            {data.badge}
+      <View style={roleCardStyles.body}>
+        <View style={roleCardStyles.titleRow}>
+          <EventlyText variant="subtitle" style={roleCardStyles.title}>
+            {data.title}
           </EventlyText>
+          <EventlyIcon name="chevron-right" size={20} color={brand.accent} />
         </View>
-      </View>
 
-      <EventlyText variant="h2" style={roleCardStyles.title}>
-        {data.title}
-      </EventlyText>
-      <EventlyText variant="body" style={roleCardStyles.description}>
-        {data.description}
-      </EventlyText>
-
-      <View style={[roleCardStyles.ctaPill, { backgroundColor: data.accent }]}>
-        <EventlyText variant="subtitle" style={roleCardStyles.ctaText}>
-          {data.cta}
+        <EventlyText variant="caption" style={roleCardStyles.description}>
+          {data.description}
         </EventlyText>
-        <EventlyIcon name="arrow-right" size={16} color={colors.onPrimary} />
+
+        <EventlyText variant="caption" style={roleCardStyles.requirement}>
+          {data.requirement}
+        </EventlyText>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 

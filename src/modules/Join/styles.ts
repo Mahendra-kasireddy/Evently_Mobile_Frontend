@@ -1,48 +1,98 @@
 import { Platform, StyleSheet } from 'react-native';
-import { colors, spacing } from '../../theme';
-import { JOIN_BG, JOIN_NAVY, JOIN_TEXT_MUTED } from './constants';
+import { globalStyles } from '../../styles/globalStyles';
+import { brand, spacing } from '../../theme';
+
+/** Same curve as the login hero — the two screens are one flow. */
+export const HEADER_RADIUS = 28;
 
 export const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: JOIN_BG },
-  content: { padding: spacing.lg, paddingBottom: spacing.xl },
-  subtitle: { color: JOIN_TEXT_MUTED, marginBottom: spacing.xl },
+  container: { flex: 1, backgroundColor: brand.bg },
+  /* Same as the sign-in hero: full-bleed to the top edge, with the status bar
+     inset applied as padding by the screen. */
+  header: {
+    backgroundColor: brand.navy,
+    borderBottomLeftRadius: HEADER_RADIUS,
+    borderBottomRightRadius: HEADER_RADIUS,
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.lg,
+    overflow: 'hidden',
+  },
+  glow: {
+    position: 'absolute',
+    top: -120,
+    right: -90,
+    width: 260,
+    height: 260,
+    borderRadius: 999,
+    backgroundColor: brand.navyPlum,
+  },
+  closeButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 11,
+    backgroundColor: brand.navySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: { color: brand.onNavy, marginTop: spacing.md },
+  subtitle: { color: brand.onNavyMuted, marginTop: spacing.sm },
+  content: { padding: spacing.md, paddingBottom: spacing.xl, gap: spacing.md },
 });
 
 export const roleCardStyles = StyleSheet.create({
+  /* Outlined in accent rather than shadowed: both cards are choices, and a
+     shadow would rank one above the other by depth alone. */
   card: {
-    backgroundColor: colors.background,
-    borderRadius: 24,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-    overflow: 'hidden',
-    position: 'relative',
+    flexDirection: 'row',
+    gap: spacing.sm,
+    backgroundColor: brand.surface,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: brand.accentBorder,
+    padding: spacing.md,
     ...Platform.select({
-      ios: { shadowColor: JOIN_NAVY, shadowOpacity: 0.1, shadowRadius: 16, shadowOffset: { width: 0, height: 6 } },
-      android: { elevation: 3 },
+      ios: {
+        shadowColor: brand.navy,
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 4 },
+      },
+      android: { elevation: 1 },
     }),
   },
-  decorBlob: { position: 'absolute', top: -36, right: -36, width: 110, height: 110, borderRadius: 999 },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  iconCircle: { width: 56, height: 56, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
-  badge: {
+  cardPressed: { backgroundColor: brand.accentSoft },
+  iconTile: {
+    width: 40,
+    height: 40,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  body: { flex: 1 },
+  titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    borderRadius: 999,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 5,
+    justifyContent: 'space-between',
+    gap: spacing.sm,
   },
-  badgeText: { color: JOIN_NAVY, fontWeight: '700', fontSize: 11 },
-  title: { color: JOIN_NAVY, marginTop: spacing.md },
-  description: { color: JOIN_TEXT_MUTED, marginTop: spacing.xs, marginBottom: spacing.lg },
-  ctaPill: {
-    alignSelf: 'flex-start',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    borderRadius: 999,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+  title: { color: brand.navy, flexShrink: 1 },
+  description: { color: brand.textMuted, marginTop: 2 },
+  requirement: {
+    color: brand.accentDeep,
+    fontWeight: '600',
+    marginTop: spacing.sm,
   },
-  ctaText: { color: colors.onPrimary, fontWeight: '700' },
+});
+
+export const footnoteStyles = StyleSheet.create({
+  card: {
+    ...globalStyles.row,
+    gap: spacing.sm,
+    backgroundColor: brand.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: brand.border,
+    padding: spacing.md,
+  },
+  text: { flex: 1, color: brand.textMuted },
 });

@@ -1,7 +1,5 @@
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
   RefreshControl,
   ScrollView,
   TextInput,
@@ -9,7 +7,12 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
+import {
+  AppHeader,
+  EventlyIcon,
+  EventlyText,
+  KeyboardAvoider,
+} from '../../Components';
 import { colors } from '../../theme';
 import {
   SETTINGS_ACCENT,
@@ -75,7 +78,12 @@ export function SettingsScreen() {
           <EventlyText variant="body" style={styles.errorText}>
             {errorMessage ?? 'Something went wrong.'}
           </EventlyText>
-          <TouchableOpacity style={styles.retryButton} activeOpacity={0.8} onPress={refetch} accessibilityRole="button">
+          <TouchableOpacity
+            style={styles.retryButton}
+            activeOpacity={0.8}
+            onPress={refetch}
+            accessibilityRole="button"
+          >
             <EventlyIcon name="refresh" size={16} color={SETTINGS_ACCENT} />
             <EventlyText variant="caption" style={styles.retryText}>
               {COPY.retry}
@@ -93,11 +101,13 @@ export function SettingsScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {header}
-      <KeyboardAvoidingView style={styles.scroll} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardAvoider style={styles.scroll}>
         <ScrollView
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
-          refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
+          refreshControl={
+            <RefreshControl refreshing={isLoading} onRefresh={refetch} />
+          }
         >
           <EventlyText variant="caption" style={styles.sectionTitle}>
             {COPY.detailsSection}
@@ -105,7 +115,10 @@ export function SettingsScreen() {
 
           <View style={styles.card}>
             {SETTINGS_FIELDS.map((field, index) => (
-              <View key={field.key} style={[styles.field, index === 0 && styles.fieldFirst]}>
+              <View
+                key={field.key}
+                style={[styles.field, index === 0 && styles.fieldFirst]}
+              >
                 <EventlyText variant="body" style={styles.label}>
                   {field.label}
                 </EventlyText>
@@ -115,9 +128,14 @@ export function SettingsScreen() {
                   </EventlyText>
                 ) : null}
                 <TextInput
-                  style={[styles.input, field.key === 'email' && emailInvalid && styles.inputInvalid]}
+                  style={[
+                    styles.input,
+                    field.key === 'email' &&
+                      emailInvalid &&
+                      styles.inputInvalid,
+                  ]}
                   value={draft[field.key]}
-                  onChangeText={(value) => setField(field.key, value)}
+                  onChangeText={value => setField(field.key, value)}
                   placeholder={field.placeholder}
                   placeholderTextColor={colors.textMuted}
                   keyboardType={field.keyboard}
@@ -131,7 +149,11 @@ export function SettingsScreen() {
                 number, which this screen deliberately does not pretend to do. */}
             <View style={styles.phoneRow}>
               <View style={styles.phoneIcon}>
-                <EventlyIcon name="phone-outline" size={18} color={SETTINGS_ACCENT} />
+                <EventlyIcon
+                  name="phone-outline"
+                  size={18}
+                  color={SETTINGS_ACCENT}
+                />
               </View>
               <View style={styles.phoneText}>
                 <EventlyText variant="caption" style={styles.hint}>
@@ -144,15 +166,25 @@ export function SettingsScreen() {
               {user.phone ? (
                 <View style={styles.verified}>
                   <EventlyIcon
-                    name={user.phoneVerified ? 'check-decagram' : 'alert-circle-outline'}
+                    name={
+                      user.phoneVerified
+                        ? 'check-decagram'
+                        : 'alert-circle-outline'
+                    }
                     size={15}
-                    color={user.phoneVerified ? SETTINGS_GREEN : colors.textMuted}
+                    color={
+                      user.phoneVerified ? SETTINGS_GREEN : colors.textMuted
+                    }
                   />
                   <EventlyText
                     variant="caption"
                     style={[
                       styles.verifiedText,
-                      { color: user.phoneVerified ? SETTINGS_GREEN : colors.textMuted },
+                      {
+                        color: user.phoneVerified
+                          ? SETTINGS_GREEN
+                          : colors.textMuted,
+                      },
                     ]}
                   >
                     {user.phoneVerified ? COPY.verified : COPY.unverified}
@@ -190,14 +222,18 @@ export function SettingsScreen() {
 
           {justSaved ? (
             <View style={styles.savedRow}>
-              <EventlyIcon name="check-circle" size={16} color={SETTINGS_GREEN} />
+              <EventlyIcon
+                name="check-circle"
+                size={16}
+                color={SETTINGS_GREEN}
+              />
               <EventlyText variant="caption" style={styles.savedText}>
                 {COPY.saved}
               </EventlyText>
             </View>
           ) : null}
         </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardAvoider>
     </SafeAreaView>
   );
 }

@@ -19,7 +19,13 @@ export const styles = StyleSheet.create({
   body: { flex: 1 },
   scroll: { flex: 1 },
   content: { padding: spacing.md, paddingBottom: spacing.xl },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg, backgroundColor: PLAN_BG },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.lg,
+    backgroundColor: PLAN_BG,
+  },
   loadingText: { color: PLAN_TEXT_MUTED, marginTop: spacing.md },
   errorText: { color: colors.danger, textAlign: 'center' },
   retryButton: { marginTop: spacing.lg },
@@ -28,33 +34,95 @@ export const styles = StyleSheet.create({
     paddingTop: spacing.sm,
     paddingBottom: spacing.md,
     backgroundColor: PLAN_BG,
+    borderTopWidth: 1,
+    borderTopColor: PLAN_BORDER,
   },
+  /*
+   * No Android elevation.
+   *
+   * It used to carry `elevation: 4`, and Android draws an elevation shadow
+   * from the view's outline — which for this button fell back to its bounding
+   * rectangle, not its 999px radius. The result was a white rectangle poking
+   * out at all four corners of the pill, most visible once the button turned
+   * orange. The separation the shadow was for is now the footer's top rule,
+   * which is honest about being a straight line.
+   */
   floatingButton: {
     borderRadius: 999,
+    overflow: 'hidden',
     ...Platform.select({
-      ios: { shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 12, shadowOffset: { width: 0, height: 6 } },
-      android: { elevation: 4 },
+      ios: {
+        shadowColor: '#000',
+        shadowOpacity: 0.18,
+        shadowRadius: 12,
+        shadowOffset: { width: 0, height: 6 },
+      },
+      android: {},
     }),
   },
-  blockReasonText: { color: colors.danger, textAlign: 'center', marginBottom: spacing.sm },
+  /*
+   * Disabled, and still readable.
+   *
+   * EventlyButton dims every disabled button to opacity 0.5, which on an
+   * outline button leaves the label around 2:1 against the page — you cannot
+   * act on a control whose text you cannot read, and "greyed out" is supposed
+   * to mean not yet, not broken. `style` is applied last in the component's
+   * array, so restoring full opacity here is a local override that leaves
+   * every other button in the app alone.
+   */
+  continueDisabled: {
+    opacity: 1,
+    backgroundColor: colors.background,
+    borderColor: PLAN_BORDER,
+  },
   fixedHeader: {
     paddingHorizontal: spacing.md,
     paddingTop: spacing.sm,
-    paddingBottom: spacing.md,
+    paddingBottom: spacing.sm,
     backgroundColor: PLAN_BG,
-    borderBottomWidth: 1,
-    borderBottomColor: PLAN_BORDER,
   },
-  successCard: { ...globalStyles.card, padding: spacing.lg, alignItems: 'center' },
-  successTitle: { color: PLAN_NAVY, marginTop: spacing.md, textAlign: 'center' },
-  successSubtitle: { color: PLAN_TEXT_MUTED, textAlign: 'center', marginTop: spacing.sm },
+  /*
+   * A fade, where a 1px rule used to be.
+   *
+   * The occasion tiles scroll under this edge, and a hard line cut them
+   * mid-card — the first thing on the screen was a band of half-tiles. Pulled
+   * up over the scroll view so content dissolves into the header instead.
+   */
+  headerFade: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 14,
+    zIndex: 2,
+  },
+  successCard: {
+    ...globalStyles.card,
+    padding: spacing.lg,
+    alignItems: 'center',
+  },
+  successTitle: {
+    color: PLAN_NAVY,
+    marginTop: spacing.md,
+    textAlign: 'center',
+  },
+  successSubtitle: {
+    color: PLAN_TEXT_MUTED,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+  },
   newPlanButton: { marginTop: spacing.lg },
 });
 
 // Web's PlanHero.module.css: a dark navy card with an orange eyebrow/accent —
 // the same hero treatment Home's Banner already ports from the same design.
 export const heroStyles = StyleSheet.create({
-  section: { marginBottom: spacing.lg, backgroundColor: PLAN_NAVY_DEEP, borderRadius: 16, padding: spacing.md },
+  section: {
+    marginBottom: spacing.lg,
+    backgroundColor: PLAN_NAVY_DEEP,
+    borderRadius: 16,
+    padding: spacing.md,
+  },
   heading: { color: colors.onPrimary },
   headingAccent: { color: '#ff8b5e' },
   subtitle: { color: 'rgba(255,255,255,0.74)', marginTop: 2 },
@@ -74,38 +142,46 @@ export const heroStyles = StyleSheet.create({
   plainSubtitle: { color: PLAN_TEXT_MUTED, marginTop: spacing.xs },
 });
 
+/*
+ * A progress bar and one line of text, rather than four numbered dots.
+ *
+ * Four labels never fit across a phone: "Event details", "Categories", "Find
+ * organizers" and "Review" truncated to "Event…", "Categ…", "Find or…", which
+ * names nothing. Only the current step actually needs spelling out — the rest
+ * is position, and a segmented bar carries position better than four
+ * abbreviations while costing less height.
+ */
 export const stepperStyles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'flex-start' },
-  item: { flex: 1, alignItems: 'center' },
-  dot: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    borderWidth: 2,
-    borderColor: PLAN_BORDER,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.background,
+  wrap: { gap: spacing.sm },
+  track: { flexDirection: 'row', gap: 5 },
+  segment: {
+    flex: 1,
+    height: 4,
+    borderRadius: 999,
+    backgroundColor: PLAN_BORDER,
   },
-  dotCurrent: { borderColor: PLAN_ACCENT, backgroundColor: PLAN_ACCENT },
-  dotDone: { borderColor: PLAN_ACCENT, backgroundColor: colors.background },
-  dotNumber: { color: PLAN_TEXT_MUTED, fontSize: 11, fontWeight: '700' },
-  dotNumberCurrent: { color: colors.onPrimary },
-  dotNumberDone: { color: PLAN_ACCENT },
-  line: { flex: 1, height: 2, marginTop: 12, backgroundColor: PLAN_BORDER },
-  lineDone: { backgroundColor: PLAN_ACCENT },
-  label: { color: PLAN_TEXT_MUTED, marginTop: spacing.xs, textAlign: 'center' },
-  labelCurrent: { color: PLAN_NAVY, fontWeight: '700' },
+  segmentDone: { backgroundColor: PLAN_ACCENT },
+  caption: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  captionCount: { color: PLAN_ACCENT, fontWeight: '700' },
+  captionDivider: { color: PLAN_BORDER },
+  captionLabel: { color: PLAN_NAVY, fontWeight: '600', flexShrink: 1 },
+  captionSpacer: { flex: 1 },
+  captionNext: { color: PLAN_TEXT_MUTED },
 });
 
 export const occasionPickerStyles = StyleSheet.create({
   section: { marginBottom: spacing.lg },
-  sectionTitle: { color: PLAN_NAVY, marginBottom: spacing.md },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  sectionTitle: {
+    color: PLAN_NAVY,
+    marginBottom: spacing.sm,
+    fontWeight: '700',
+  },
+  grid: { flexDirection: 'row', gap: spacing.sm },
+  gridContent: { gap: spacing.sm, paddingRight: spacing.md },
   card: {
-    width: 100,
-    height: 108,
-    borderRadius: 16,
+    width: 88,
+    height: 76,
+    borderRadius: 14,
     padding: spacing.sm,
     justifyContent: 'space-between',
     overflow: 'hidden',
@@ -113,7 +189,13 @@ export const occasionPickerStyles = StyleSheet.create({
     borderColor: 'transparent',
   },
   cardSelected: { borderColor: PLAN_ACCENT },
-  cardBackground: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
+  cardBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   artLayer: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
   iconBadge: {
     width: 26,
@@ -142,13 +224,52 @@ export const occasionPickerStyles = StyleSheet.create({
 // another border. controlInput cancels EventlyTextInput's own base border/
 // padding so controlRow supplies the one visible outline.
 export const eventDetailsStyles = StyleSheet.create({
-  section: { marginBottom: spacing.lg },
-  field: { marginBottom: spacing.md },
+  section: { marginBottom: spacing.lg, gap: spacing.sm },
+  sectionTitle: { color: PLAN_NAVY, fontWeight: '700' },
+  field: { marginBottom: 0 },
+  /* Two half-width fields side by side. Date and guest count are both short
+     answers, and pairing them buys back a whole field's height. */
+  pair: { flexDirection: 'row', gap: spacing.sm },
+  pairItem: { flex: 1 },
   label: { color: PLAN_NAVY, marginBottom: spacing.xs, fontWeight: '600' },
+  /*
+   * The field's name, inside the field.
+   *
+   * A label above the control cost 74px per field — 18 of label, 4 of gap, 52
+   * of control — so three fields filled the screen. Moving it inside brings
+   * that to 58 and pairs the short ones, which is the difference between
+   * seeing the whole step and scrolling through it.
+   */
+  caption: {
+    color: PLAN_TEXT_MUTED,
+    fontSize: 9.5,
+    lineHeight: 12,
+    fontWeight: '600',
+    letterSpacing: 0.7,
+    textTransform: 'uppercase',
+  },
+  captionOptional: {
+    fontWeight: '500',
+    letterSpacing: 0,
+    textTransform: 'none',
+  },
+  control: {
+    height: 58,
+    justifyContent: 'center',
+    gap: 3,
+    borderWidth: 1.5,
+    borderColor: PLAN_BORDER,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    backgroundColor: colors.background,
+  },
+  /* An optional field should look optional before it is read. */
+  controlOptional: { backgroundColor: 'transparent', borderStyle: 'dashed' },
+  controlValueRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   controlRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 52,
+    height: 58,
     borderWidth: 1.5,
     borderColor: PLAN_BORDER,
     borderRadius: 14,
@@ -183,17 +304,48 @@ export const eventDetailsStyles = StyleSheet.create({
 });
 
 export const dateModalStyles = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: colors.overlay, justifyContent: 'flex-end' },
-  card: { backgroundColor: colors.background, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: spacing.lg },
-  headRow: { ...globalStyles.row, justifyContent: 'space-between', marginBottom: spacing.md },
+  overlay: {
+    flex: 1,
+    backgroundColor: colors.overlay,
+    justifyContent: 'flex-end',
+  },
+  card: {
+    backgroundColor: colors.background,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: spacing.lg,
+  },
+  headRow: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+  },
   monthLabel: { color: PLAN_NAVY },
-  navButton: { width: 32, height: 32, borderRadius: 16, backgroundColor: PLAN_BG, alignItems: 'center', justifyContent: 'center' },
+  navButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: PLAN_BG,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   navButtonDisabled: { opacity: 0.3 },
   weekdayRow: { flexDirection: 'row' },
   weekday: { flex: 1, textAlign: 'center', color: PLAN_TEXT_MUTED },
   dayGrid: { flexDirection: 'row', flexWrap: 'wrap', marginTop: spacing.sm },
-  dayCell: { width: `${100 / 7}%`, aspectRatio: 1, alignItems: 'center', justifyContent: 'center' },
-  dayCircle: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
+  dayCell: {
+    width: `${100 / 7}%`,
+    aspectRatio: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dayCircle: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   daySelected: { backgroundColor: PLAN_ACCENT },
   dayText: { color: PLAN_NAVY },
   dayTextDisabled: { color: PLAN_BORDER },
@@ -205,11 +357,32 @@ export const dateModalStyles = StyleSheet.create({
 // and Budget all pick from this instead of inline chip rows/dropdowns, which
 // read as a ported web control rather than a native mobile picker.
 export const selectModalStyles = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: colors.overlay, justifyContent: 'flex-end' },
-  card: { backgroundColor: colors.background, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: spacing.lg, maxHeight: '75%' },
-  headRow: { ...globalStyles.row, justifyContent: 'space-between', marginBottom: spacing.md },
+  overlay: {
+    flex: 1,
+    backgroundColor: colors.overlay,
+    justifyContent: 'flex-end',
+  },
+  card: {
+    backgroundColor: colors.background,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: spacing.lg,
+    maxHeight: '75%',
+  },
+  headRow: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+  },
   title: { color: PLAN_NAVY },
-  closeButton: { width: 32, height: 32, borderRadius: 16, backgroundColor: PLAN_BG, alignItems: 'center', justifyContent: 'center' },
+  closeButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: PLAN_BG,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -250,13 +423,24 @@ export const selectModalStyles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   clearText: { color: PLAN_TEXT_MUTED, fontStyle: 'italic' },
-  emptyText: { color: PLAN_TEXT_MUTED, textAlign: 'center', paddingVertical: spacing.lg },
+  emptyText: {
+    color: PLAN_TEXT_MUTED,
+    textAlign: 'center',
+    paddingVertical: spacing.lg,
+  },
 });
 
 export const ideasStyles = StyleSheet.create({
   section: { marginBottom: spacing.lg },
   head: { ...globalStyles.row, gap: spacing.sm, marginBottom: spacing.xs },
-  icon: { width: 26, height: 26, borderRadius: 13, backgroundColor: PLAN_ACCENT_SOFT, alignItems: 'center', justifyContent: 'center' },
+  icon: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: PLAN_ACCENT_SOFT,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   title: { color: PLAN_NAVY, fontWeight: '600' },
   subtitle: { color: PLAN_TEXT_MUTED, marginBottom: spacing.sm },
   chipRow: { marginBottom: spacing.sm },
@@ -286,10 +470,19 @@ export const ideasStyles = StyleSheet.create({
 
 export const categoriesStepStyles = StyleSheet.create({
   section: { marginBottom: spacing.lg },
-  head: { ...globalStyles.row, justifyContent: 'space-between', marginBottom: spacing.xs },
+  head: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    marginBottom: spacing.xs,
+  },
   title: { color: PLAN_NAVY, flex: 1, marginRight: spacing.sm },
   subtitle: { color: PLAN_TEXT_MUTED, marginBottom: spacing.md },
-  counterPill: { backgroundColor: PLAN_ACCENT_SOFT, borderRadius: 999, paddingHorizontal: spacing.sm, paddingVertical: 4 },
+  counterPill: {
+    backgroundColor: PLAN_ACCENT_SOFT,
+    borderRadius: 999,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+  },
   counter: { color: PLAN_ACCENT, fontWeight: '700' },
   // A single-column checklist — each row a full-width tappable card with a
   // trailing checkmark circle, the native mobile pattern for multi-select
@@ -308,7 +501,13 @@ export const categoriesStepStyles = StyleSheet.create({
   // outline, so a screen with several rows selected doesn't turn into a wall
   // of bold orange borders.
   rowSelected: { backgroundColor: PLAN_ACCENT_SOFT },
-  icon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+  icon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   textCol: { flex: 1 },
   rowTitle: { color: PLAN_NAVY },
   rowSubtitle: { color: PLAN_TEXT_MUTED, marginTop: 1 },
@@ -345,12 +544,23 @@ export const categoriesStepStyles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingVertical: 0,
   },
-  addButton: { width: 28, height: 28, borderRadius: 14, backgroundColor: PLAN_ACCENT, alignItems: 'center', justifyContent: 'center' },
+  addButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: PLAN_ACCENT,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
 
 export const organizersStyles = StyleSheet.create({
   section: { marginBottom: spacing.lg },
-  toolsRow: { ...globalStyles.row, justifyContent: 'space-between', marginBottom: spacing.sm },
+  toolsRow: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    marginBottom: spacing.sm,
+  },
   resultCount: { color: PLAN_NAVY, flex: 1 },
   filterButton: {
     ...globalStyles.row,
@@ -361,7 +571,10 @@ export const organizersStyles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
   },
-  filterButtonActive: { borderColor: PLAN_ACCENT, backgroundColor: PLAN_ACCENT },
+  filterButtonActive: {
+    borderColor: PLAN_ACCENT,
+    backgroundColor: PLAN_ACCENT,
+  },
   filterButtonText: { color: PLAN_NAVY },
   filterButtonTextActive: { color: colors.onPrimary },
   sortRow: { gap: spacing.sm, paddingBottom: spacing.md },
@@ -380,55 +593,148 @@ export const organizersStyles = StyleSheet.create({
   card: { ...globalStyles.card, padding: spacing.md },
   cardMuted: { opacity: 0.6 },
   topRow: { ...globalStyles.row, alignItems: 'flex-start', gap: spacing.sm },
-  avatar: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   avatarText: { color: colors.onPrimary },
   idCol: { flex: 1 },
   nameRow: { ...globalStyles.row, flexWrap: 'wrap', gap: spacing.xs },
   name: { color: PLAN_NAVY },
-  tierBadge: { ...globalStyles.row, gap: 3, borderRadius: 999, paddingHorizontal: spacing.sm, paddingVertical: 2 },
+  tierBadge: {
+    ...globalStyles.row,
+    gap: 3,
+    borderRadius: 999,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+  },
   tierBadgeText: { color: colors.onPrimary, fontWeight: '700' },
-  conciergePill: { ...globalStyles.row, gap: 3, backgroundColor: PLAN_NAVY_DEEP, borderRadius: 999, paddingHorizontal: spacing.sm, paddingVertical: 2 },
+  conciergePill: {
+    ...globalStyles.row,
+    gap: 3,
+    backgroundColor: PLAN_NAVY_DEEP,
+    borderRadius: 999,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+  },
   conciergeText: { color: colors.onPrimary, fontWeight: '700' },
-  scorePill: { ...globalStyles.row, gap: 3, backgroundColor: PLAN_ACCENT_SOFT, borderRadius: 999, paddingHorizontal: spacing.sm, paddingVertical: 2 },
+  scorePill: {
+    ...globalStyles.row,
+    gap: 3,
+    backgroundColor: PLAN_ACCENT_SOFT,
+    borderRadius: 999,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+  },
   scoreText: { color: PLAN_ACCENT, fontWeight: '700' },
   ratingRow: { ...globalStyles.row, gap: spacing.xs, marginTop: spacing.xs },
   ratingText: { color: PLAN_NAVY },
   reviewsText: { color: PLAN_TEXT_MUTED },
   metaText: { color: PLAN_TEXT_MUTED, marginTop: 2 },
-  tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, marginTop: spacing.sm },
-  tag: { backgroundColor: PLAN_BG, borderRadius: 8, paddingHorizontal: spacing.sm, paddingVertical: 2 },
+  tagRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.xs,
+    marginTop: spacing.sm,
+  },
+  tag: {
+    backgroundColor: PLAN_BG,
+    borderRadius: 8,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+  },
   tagText: { color: PLAN_TEXT_MUTED },
   reasons: { marginTop: spacing.sm, gap: 4 },
   reasonRow: { ...globalStyles.row, gap: spacing.xs },
   reasonText: { color: PLAN_NAVY, flex: 1 },
   matchRow: { ...globalStyles.row, gap: spacing.xs, marginTop: spacing.sm },
   matchText: { color: PLAN_NAVY },
-  estRow: { marginTop: spacing.sm, borderTopWidth: 1, borderTopColor: PLAN_BORDER, paddingTop: spacing.sm },
+  estRow: {
+    marginTop: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: PLAN_BORDER,
+    paddingTop: spacing.sm,
+  },
   estLabel: { color: PLAN_TEXT_MUTED, fontSize: 10, letterSpacing: 0.5 },
   estValue: { color: PLAN_NAVY, marginTop: 2 },
   unavailRow: { ...globalStyles.row, gap: spacing.xs },
   unavailText: { color: colors.danger },
   actionsRow: { marginTop: spacing.md },
   selectButton: {},
-  emptyState: { ...globalStyles.card, padding: spacing.lg, alignItems: 'center' },
+  emptyState: {
+    ...globalStyles.card,
+    padding: spacing.lg,
+    alignItems: 'center',
+  },
   emptyTitle: { color: PLAN_NAVY, marginTop: spacing.md, textAlign: 'center' },
-  emptyMessage: { color: PLAN_TEXT_MUTED, marginTop: spacing.sm, textAlign: 'center' },
+  emptyMessage: {
+    color: PLAN_TEXT_MUTED,
+    marginTop: spacing.sm,
+    textAlign: 'center',
+  },
   emptyButton: { marginTop: spacing.md },
 });
 
 export const filterModalStyles = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: colors.overlay, justifyContent: 'flex-end' },
-  card: { backgroundColor: colors.background, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: spacing.lg, maxHeight: '80%' },
-  headRow: { ...globalStyles.row, justifyContent: 'space-between', marginBottom: spacing.md },
+  overlay: {
+    flex: 1,
+    backgroundColor: colors.overlay,
+    justifyContent: 'flex-end',
+  },
+  card: {
+    backgroundColor: colors.background,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: spacing.lg,
+    maxHeight: '80%',
+  },
+  headRow: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+  },
   title: { color: PLAN_NAVY },
-  closeButton: { width: 32, height: 32, borderRadius: 16, backgroundColor: PLAN_BG, alignItems: 'center', justifyContent: 'center' },
-  groupLabel: { color: PLAN_TEXT_MUTED, letterSpacing: 0.5, marginTop: spacing.md, marginBottom: spacing.sm },
-  checkRow: { ...globalStyles.row, gap: spacing.sm, paddingVertical: spacing.xs },
-  checkbox: { width: 20, height: 20, borderRadius: 6, borderWidth: 2, borderColor: PLAN_BORDER, alignItems: 'center', justifyContent: 'center' },
+  closeButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: PLAN_BG,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  groupLabel: {
+    color: PLAN_TEXT_MUTED,
+    letterSpacing: 0.5,
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  checkRow: {
+    ...globalStyles.row,
+    gap: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: PLAN_BORDER,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   checkboxOn: { backgroundColor: PLAN_ACCENT, borderColor: PLAN_ACCENT },
   checkLabel: { color: PLAN_NAVY },
   pillRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  pill: { borderWidth: 1.5, borderColor: PLAN_BORDER, borderRadius: 999, paddingHorizontal: spacing.md, paddingVertical: spacing.xs },
+  pill: {
+    borderWidth: 1.5,
+    borderColor: PLAN_BORDER,
+    borderRadius: 999,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+  },
   pillOn: { borderColor: PLAN_ACCENT, backgroundColor: PLAN_ACCENT },
   pillText: { color: PLAN_NAVY },
   pillTextOn: { color: colors.onPrimary },
@@ -446,35 +752,79 @@ export const reviewStyles = StyleSheet.create({
   sectionBlock: { paddingVertical: spacing.md },
   sectionBlockFirst: { paddingTop: 0 },
   sectionDivider: { height: 1, backgroundColor: PLAN_BORDER },
-  panelHead: { ...globalStyles.row, justifyContent: 'space-between', marginBottom: spacing.sm },
+  panelHead: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    marginBottom: spacing.sm,
+  },
   panelTitle: { color: PLAN_NAVY },
   editButton: { ...globalStyles.row, gap: 4 },
   editText: { color: PLAN_ACCENT },
   // A 2-column key/value grid reads like a checkout summary — lighter than a
   // vertical list of icon-badged rows repeated six times.
   detailGrid: { flexDirection: 'row', flexWrap: 'wrap' },
-  detailItem: { width: '50%', marginBottom: spacing.sm, paddingRight: spacing.sm },
+  detailItem: {
+    width: '50%',
+    marginBottom: spacing.sm,
+    paddingRight: spacing.sm,
+  },
   detailItemFull: { width: '100%', marginBottom: spacing.sm },
   rowLabel: { color: PLAN_TEXT_MUTED },
   rowValue: { color: PLAN_NAVY, marginTop: 1 },
   rowValueMuted: { color: PLAN_TEXT_MUTED },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
-  chip: { ...globalStyles.row, gap: 4, backgroundColor: PLAN_BG, borderRadius: 999, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs },
+  chip: {
+    ...globalStyles.row,
+    gap: 4,
+    backgroundColor: PLAN_BG,
+    borderRadius: 999,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
   chipText: { color: PLAN_NAVY },
   emptyText: { color: PLAN_TEXT_MUTED },
   orgRow: { ...globalStyles.row, gap: spacing.sm, marginTop: spacing.sm },
-  orgAvatar: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  orgAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   orgAvatarText: { color: colors.onPrimary },
   orgMeta: { flex: 1 },
   orgName: { color: PLAN_NAVY },
   orgSub: { ...globalStyles.row, gap: 4, color: PLAN_TEXT_MUTED },
   orgSubText: { color: PLAN_TEXT_MUTED },
-  orgTag: { backgroundColor: PLAN_ACCENT_SOFT, color: PLAN_ACCENT, borderRadius: 999, paddingHorizontal: spacing.sm, paddingVertical: 2, fontWeight: '700' },
-  nextPanel: { ...globalStyles.card, padding: spacing.md, marginBottom: spacing.md },
+  orgTag: {
+    backgroundColor: PLAN_ACCENT_SOFT,
+    color: PLAN_ACCENT,
+    borderRadius: 999,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    fontWeight: '700',
+  },
+  nextPanel: {
+    ...globalStyles.card,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
   nextPanelTitle: { color: PLAN_NAVY, marginBottom: spacing.sm },
-  nextRow: { ...globalStyles.row, alignItems: 'flex-start', gap: spacing.sm, marginBottom: spacing.sm },
+  nextRow: {
+    ...globalStyles.row,
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
   nextTextCol: { flex: 1 },
-  nextIcon: { width: 28, height: 28, borderRadius: 14, backgroundColor: PLAN_ACCENT_SOFT, alignItems: 'center', justifyContent: 'center' },
+  nextIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: PLAN_ACCENT_SOFT,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   nextTitle: { color: PLAN_NAVY },
   nextDesc: { color: PLAN_TEXT_MUTED, marginTop: 1 },
   quoteBox: {
@@ -491,15 +841,32 @@ export const reviewStyles = StyleSheet.create({
   quoteText: { color: PLAN_TEXT_MUTED, marginTop: 1 },
   submitCard: { ...globalStyles.card, padding: spacing.md },
   submitTitle: { color: PLAN_NAVY },
-  submitText: { color: PLAN_TEXT_MUTED, marginTop: spacing.xs, marginBottom: spacing.md },
+  submitText: {
+    color: PLAN_TEXT_MUTED,
+    marginTop: spacing.xs,
+    marginBottom: spacing.md,
+  },
   savedRow: { ...globalStyles.row, gap: spacing.xs, marginBottom: spacing.sm },
   savedText: { color: PLAN_GREEN },
-  errorBox: { ...globalStyles.row, alignItems: 'flex-start', gap: spacing.xs, backgroundColor: '#FEF2F2', borderRadius: 12, padding: spacing.sm, marginBottom: spacing.md },
+  errorBox: {
+    ...globalStyles.row,
+    alignItems: 'flex-start',
+    gap: spacing.xs,
+    backgroundColor: '#FEF2F2',
+    borderRadius: 12,
+    padding: spacing.sm,
+    marginBottom: spacing.md,
+  },
   errorText: { color: colors.danger, flex: 1 },
   submitButton: {
     borderRadius: 999,
     ...Platform.select({
-      ios: { shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 12, shadowOffset: { width: 0, height: 6 } },
+      ios: {
+        shadowColor: '#000',
+        shadowOpacity: 0.18,
+        shadowRadius: 12,
+        shadowOffset: { width: 0, height: 6 },
+      },
       android: { elevation: 4 },
     }),
   },

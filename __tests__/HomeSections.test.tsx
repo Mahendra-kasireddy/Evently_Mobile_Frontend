@@ -14,13 +14,24 @@ import ReactTestRenderer from 'react-test-renderer';
 
 jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
   const { Text } = require('react-native');
-  return function MockIcon({ name, size, color }: { name: string; size?: number; color?: string }) {
+  return function MockIcon({
+    name,
+    size,
+    color,
+  }: {
+    name: string;
+    size?: number;
+    color?: string;
+  }) {
     return <Text style={{ fontSize: size, color }}>{` icon:${name}`}</Text>;
   };
 });
 
 import { page, toHtml } from '../test-utils/rn-to-html';
 import { EventHero } from '../src/modules/Home/sections/EventHero';
+import { EventRow } from '../src/modules/Home/sections/EventRow';
+import { EventlyText as EventlyTextForDump } from '../src/Components/EventlyText';
+import { View } from 'react-native';
 import { HomeHeader } from '../src/modules/Home/sections/HomeHeader';
 import { OccasionGrid } from '../src/modules/Home/sections/OccasionGrid';
 import { Offers } from '../src/modules/Home/sections/Offers';
@@ -29,17 +40,19 @@ import {
   formatCompactINR,
   mapCurrentEvent,
   mapOtherEvents,
+  normalizeWhen,
   mapOccasions,
   mapCoupons,
   mapPackages,
 } from '../src/modules/Home/utils';
-import {
-  SEARCH_PLACEHOLDER } from '../src/modules/Home/constants';
+import { SEARCH_PLACEHOLDER } from '../src/modules/Home/constants';
 import type { HomeFeedDTO } from '../src/modules/Home/types';
 
 declare const process: { env: Record<string, string | undefined> };
-const fs: { writeFileSync(p: string, d: string, e: string): void; existsSync(p: string): boolean } =
-  require('fs');
+const fs: {
+  writeFileSync(p: string, d: string, e: string): void;
+  existsSync(p: string): boolean;
+} = require('fs');
 
 const feed = (over: Partial<HomeFeedDTO>): HomeFeedDTO => over as HomeFeedDTO;
 
@@ -108,21 +121,36 @@ const quoteEvent = (over: Record<string, unknown> = {}) =>
         quotes: [
           {
             id: 'q1',
-            organizer: { id: 'o1', name: 'Venkat Decor & Events', initials: 'VD', avatarColor: '#1d9e75' },
+            organizer: {
+              id: 'o1',
+              name: 'Venkat Decor & Events',
+              initials: 'VD',
+              avatarColor: '#1d9e75',
+            },
             total: 625000,
             lineItemCount: 7,
             repliedAt: '2026-09-04T12:00:00.000Z',
           },
           {
             id: 'q2',
-            organizer: { id: 'o2', name: 'Mahendra Events', initials: 'ME', avatarColor: '#e8633a' },
+            organizer: {
+              id: 'o2',
+              name: 'Mahendra Events',
+              initials: 'ME',
+              avatarColor: '#e8633a',
+            },
             total: 684000,
             lineItemCount: 7,
             repliedAt: '2026-09-04T09:00:00.000Z',
           },
         ],
         awaiting: [
-          { id: 'o4', name: 'Sreeja Wedding Co.', initials: 'SW', avatarColor: '#6d5bd0' },
+          {
+            id: 'o4',
+            name: 'Sreeja Wedding Co.',
+            initials: 'SW',
+            avatarColor: '#6d5bd0',
+          },
         ],
         ...over,
       } as HomeFeedDTO['currentEvent'],
@@ -150,22 +178,33 @@ const briefDTO = (over: Record<string, unknown> = {}) =>
     quotes: [],
     awaiting: [],
     ...over,
-  }) as NonNullable<HomeFeedDTO['currentEvent']>;
+  } as NonNullable<HomeFeedDTO['currentEvent']>);
 
 describe('occasion tiles with and without a photo', () => {
   const tiles = (over: Record<string, unknown> = {}) =>
     mapOccasions(
       feed({
         occasions: [
-          { id: 'wedding', label: 'Wedding', art: 'wedding', fromPrice: 0, mostPlanned: false, ...over },
+          {
+            id: 'wedding',
+            label: 'Wedding',
+            art: 'wedding',
+            fromPrice: 0,
+            mostPlanned: false,
+            ...over,
+          },
         ],
       } as unknown as HomeFeedDTO),
     )!;
 
   it('carries an uploaded photo through, made absolute', () => {
     // The server sends a root-relative path; React Native cannot fetch one.
-    const [tile] = tiles({ imageUrl: '/api/upload/file/categoryImage/x.png' }).items;
-    expect(tile.photoUrl).toBe('http://localhost:3000/api/upload/file/categoryImage/x.png');
+    const [tile] = tiles({
+      imageUrl: '/api/upload/file/categoryImage/x.png',
+    }).items;
+    expect(tile.photoUrl).toBe(
+      'http://localhost:3000/api/upload/file/categoryImage/x.png',
+    );
   });
 
   it('reports no photo as no photo, so the tile draws its illustration', () => {
@@ -177,7 +216,9 @@ describe('occasion tiles with and without a photo', () => {
   it('still keeps the illustration key alongside the photo', () => {
     // The gradient is painted underneath either way, so a failed image never
     // leaves a blank rectangle.
-    const [tile] = tiles({ imageUrl: '/api/upload/file/categoryImage/x.png' }).items;
+    const [tile] = tiles({
+      imageUrl: '/api/upload/file/categoryImage/x.png',
+    }).items;
     expect(tile.art).toBe('wedding');
   });
 });
@@ -200,16 +241,165 @@ describe('mapOtherEvents', () => {
   it('keeps the order the server ranked them in', () => {
     const events = mapOtherEvents(
       feed({
-        otherEvents: [briefDTO({ refId: 'a', title: 'Anniversary' }), briefDTO({ refId: 'b', title: 'Naming' })],
+        otherEvents: [
+          briefDTO({ refId: 'a', title: 'Anniversary' }),
+          briefDTO({ refId: 'b', title: 'Naming' }),
+        ],
       }),
     );
-    expect(events.map((e) => e.title)).toEqual(['Anniversary', 'Naming']);
+    expect(events.map(e => e.title)).toEqual(['Anniversary', 'Naming']);
   });
 
   it('is empty for the ordinary account with one event', () => {
     expect(mapOtherEvents(feed({ otherEvents: [] }))).toEqual([]);
     // Older payloads predate the field; Home must not crash on them.
     expect(mapOtherEvents(feed({}))).toEqual([]);
+  });
+
+  /*
+   * The duplicate that reached customers. `otherEvents` is documented as never
+   * repeating `currentEvent`, the server broke that, and Home stacked one
+   * Corporate request on itself — a customer who created one event saw two and
+   * could not tell whether they had created it twice.
+   */
+  it('drops an event the leading card is already about', () => {
+    const events = mapOtherEvents(
+      feed({ currentEvent: briefDTO(), otherEvents: [briefDTO()] }),
+    );
+    expect(events).toEqual([]);
+  });
+
+  it('drops the duplicate even when it arrives under a different id', () => {
+    /*
+     * The real shape of it: one event resolved from two records — the quote
+     * request and the plan behind it — so the ids differ, the `source` differs
+     * and the date arrives in two formats. Nothing an id comparison can catch;
+     * everything the customer reads is identical.
+     */
+    const events = mapOtherEvents(
+      feed({
+        currentEvent: briefDTO({
+          refId: 'req9',
+          source: 'quote',
+          when: '2026-09-05',
+        }),
+        otherEvents: [
+          briefDTO({
+            refId: 'plan3',
+            source: 'plan',
+            when: '5 September 2026',
+            sentToCount: 0,
+            closesInDays: null,
+          }),
+        ],
+      }),
+    );
+    expect(events).toEqual([]);
+  });
+
+  it('keeps two real events that share a date and a venue', () => {
+    // Two different celebrations on one day at one hall is a thing a customer
+    // can genuinely have, and collapsing them would hide one.
+    const events = mapOtherEvents(
+      feed({
+        currentEvent: briefDTO({ refId: 'a', title: 'Anniversary' }),
+        otherEvents: [briefDTO({ refId: 'b', title: 'Naming ceremony' })],
+      }),
+    );
+    expect(events.map(e => e.title)).toEqual(['Naming ceremony']);
+  });
+
+  it('drops a duplicate of the booked card too', () => {
+    const events = mapOtherEvents(
+      feed({
+        booking: { id: 'bk1' } as NonNullable<HomeFeedDTO['booking']>,
+        otherEvents: [briefDTO({ refId: 'bk1' })],
+      }),
+    );
+    expect(events).toEqual([]);
+  });
+});
+
+describe('a second event on Home', () => {
+  /*
+   * Ten events used to mean ten full navy heroes — ten screens of card before
+   * a customer reached anything else on Home. Only the leading event keeps
+   * that weight now; the rest are one-line rows.
+   */
+  const row = (over: Record<string, unknown> = {}) => {
+    const [event] = mapOtherEvents(feed({ otherEvents: [briefDTO(over)] }));
+    let tree!: ReactTestRenderer.ReactTestRenderer;
+    ReactTestRenderer.act(() => {
+      tree = ReactTestRenderer.create(
+        <EventRow event={event} onPress={() => {}} />,
+      );
+    });
+    return tree;
+  };
+
+  const textIn = (tree: ReactTestRenderer.ReactTestRenderer): string => {
+    const out: string[] = [];
+    const walk = (n: unknown): void => {
+      if (n == null) return;
+      if (typeof n === 'string') return void out.push(n);
+      if (Array.isArray(n)) return n.forEach(walk);
+      walk((n as { children?: unknown }).children);
+    };
+    walk(tree.toJSON());
+    return out.join(' ');
+  };
+
+  it('keeps what tells one event from another', () => {
+    const text = textIn(row());
+    expect(text).toContain('Anniversary');
+    expect(text).toContain('5 Sep 2026');
+    expect(text).toContain('Kukatpally');
+  });
+
+  it('counts the replies, and says nothing at zero', () => {
+    // "0 quotes" is not news anyone can act on, and it costs a row its width.
+    expect(textIn(row({ quoteCount: 3 }))).toContain('3');
+    expect(textIn(row({ quoteCount: 0 }))).not.toMatch(/\b0\b/);
+  });
+
+  it('is one control, not three', () => {
+    // The hero carries a button, a link and a tappable quote per organizer. A
+    // row that did the same would be unreadable at this height, so the row
+    // itself is the button.
+    const buttons = row().root.findAll(
+      node => node.props?.accessibilityRole === 'button',
+      { deep: true },
+    );
+    // The Pressable and the host view it renders — one control either way.
+    expect(new Set(buttons.map(b => b.props.accessibilityLabel)).size).toBe(1);
+  });
+});
+
+describe('the date on a home card', () => {
+  /*
+   * Two server paths compose an event and they do not agree on a format: the
+   * request path sends "2026-09-21", the booking path "21 September 2026". The
+   * customer saw both, on two cards about the same day.
+   */
+  it('spells out a bare ISO date the way the rest of the app does', () => {
+    expect(normalizeWhen('2026-09-21')).toBe('21 September 2026');
+  });
+
+  it('leaves anything it does not recognise exactly as it arrived', () => {
+    // A range, a note, an already-spelled-out date: guessing at a format Home
+    // does not know is how a real value becomes "Invalid Date".
+    expect(normalizeWhen('21 September 2026')).toBe('21 September 2026');
+    expect(normalizeWhen('Sep–Oct 2026')).toBe('Sep–Oct 2026');
+    expect(normalizeWhen('Date TBC')).toBe('Date TBC');
+    expect(normalizeWhen('')).toBe('');
+  });
+
+  it('shows the spelled-out date on the card itself', () => {
+    const event = mapCurrentEvent(
+      feed({ currentEvent: briefDTO({ when: '2026-09-21' }) }),
+    );
+    expect(event?.when).toBe('21 September 2026');
+    expect(event?.factsLine).toContain('21 September 2026');
   });
 });
 
@@ -229,7 +419,12 @@ describe('a brief with only one quote', () => {
       quotes: [
         {
           id: 'q1',
-          organizer: { id: 'o1', name: 'Mahendra Events', initials: 'ME', avatarColor: '#e8633a' },
+          organizer: {
+            id: 'o1',
+            name: 'Mahendra Events',
+            initials: 'ME',
+            avatarColor: '#e8633a',
+          },
           total: 185000,
           lineItemCount: 5,
           repliedAt: '2026-09-11T09:00:00.000Z',
@@ -246,7 +441,9 @@ describe('a brief with only one quote', () => {
   it('shows no price range when there is only one price', () => {
     // "Lowest ₹1,85,000 · highest ₹1,85,000" is one number twice.
     expect(single().spreadLabel).toBe('');
-    expect(quoteEvent().spreadLabel).toBe('Lowest ₹6,25,000 · highest ₹7,42,000');
+    expect(quoteEvent().spreadLabel).toBe(
+      'Lowest ₹6,25,000 · highest ₹7,42,000',
+    );
   });
 
   it('does not tag the only quote as the lowest', () => {
@@ -284,10 +481,14 @@ describe('mapCurrentEvent', () => {
   });
 
   it('states the spread only when both ends are priced', () => {
-    expect(quoteEvent().spreadLabel).toBe('Lowest ₹6,25,000 · highest ₹7,42,000');
+    expect(quoteEvent().spreadLabel).toBe(
+      'Lowest ₹6,25,000 · highest ₹7,42,000',
+    );
     // A lone "lowest" reads as the price, and the point of the line is a range.
     expect(quoteEvent({ highestQuote: 0 }).spreadLabel).toBe('');
-    expect(quoteEvent({ lowestQuote: 0, highestQuote: 0 }).spreadLabel).toBe('');
+    expect(quoteEvent({ lowestQuote: 0, highestQuote: 0 }).spreadLabel).toBe(
+      '',
+    );
   });
 
   it('counts the quotes that arrived, never a total it was never told', () => {
@@ -296,26 +497,48 @@ describe('mapCurrentEvent', () => {
      * "3 of 4 quotes in" would be a denominator this system cannot produce.
      */
     expect(quoteEvent().quotedLabel).toBe('3 organizers have quoted');
-    expect(quoteEvent({ quoteCount: 1 }).quotedLabel).toBe('1 organizer has quoted');
+    expect(quoteEvent({ quoteCount: 1 }).quotedLabel).toBe(
+      '1 organizer has quoted',
+    );
     expect(quoteEvent({ quoteCount: 0 }).quotedLabel).toBe('');
   });
 });
 
 describe('mapOccasions', () => {
   const tiles = (items: Array<Record<string, unknown>>) =>
-    mapOccasions(feed({ occasions: items as unknown as HomeFeedDTO['occasions'] }));
+    mapOccasions(
+      feed({ occasions: items as unknown as HomeFeedDTO['occasions'] }),
+    );
 
   it('prefers the badge over a price when an occasion has both', () => {
     const vm = tiles([
-      { id: 'wedding', label: 'Wedding', art: 'wedding', fromPrice: 250000, mostPlanned: true },
+      {
+        id: 'wedding',
+        label: 'Wedding',
+        art: 'wedding',
+        fromPrice: 250000,
+        mostPlanned: true,
+      },
     ]);
     expect(vm?.items[0].note).toBe('Most planned');
   });
 
   it('shows a from-price only when an organizer published one', () => {
     const vm = tiles([
-      { id: 'birthday', label: 'Birthday', art: 'birthday', fromPrice: 40000, mostPlanned: false },
-      { id: 'corporate', label: 'Corporate', art: 'corporate', fromPrice: 0, mostPlanned: false },
+      {
+        id: 'birthday',
+        label: 'Birthday',
+        art: 'birthday',
+        fromPrice: 40000,
+        mostPlanned: false,
+      },
+      {
+        id: 'corporate',
+        label: 'Corporate',
+        art: 'corporate',
+        fromPrice: 0,
+        mostPlanned: false,
+      },
     ]);
     expect(vm?.items[0].note).toBe('From ₹40,000');
     // "From ₹0" would be a price nobody is offering.
@@ -324,7 +547,9 @@ describe('mapOccasions', () => {
 
   it('falls back to a gradient it can actually paint', () => {
     // An unknown art key would index the gradient map to undefined and crash.
-    const vm = tiles([{ id: 'x', label: 'Mystery', art: 'unheard-of', fromPrice: 0 }]);
+    const vm = tiles([
+      { id: 'x', label: 'Mystery', art: 'unheard-of', fromPrice: 0 },
+    ]);
     expect(vm?.items[0].art).toBe('wedding');
   });
 });
@@ -351,7 +576,9 @@ describe('mapCoupons', () => {
   it('counts the cards actually on screen', () => {
     // A header saying "3 live" over two cards is the kind of small lie that
     // makes a customer stop believing the rest of the screen.
-    expect(coupons([coupon(), coupon({ id: 'c2' })])?.countLabel).toBe('2 live');
+    expect(coupons([coupon(), coupon({ id: 'c2' })])?.countLabel).toBe(
+      '2 live',
+    );
   });
 
   it('leads with the code, because that is what has to be carried', () => {
@@ -366,9 +593,9 @@ describe('mapCoupons', () => {
     // Abbreviated on the card, spelled out in the sheet — the card has two
     // lines to say this in and a third would be clipped.
     expect(vm?.items[0].terms).toContain('ends 30 Sep');
-    expect(vm?.items[0].details.find((row) => row.label === 'Valid until')?.value).toBe(
-      '30 September',
-    );
+    expect(
+      vm?.items[0].details.find(row => row.label === 'Valid until')?.value,
+    ).toBe('30 September');
   });
 
   it('says nothing rather than padding a coupon with no conditions', () => {
@@ -379,13 +606,15 @@ describe('mapCoupons', () => {
 
   it('states the cap on a percentage, which is the part that surprises people', () => {
     const vm = coupons([coupon({ maxDiscount: 5000 })]);
-    const discount = vm?.items[0].details.find((row) => row.label === 'Discount');
+    const discount = vm?.items[0].details.find(row => row.label === 'Discount');
     expect(discount?.value).toContain('up to');
   });
 
   it('counts down how many uses this customer has left', () => {
     const vm = coupons([coupon({ perCustomerLimit: 3, timesUsed: 2 })]);
-    const uses = vm?.items[0].details.find((row) => row.label === 'You can use it');
+    const uses = vm?.items[0].details.find(
+      row => row.label === 'You can use it',
+    );
     expect(uses?.value).toBe('Once');
   });
 
@@ -408,18 +637,24 @@ describe('mapCoupons', () => {
 
   it('names the organizer in the details, and says nothing for a platform coupon', () => {
     const scoped = coupons([coupon({ organizerName: 'Mahendra Events' })]);
-    expect(scoped?.items[0].details.find((row) => row.label === 'Works with')?.value).toBe(
-      'Mahendra Events',
-    );
+    expect(
+      scoped?.items[0].details.find(row => row.label === 'Works with')?.value,
+    ).toBe('Mahendra Events');
 
     // "Any organizer" on every platform coupon is a row nobody reads twice.
     const platform = coupons([coupon()]);
-    expect(platform?.items[0].details.some((row) => row.label === 'Works with')).toBe(false);
+    expect(
+      platform?.items[0].details.some(row => row.label === 'Works with'),
+    ).toBe(false);
   });
 
   it('alternates the card tone so a run reads as a row', () => {
     const vm = coupons([coupon(), coupon({ id: 'c2' }), coupon({ id: 'c3' })]);
-    expect(vm?.items.map((item) => item.tone)).toEqual(['accent', 'navy', 'accent']);
+    expect(vm?.items.map(item => item.tone)).toEqual([
+      'accent',
+      'navy',
+      'accent',
+    ]);
   });
 
   it('hides the section entirely when nothing is running', () => {
@@ -468,7 +703,7 @@ describe('mapPackages', () => {
     expect(one({ listPrice: 0 }).listPriceLabel).toBe('');
   });
 
-  it("attributes recent bookings to the organizer, since that is whose they are", () => {
+  it('attributes recent bookings to the organizer, since that is whose they are', () => {
     expect(one({}).organizer?.bookedLabel).toBe('42 booked this month');
     expect(one({ organizer: null }).organizer).toBeNull();
   });
@@ -490,7 +725,9 @@ describe('EventHero', () => {
     expect(text).toContain('Quotes received');
     expect(text).toContain('Naming ceremony');
     expect(text).toContain('5 Sep 2026 · Kukatpally · 150 guests');
-    expect(text).toContain('Your request went to 4 organizers · 3 have replied');
+    expect(text).toContain(
+      'Your request went to 4 organizers · 3 have replied',
+    );
     expect(text).toContain('Closes in 4 days');
   });
 
@@ -510,7 +747,9 @@ describe('EventHero', () => {
 
   it('names the organizer who has not replied', () => {
     // "One organizer hasn't replied" is not something a customer can act on.
-    expect(textOf(render(hero()))).toContain("Sreeja Wedding Co. hasn't replied yet");
+    expect(textOf(render(hero()))).toContain(
+      "Sreeja Wedding Co. hasn't replied yet",
+    );
   });
 
   it('counts the quotes on the button, so the tap says what it gets', () => {
@@ -527,7 +766,15 @@ describe('EventHero', () => {
 
   it('falls back to progress before anyone has replied', () => {
     const text = textOf(
-      render(hero({ quoteCount: 0, lowestQuote: 0, highestQuote: 0, quotes: [], awaiting: [] })),
+      render(
+        hero({
+          quoteCount: 0,
+          lowestQuote: 0,
+          highestQuote: 0,
+          quotes: [],
+          awaiting: [],
+        }),
+      ),
     );
     expect(text).not.toContain('Lowest');
     expect(text).not.toContain('line items');
@@ -564,21 +811,29 @@ describe('HomeHeader', () => {
   };
 
   it('badges both counts, and neither at zero', () => {
-    const withCounts = textOf(render(<HomeHeader {...base} savedCount={1} unreadCount={2} />));
+    const withCounts = textOf(
+      render(<HomeHeader {...base} savedCount={1} unreadCount={2} />),
+    );
     expect(withCounts).toContain('1');
     expect(withCounts).toContain('2');
 
     // A badge reading "0" is noise.
-    const bare = render(<HomeHeader {...base} savedCount={0} unreadCount={0} />);
+    const bare = render(
+      <HomeHeader {...base} savedCount={0} unreadCount={0} />,
+    );
     expect(textOf(bare)).not.toContain('0');
   });
 
   it('caps a big count rather than stretching the dot', () => {
-    expect(textOf(render(<HomeHeader {...base} savedCount={0} unreadCount={42} />))).toContain('9+');
+    expect(
+      textOf(render(<HomeHeader {...base} savedCount={0} unreadCount={42} />)),
+    ).toContain('9+');
   });
 
   it('names what can actually be searched', () => {
-    const text = textOf(render(<HomeHeader {...base} savedCount={0} unreadCount={0} />));
+    const text = textOf(
+      render(<HomeHeader {...base} savedCount={0} unreadCount={0} />),
+    );
     expect(text).toContain('Search packages, organizers, decor');
   });
 });
@@ -632,9 +887,27 @@ describe('render dump', () => {
           },
         } as HomeFeedDTO['content'],
         occasions: [
-          { id: 'wedding', label: 'Wedding', art: 'wedding', fromPrice: 0, mostPlanned: true },
-          { id: 'birthday', label: 'Birthday', art: 'birthday', fromPrice: 40000, mostPlanned: false },
-          { id: 'naming', label: 'Naming', art: 'naming', fromPrice: 55000, mostPlanned: false },
+          {
+            id: 'wedding',
+            label: 'Wedding',
+            art: 'wedding',
+            fromPrice: 0,
+            mostPlanned: true,
+          },
+          {
+            id: 'birthday',
+            label: 'Birthday',
+            art: 'birthday',
+            fromPrice: 40000,
+            mostPlanned: false,
+          },
+          {
+            id: 'naming',
+            label: 'Naming',
+            art: 'naming',
+            fromPrice: 55000,
+            mostPlanned: false,
+          },
           {
             id: 'housewarming',
             label: 'Housewarming',
@@ -649,7 +922,13 @@ describe('render dump', () => {
             fromPrice: 30000,
             mostPlanned: false,
           },
-          { id: 'corporate', label: 'Corporate', art: 'corporate', fromPrice: 0, mostPlanned: false },
+          {
+            id: 'corporate',
+            label: 'Corporate',
+            art: 'corporate',
+            fromPrice: 0,
+            mostPlanned: false,
+          },
         ] as HomeFeedDTO['occasions'],
       }),
     )!;
@@ -684,8 +963,52 @@ describe('render dump', () => {
         ),
       ],
       [
+        'Home — one card, then rows',
+        toHtml(
+          render(
+            <>
+              <EventHero
+                event={quoteEvent()}
+                ctaLabel={quoteEvent().ctaLabel}
+                onPressCta={noop}
+                onPressDetails={noop}
+                onPressQuote={noop}
+              />
+              <View style={require('../src/modules/Home/styles').sectionStyles.block}>
+                <View style={require('../src/modules/Home/styles').sectionStyles.headRow}>
+                  <EventlyTextForDump
+                    variant="h2"
+                    style={require('../src/modules/Home/styles').sectionStyles.title}
+                  >
+                    Your other events
+                  </EventlyTextForDump>
+                  <EventlyTextForDump
+                    variant="subtitle"
+                    style={require('../src/modules/Home/styles').sectionStyles.action}
+                  >
+                    See all 11
+                  </EventlyTextForDump>
+                </View>
+                {[
+                  { refId: 'r1', title: 'Wedding', stageLabel: 'PLAN IN PROGRESS', factsLine: '17 September 2026 · 100 guests', quoteCount: 0 },
+                  { refId: 'r2', title: 'Naming ceremony', stageLabel: 'QUOTES RECEIVED', factsLine: '5 October 2026 · Kukatpally', quoteCount: 3 },
+                  { refId: 'r3', title: 'Housewarming', stageLabel: 'AWAITING ORGANIZER RESPONSE', factsLine: '2 November 2026 · Gachibowli', quoteCount: 0 },
+                ].map((over) => {
+                  const [row] = mapOtherEvents(feed({ otherEvents: [briefDTO(over)] }));
+                  return <EventRow key={over.refId} event={{ ...row, ...over }} onPress={noop} />;
+                })}
+              </View>
+            </>,
+          ).toJSON(),
+        ),
+      ],
+      [
         'Home — plan something new',
-        toHtml(render(<OccasionGrid data={occasions} onPressOccasion={noop} />).toJSON()),
+        toHtml(
+          render(
+            <OccasionGrid data={occasions} onPressOccasion={noop} />,
+          ).toJSON(),
+        ),
       ],
       [
         'Home — trust',
@@ -705,7 +1028,12 @@ describe('render dump', () => {
 
     fs.writeFileSync(
       out,
-      page(panels, { title: 'Home', width: 390, background: '#faf8f7', padding: 0 }),
+      page(panels, {
+        title: 'Home',
+        width: 390,
+        background: '#faf8f7',
+        padding: 0,
+      }),
       'utf8',
     );
     expect(fs.existsSync(out)).toBe(true);

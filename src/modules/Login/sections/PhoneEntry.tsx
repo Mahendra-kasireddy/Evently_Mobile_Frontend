@@ -1,57 +1,91 @@
 import { useState } from 'react';
-import { View } from 'react-native';
-import { EventlyButton, EventlyText, EventlyTextInput } from '../../../Components';
-import { DIAL_CODE, LOGIN_ACCENT, LOGIN_FORM_COPY } from '../constants';
-import { formCardStyles, phoneEntryStyles } from '../styles';
+import { Pressable, View } from 'react-native';
+import {
+  EventlyIcon,
+  EventlyText,
+  EventlyTextInput,
+} from '../../../Components';
+import { brand } from '../../../theme';
+import { MOBILE_LENGTH, PHONE_COPY } from '../constants';
+import { fieldStyles } from '../styles';
+import { formatMobile, sanitizeDigits } from '../utils';
+import { DialCodeSheet } from './DialCodeSheet';
 
 interface PhoneEntryProps {
   phone: string;
+  dialCode: string;
   onChangePhone: (value: string) => void;
-  onSubmit: () => void;
-  isSubmitting: boolean;
+  onChangeDialCode: (code: string) => void;
 }
 
-export function PhoneEntry({ phone, onChangePhone, onSubmit, isSubmitting }: PhoneEntryProps) {
+/**
+ * The number field — a real input, so tapping it brings up the phone keypad
+ * the person already knows, with their own paste and autofill.
+ *
+ * What is stored is bare digits and what is shown is grouped 5 + 5, so the
+ * value is formatted on the way out and stripped on the way back in. Stripping
+ * is what makes backspace work across the space: deleting it leaves ten digits
+ * minus one, which re-formats without it.
+ */
+export function PhoneEntry({
+  phone,
+  dialCode,
+  onChangePhone,
+  onChangeDialCode,
+}: PhoneEntryProps) {
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [focused, setFocused] = useState(false);
 
   return (
-    <View>
-      <EventlyText variant="h2" style={formCardStyles.title}>
-        {LOGIN_FORM_COPY.title}
-      </EventlyText>
-      <EventlyText variant="body" style={formCardStyles.subtitle}>
-        {LOGIN_FORM_COPY.subtitle}
-      </EventlyText>
+    <>
+      <View
+        style={[fieldStyles.phoneRow, focused && fieldStyles.phoneRowFocused]}
+        testID="phone-field"
+      >
+        <Pressable
+          style={fieldStyles.dialButton}
+          onPress={() => setSheetOpen(true)}
+          accessibilityRole="button"
+          accessibilityLabel={`Country code ${dialCode}. Change`}
+          testID="dial-code-button"
+        >
+          <EventlyText style={fieldStyles.dialCode}>{dialCode}</EventlyText>
+          <EventlyIcon name="chevron-down" size={16} color={brand.navy} />
+        </Pressable>
 
-      <View style={phoneEntryStyles.container}>
-        <EventlyText variant="subtitle" style={phoneEntryStyles.label}>
-          {LOGIN_FORM_COPY.mobileLabel}
-        </EventlyText>
-        <View style={[phoneEntryStyles.controlRow, focused && phoneEntryStyles.controlRowFocused]}>
-          <EventlyText variant="subtitle" style={phoneEntryStyles.dialCode}>
-            {DIAL_CODE}
-          </EventlyText>
-          <EventlyTextInput
-            style={phoneEntryStyles.input}
-            placeholder={LOGIN_FORM_COPY.placeholder}
-            keyboardType="number-pad"
-            maxLength={10}
-            value={phone}
-            onChangeText={onChangePhone}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-            autoFocus
-          />
-        </View>
-        <EventlyButton
-          title={LOGIN_FORM_COPY.sendCta}
-          onPress={onSubmit}
-          loading={isSubmitting}
-          accentColor={LOGIN_ACCENT}
-          style={phoneEntryStyles.button}
+        <View style={fieldStyles.divider} />
+
+        <EventlyTextInput
+          style={fieldStyles.input}
+          value={formatMobile(phone)}
+          onChangeText={value =>
+            onChangePhone(sanitizeDigits(value, MOBILE_LENGTH))
+          }
+          placeholder={PHONE_COPY.placeholder}
+          placeholderTextColor={brand.textPlaceholder}
+          keyboardType="number-pad"
+          returnKeyType="done"
+          // One more than the ten digits, for the space the grouping adds.
+          maxLength={MOBILE_LENGTH + 1}
+          autoComplete="tel"
+          textContentType="telephoneNumber"
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          accessibilityLabel={PHONE_COPY.a11yField}
+          testID="phone-input"
         />
       </View>
-    </View>
+
+      <DialCodeSheet
+        visible={sheetOpen}
+        selected={dialCode}
+        onSelect={code => {
+          onChangeDialCode(code);
+          setSheetOpen(false);
+        }}
+        onClose={() => setSheetOpen(false)}
+      />
+    </>
   );
 }
 

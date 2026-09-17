@@ -1,10 +1,17 @@
 import { useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyButton, EventlyIcon, EventlyText } from '../../Components';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
+import {
+  AppHeader,
+  EventlyButton,
+  EventlyIcon,
+  EventlyText,
+  KeyboardAvoider,
+} from '../../Components';
 import type { MainTabParamList } from '../../navigation/types';
-import { PLAN_ACCENT, PLAN_BORDER, PLAN_GREEN } from './constants';
+import { PLAN_ACCENT, PLAN_BG, PLAN_GREEN, PLAN_TEXT_MUTED } from './constants';
 import { usePlanContainer } from './container';
 import { CategoriesStep } from './sections/CategoriesStep';
 import { EventDetailsForm } from './sections/EventDetailsForm';
@@ -17,9 +24,42 @@ import { Stepper } from './sections/Stepper';
 import { eventDetailsStyles, styles } from './styles';
 import { splitBannerSentence } from './utils';
 
+/**
+ * The soft edge under the fixed header.
+ *
+ * Replaces a 1px rule that cut the occasion tiles in half as they scrolled
+ * beneath it. Drawn with react-native-svg — already a dependency and already
+ * used by OccasionPicker — rather than adding a gradient library for 14px of
+ * chrome. Not touchable, or it would swallow taps meant for the first tiles.
+ */
+function HeaderFade() {
+  return (
+    <View style={styles.headerFade} pointerEvents="none">
+      <Svg width="100%" height="100%">
+        <Defs>
+          <LinearGradient id="planHeaderFade" x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor={PLAN_BG} stopOpacity={1} />
+            <Stop offset="1" stopColor={PLAN_BG} stopOpacity={0} />
+          </LinearGradient>
+        </Defs>
+        <Rect
+          x={0}
+          y={0}
+          width="100%"
+          height="100%"
+          fill="url(#planHeaderFade)"
+        />
+      </Svg>
+    </View>
+  );
+}
+
 export function PlanScreen() {
   const route = useRoute<RouteProp<MainTabParamList, 'Plan'>>();
-  const container = usePlanContainer(route.params?.occasionId, route.params?.organizerId);
+  const container = usePlanContainer(
+    route.params?.occasionId,
+    route.params?.organizerId,
+  );
 
   if (container.isLoadingScreen) {
     return (
@@ -61,7 +101,8 @@ export function PlanScreen() {
             Quote requested!
           </EventlyText>
           <EventlyText variant="body" style={styles.successSubtitle}>
-            Your plan is saved and the quote request is on its way. You&rsquo;ll hear back within a day.
+            Your plan is saved and the quote request is on its way. You&rsquo;ll
+            hear back within a day.
           </EventlyText>
         </View>
         <EventlyButton
@@ -92,12 +133,25 @@ export function PlanScreen() {
           No back arrow: Plan is a bottom-tab root, so there is nothing behind it
           to go back to. Moving between steps is the Stepper right below.
         */}
-        <AppHeader title={`Plan your ${occasionLabel}`} showBackButton={false} compact />
-        <Stepper steps={container.steps} current={stepIndex} onSelect={container.goToStep} />
+        <AppHeader
+          title={`Plan your ${occasionLabel}`}
+          showBackButton={false}
+          compact
+        />
+        <Stepper
+          steps={container.steps}
+          current={stepIndex}
+          onSelect={container.goToStep}
+        />
       </View>
 
-      <KeyboardAvoidingView style={styles.body} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView style={styles.scroll} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <KeyboardAvoider style={styles.body}>
+        <HeaderFade />
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+        >
           <PlanHero
             occasionLabel={occasionLabel}
             isDetailsStep={isDetailsStep}
@@ -129,13 +183,21 @@ export function PlanScreen() {
               whatNext={data.whatNext ?? []}
               quoteNote={data.quoteNote}
               onEditDetails={() => container.goToStep(stepIndices.detailsIndex)}
-              onEditCategories={() => container.goToStep(stepIndices.categoriesIndex)}
-              onEditOrganizer={() => container.goToStep(stepIndices.organizersIndex)}
+              onEditCategories={() =>
+                container.goToStep(stepIndices.categoriesIndex)
+              }
+              onEditOrganizer={() =>
+                container.goToStep(stepIndices.organizersIndex)
+              }
               onSubmit={container.submitPlan}
             />
           ) : isDetailsStep ? (
             <>
-              <OccasionPicker occasions={container.occasions} selectedId={container.draft.occasionId} onSelect={container.selectOccasion} />
+              <OccasionPicker
+                occasions={container.occasions}
+                selectedId={container.draft.occasionId}
+                onSelect={container.selectOccasion}
+              />
               <EventDetailsForm
                 draft={container.draft}
                 cityOptions={data.cityOptions ?? []}
@@ -149,14 +211,24 @@ export function PlanScreen() {
                 config={data.ideas}
                 value={container.draft.ideas}
                 onAdd={container.addIdea}
-                onChange={(value) => container.setField('ideas', value)}
+                onChange={value => container.setField('ideas', value)}
               />
               {data.budgetBanner ? (
                 <View style={eventDetailsStyles.banner}>
-                  <EventlyIcon name="information-outline" size={17} color={PLAN_GREEN} />
-                  <EventlyText variant="body" style={eventDetailsStyles.bannerText}>
+                  <EventlyIcon
+                    name="information-outline"
+                    size={17}
+                    color={PLAN_GREEN}
+                  />
+                  <EventlyText
+                    variant="body"
+                    style={eventDetailsStyles.bannerText}
+                  >
                     {banner.bold ? (
-                      <EventlyText variant="body" style={eventDetailsStyles.bannerBold}>
+                      <EventlyText
+                        variant="body"
+                        style={eventDetailsStyles.bannerBold}
+                      >
                         {banner.bold}
                       </EventlyText>
                     ) : null}
@@ -177,21 +249,39 @@ export function PlanScreen() {
 
         {!isOrganizersStep && !isReviewStep ? (
           <View style={styles.footerBar}>
-            {container.blockReason ? (
-              <EventlyText variant="caption" style={styles.blockReasonText}>
-                {container.blockReason}
-              </EventlyText>
-            ) : null}
+            {/*
+              No reason line above the button.
+              
+              `blockReason` is still computed by the container and still gates
+              `canContinue` — it simply is not printed here any more. The button
+              carries the state on its own: an outline while the step is
+              unanswered, a filled accent once it is.
+
+              Disabled keeps the muted text colour rather than EventlyButton's
+              usual 50% dim, because a label nobody can read cannot say the
+              control is waiting rather than broken. See `continueDisabled` in
+              ./styles.
+            */}
             <EventlyButton
-              title={isDetailsStep ? data.continueLabel || 'Continue' : 'Continue to organizers'}
+              title={
+                isDetailsStep
+                  ? data.continueLabel || 'Continue'
+                  : 'Continue to organizers'
+              }
               onPress={container.continueStep}
               disabled={!container.canContinue}
-              accentColor={container.canContinue ? PLAN_ACCENT : PLAN_BORDER}
-              style={styles.floatingButton}
+              variant={container.canContinue ? 'primary' : 'outline'}
+              accentColor={
+                container.canContinue ? PLAN_ACCENT : PLAN_TEXT_MUTED
+              }
+              style={[
+                styles.floatingButton,
+                !container.canContinue && styles.continueDisabled,
+              ]}
             />
           </View>
         ) : null}
-      </KeyboardAvoidingView>
+      </KeyboardAvoider>
     </SafeAreaView>
   );
 }

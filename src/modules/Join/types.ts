@@ -3,12 +3,9 @@ import type { JoinRole } from '../../navigation/types';
 export interface RoleCardData {
   key: JoinRole;
   icon: string;
-  badgeIcon: string;
-  badge: string;
+  iconColor: string;
+  iconBackground: string;
   title: string;
   description: string;
-  cta: string;
-  accent: string;
-  accentSoft: string;
-  badgeSoft: string;
+  requirement: string;
 }

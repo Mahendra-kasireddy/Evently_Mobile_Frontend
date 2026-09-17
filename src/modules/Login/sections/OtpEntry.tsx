@@ -1,117 +1,149 @@
-import { useRef } from 'react';
-import { TouchableOpacity, View, type NativeSyntheticEvent, type TextInput, type TextInputKeyPressEventData } from 'react-native';
-import { EventlyButton, EventlyIcon, EventlyText, EventlyTextInput } from '../../../Components';
-import { LOGIN_ACCENT, LOGIN_TEXT_MUTED, OTP_LENGTH } from '../constants';
-import { formCardStyles, otpEntryStyles } from '../styles';
+import { useRef, useState } from 'react';
+import { Pressable, View } from 'react-native';
+import {
+  EventlyIcon,
+  EventlyText,
+  EventlyTextInput,
+} from '../../../Components';
+import type { TextInput } from 'react-native';
+import { brand } from '../../../theme';
+import { OTP_COPY, OTP_LENGTH } from '../constants';
+import { otpStyles } from '../styles';
+import {
+  activeOtpIndex,
+  formatCooldown,
+  otpDigits,
+  sanitizeDigits,
+} from '../utils';
 
 interface OtpEntryProps {
   code: string;
   onChangeCode: (value: string) => void;
-  onSubmit: () => void;
-  onChangeNumber: () => void;
   onResend: () => void;
-  isSubmitting: boolean;
-  devCode: string | null;
-  sentTo: string | null;
-  resendSeconds: number;
   canResend: boolean;
+  resendSeconds: number;
+  devCode: string | null;
 }
 
+/**
+ * Six cells over one real input.
+ *
+ * The cells are the picture; the field is a single transparent TextInput laid
+ * across them. One input rather than six is what makes paste, SMS autofill and
+ * backspace-across-cells behave the way the OS already does them — six
+ * one-character inputs have to reimplement all three, and get them subtly
+ * wrong.
+ *
+ * The cell that the next keystroke fills is outlined while the field has
+ * focus: there is no visible caret, so without it people tap a cell in the
+ * middle and wonder why their digit went elsewhere.
+ */
 export function OtpEntry({
   code,
   onChangeCode,
-  onSubmit,
-  onChangeNumber,
   onResend,
-  isSubmitting,
-  devCode,
-  sentTo,
-  resendSeconds,
   canResend,
+  resendSeconds,
+  devCode,
 }: OtpEntryProps) {
-  const boxRefs = useRef<Array<TextInput | null>>([]);
-  const digits = Array.from({ length: OTP_LENGTH }, (_, i) => code[i] ?? '');
-
-  const setDigit = (index: number, value: string) => {
-    const clean = value.replace(/\D/g, '').slice(-1);
-    const next = digits.slice();
-    next[index] = clean;
-    onChangeCode(next.join(''));
-    if (clean && index < OTP_LENGTH - 1) {
-      boxRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleKeyPress = (index: number, event: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
-    if (event.nativeEvent.key === 'Backspace' && !digits[index] && index > 0) {
-      boxRefs.current[index - 1]?.focus();
-    }
-  };
+  const inputRef = useRef<TextInput>(null);
+  const [focused, setFocused] = useState(false);
+  const digits = otpDigits(code);
+  const active = activeOtpIndex(code);
 
   return (
     <View>
-      <TouchableOpacity style={otpEntryStyles.backRow} onPress={onChangeNumber} accessibilityLabel="Change mobile number">
-        <EventlyIcon name="arrow-left" size={15} color={LOGIN_TEXT_MUTED} />
-        <EventlyText variant="body" style={otpEntryStyles.backText}>
-          Change number
-        </EventlyText>
-      </TouchableOpacity>
-
-      <EventlyText variant="h2" style={formCardStyles.title}>
-        Verify your number
-      </EventlyText>
-      <EventlyText variant="body" style={formCardStyles.subtitle}>
-        Enter the 6-digit code sent to <EventlyText variant="subtitle" style={otpEntryStyles.sentToText}>{sentTo ?? 'your phone'}</EventlyText>.
+      <EventlyText variant="subtitle" style={otpStyles.label}>
+        {OTP_COPY.label}
       </EventlyText>
 
-      <View style={otpEntryStyles.container}>
-        <View style={otpEntryStyles.boxRow}>
-          {digits.map((digit, index) => (
-            <EventlyTextInput
-              key={index}
-              ref={(el) => {
-                boxRefs.current[index] = el;
-              }}
-              style={[otpEntryStyles.box, digit && otpEntryStyles.boxFilled]}
-              keyboardType="number-pad"
-              maxLength={1}
-              value={digit}
-              onChangeText={(value) => setDigit(index, value)}
-              onKeyPress={(event) => handleKeyPress(index, event)}
-              autoFocus={index === 0}
-            />
-          ))}
-        </View>
+      <Pressable
+        style={otpStyles.boxRow}
+        onPress={() => inputRef.current?.focus()}
+        accessible={false}
+        testID="otp-boxes"
+      >
+        {digits.map((digit, index) => (
+          <View
+            key={index}
+            style={[
+              otpStyles.box,
+              digit ? otpStyles.boxFilled : null,
+              focused && index === active && !digit
+                ? otpStyles.boxActive
+                : null,
+            ]}
+          >
+            <EventlyText style={otpStyles.boxText}>{digit}</EventlyText>
+          </View>
+        ))}
 
-        {devCode ? (
-          <EventlyText variant="caption" style={otpEntryStyles.devHint}>
-            Dev code: {devCode}
-          </EventlyText>
-        ) : null}
-
-        <EventlyButton
-          title="Verify & continue"
-          onPress={onSubmit}
-          disabled={code.length < OTP_LENGTH}
-          loading={isSubmitting}
-          accentColor={LOGIN_ACCENT}
-          style={otpEntryStyles.button}
+        <EventlyTextInput
+          ref={inputRef}
+          style={otpStyles.hiddenInput}
+          value={code}
+          onChangeText={value =>
+            onChangeCode(sanitizeDigits(value, OTP_LENGTH))
+          }
+          keyboardType="number-pad"
+          returnKeyType="done"
+          maxLength={OTP_LENGTH}
+          autoComplete="sms-otp"
+          textContentType="oneTimeCode"
+          caretHidden
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          accessibilityLabel={
+            code
+              ? `One time code, ${code.split('').join(' ')}`
+              : 'One time code, empty'
+          }
+          testID="otp-input"
         />
+      </Pressable>
 
-        <View style={otpEntryStyles.resendRow}>
-          {canResend ? (
-            <TouchableOpacity onPress={onResend} accessibilityLabel="Resend code">
-              <EventlyText variant="body" style={otpEntryStyles.resendActive}>
-                Resend code
-              </EventlyText>
-            </TouchableOpacity>
-          ) : (
-            <EventlyText variant="body" style={otpEntryStyles.resendText}>
-              Resend code in 0:{String(resendSeconds).padStart(2, '0')}
-            </EventlyText>
-          )}
-        </View>
+      <EventlyText variant="caption" style={otpStyles.retryLead}>
+        {OTP_COPY.retryLead}
+      </EventlyText>
+
+      <View style={otpStyles.retryRow}>
+        <Pressable
+          style={[
+            otpStyles.retryPill,
+            !canResend && otpStyles.retryPillWaiting,
+          ]}
+          onPress={onResend}
+          disabled={!canResend}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: !canResend }}
+          accessibilityLabel={
+            canResend
+              ? 'Resend code by S M S'
+              : `Resend available in ${resendSeconds} seconds`
+          }
+          testID="otp-resend-sms"
+        >
+          <EventlyIcon
+            name="message-text-outline"
+            size={14}
+            color={canResend ? brand.accentDeep : brand.textMuted}
+          />
+          <EventlyText
+            style={[
+              otpStyles.retryText,
+              !canResend && otpStyles.retryTextWaiting,
+            ]}
+          >
+            {canResend ? OTP_COPY.retryChannel : formatCooldown(resendSeconds)}
+          </EventlyText>
+        </Pressable>
       </View>
+
+      {devCode ? (
+        <EventlyText variant="caption" style={otpStyles.devHint}>
+          Dev code: {devCode}
+        </EventlyText>
+      ) : null}
     </View>
   );
 }

@@ -1,35 +1,64 @@
 import { useEffect, useRef } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Animated, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText } from '../../Components';
+import {
+  Animated,
+  Keyboard,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { EventlyIcon, EventlyText, KeyboardAvoider } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
-import { colors } from '../../theme';
-import { JOIN_LINK_COPY, LOGIN_TEXT_MUTED, LOGIN_TRUST_NOTE } from './constants';
+import { OTP_COPY, PHONE_COPY } from './constants';
 import { useLoginContainer } from './container';
-import { LoginPromo } from './sections/LoginPromo';
+import { AuthCta } from './sections/AuthCta';
+import { AuthHero } from './sections/AuthHero';
+import { BusinessEntryCard } from './sections/BusinessEntryCard';
 import { OtpEntry } from './sections/OtpEntry';
+import { OtpHeader } from './sections/OtpHeader';
+import { OtpSafetyNote } from './sections/OtpSafetyNote';
 import { PhoneEntry } from './sections/PhoneEntry';
-import { formCardStyles, styles } from './styles';
+import { TermsNote } from './sections/TermsNote';
+import { styles } from './styles';
+import { formatSentTo } from './utils';
 
 type LoginNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-/** Renders whichever step the container is on. No fetching or step logic here. */
+/**
+ * Sign in: a number, then the code that was texted to it.
+ *
+ * Both steps share one layout — navy block, the field and its CTA, then a
+ * footer — so moving between them does not reflow the screen.
+ *
+ * The footer is pushed to the bottom by a flexible spacer rather than sitting
+ * wherever the content happens to end: with the keyboard down that fills what
+ * would otherwise be a dead half-screen, and with the keyboard up the spacer
+ * collapses to nothing and the footer follows the content. Either way the
+ * field the person is typing into stays on screen, which is what the
+ * KeyboardAvoidingView around the whole thing is for.
+ */
 export function LoginScreen() {
   const navigation = useNavigation<LoginNavigationProp>();
+  const insets = useSafeAreaInsets();
   const {
     step,
     phone,
+    dialCode,
     code,
     sentTo,
     devCode,
+    isPhoneValid,
+    isCodeValid,
     isSubmittingPhone,
     isSubmittingCode,
     errorMessage,
     resendSeconds,
     canResend,
     setPhone,
+    setDialCode,
     setCode,
     submitPhone,
     submitCode,
@@ -37,45 +66,110 @@ export function LoginScreen() {
     changeNumber,
   } = useLoginContainer();
 
+  const isPhoneStep = step === 'phone';
+
   const bodyOpacity = useRef(new Animated.Value(0)).current;
-  const bodyTranslateY = useRef(new Animated.Value(12)).current;
+  const bodyTranslateY = useRef(new Animated.Value(10)).current;
 
   useEffect(() => {
     bodyOpacity.setValue(0);
-    bodyTranslateY.setValue(12);
+    bodyTranslateY.setValue(10);
     Animated.parallel([
-      Animated.timing(bodyOpacity, { toValue: 1, duration: 260, useNativeDriver: true }),
-      Animated.timing(bodyTranslateY, { toValue: 0, duration: 260, useNativeDriver: true }),
+      Animated.timing(bodyOpacity, {
+        toValue: 1,
+        duration: 220,
+        useNativeDriver: true,
+      }),
+      Animated.timing(bodyTranslateY, {
+        toValue: 0,
+        duration: 220,
+        useNativeDriver: true,
+      }),
     ]).start();
   }, [step, bodyOpacity, bodyTranslateY]);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView style={styles.scroll} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <LoginPromo />
+    <View style={styles.container}>
+      {/* Light glyphs, drawing under the bar: the navy header runs to the top
+          edge, so the clock and battery sit on it. */}
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
 
-          <Animated.View style={[styles.body, { opacity: bodyOpacity, transform: [{ translateY: bodyTranslateY }] }]}>
-            {step === 'phone' ? (
-              <PhoneEntry phone={phone} onChangePhone={setPhone} onSubmit={submitPhone} isSubmitting={isSubmittingPhone} />
+      {isPhoneStep ? (
+        <AuthHero topInset={insets.top} />
+      ) : (
+        <OtpHeader
+          sentTo={formatSentTo(sentTo, phone)}
+          onBack={changeNumber}
+          topInset={insets.top}
+        />
+      )}
+
+      <KeyboardAvoider style={styles.flex}>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={[
+            styles.content,
+            { paddingBottom: insets.bottom + 16 },
+          ]}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          showsVerticalScrollIndicator={false}
+        >
+          <Animated.View
+            style={{
+              opacity: bodyOpacity,
+              transform: [{ translateY: bodyTranslateY }],
+            }}
+          >
+            {isPhoneStep ? (
+              <>
+                <PhoneEntry
+                  phone={phone}
+                  dialCode={dialCode}
+                  onChangePhone={setPhone}
+                  onChangeDialCode={setDialCode}
+                />
+                <AuthCta
+                  idleLabel={PHONE_COPY.ctaIdle}
+                  readyLabel={PHONE_COPY.ctaReady}
+                  ready={isPhoneValid}
+                  loading={isSubmittingPhone}
+                  onPress={submitPhone}
+                  testID="phone-cta"
+                />
+              </>
             ) : (
-              <OtpEntry
-                code={code}
-                onChangeCode={setCode}
-                onSubmit={submitCode}
-                onChangeNumber={changeNumber}
-                onResend={resendCode}
-                isSubmitting={isSubmittingCode}
-                devCode={devCode}
-                sentTo={sentTo}
-                resendSeconds={resendSeconds}
-                canResend={canResend}
-              />
+              <>
+                <OtpEntry
+                  code={code}
+                  onChangeCode={setCode}
+                  onResend={resendCode}
+                  canResend={canResend}
+                  resendSeconds={resendSeconds}
+                  devCode={devCode}
+                />
+                <AuthCta
+                  idleLabel={OTP_COPY.ctaIdle}
+                  readyLabel={OTP_COPY.ctaReady}
+                  ready={isCodeValid}
+                  loading={isSubmittingCode}
+                  onPress={submitCode}
+                  testID="otp-cta"
+                />
+              </>
             )}
 
             {errorMessage ? (
-              <View style={styles.errorBox}>
-                <EventlyIcon name="alert-circle-outline" size={16} color={colors.danger} />
+              <View style={styles.errorBox} accessibilityLiveRegion="polite">
+                <EventlyIcon
+                  name="alert-circle-outline"
+                  size={16}
+                  color="#b3261e"
+                />
                 <EventlyText variant="body" style={styles.errorText}>
                   {errorMessage}
                 </EventlyText>
@@ -83,33 +177,29 @@ export function LoginScreen() {
             ) : null}
           </Animated.View>
 
-          {step === 'phone' ? (
-            <View style={styles.joinRow}>
-              <EventlyText variant="body" style={styles.joinText}>
-                {JOIN_LINK_COPY.label}
-              </EventlyText>
-              <TouchableOpacity onPress={() => navigation.navigate('Join')} accessibilityLabel="Create an organizer or sub-vendor account">
-                <EventlyText variant="subtitle" style={styles.joinCta}>
-                  {JOIN_LINK_COPY.cta}
-                </EventlyText>
-              </TouchableOpacity>
-            </View>
-          ) : null}
+          {/* Tapping the gap puts the keyboard away, the way tapping off a
+              field does everywhere else. */}
+          <Pressable
+            style={styles.spacer}
+            onPress={Keyboard.dismiss}
+            accessible={false}
+          />
 
-          <EventlyText variant="caption" style={formCardStyles.terms}>
-            By continuing you agree to Evently&apos;s <EventlyText variant="caption" style={formCardStyles.termsBold}>Terms</EventlyText> &{' '}
-            <EventlyText variant="caption" style={formCardStyles.termsBold}>Privacy Policy</EventlyText>.
-          </EventlyText>
-
-          <View style={styles.trustRow}>
-            <EventlyIcon name="shield-check-outline" size={14} color={LOGIN_TEXT_MUTED} />
-            <EventlyText variant="caption" style={styles.trustText}>
-              {LOGIN_TRUST_NOTE}
-            </EventlyText>
+          <View style={styles.footer}>
+            {isPhoneStep ? (
+              <>
+                <BusinessEntryCard
+                  onPress={() => navigation.navigate('Join')}
+                />
+                <TermsNote />
+              </>
+            ) : (
+              <OtpSafetyNote />
+            )}
           </View>
         </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      </KeyboardAvoider>
+    </View>
   );
 }
 

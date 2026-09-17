@@ -1,14 +1,17 @@
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
+import {
+  AppHeader,
+  EventlyIcon,
+  EventlyText,
+  KeyboardAvoider,
+} from '../../Components';
 import { colors } from '../../theme';
 import { CONTACT_COPY as COPY, LEGAL_GREEN } from './constants';
 import { useContactContainer } from './container';
@@ -26,14 +29,27 @@ interface FieldProps {
   onChange: (value: string) => void;
 }
 
-function Field({ label, value, error, first, multiline, placeholder, keyboard, onChange }: FieldProps) {
+function Field({
+  label,
+  value,
+  error,
+  first,
+  multiline,
+  placeholder,
+  keyboard,
+  onChange,
+}: FieldProps) {
   return (
     <>
       <EventlyText variant="body" style={[s.label, first && s.labelFirst]}>
         {label}
       </EventlyText>
       <TextInput
-        style={[s.input, multiline && s.inputMultiline, !!error && s.inputInvalid]}
+        style={[
+          s.input,
+          multiline && s.inputMultiline,
+          !!error && s.inputInvalid,
+        ]}
         value={value}
         onChangeText={onChange}
         multiline={multiline}
@@ -61,18 +77,34 @@ function Field({ label, value, error, first, multiline, placeholder, keyboard, o
  * request the admin console works from. This uses it.
  */
 export function ContactScreen() {
-  const { draft, setField, subjects, errors, isSending, sendErrorMessage, isSent, send, reset } =
-    useContactContainer();
+  const {
+    draft,
+    setField,
+    subjects,
+    errors,
+    isSending,
+    sendErrorMessage,
+    isSent,
+    send,
+    reset,
+  } = useContactContainer();
 
   return (
     <SafeAreaView style={s.container} edges={['top']}>
       <AppHeader title={COPY.title} compact />
-      <KeyboardAvoidingView style={s.scroll} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView contentContainerStyle={s.content} keyboardShouldPersistTaps="handled">
+      <KeyboardAvoider style={s.scroll}>
+        <ScrollView
+          contentContainerStyle={s.content}
+          keyboardShouldPersistTaps="handled"
+        >
           {isSent ? (
             <View style={s.sent}>
               <View style={s.sentIcon}>
-                <EventlyIcon name="check-circle" size={30} color={LEGAL_GREEN} />
+                <EventlyIcon
+                  name="check-circle"
+                  size={30}
+                  color={LEGAL_GREEN}
+                />
               </View>
               <EventlyText variant="h2" style={s.sentTitle}>
                 {COPY.sentTitle}
@@ -86,7 +118,11 @@ export function ContactScreen() {
                 onPress={reset}
                 accessibilityRole="button"
               >
-                <EventlyIcon name="pencil-outline" size={15} color={LEGAL_GREEN} />
+                <EventlyIcon
+                  name="pencil-outline"
+                  size={15}
+                  color={LEGAL_GREEN}
+                />
                 <EventlyText variant="caption" style={s.sentAgainText}>
                   {COPY.sentAgain}
                 </EventlyText>
@@ -104,28 +140,28 @@ export function ContactScreen() {
                 label={COPY.name}
                 value={draft.name}
                 error={errors.name}
-                onChange={(v) => setField('name', v)}
+                onChange={v => setField('name', v)}
               />
               <Field
                 label={COPY.email}
                 value={draft.email}
                 error={errors.email}
                 keyboard="email-address"
-                onChange={(v) => setField('email', v)}
+                onChange={v => setField('email', v)}
               />
               <Field
                 label={COPY.phone}
                 value={draft.phone}
                 error={errors.phone}
                 keyboard="phone-pad"
-                onChange={(v) => setField('phone', v)}
+                onChange={v => setField('phone', v)}
               />
 
               <EventlyText variant="body" style={s.label}>
                 {COPY.subject}
               </EventlyText>
               <View style={s.subjects}>
-                {subjects.map((subject) => {
+                {subjects.map(subject => {
                   const on = draft.subject === subject.value;
                   return (
                     <TouchableOpacity
@@ -137,7 +173,10 @@ export function ContactScreen() {
                       accessibilityState={{ selected: on }}
                       accessibilityLabel={subject.label}
                     >
-                      <EventlyText variant="caption" style={on ? s.subjectTextOn : s.subjectText}>
+                      <EventlyText
+                        variant="caption"
+                        style={on ? s.subjectTextOn : s.subjectText}
+                      >
                         {subject.label}
                       </EventlyText>
                     </TouchableOpacity>
@@ -156,7 +195,9 @@ export function ContactScreen() {
                 error={errors.message}
                 multiline
                 placeholder={COPY.messagePlaceholder}
-                onChange={(v) => setField('message', v as ContactDraft['message'])}
+                onChange={v =>
+                  setField('message', v as ContactDraft['message'])
+                }
               />
 
               <TouchableOpacity
@@ -185,7 +226,7 @@ export function ContactScreen() {
             </>
           )}
         </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardAvoider>
     </SafeAreaView>
   );
 }

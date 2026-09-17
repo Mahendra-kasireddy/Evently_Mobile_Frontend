@@ -18,7 +18,12 @@ export const ORGANIZER_BY_ID_ENDPOINT = '/organizer/getOrganizerById';
 
 // Field order/icons for the hero "your event so far" draft bar — mirrors
 // web's FIELD_DEFS (occasion/when/where/guests, in that order).
-export const HERO_FIELD_ORDER: Array<keyof HeroDraft> = ['occasion', 'when', 'where', 'guests'];
+export const HERO_FIELD_ORDER: Array<keyof HeroDraft> = [
+  'occasion',
+  'when',
+  'where',
+  'guests',
+];
 
 export const HERO_FIELD_ICON_NAME: Record<keyof HeroDraft, string> = {
   occasion: 'heart-outline',
@@ -49,6 +54,13 @@ export const SEARCH_PLACEHOLDER = 'Search packages, organizers, decor';
 export const HERO_BACKGROUND_COLOR = '#0e1a33'; // --color-navy-deep
 
 // The screen's own tokens, matching the other ported surfaces.
+/**
+ * How many of the customer's other live events Home lists before linking to
+ * the Events tab. Three fits above the fold beside the leading card, and keeps
+ * Home the same length for a customer with four events and one with forty.
+ */
+export const OTHER_EVENTS_ON_HOME = 3;
+
 export const HOME_NAVY = '#1a2e5a';
 export const HOME_NAVY_DEEP = '#0e1a33';
 /** One step lighter than the hero, for a panel sitting on it. */
@@ -278,7 +290,8 @@ export const BOOKED_RING_TRACK_COLOR = '#eef0f4';
  */
 export const BOOKED_RING_SIZE = 76;
 export const BOOKED_RING_STROKE = 9;
-export const BOOKED_RING_RADIUS = (BOOKED_RING_SIZE - BOOKED_RING_STROKE - 2) / 2;
+export const BOOKED_RING_RADIUS =
+  (BOOKED_RING_SIZE - BOOKED_RING_STROKE - 2) / 2;
 export const BOOKED_RING_CIRCUMFERENCE = 2 * Math.PI * BOOKED_RING_RADIUS;
 export const BOOKED_RING_DISC = 84;
 
@@ -303,11 +316,13 @@ export const ORGANIZER_COPY = {
   noRating: 'No reviews yet',
   scopeWithCity: (city: string) =>
     `No organizers in ${city} yet — showing highly-rated organizers from other areas.`,
-  scopeNoCity: 'Set your location to see organizers near you. Showing highly-rated organizers for now.',
+  scopeNoCity:
+    'Set your location to see organizers near you. Showing highly-rated organizers for now.',
   emptyTitle: 'Looking for organizers in your area?',
   emptyWithCity: (city: string) =>
     `We couldn't find organizers in ${city} yet. You can change your city any time.`,
-  emptyNoCity: "We couldn't find organizers nearby yet. Setting your city helps us match you.",
+  emptyNoCity:
+    "We couldn't find organizers nearby yet. Setting your city helps us match you.",
   emptyCta: 'Change city',
 };
 

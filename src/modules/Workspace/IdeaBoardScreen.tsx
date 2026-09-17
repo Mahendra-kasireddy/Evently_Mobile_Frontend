@@ -3,21 +3,35 @@ import type { RouteProp } from '@react-navigation/native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
   RefreshControl,
   ScrollView,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
+import {
+  AppHeader,
+  EventlyIcon,
+  EventlyText,
+  KeyboardAvoider,
+} from '../../Components';
 import { colors } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
 import { IDEAS_COPY, WORKSPACE_ACCENT, matchesBoardFilter } from './constants';
-import { useApproveIdea, useIdeaBoard, usePostIdea, useUploadIdeaImage } from './hooks';
+import {
+  useApproveIdea,
+  useIdeaBoard,
+  usePostIdea,
+  useUploadIdeaImage,
+} from './hooks';
 import { BoardComposer } from './sections/BoardComposer';
-import { BoardEmpty, BoardFilters, BoardHero, IdeaCard, VisionCard } from './sections/BoardFeed';
+import {
+  BoardEmpty,
+  BoardFilters,
+  BoardHero,
+  IdeaCard,
+  VisionCard,
+} from './sections/BoardFeed';
 import { boardStyles as s, styles } from './styles';
 import type { BoardFilter, DraftPost } from './types';
 
@@ -51,9 +65,18 @@ export function IdeaBoardScreen() {
 
   const organizer = organizerName || 'your organizer';
   const items = useMemo(() => data?.items ?? [], [data]);
-  const visible = useMemo(() => items.filter((i) => matchesBoardFilter(i, filter)), [items, filter]);
+  const visible = useMemo(
+    () => items.filter(i => matchesBoardFilter(i, filter)),
+    [items, filter],
+  );
 
-  const header = <AppHeader title={IDEAS_COPY.title} compact onBackPress={() => navigation.goBack()} />;
+  const header = (
+    <AppHeader
+      title={IDEAS_COPY.title}
+      compact
+      onBackPress={() => navigation.goBack()}
+    />
+  );
 
   const submit = (draft: DraftPost) => {
     post
@@ -118,16 +141,14 @@ export function IdeaBoardScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {header}
-      <KeyboardAvoidingView
-        style={styles.scroll}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={90}
-      >
+      <KeyboardAvoider style={styles.scroll} keyboardVerticalOffset={90}>
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={s.content}
           keyboardShouldPersistTaps="handled"
-          refreshControl={<RefreshControl refreshing={loading} onRefresh={refetch} />}
+          refreshControl={
+            <RefreshControl refreshing={loading} onRefresh={refetch} />
+          }
         >
           <BoardHero counts={data.counts} organizerName={organizer} />
 
@@ -147,10 +168,13 @@ export function IdeaBoardScreen() {
           <BoardFilters value={filter} items={items} onChange={setFilter} />
 
           {visible.length === 0 ? (
-            <BoardEmpty hasAnyPosts={items.length > 0} organizerName={organizer} />
+            <BoardEmpty
+              hasAnyPosts={items.length > 0}
+              organizerName={organizer}
+            />
           ) : (
             <View style={s.feed}>
-              {visible.map((idea) => (
+              {visible.map(idea => (
                 <IdeaCard
                   key={idea.id}
                   idea={idea}
@@ -163,7 +187,7 @@ export function IdeaBoardScreen() {
 
           <VisionCard vision={data.vision} organizerName={organizer} />
         </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardAvoider>
     </SafeAreaView>
   );
 }

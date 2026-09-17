@@ -31,7 +31,11 @@ jest.mock('@react-navigation/native', () => ({
 jest.mock('../src/modules/NameCapture', () => ({ NameGateSheet: () => null }));
 
 jest.mock('../src/modules/Chat', () => ({
-  useOpenWithOrganizer: () => ({ loading: false, execute: jest.fn(), error: null }),
+  useOpenWithOrganizer: () => ({
+    loading: false,
+    execute: jest.fn(),
+    error: null,
+  }),
 }));
 
 const mockContainer = jest.fn();
@@ -44,7 +48,9 @@ import type { HomeContainerResult } from '../src/modules/Home/container';
 import type { CurrentEventViewModel } from '../src/modules/Home/types';
 
 /** A hero-ready event, of whatever stage the test needs. */
-const event = (over: Partial<CurrentEventViewModel> = {}): CurrentEventViewModel =>
+const event = (
+  over: Partial<CurrentEventViewModel> = {},
+): CurrentEventViewModel =>
   ({
     refId: 'req-anniv',
     title: 'Anniversary',
@@ -67,7 +73,7 @@ const event = (over: Partial<CurrentEventViewModel> = {}): CurrentEventViewModel
     awaitingLabel: '',
     ctaLabel: 'See the quote',
     ...over,
-  }) as CurrentEventViewModel;
+  } as CurrentEventViewModel);
 
 const booked = {
   id: 'bk1',
@@ -126,7 +132,7 @@ const result = (over: Partial<HomeContainerResult> = {}): HomeContainerResult =>
     savedPackageIds: [],
     toggleSavedPackage: jest.fn(),
     ...over,
-  }) as unknown as HomeContainerResult;
+  } as unknown as HomeContainerResult);
 
 function textOf(tree: ReactTestRenderer.ReactTestRenderer): string {
   const out: string[] = [];
@@ -143,12 +149,27 @@ function textOf(tree: ReactTestRenderer.ReactTestRenderer): string {
   return out.join(' | ');
 }
 
-function render(): string {
+function renderTree(): ReactTestRenderer.ReactTestRenderer {
   let tree!: ReactTestRenderer.ReactTestRenderer;
   ReactTestRenderer.act(() => {
     tree = ReactTestRenderer.create(<HomeScreen />);
   });
-  return textOf(tree);
+  return tree;
+}
+
+function render(): string {
+  return textOf(renderTree());
+}
+
+/** Whether a control with this testID is on screen at all. */
+function hasControl(
+  tree: ReactTestRenderer.ReactTestRenderer,
+  testID: string,
+): boolean {
+  return (
+    tree.root.findAll(node => node.props?.testID === testID, { deep: true })
+      .length > 0
+  );
 }
 
 beforeEach(() => {
@@ -164,7 +185,11 @@ describe('the event cards Home draws', () => {
      * request existed at all.
      */
     mockContainer.mockReturnValue(
-      result({ bookedEvent: booked, currentEvent: null, otherEvents: [event()] }),
+      result({
+        bookedEvent: booked,
+        currentEvent: null,
+        otherEvents: [event()],
+      }),
     );
 
     const text = render();
@@ -173,7 +198,9 @@ describe('the event cards Home draws', () => {
   });
 
   it('draws the booked card alone when nothing else is live', () => {
-    mockContainer.mockReturnValue(result({ bookedEvent: booked, otherEvents: [] }));
+    mockContainer.mockReturnValue(
+      result({ bookedEvent: booked, otherEvents: [] }),
+    );
 
     const text = render();
     expect(text).toContain('EVT-2026-1977');
@@ -181,7 +208,9 @@ describe('the event cards Home draws', () => {
   });
 
   it('draws the hero for an account with a brief and no booking', () => {
-    mockContainer.mockReturnValue(result({ currentEvent: event(), otherEvents: [] }));
+    mockContainer.mockReturnValue(
+      result({ currentEvent: event(), otherEvents: [] }),
+    );
 
     const text = render();
     expect(text).toContain('Anniversary');
@@ -190,7 +219,9 @@ describe('the event cards Home draws', () => {
   it('never draws the leading event twice', () => {
     // `otherEvents` excludes `currentEvent` server-side; if that ever regressed
     // the customer would see the same event stacked on itself.
-    mockContainer.mockReturnValue(result({ currentEvent: event(), otherEvents: [] }));
+    mockContainer.mockReturnValue(
+      result({ currentEvent: event(), otherEvents: [] }),
+    );
 
     expect(render().match(/Anniversary/g)).toHaveLength(1);
   });
@@ -206,5 +237,66 @@ describe('the event cards Home draws', () => {
     const text = render();
     expect(text).toContain('Anniversary');
     expect(text).toContain('Wedding');
+  });
+
+  /*
+   * How long Home is, for a customer who uses it.
+   *
+   * Every live event used to be a full navy hero, so ten events were ten
+   * screens of card before anything else — offers, packages, organizers — was
+   * reachable at all. Home now lists three and links to the tab that holds
+   * them all, which keeps its height the same whether a customer has four
+   * events or forty.
+   */
+  const many = (count: number) =>
+    Array.from({ length: count }, (_, i) =>
+      event({ refId: `req-${i}`, title: `Event ${i}` }),
+    );
+
+  it('lists at most three of the other events', () => {
+    mockContainer.mockReturnValue(
+      result({
+        currentEvent: event({ title: 'Leading' }),
+        otherEvents: many(10),
+      }),
+    );
+
+    const text = render();
+    expect(text).toContain('Leading');
+    expect(text).toContain('Event 0');
+    expect(text).toContain('Event 2');
+    expect(text).not.toContain('Event 3');
+  });
+
+  it('links out with the real total, not the number on screen', () => {
+    // Eleven events: the leading card plus ten others. A link reading "See all
+    // 3" would be counting what it already showed.
+    mockContainer.mockReturnValue(
+      result({
+        currentEvent: event({ title: 'Leading' }),
+        otherEvents: many(10),
+      }),
+    );
+
+    const link = renderTree().root.findAll(
+      node =>
+        node.props?.testID === 'see-all-events' &&
+        node.props?.accessibilityRole === 'button',
+      { deep: true },
+    )[0];
+    expect(link.props.accessibilityLabel).toBe('See all 11 events');
+  });
+
+  it('offers no link when every event is already on screen', () => {
+    mockContainer.mockReturnValue(
+      result({
+        currentEvent: event({ title: 'Leading' }),
+        otherEvents: many(2),
+      }),
+    );
+
+    const tree = renderTree();
+    expect(textOf(tree)).toContain('Event 1');
+    expect(hasControl(tree, 'see-all-events')).toBe(false);
   });
 });

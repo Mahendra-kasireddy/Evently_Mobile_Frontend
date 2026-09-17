@@ -4,7 +4,6 @@ import type { RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
   Platform,
   RefreshControl,
   ScrollView,
@@ -13,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText } from '../../Components';
+import { EventlyIcon, EventlyText, KeyboardAvoider } from '../../Components';
 import { colors } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
 import { CHAT_ACCENT, CHAT_COPY as COPY } from './constants';
@@ -73,14 +72,17 @@ export function ConversationScreen() {
         }
       />
 
-      <KeyboardAvoidingView
+      <KeyboardAvoider
         style={s.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
         {container.isLoading && container.groups.length === 0 ? (
           <View style={s.container}>
-            <ActivityIndicator size="large" color={CHAT_ACCENT} style={s.spinner} />
+            <ActivityIndicator
+              size="large"
+              color={CHAT_ACCENT}
+              style={s.spinner}
+            />
           </View>
         ) : (
           <ScrollView
@@ -89,9 +91,14 @@ export function ConversationScreen() {
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             refreshControl={
-              <RefreshControl refreshing={container.isLoading} onRefresh={container.refetch} />
+              <RefreshControl
+                refreshing={container.isLoading}
+                onRefresh={container.refetch}
+              />
             }
-            onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: false })}
+            onContentSizeChange={() =>
+              scrollRef.current?.scrollToEnd({ animated: false })
+            }
           >
             {container.groups.length === 0 ? (
               <>
@@ -104,7 +111,7 @@ export function ConversationScreen() {
               </>
             ) : null}
 
-            {container.groups.map((group) => (
+            {container.groups.map(group => (
               <View key={group.key}>
                 {/* Only once a thread spans more than one day — see
                     `showDayLabels`. */}
@@ -113,11 +120,17 @@ export function ConversationScreen() {
                     {group.dayLabel}
                   </EventlyText>
                 ) : null}
-                {group.items.map((message) => {
+                {group.items.map(message => {
                   const mine = message.sender === 'customer';
                   return (
-                    <View key={message.id} style={[s.bubble, mine ? s.mine : s.theirs]}>
-                      <EventlyText variant="body" style={mine ? s.mineText : s.theirsText}>
+                    <View
+                      key={message.id}
+                      style={[s.bubble, mine ? s.mine : s.theirs]}
+                    >
+                      <EventlyText
+                        variant="body"
+                        style={mine ? s.mineText : s.theirsText}
+                      >
                         {message.text}
                       </EventlyText>
                       <EventlyText
@@ -141,7 +154,10 @@ export function ConversationScreen() {
         ) : null}
 
         <View style={s.foot}>
-          <SuggestionBar suggestions={container.suggestions} onPick={pickSuggestion} />
+          <SuggestionBar
+            suggestions={container.suggestions}
+            onPick={pickSuggestion}
+          />
 
           <View style={s.composer}>
             <TextInput
@@ -163,11 +179,15 @@ export function ConversationScreen() {
               accessibilityRole="button"
               accessibilityLabel={COPY.send}
             >
-              <EventlyIcon name="arrow-right" size={22} color={colors.onPrimary} />
+              <EventlyIcon
+                name="arrow-right"
+                size={22}
+                color={colors.onPrimary}
+              />
             </TouchableOpacity>
           </View>
         </View>
-      </KeyboardAvoidingView>
+      </KeyboardAvoider>
     </SafeAreaView>
   );
 }
