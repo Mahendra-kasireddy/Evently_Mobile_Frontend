@@ -29,7 +29,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarInitial: { color: colors.onPrimary, fontSize: 34, fontWeight: '800' },
+  avatarInitial: { color: colors.onPrimary, fontSize: 34, fontWeight: '700' },
   avatarLayer: { position: 'absolute' },
   heading: { color: NAME_GATE_NAVY, textAlign: 'center' },
   subtitle: { color: NAME_GATE_TEXT_MUTED, textAlign: 'center', marginTop: spacing.xs, marginBottom: spacing.lg },

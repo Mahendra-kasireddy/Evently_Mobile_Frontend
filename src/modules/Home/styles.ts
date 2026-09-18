@@ -1,5 +1,6 @@
 import { Dimensions, StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
+import { brand } from '../../theme';
 import { colors, spacing } from '../../theme';
 import {
   BOOKED_STEP_DONE_COLOR,
@@ -96,6 +97,167 @@ export const homeHeaderStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+});
+
+/**
+ * Home's "tell us the basics" block.
+ *
+ * On the page, not on a navy card. It used to be a dark hero with confetti and
+ * a garland behind it, which put four form rows on top of a decorated
+ * background — the form is the point of the block, and the decoration was
+ * competing with it for the only thing the customer is meant to look at.
+ */
+export const basicsStyles = StyleSheet.create({
+  wrap: { paddingHorizontal: spacing.md, paddingTop: spacing.sm },
+  /* Measured off the mockup: a 25pt face set solid-ish at 30, not the 26/34
+     it was. The extra four points of leading were what made a two-line
+     heading read as three. */
+  heading: {
+    color: HOME_NAVY,
+    fontSize: 25,
+    lineHeight: 30,
+    fontWeight: '700',
+    letterSpacing: -0.5,
+  },
+  headingAccent: { color: HERO_ACCENT_COLOR, fontStyle: 'italic' },
+  subtitle: {
+    color: colors.textMuted,
+    fontSize: 13,
+    lineHeight: 19,
+    marginTop: spacing.sm,
+  },
+
+  dividerRow: {
+    ...globalStyles.row,
+    gap: spacing.sm,
+    marginTop: spacing.lg,
+    marginBottom: spacing.md,
+  },
+  dividerLine: { flex: 1, height: 1, backgroundColor: HOME_HAIRLINE },
+  dividerText: { color: colors.textMuted },
+
+  card: {
+    backgroundColor: colors.background,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: HOME_HAIRLINE,
+    overflow: 'hidden',
+  },
+  row: {
+    ...globalStyles.row,
+    gap: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 12,
+  },
+  rowDivided: { borderTopWidth: 1, borderTopColor: HOME_HAIRLINE },
+  rowPressed: { backgroundColor: HOME_ACCENT_SOFT },
+  rowText: { flex: 1 },
+  rowLabel: { color: colors.textMuted, fontSize: 13, lineHeight: 17 },
+  /* The value is the answer, so it carries the weight — the label above it is
+     only there to say what the answer is to. */
+  rowValue: {
+    color: HOME_NAVY,
+    fontSize: 16,
+    lineHeight: 22,
+    fontWeight: '700',
+  },
+  rowValueEmpty: { color: brand.textPlaceholder, fontWeight: '400' },
+
+  quickRow: {
+    ...globalStyles.row,
+    gap: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: HOME_HAIRLINE,
+    paddingLeft: spacing.md,
+    paddingVertical: 10,
+  },
+  quickLabel: { color: colors.textMuted },
+  quickChips: { gap: spacing.sm, paddingRight: spacing.md },
+  chip: {
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: HOME_HAIRLINE,
+    backgroundColor: colors.background,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  chipActive: {
+    borderColor: HERO_ACCENT_COLOR,
+    backgroundColor: HOME_ACCENT_SOFT,
+  },
+  chipText: {
+    color: HOME_NAVY,
+    fontSize: 12,
+    lineHeight: 17,
+    fontWeight: '600',
+  },
+  chipTextActive: { color: HERO_ACCENT_COLOR },
+
+  /*
+   * One card, not two.
+   *
+   * The budget row used to be its own bordered box stacked under the toggle's,
+   * which met it edge to edge — two hairlines against each other and four
+   * rounded corners notching into the seam. It is a row inside the same card
+   * now, divided the way the four basics rows are.
+   */
+  budgetCard: {
+    backgroundColor: colors.background,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: HOME_HAIRLINE,
+    marginTop: spacing.md,
+    overflow: 'hidden',
+  },
+  budgetOn: { borderColor: HERO_ACCENT_COLOR },
+  budgetRow: {
+    ...globalStyles.row,
+    gap: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 12,
+  },
+  budgetRowDivided: { borderTopWidth: 1, borderTopColor: HOME_HAIRLINE },
+  budgetText: { flex: 1 },
+  budgetTitle: {
+    color: HOME_NAVY,
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: '700',
+  },
+  budgetLink: {
+    color: HOME_NAVY,
+    textDecorationLine: 'underline',
+    marginTop: 1,
+  },
+
+  cta: {
+    ...globalStyles.row,
+    justifyContent: 'center',
+    gap: spacing.sm,
+    height: 54,
+    borderRadius: 999,
+    backgroundColor: HERO_ACCENT_COLOR,
+    marginTop: spacing.md,
+  },
+  ctaIdle: { backgroundColor: HOME_TRACK },
+  ctaText: {
+    color: colors.onPrimary,
+    fontSize: 16,
+    lineHeight: 22,
+    fontWeight: '700',
+  },
+  ctaTextIdle: { color: colors.textMuted },
+
+  errorText: { color: colors.danger, marginTop: spacing.sm },
+  successCard: {
+    backgroundColor: HOME_GREEN_SOFT,
+    borderRadius: 16,
+    padding: spacing.md,
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  successText: { color: HOME_NAVY, textAlign: 'center' },
+  successEdit: { color: HERO_ACCENT_COLOR, fontWeight: '700' },
 });
 
 export const bannerStyles = StyleSheet.create({
@@ -458,7 +620,7 @@ export const bookedEventStyles = StyleSheet.create({
     marginLeft: 'auto',
     flexShrink: 0,
   },
-  daysCount: { color: HOME_NAVY_DEEP, fontSize: 17, fontWeight: '800' },
+  daysCount: { color: HOME_NAVY_DEEP, fontSize: 17, fontWeight: '700' },
   daysLabel: { color: colors.textMuted, fontSize: 13 },
 
   title: {
@@ -754,7 +916,7 @@ export const packagesStyles = StyleSheet.create({
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.border },
   dotOn: { width: 18, backgroundColor: HERO_ACCENT_COLOR },
   headText: { flex: 1, paddingRight: spacing.sm },
-  title: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 20, fontWeight: '800' },
+  title: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 20, fontWeight: '700' },
   subtitle: { color: colors.textMuted, marginTop: spacing.xs, lineHeight: 20 },
   buildButton: { ...globalStyles.row, gap: 2, paddingTop: 2 },
   buildText: { color: HERO_ACCENT_COLOR, fontWeight: '700' },
@@ -786,7 +948,7 @@ export const packagesStyles = StyleSheet.create({
   badgeText: {
     color: CATEGORY_ICON_BADGE_COLOR,
     fontSize: 11,
-    fontWeight: '800',
+    fontWeight: '700',
     letterSpacing: 0.6,
     textTransform: 'uppercase',
   },
@@ -800,14 +962,14 @@ export const packagesStyles = StyleSheet.create({
   packageTitle: {
     color: CATEGORY_ICON_BADGE_COLOR,
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '700',
     flexShrink: 1,
   },
   guests: { color: colors.textMuted },
   budget: {
     color: HERO_ACCENT_COLOR,
     fontSize: 21,
-    fontWeight: '800',
+    fontWeight: '700',
     marginTop: spacing.xs,
   },
 
@@ -845,7 +1007,7 @@ export const packagesStyles = StyleSheet.create({
 export const topOrganizersStyles = StyleSheet.create({
   section: { marginTop: spacing.lg, paddingHorizontal: spacing.md },
   header: { ...globalStyles.row, justifyContent: 'space-between' },
-  title: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 20, fontWeight: '800' },
+  title: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 20, fontWeight: '700' },
 
   // Shown only when these organizers are not actually local — see `scope`.
   scopeNote: { ...globalStyles.row, gap: spacing.xs, marginTop: spacing.sm },
@@ -867,9 +1029,9 @@ export const topOrganizersStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { color: colors.onPrimary, fontSize: 18, fontWeight: '800' },
+  avatarText: { color: colors.onPrimary, fontSize: 18, fontWeight: '700' },
   idCol: { flex: 1 },
-  name: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 17, fontWeight: '800' },
+  name: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 17, fontWeight: '700' },
   tierBadge: {
     ...globalStyles.row,
     alignSelf: 'flex-start',
@@ -890,7 +1052,7 @@ export const topOrganizersStyles = StyleSheet.create({
   },
   ratingValue: {
     color: CATEGORY_ICON_BADGE_COLOR,
-    fontWeight: '800',
+    fontWeight: '700',
     marginLeft: spacing.xs,
   },
   ratingMuted: { color: colors.textMuted, marginLeft: 3 },
@@ -1014,9 +1176,9 @@ export const organizerSheetStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { color: colors.onPrimary, fontSize: 18, fontWeight: '800' },
+  avatarText: { color: colors.onPrimary, fontSize: 18, fontWeight: '700' },
   headText: { flex: 1 },
-  name: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 19, fontWeight: '800' },
+  name: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 19, fontWeight: '700' },
   meta: { color: colors.textMuted, marginTop: 2 },
   centered: { alignItems: 'center', paddingVertical: spacing.xl },
   errorText: {
@@ -1177,21 +1339,46 @@ export const sectionStyles = StyleSheet.create({
     gap: spacing.sm,
     paddingHorizontal: spacing.md,
   },
+  /*
+   * Size and weight come from the `sectionTitle` token, not from here.
+   *
+   * This used to hardcode 21/700, which overrode the `h2` variant the
+   * component asks for and made every section heading three points larger than
+   * the design system's — on the one component every section on Home draws its
+   * heading with.
+   */
   title: {
     color: HOME_NAVY,
-    fontSize: 21,
-    fontWeight: '700',
     letterSpacing: -0.3,
     flexShrink: 1,
   },
-  action: { color: HERO_ACCENT_COLOR, fontSize: 15, fontWeight: '600' },
+  /** The trailing "See all" — the design system's button token. */
+  action: { color: HERO_ACCENT_COLOR },
+  /** The line under a section heading. Size from the `body` token. */
   subtitle: {
     color: colors.textMuted,
-    fontSize: 14,
-    lineHeight: 20,
-    marginTop: 4,
+    marginTop: spacing.xs,
     paddingHorizontal: spacing.md,
   },
+});
+
+export const seeAllStyles = StyleSheet.create({
+  list: { paddingTop: spacing.sm, paddingBottom: spacing.xl, flexGrow: 1 },
+  count: {
+    color: colors.textMuted,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.xs,
+  },
+  emptyTitle: { color: HOME_NAVY, textAlign: 'center' },
+  emptyBody: {
+    color: colors.textMuted,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+  },
+  /* The carousel's card, given a row of its own. Its width comes from the
+     horizontal list it was built for, so it is padded into the column rather
+     than left floating at its carousel size. */
+  offerRow: { paddingHorizontal: spacing.md, paddingBottom: spacing.sm },
 });
 
 /**

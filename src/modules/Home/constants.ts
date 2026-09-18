@@ -51,6 +51,72 @@ export const TRUST_ICON_NAME: Record<TrustIcon, string> = {
 /** The one line in the header's search field — what can actually be searched. */
 export const SEARCH_PLACEHOLDER = 'Search packages, organizers, decor';
 
+/** The rule above the card, which separates the pitch from the form. */
+export const BASICS_DIVIDER = 'or tell us the basics';
+
+/**
+ * Shortcuts under the four rows.
+ *
+ * Words rather than dates because the customer thinks in these terms before
+ * they think in a date — and each one still sets a real day, so the When row
+ * updates to show exactly what was chosen.
+ */
+export const QUICK_DATES: Array<{
+  label: string;
+  kind: 'weekend' | 'months';
+  months?: number;
+}> = [
+  { label: 'This weekend', kind: 'weekend' },
+  { label: 'Next month', kind: 'months', months: 1 },
+  { label: '2 months', kind: 'months', months: 2 },
+  { label: '3 months', kind: 'months', months: 3 },
+];
+
+export const QUICK_DATES_LABEL = 'Quick dates';
+
+export const BUDGET_TOGGLE_COPY = {
+  title: 'Share my budget range',
+  link: 'Know more',
+  /* Shown once the toggle is on and nothing is picked, so the row is never a
+     blank that looks broken. */
+  placeholder: 'Pick a range',
+  explainer:
+    'Organizers quote to the range you give them, so the replies come back comparable. Leave it off and you will still get quotes — they just start from scratch.',
+} as const;
+
+export const GET_QUOTES_CTA = 'Get quotes';
+
+/** Which Home section the See-all screen is showing. */
+export type SeeAllKind = 'events' | 'offers';
+
+export const SEE_ALL_COPY: Record<
+  SeeAllKind,
+  {
+    title: string;
+    countOne: string;
+    countMany: string;
+    emptyTitle: string;
+    emptyBody: string;
+  }
+> = {
+  events: {
+    title: 'Your events',
+    countOne: '1 event',
+    countMany: 'events',
+    emptyTitle: 'Nothing live right now',
+    emptyBody:
+      'Plans you start and requests you send will appear here until they are booked or closed.',
+  },
+  offers: {
+    title: 'Offers for you',
+    countOne: '1 offer',
+    countMany: 'offers',
+    emptyTitle: 'No offers right now',
+    emptyBody:
+      'Coupons appear here while they are live and you have uses left. There are none at the moment.',
+  },
+};
+
 export const HERO_BACKGROUND_COLOR = '#0e1a33'; // --color-navy-deep
 
 // The screen's own tokens, matching the other ported surfaces.

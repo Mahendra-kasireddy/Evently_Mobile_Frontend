@@ -4,6 +4,7 @@ export { EventlyButton } from './EventlyButton';
 export { EventlyTextInput } from './EventlyTextInput';
 export { EventlyIcon } from './EventlyIcon';
 export { KeyboardAvoider } from './KeyboardAvoider';
+export { CalendarSheet, todayIso, toIsoDate } from './CalendarSheet';
 export { EventlyImage } from './EventlyImage';
 export { OccasionArt } from './OccasionArt';
 export { Confetti } from './Confetti';

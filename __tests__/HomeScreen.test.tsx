@@ -118,7 +118,9 @@ const result = (over: Partial<HomeContainerResult> = {}): HomeContainerResult =>
     isError: false,
     errorMessage: null,
     refetch: jest.fn(),
-    heroDraft: null,
+    /* Never null now: the draft lives in the store, seeded with today's date
+       and a hundred guests so the card opens answerable rather than blank. */
+    heroDraft: { occasion: '', when: '2026-09-18', where: '', guests: '100' },
     setHeroField: jest.fn(),
     submitHeroDraft: jest.fn(),
     isRequestingQuotes: false,
@@ -174,6 +176,49 @@ function hasControl(
 
 beforeEach(() => {
   jest.clearAllMocks();
+});
+
+describe('the basics form', () => {
+  /*
+   * It used to be gated on having no live event, which sounded reasonable and
+   * meant that anyone with a request in flight — most people who use the app
+   * twice — never saw it again. Planning a second event is the thing Home is
+   * for, so it is always there.
+   */
+  const withBanner = (over: Partial<HomeContainerResult> = {}) =>
+    result({
+      banner: {
+        greeting: '',
+        headingLead: 'What shall we',
+        headingAccent: 'celebrate',
+        headingTail: 'next?',
+        subtitle: 'Verified organizers send tailored quotes within a day.',
+        draftLabel: '',
+        defaultDraft: { occasion: '', when: '', where: '', guests: '' },
+        options: { occasion: [], when: [], where: [], guests: [] },
+        trust: [],
+      } as unknown as HomeContainerResult['banner'],
+      ...over,
+    });
+
+  it('is on screen for an account with nothing on', () => {
+    mockContainer.mockReturnValue(withBanner());
+    expect(render()).toContain('celebrate');
+  });
+
+  it('stays on screen for an account with a live request', () => {
+    mockContainer.mockReturnValue(withBanner({ currentEvent: event() }));
+    const text = render();
+    expect(text).toContain('celebrate');
+    expect(text).toContain('Anniversary');
+  });
+
+  it('stays on screen for an account with a booking', () => {
+    mockContainer.mockReturnValue(withBanner({ bookedEvent: booked }));
+    const text = render();
+    expect(text).toContain('celebrate');
+    expect(text).toContain('EVT-2026-1977');
+  });
 });
 
 describe('the event cards Home draws', () => {

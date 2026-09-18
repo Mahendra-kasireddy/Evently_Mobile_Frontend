@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer, { setActiveView, setAuthHydrated, setToken, type AppView } from './authSlice';
+import heroDraftReducer from './heroDraftSlice';
 import locationReducer from './locationSlice';
 import onboardingReducer, { setHasSeenOnboarding, setOnboardingHydrated } from './onboardingSlice';
 
@@ -11,6 +12,7 @@ const ONBOARDING_SEEN_KEY = 'evently.onboarding.seen';
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    heroDraft: heroDraftReducer,
     location: locationReducer,
     onboarding: onboardingReducer,
   },

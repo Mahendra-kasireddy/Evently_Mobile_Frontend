@@ -102,7 +102,11 @@ export function EventSummaryCard({
         {heading}
         <View style={s.card}>
           <View style={s.errorBody}>
-            <EventlyIcon name="cloud-off-outline" size={28} color={colors.textMuted} />
+            <EventlyIcon
+              name="cloud-off-outline"
+              size={28}
+              color={colors.textMuted}
+            />
             <EventlyText variant="subtitle" style={s.errorTitle}>
               {EVENT_SUMMARY_ERROR.title}
             </EventlyText>
@@ -134,7 +138,11 @@ export function EventSummaryCard({
         <View style={s.card}>
           <View style={s.emptyBody}>
             <View style={s.emptyIconChip}>
-              <EventlyIcon name="calendar-plus" size={26} color={HERO_ACCENT_COLOR} />
+              <EventlyIcon
+                name="calendar-plus"
+                size={26}
+                color={HERO_ACCENT_COLOR}
+              />
             </View>
             <EventlyText variant="subtitle" style={s.emptyTitle}>
               {EVENT_SUMMARY_EMPTY.title}
@@ -186,12 +194,20 @@ export function EventSummaryCard({
               accessibilityRole="button"
               accessibilityLabel={
                 isReal
-                  ? `${HERO_FIELD_LABEL[field]}: ${value || 'not set'}. Opens your event.`
-                  : `${HERO_FIELD_LABEL[field]}: ${value || 'not chosen'}. Opens the picker.`
+                  ? `${HERO_FIELD_LABEL[field]}: ${
+                      value || 'not set'
+                    }. Opens your event.`
+                  : `${HERO_FIELD_LABEL[field]}: ${
+                      value || 'not chosen'
+                    }. Opens the picker.`
               }
             >
               <View style={s.iconChip}>
-                <EventlyIcon name={HERO_FIELD_ICON_NAME[field]} size={20} color={HERO_ACCENT_COLOR} />
+                <EventlyIcon
+                  name={HERO_FIELD_ICON_NAME[field]}
+                  size={20}
+                  color={HERO_ACCENT_COLOR}
+                />
               </View>
               <View style={s.rowText}>
                 <EventlyText variant="caption" style={s.rowLabel}>
@@ -222,16 +238,26 @@ export function EventSummaryCard({
           disabled={isSubmitting}
           onPress={isReal ? onPressEvent : onSubmitDraft}
           accessibilityRole="button"
-          accessibilityLabel={isReal ? EVENT_SUMMARY_OPEN_CTA[event.source] : EVENT_SUMMARY_DRAFT_CTA}
+          accessibilityLabel={
+            isReal
+              ? EVENT_SUMMARY_OPEN_CTA[event.source]
+              : EVENT_SUMMARY_DRAFT_CTA
+          }
         >
           {isSubmitting ? (
             <ActivityIndicator size="small" color={colors.onPrimary} />
           ) : (
             <>
               <EventlyText variant="subtitle" style={s.ctaText}>
-                {isReal ? EVENT_SUMMARY_OPEN_CTA[event.source] : EVENT_SUMMARY_DRAFT_CTA}
+                {isReal
+                  ? EVENT_SUMMARY_OPEN_CTA[event.source]
+                  : EVENT_SUMMARY_DRAFT_CTA}
               </EventlyText>
-              <EventlyIcon name="chevron-right" size={20} color={colors.onPrimary} />
+              <EventlyIcon
+                name="chevron-right"
+                size={20}
+                color={colors.onPrimary}
+              />
             </>
           )}
         </TouchableOpacity>

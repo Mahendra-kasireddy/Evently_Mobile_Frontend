@@ -35,7 +35,7 @@ export const heroStyles = StyleSheet.create({
   top: { ...globalStyles.row, gap: spacing.md },
   ringWrap: { width: 78, height: 78, alignItems: 'center', justifyContent: 'center' },
   ringText: { position: 'absolute', alignItems: 'center', justifyContent: 'center' },
-  ringPercent: { color: colors.onPrimary, fontSize: 17, fontWeight: '800' },
+  ringPercent: { color: colors.onPrimary, fontSize: 17, fontWeight: '700' },
   ringCaption: { color: colors.onPrimaryMuted, fontSize: 10, marginTop: 1 },
   headText: { flex: 1 },
   eyebrow: {
@@ -44,7 +44,7 @@ export const heroStyles = StyleSheet.create({
     textTransform: 'uppercase',
     fontWeight: '700',
   },
-  title: { color: colors.onPrimary, fontSize: 20, fontWeight: '800', marginTop: 2 },
+  title: { color: colors.onPrimary, fontSize: 20, fontWeight: '700', marginTop: 2 },
   statusPill: {
     ...globalStyles.row,
     alignSelf: 'flex-start',
@@ -65,13 +65,13 @@ export const heroStyles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.14)',
   },
-  countdownCount: { color: colors.onPrimary, fontSize: 26, fontWeight: '800' },
+  countdownCount: { color: colors.onPrimary, fontSize: 26, fontWeight: '700' },
   countdownLabel: { color: colors.onPrimaryMuted },
 });
 
 export const sectionStyles = StyleSheet.create({
   section: { marginTop: spacing.lg, paddingHorizontal: spacing.md },
-  title: { color: WORKSPACE_NAVY, fontSize: 17, fontWeight: '800' },
+  title: { color: WORKSPACE_NAVY, fontSize: 17, fontWeight: '700' },
   card: {
     ...globalStyles.card,
     borderRadius: 16,
@@ -213,7 +213,7 @@ export const boardStyles = StyleSheet.create({
     paddingVertical: 4,
   },
   heroPillText: { color: colors.onPrimary, fontWeight: '700', letterSpacing: 0.8 },
-  heroTitle: { color: colors.onPrimary, fontSize: 22, fontWeight: '800', marginTop: spacing.sm },
+  heroTitle: { color: colors.onPrimary, fontSize: 22, fontWeight: '700', marginTop: spacing.sm },
   heroSubtitle: { color: colors.onPrimaryMuted, marginTop: spacing.xs, lineHeight: 20 },
   stats: {
     ...globalStyles.row,
@@ -224,7 +224,7 @@ export const boardStyles = StyleSheet.create({
     borderTopColor: 'rgba(255,255,255,0.14)',
   },
   stat: { flex: 1 },
-  statValue: { color: colors.onPrimary, fontSize: 22, fontWeight: '800' },
+  statValue: { color: colors.onPrimary, fontSize: 22, fontWeight: '700' },
   statLabel: { color: colors.onPrimaryMuted, marginTop: 1 },
 
   // Composer.
@@ -246,7 +246,7 @@ export const boardStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarSquare: { borderRadius: 12, backgroundColor: WORKSPACE_NAVY },
-  avatarText: { color: colors.onPrimary, fontWeight: '800', fontSize: 13 },
+  avatarText: { color: colors.onPrimary, fontWeight: '700', fontSize: 13 },
   input: {
     flex: 1,
     // A TextInput resolves no face of its own — see Components/EventlyText.
@@ -382,7 +382,7 @@ export const boardStyles = StyleSheet.create({
     marginTop: spacing.lg,
     padding: spacing.md,
   },
-  visionTitle: { color: WORKSPACE_NAVY, fontSize: 17, fontWeight: '800' },
+  visionTitle: { color: WORKSPACE_NAVY, fontSize: 17, fontWeight: '700' },
   visionSubtitle: { color: colors.textMuted, marginTop: 2 },
   visionEmpty: { color: colors.textMuted, marginTop: spacing.sm, lineHeight: 20 },
   visionRow: { ...globalStyles.row, gap: spacing.sm, marginTop: spacing.md },

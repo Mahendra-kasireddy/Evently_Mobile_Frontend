@@ -66,7 +66,7 @@ export const listStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   text: { flex: 1 },
-  title: { color: INV_NAVY, fontSize: 16, fontWeight: '800' },
+  title: { color: INV_NAVY, fontSize: 16, fontWeight: '700' },
   ref: { color: colors.textMuted, marginTop: 1, letterSpacing: 0.4 },
   statusChip: { borderRadius: 999, paddingHorizontal: spacing.sm, paddingVertical: 3 },
   statusChipAction: { backgroundColor: INV_ACCENT_SOFT },
@@ -103,7 +103,7 @@ export const heroStyles = StyleSheet.create({
     letterSpacing: 0.5,
     fontWeight: '700',
   },
-  heading: { color: colors.onPrimary, fontSize: 22, fontWeight: '800', marginTop: spacing.sm },
+  heading: { color: colors.onPrimary, fontSize: 22, fontWeight: '700', marginTop: spacing.sm },
   sub: { color: colors.onPrimaryMuted, marginTop: spacing.xs, lineHeight: 20 },
 
   statusRow: {
@@ -178,7 +178,7 @@ export const sectionStyles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     marginTop: spacing.lg,
   },
-  title: { color: INV_NAVY, fontSize: 17, fontWeight: '800' },
+  title: { color: INV_NAVY, fontSize: 17, fontWeight: '700' },
   count: { color: colors.textMuted },
 
   row: {
@@ -268,7 +268,7 @@ export const previewStyles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
   },
-  hosts: { color: colors.onPrimary, fontSize: 24, fontWeight: '800', textAlign: 'center', marginTop: spacing.sm },
+  hosts: { color: colors.onPrimary, fontSize: 24, fontWeight: '700', textAlign: 'center', marginTop: spacing.sm },
   when: { color: colors.onPrimaryMuted, marginTop: spacing.sm, textAlign: 'center' },
   venue: { color: colors.onPrimaryMuted, marginTop: 2, textAlign: 'center' },
 
@@ -282,7 +282,7 @@ export const previewStyles = StyleSheet.create({
   blockTitle: { color: INV_NAVY, fontWeight: '700', flex: 1 },
   blockBody: { color: colors.textMuted, marginTop: 2, lineHeight: 19 },
 
-  scheduleTitle: { color: INV_NAVY, fontWeight: '800', paddingHorizontal: spacing.md, paddingTop: spacing.md },
+  scheduleTitle: { color: INV_NAVY, fontWeight: '700', paddingHorizontal: spacing.md, paddingTop: spacing.md },
   subEvent: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
   subEventBar: { width: 3, borderRadius: 2, backgroundColor: INV_ACCENT },
   subEventName: { color: INV_NAVY, fontWeight: '700' },
@@ -295,7 +295,7 @@ export const previewStyles = StyleSheet.create({
 export const previewSheetStyles = StyleSheet.create({
   head: { ...globalStyles.row, gap: spacing.sm },
   headText: { flex: 1 },
-  title: { color: INV_NAVY, fontSize: 19, fontWeight: '800' },
+  title: { color: INV_NAVY, fontSize: 19, fontWeight: '700' },
   meta: { ...globalStyles.row, gap: spacing.xs, marginTop: 2 },
   metaText: { color: colors.textMuted },
   ownerCustomer: { color: INV_ACCENT, fontWeight: '700' },
@@ -341,7 +341,7 @@ export const sheetStyles = StyleSheet.create({
     backgroundColor: colors.border,
     marginBottom: spacing.md,
   },
-  title: { color: INV_NAVY, fontSize: 19, fontWeight: '800' },
+  title: { color: INV_NAVY, fontSize: 19, fontWeight: '700' },
   subtitle: { color: colors.textMuted, marginTop: spacing.xs, lineHeight: 19 },
 
   label: { color: INV_NAVY, fontWeight: '700', marginTop: spacing.lg },

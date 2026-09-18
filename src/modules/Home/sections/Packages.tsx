@@ -1,6 +1,11 @@
 import { FlatList, TouchableOpacity, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
-import { EventlyIcon, EventlyImage, EventlyText, OccasionArt } from '../../../Components';
+import {
+  EventlyIcon,
+  EventlyImage,
+  EventlyText,
+  OccasionArt,
+} from '../../../Components';
 import { CATEGORY_GRADIENT, HERO_ACCENT_COLOR, HOME_NAVY } from '../constants';
 import { packageCardStyles as s } from '../styles';
 import { SectionHead } from './SectionHead';
@@ -24,14 +29,20 @@ interface PackageCardProps {
   onToggleSaved: () => void;
 }
 
-function PackageCard({ item, onPress, saved, onToggleSaved }: PackageCardProps) {
+function PackageCard({
+  item,
+  onPress,
+  saved,
+  onToggleSaved,
+}: PackageCardProps) {
   const [start, end] = CATEGORY_GRADIENT[item.art];
   /*
    * SVG ids are global to the document, so a shared id would make every card
    * on the screen paint whichever gradient rendered last. Scoped per package.
    */
   const gradientId = `packageBanner-${item.id}`;
-  const rating = item.organizer && item.organizer.reviews > 0 ? item.organizer : null;
+  const rating =
+    item.organizer && item.organizer.reviews > 0 ? item.organizer : null;
 
   return (
     <View style={s.card}>
@@ -58,18 +69,39 @@ function PackageCard({ item, onPress, saved, onToggleSaved }: PackageCardProps) 
           {/* A real photo when the package has one; otherwise the occasion's
               own illustration over its gradient, never a broken frame. */}
           {item.photoUrl ? (
-            <EventlyImage source={{ uri: item.photoUrl }} style={s.bannerLayer} resizeMode="cover" />
+            <EventlyImage
+              source={{ uri: item.photoUrl }}
+              style={s.bannerLayer}
+              resizeMode="cover"
+            />
           ) : (
             <>
               <View style={s.bannerLayer}>
-                <Svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <Svg
+                  width="100%"
+                  height="100%"
+                  viewBox="0 0 100 100"
+                  preserveAspectRatio="none"
+                >
                   <Defs>
-                    <LinearGradient id={gradientId} x1="20%" y1="0%" x2="80%" y2="100%">
+                    <LinearGradient
+                      id={gradientId}
+                      x1="20%"
+                      y1="0%"
+                      x2="80%"
+                      y2="100%"
+                    >
                       <Stop offset="0" stopColor={start} />
                       <Stop offset="1" stopColor={end} />
                     </LinearGradient>
                   </Defs>
-                  <Rect x={0} y={0} width={100} height={100} fill={`url(#${gradientId})`} />
+                  <Rect
+                    x={0}
+                    y={0}
+                    width={100}
+                    height={100}
+                    fill={`url(#${gradientId})`}
+                  />
                 </Svg>
               </View>
               <View style={s.bannerArt} pointerEvents="none">
@@ -80,14 +112,22 @@ function PackageCard({ item, onPress, saved, onToggleSaved }: PackageCardProps) 
 
           {item.badge ? (
             <View style={s.badge}>
-              <EventlyText variant="caption" style={s.badgeText} numberOfLines={1}>
+              <EventlyText
+                variant="caption"
+                style={s.badgeText}
+                numberOfLines={1}
+              >
                 {item.badge.toUpperCase()}
               </EventlyText>
             </View>
           ) : null}
 
           {item.bannerNote ? (
-            <EventlyText variant="caption" style={s.bannerNote} numberOfLines={1}>
+            <EventlyText
+              variant="caption"
+              style={s.bannerNote}
+              numberOfLines={1}
+            >
               {item.bannerNote}
             </EventlyText>
           ) : null}
@@ -98,7 +138,11 @@ function PackageCard({ item, onPress, saved, onToggleSaved }: PackageCardProps) 
             {item.title}
           </EventlyText>
           {item.organizer ? (
-            <EventlyText variant="caption" style={s.organizer} numberOfLines={1}>
+            <EventlyText
+              variant="caption"
+              style={s.organizer}
+              numberOfLines={1}
+            >
               {item.organizer.name}
             </EventlyText>
           ) : null}
@@ -143,7 +187,9 @@ function PackageCard({ item, onPress, saved, onToggleSaved }: PackageCardProps) 
         onPress={onToggleSaved}
         accessibilityRole="button"
         accessibilityState={{ selected: saved }}
-        accessibilityLabel={`${saved ? 'Remove' : 'Save'} ${item.title}${saved ? ' from' : ' to'} your saved packages`}
+        accessibilityLabel={`${saved ? 'Remove' : 'Save'} ${item.title}${
+          saved ? ' from' : ' to'
+        } your saved packages`}
       >
         <EventlyIcon
           name={saved ? 'heart' : 'heart-outline'}
@@ -181,7 +227,7 @@ export function Packages({
       />
       <FlatList
         data={data.items}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={PACKAGE_LIST_PADDING}
@@ -198,6 +244,10 @@ export function Packages({
   );
 }
 
-const PACKAGE_LIST_PADDING = { paddingHorizontal: 16, paddingTop: 14, gap: 12 } as const;
+const PACKAGE_LIST_PADDING = {
+  paddingHorizontal: 16,
+  paddingTop: 14,
+  gap: 12,
+} as const;
 
 export default Packages;

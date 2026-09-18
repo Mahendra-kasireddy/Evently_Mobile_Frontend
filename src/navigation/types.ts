@@ -1,4 +1,5 @@
 import type { NavigatorScreenParams } from '@react-navigation/native';
+import type { SeeAllKind } from '../modules/Home/constants';
 
 export type MainTabParamList = {
   Home: undefined;
@@ -53,13 +54,33 @@ export type RootStackParamList = {
    * without a second request for what the workspace already knows.
    */
   IdeaBoard: { bookingId: string; organizerName?: string; authorName?: string };
+  /**
+   * One Home section, in full.
+   *
+   * Every section on Home is a preview — the events stop at three, the offers
+   * are a carousel — and each "See all" opens this with the section it means.
+   * Separate from the `Events` tab on purpose: that tab is the customer's
+   * bookings and the tools hanging off them, and a draft plan has none of
+   * those.
+   */
+  SeeAll: { kind: SeeAllKind };
+  /**
+   * The two search screens behind Home's "tell us the basics" card.
+   *
+   * They take no params and return none: the field they edit lives in the
+   * store, so a picker does not have to know which screen pushed it.
+   */
+  OccasionPicker: undefined;
+  AreaPicker: undefined;
   /** What the customer has kept for later, from the Home carousel. */
   SavedPackages: undefined;
   /**
    * Packages and organizers matching a query. `openFilters` is how the home
    * header's filter button lands with the sheet already up.
    */
-  Search: { kind?: 'packages' | 'organizers'; openFilters?: boolean } | undefined;
+  Search:
+    | { kind?: 'packages' | 'organizers'; openFilters?: boolean }
+    | undefined;
   /** Every quote on one request, side by side. */
   CompareQuotes: { requestId: string; title?: string };
   /**
@@ -68,7 +89,12 @@ export type RootStackParamList = {
    * Both quotation ids are route params rather than derived here, so the
    * screen compares exactly the pair the customer chose.
    */
-  LineByLine: { requestId: string; leftId: string; rightId: string; title?: string };
+  LineByLine: {
+    requestId: string;
+    leftId: string;
+    rightId: string;
+    title?: string;
+  };
   /**
    * Paying the advance on an accepted quotation.
    *

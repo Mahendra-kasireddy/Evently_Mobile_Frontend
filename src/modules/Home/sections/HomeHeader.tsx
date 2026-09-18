@@ -64,7 +64,11 @@ export function HomeHeader({
           accessibilityLabel={`Location: ${locationLabel}. Change it.`}
         >
           <EventlyIcon name="map-marker" size={20} color={HERO_ACCENT_COLOR} />
-          <EventlyText variant="subtitle" style={s.locationLabel} numberOfLines={1}>
+          <EventlyText
+            variant="subtitle"
+            style={s.locationLabel}
+            numberOfLines={1}
+          >
             {locationLabel}
           </EventlyText>
           <EventlyIcon name="chevron-down" size={19} color={HOME_NAVY} />
@@ -76,7 +80,9 @@ export function HomeHeader({
             onPress={onPressSaved}
             accessibilityRole="button"
             accessibilityLabel={
-              savedCount > 0 ? `Saved packages, ${savedCount} saved` : 'Saved packages'
+              savedCount > 0
+                ? `Saved packages, ${savedCount} saved`
+                : 'Saved packages'
             }
           >
             <EventlyIcon name="heart-outline" size={23} color={HOME_NAVY} />
@@ -88,7 +94,9 @@ export function HomeHeader({
             onPress={onPressNotifications}
             accessibilityRole="button"
             accessibilityLabel={
-              unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'
+              unreadCount > 0
+                ? `Notifications, ${unreadCount} unread`
+                : 'Notifications'
             }
           >
             <EventlyIcon name="bell-outline" size={23} color={HOME_NAVY} />
@@ -106,7 +114,11 @@ export function HomeHeader({
           accessibilityLabel={searchPlaceholder}
         >
           <EventlyIcon name="magnify" size={21} color={colors.textMuted} />
-          <EventlyText variant="body" style={s.searchPlaceholder} numberOfLines={1}>
+          <EventlyText
+            variant="body"
+            style={s.searchPlaceholder}
+            numberOfLines={1}
+          >
             {searchPlaceholder}
           </EventlyText>
         </TouchableOpacity>

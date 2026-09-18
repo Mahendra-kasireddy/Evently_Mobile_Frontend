@@ -13,10 +13,18 @@ interface TopOrganizersProps {
   onPressChangeCity: () => void;
 }
 
-function OrganizerRow({ item, onPress }: { item: OrganizerItem; onPress: () => void }) {
+function OrganizerRow({
+  item,
+  onPress,
+}: {
+  item: OrganizerItem;
+  onPress: () => void;
+}) {
   const spoken = [
     item.name,
-    item.reviews > 0 ? `${item.rating.toFixed(1)} from ${item.reviews} reviews` : 'No reviews yet',
+    item.reviews > 0
+      ? `${item.rating.toFixed(1)} from ${item.reviews} reviews`
+      : 'No reviews yet',
     item.tier,
     item.bookedLabel,
     item.fromLabel ? `from ${item.fromLabel}` : '',
@@ -70,7 +78,10 @@ function OrganizerRow({ item, onPress }: { item: OrganizerItem; onPress: () => v
               </EventlyText>
             </>
           )}
-          <EventlyText variant="caption" style={[s.tier, { color: TIER_COLOR[item.tier] }]}>
+          <EventlyText
+            variant="caption"
+            style={[s.tier, { color: TIER_COLOR[item.tier] }]}
+          >
             {item.tier}
           </EventlyText>
         </View>
@@ -121,10 +132,17 @@ export function TopOrganizers({
 }: TopOrganizersProps) {
   return (
     <View>
-      <SectionHead title={data.title} actionLabel="See all" onPressAction={onPressSeeAll} />
+      <SectionHead
+        title={data.title}
+        actionLabel="See all"
+        onPressAction={onPressSeeAll}
+      />
 
       {data.scopeNote ? (
-        <TouchableOpacity onPress={onPressChangeCity} accessibilityRole="button">
+        <TouchableOpacity
+          onPress={onPressChangeCity}
+          accessibilityRole="button"
+        >
           <EventlyText variant="caption" style={s.emptyText}>
             {data.scopeNote}
           </EventlyText>
@@ -135,7 +153,10 @@ export function TopOrganizers({
           load. When there is genuinely nobody, say so and offer the one thing
           that can change it. */}
       {data.items.length === 0 ? (
-        <TouchableOpacity onPress={onPressChangeCity} accessibilityRole="button">
+        <TouchableOpacity
+          onPress={onPressChangeCity}
+          accessibilityRole="button"
+        >
           <EventlyText variant="body" style={s.emptyText}>
             {data.city
               ? `No organizers listed for ${data.city} yet. Change your city to look further afield.`
@@ -143,8 +164,12 @@ export function TopOrganizers({
           </EventlyText>
         </TouchableOpacity>
       ) : (
-        data.items.map((item) => (
-          <OrganizerRow key={item.id} item={item} onPress={() => onPressOrganizer(item.id)} />
+        data.items.map(item => (
+          <OrganizerRow
+            key={item.id}
+            item={item}
+            onPress={() => onPressOrganizer(item.id)}
+          />
         ))
       )}
     </View>

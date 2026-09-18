@@ -957,7 +957,7 @@ describe('render dump', () => {
                 onPressDetails={noop}
                 onPressQuote={noop}
               />
-              <Offers data={offers} onPressOffer={noop} />
+              <Offers data={offers} onPressOffer={noop} onPressSeeAll={noop} />
             </>,
           ).toJSON(),
         ),
@@ -974,28 +974,66 @@ describe('render dump', () => {
                 onPressDetails={noop}
                 onPressQuote={noop}
               />
-              <View style={require('../src/modules/Home/styles').sectionStyles.block}>
-                <View style={require('../src/modules/Home/styles').sectionStyles.headRow}>
+              <View
+                style={
+                  require('../src/modules/Home/styles').sectionStyles.block
+                }
+              >
+                <View
+                  style={
+                    require('../src/modules/Home/styles').sectionStyles.headRow
+                  }
+                >
                   <EventlyTextForDump
                     variant="h2"
-                    style={require('../src/modules/Home/styles').sectionStyles.title}
+                    style={
+                      require('../src/modules/Home/styles').sectionStyles.title
+                    }
                   >
                     Your other events
                   </EventlyTextForDump>
                   <EventlyTextForDump
                     variant="subtitle"
-                    style={require('../src/modules/Home/styles').sectionStyles.action}
+                    style={
+                      require('../src/modules/Home/styles').sectionStyles.action
+                    }
                   >
                     See all 11
                   </EventlyTextForDump>
                 </View>
                 {[
-                  { refId: 'r1', title: 'Wedding', stageLabel: 'PLAN IN PROGRESS', factsLine: '17 September 2026 · 100 guests', quoteCount: 0 },
-                  { refId: 'r2', title: 'Naming ceremony', stageLabel: 'QUOTES RECEIVED', factsLine: '5 October 2026 · Kukatpally', quoteCount: 3 },
-                  { refId: 'r3', title: 'Housewarming', stageLabel: 'AWAITING ORGANIZER RESPONSE', factsLine: '2 November 2026 · Gachibowli', quoteCount: 0 },
-                ].map((over) => {
-                  const [row] = mapOtherEvents(feed({ otherEvents: [briefDTO(over)] }));
-                  return <EventRow key={over.refId} event={{ ...row, ...over }} onPress={noop} />;
+                  {
+                    refId: 'r1',
+                    title: 'Wedding',
+                    stageLabel: 'PLAN IN PROGRESS',
+                    factsLine: '17 September 2026 · 100 guests',
+                    quoteCount: 0,
+                  },
+                  {
+                    refId: 'r2',
+                    title: 'Naming ceremony',
+                    stageLabel: 'QUOTES RECEIVED',
+                    factsLine: '5 October 2026 · Kukatpally',
+                    quoteCount: 3,
+                  },
+                  {
+                    refId: 'r3',
+                    title: 'Housewarming',
+                    stageLabel: 'AWAITING ORGANIZER RESPONSE',
+                    factsLine: '2 November 2026 · Gachibowli',
+                    quoteCount: 0,
+                  },
+                ].map(over => {
+                  const [row] = mapOtherEvents(
+                    feed({ otherEvents: [briefDTO(over)] }),
+                  );
+                  return (
+                    <EventRow
+                      key={over.refId}
+                      event={{ ...row, ...over }}
+                      onPress={noop}
+                    />
+                  );
                 })}
               </View>
             </>,
@@ -1032,6 +1070,81 @@ describe('render dump', () => {
         title: 'Home',
         width: 390,
         background: '#faf8f7',
+        padding: 0,
+      }),
+      'utf8',
+    );
+    expect(fs.existsSync(out)).toBe(true);
+  });
+});
+
+/* The basics block, as a picture. Run with EVENTLY_RENDER_OUT set. */
+describe('basics render dump', () => {
+  it('writes an HTML rendering when EVENTLY_BASICS_OUT is set', () => {
+    const out: string | undefined = process.env.EVENTLY_BASICS_OUT;
+    if (!out) return;
+
+    const { Banner } = require('../src/modules/Home/sections/Banner');
+    const { brand } = require('../src/theme');
+    const noop = () => {};
+
+    const banner = {
+      greeting: '',
+      headingLead: 'What shall we',
+      headingAccent: 'celebrate',
+      headingTail: 'next?',
+      subtitle:
+        'Verified organizers send tailored quotes within a day. You compare, you choose.',
+      draftLabel: '',
+      defaultDraft: { occasion: '', when: '', where: '', guests: '' },
+      options: { occasion: [], when: [], where: [], guests: [] },
+      trust: [
+        { icon: 'zap', label: 'Quotes in under a day' },
+        { icon: 'shield', label: 'Verified organizers only' },
+        { icon: 'star', label: '4.8 average rating' },
+      ],
+    };
+
+    const state = (over: Record<string, unknown> = {}) => (
+      <Banner
+        data={banner}
+        heroDraft={{
+          occasion: 'Naming ceremony',
+          when: '2026-09-20',
+          where: 'Hyderabad',
+          guests: '300',
+        }}
+        onEditField={noop}
+        onPickDate={noop}
+        shareBudget={false}
+        budget=""
+        onToggleBudget={noop}
+        onPressBudgetRange={noop}
+        onSubmit={noop}
+        isSubmitting={false}
+        quotesRequested={false}
+        quotesErrorMessage={null}
+        onEditAgain={noop}
+        {...over}
+      />
+    );
+
+    const panels: Array<[string, string]> = [
+      ['Basics — budget off', toHtml(render(state()).toJSON())],
+      [
+        'Basics — budget on',
+        toHtml(
+          render(state({ shareBudget: true, budget: '₹5L – ₹10L' })).toJSON(),
+        ),
+      ],
+    ];
+
+    fs.writeFileSync(
+      out,
+      page(panels, {
+        title: 'Basics',
+        width: 390,
+        background: brand.bg,
         padding: 0,
       }),
       'utf8',

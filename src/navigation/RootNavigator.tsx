@@ -1,7 +1,12 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { SeeAllScreen } from '../modules/Home';
+import { AreaPickerScreen, OccasionPickerScreen } from '../modules/Pickers';
 import { ConversationScreen } from '../modules/Chat';
 import { ComingSoonScreen } from '../modules/ComingSoon';
-import { CompareQuotesScreen, LineByLineScreen } from '../modules/CompareQuotes';
+import {
+  CompareQuotesScreen,
+  LineByLineScreen,
+} from '../modules/CompareQuotes';
 import { PaymentScreen, PaymentSuccessScreen } from '../modules/Payment';
 import { InvitationScreen } from '../modules/Invitation';
 import { JoinScreen } from '../modules/Join';
@@ -19,7 +24,10 @@ import { SettingsScreen } from '../modules/Settings';
 import { SplashScreen } from '../modules/Splash';
 import { IdeaBoardScreen, WorkspaceScreen } from '../modules/Workspace';
 import { selectAuthToken, selectIsAuthHydrated } from '../store/authSlice';
-import { selectHasSeenOnboarding, selectIsOnboardingHydrated } from '../store/onboardingSlice';
+import {
+  selectHasSeenOnboarding,
+  selectIsOnboardingHydrated,
+} from '../store/onboardingSlice';
 import { useAppSelector } from '../store/hooks';
 import { MainTabNavigator } from './MainTabNavigator';
 import type { RootStackParamList } from './types';
@@ -46,6 +54,12 @@ export function RootNavigator() {
           <Stack.Screen name="Workspace" component={WorkspaceScreen} />
           <Stack.Screen name="IdeaBoard" component={IdeaBoardScreen} />
           <Stack.Screen name="Invitations" component={InvitationScreen} />
+          <Stack.Screen name="SeeAll" component={SeeAllScreen} />
+          <Stack.Screen
+            name="OccasionPicker"
+            component={OccasionPickerScreen}
+          />
+          <Stack.Screen name="AreaPicker" component={AreaPickerScreen} />
           <Stack.Screen name="SavedPackages" component={SavedPackagesScreen} />
           <Stack.Screen name="Search" component={SearchScreen} />
           <Stack.Screen name="CompareQuotes" component={CompareQuotesScreen} />
@@ -66,11 +80,16 @@ export function RootNavigator() {
           <Stack.Screen name="LegalSupport" component={LegalSupportScreen} />
           <Stack.Screen name="Contact" component={ContactScreen} />
           {/* Also present here (see below) so verifying OTP mid-onboarding doesn't unmount the wizard. */}
-          <Stack.Screen name="OrganizerOnboarding" component={OrganizerOnboardingScreen} />
+          <Stack.Screen
+            name="OrganizerOnboarding"
+            component={OrganizerOnboardingScreen}
+          />
         </>
       ) : (
         <>
-          {hasSeenOnboarding ? null : <Stack.Screen name="Onboarding" component={OnboardingScreen} />}
+          {hasSeenOnboarding ? null : (
+            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+          )}
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Join" component={JoinScreen} />
           <Stack.Screen name="ComingSoon" component={ComingSoonScreen} />
@@ -78,7 +97,10 @@ export function RootNavigator() {
               screen name is registered in the authenticated branch above too, so
               React Navigation preserves this route's state when the in-flow OTP
               verify flips `token` and swaps which branch renders. */}
-          <Stack.Screen name="OrganizerOnboarding" component={OrganizerOnboardingScreen} />
+          <Stack.Screen
+            name="OrganizerOnboarding"
+            component={OrganizerOnboardingScreen}
+          />
         </>
       )}
     </Stack.Navigator>

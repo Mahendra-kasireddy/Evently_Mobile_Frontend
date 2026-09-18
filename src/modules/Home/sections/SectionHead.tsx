@@ -19,7 +19,12 @@ interface SectionHeadProps {
  * fact about the section, not a control, and making it tappable would promise
  * a screen that does not exist.
  */
-export function SectionHead({ title, subtitle, actionLabel, onPressAction }: SectionHeadProps) {
+export function SectionHead({
+  title,
+  subtitle,
+  actionLabel,
+  onPressAction,
+}: SectionHeadProps) {
   return (
     <View>
       <View style={s.headRow}>
@@ -33,12 +38,12 @@ export function SectionHead({ title, subtitle, actionLabel, onPressAction }: Sec
               accessibilityRole="button"
               accessibilityLabel={`${actionLabel}: ${title}`}
             >
-              <EventlyText variant="body" style={s.action}>
+              <EventlyText variant="button" style={s.action}>
                 {actionLabel}
               </EventlyText>
             </TouchableOpacity>
           ) : (
-            <EventlyText variant="body" style={s.action}>
+            <EventlyText variant="button" style={s.action}>
               {actionLabel}
             </EventlyText>
           )

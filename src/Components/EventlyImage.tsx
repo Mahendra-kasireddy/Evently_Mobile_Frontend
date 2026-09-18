@@ -1,5 +1,12 @@
 import { useState } from 'react';
-import { ActivityIndicator, Image, View, type ImageProps, type StyleProp, type ViewStyle } from 'react-native';
+import {
+  ActivityIndicator,
+  Image,
+  View,
+  type ImageProps,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 import { colors } from '../theme';
 import { EventlyIcon } from './EventlyIcon';
 import { eventlyImageStyles } from './styles';
@@ -14,7 +21,12 @@ interface EventlyImageProps extends Omit<ImageProps, 'source' | 'style'> {
  * The one Image component every screen should use: shows a placeholder icon
  * when there's no source or it fails to load, and a spinner while loading.
  */
-export function EventlyImage({ source, style, fallbackIconName = 'image-off-outline', ...rest }: EventlyImageProps) {
+export function EventlyImage({
+  source,
+  style,
+  fallbackIconName = 'image-off-outline',
+  ...rest
+}: EventlyImageProps) {
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -34,7 +46,11 @@ export function EventlyImage({ source, style, fallbackIconName = 'image-off-outl
   if (!source || !hasUri || hasError) {
     return (
       <View style={[eventlyImageStyles.fallback, style]}>
-        <EventlyIcon name={fallbackIconName} size={24} color={colors.textMuted} />
+        <EventlyIcon
+          name={fallbackIconName}
+          size={24}
+          color={colors.textMuted}
+        />
       </View>
     );
   }

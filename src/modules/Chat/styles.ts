@@ -22,7 +22,7 @@ export const styles = StyleSheet.create({
    * would only take height away from the list.
    */
   header: { paddingHorizontal: GUTTER, paddingTop: spacing.sm, paddingBottom: spacing.md },
-  title: { color: CHAT_NAVY_DEEP, fontSize: 34, fontWeight: '800', letterSpacing: -0.8 },
+  title: { color: CHAT_NAVY_DEEP, fontSize: 34, fontWeight: '700', letterSpacing: -0.8 },
 
   /* Rows own their own left padding so the separators can be inset to the
      avatar while the list itself runs to the edge. */

@@ -16,7 +16,7 @@ import type {
   MainTabParamList,
   RootStackParamList,
 } from '../../navigation/types';
-import type { CouponOffer, CurrentEventViewModel } from './types';
+import type { CouponOffer, CurrentEventViewModel, HeroDraft } from './types';
 import { NameGateSheet } from '../NameCapture';
 import {
   HERO_ACCENT_COLOR,
@@ -25,6 +25,11 @@ import {
 } from './constants';
 import { useOpenWithOrganizer } from '../Chat';
 import { useHomeContainer } from './container';
+import { useOpenEvent } from './useOpenEvent';
+import { CalendarSheet, todayIso } from '../../Components';
+import { GuestsSheet, RangeSheet } from '../Pickers';
+import { usePlanScreenData } from '../Plan/hooks';
+import { Banner } from './sections/Banner';
 import { BookedEventCard } from './sections/BookedEventCard';
 import { EventRow } from './sections/EventRow';
 import { EventHero } from './sections/EventHero';
@@ -34,7 +39,6 @@ import { Offers } from './sections/Offers';
 import { CouponSheet } from './sections/CouponSheet';
 import { Packages } from './sections/Packages';
 import { TopOrganizers } from './sections/TopOrganizers';
-import { TrustStrip } from './sections/TrustStrip';
 import { sectionStyles, styles } from './styles';
 
 type HomeNavigationProp = CompositeNavigationProp<
@@ -85,6 +89,16 @@ export function HomeScreen() {
     packages,
     savedPackageIds,
     toggleSavedPackage,
+    heroDraft,
+    shareBudget,
+    budget,
+    toggleShareBudget,
+    setHeroField,
+    submitHeroDraft,
+    isRequestingQuotes,
+    quotesRequested,
+    quotesErrorMessage,
+    resetQuotesRequest,
     topOrganizers,
     header,
     isLoading,
@@ -98,6 +112,27 @@ export function HomeScreen() {
    * filter: the count on the link is the real total, and the Events tab holds
    * all of them.
    */
+  /*
+   * Which sheet is up. Occasion and Where are screens rather than sheets —
+   * both lists need a search field, and a sheet with the keyboard over it
+   * leaves about four rows visible.
+   */
+  const [openSheet, setOpenSheet] = useState<
+    'when' | 'guests' | 'budget' | null
+  >(null);
+
+  /* The Plan wizard's own bands, so a budget chosen here and one chosen there
+     are the same set — organizers filter on these, and two client-side lists
+     would drift. */
+  const { data: planScreen } = usePlanScreenData();
+  const budgetOptions = planScreen?.budgetOptions ?? [];
+
+  const editField = (field: keyof HeroDraft) => {
+    if (field === 'occasion') return navigation.navigate('OccasionPicker');
+    if (field === 'where') return navigation.navigate('AreaPicker');
+    return setOpenSheet(field);
+  };
+
   const visibleOtherEvents = otherEvents.slice(0, OTHER_EVENTS_ON_HOME);
   const hiddenEventCount = otherEvents.length - visibleOtherEvents.length;
 
@@ -122,34 +157,7 @@ export function HomeScreen() {
     onPressFilters: () => navigation.navigate('Search', { openFilters: true }),
   };
 
-  /**
-   * Where the hero's buttons go — decided by which record the event is, not by
-   * how far along it is.
-   *
-   * It used to turn on the stage, and a submitted request with no quotes yet
-   * matched no branch and fell through to the Plan wizard: a button reading
-   * "See your request" opened a blank new plan. The request's own screen is
-   * CompareQuotes, which loads one request and every quote on it — none is
-   * still a number of quotes, and the brief is on it either way. So a request
-   * opens there whether or not anyone has replied, and only a draft, which
-   * genuinely has nothing else to open, goes back to the wizard.
-   */
-  const openEvent = (event: CurrentEventViewModel) => {
-    if (event.source === 'booking') {
-      return navigation.navigate('Workspace', {
-        bookingId: event.refId,
-        workspaceName: event.title,
-      });
-    }
-    if (event.source === 'quote') {
-      return navigation.navigate('CompareQuotes', {
-        requestId: event.refId,
-        title: event.title,
-      });
-    }
-    return navigation.navigate('Plan');
-  };
-
+  const openEvent = useOpenEvent();
   const handlePressHeroCta = openEvent;
 
   /* "See all quotes & your brief" promises the same screen the button opens. */
@@ -223,6 +231,33 @@ export function HomeScreen() {
           <RefreshControl refreshing={isLoading} onRefresh={refetch} />
         }
       >
+        {/*
+          "Tell us the basics" — the four fields a brief needs, and the button
+          that sends it.
+
+          Always shown, whatever else the customer has. It was gated on having
+          no live event, which sounded reasonable and meant that anyone with a
+          request in flight — most people who use the app twice — never saw it
+          again. Planning a second event is the thing Home is for.
+        */}
+        {banner ? (
+          <Banner
+            data={banner}
+            heroDraft={heroDraft}
+            onEditField={editField}
+            onPickDate={iso => setHeroField('when', iso)}
+            shareBudget={shareBudget}
+            budget={budget}
+            onToggleBudget={toggleShareBudget}
+            onPressBudgetRange={() => setOpenSheet('budget')}
+            onSubmit={submitHeroDraft}
+            isSubmitting={isRequestingQuotes}
+            quotesRequested={quotesRequested}
+            quotesErrorMessage={quotesErrorMessage}
+            onEditAgain={resetQuotesRequest}
+          />
+        ) : null}
+
         {/*
           The booked card replaces the hero for the booking itself — the two are
           two renderings of one event, and stacking them would summarise it
@@ -310,6 +345,10 @@ export function HomeScreen() {
                * to yet.
                */
               onPressOffer={setOpenCoupon}
+              /* The row is a carousel, so most of the coupons are off screen. */
+              onPressSeeAll={() =>
+                navigation.navigate('SeeAll', { kind: 'offers' })
+              }
             />
           </View>
         )}
@@ -360,9 +399,34 @@ export function HomeScreen() {
             />
           </View>
         )}
-
-        {banner?.trust?.length ? <TrustStrip items={banner.trust} /> : null}
       </ScrollView>
+
+      <CalendarSheet
+        visible={openSheet === 'when'}
+        value={heroDraft.when}
+        minIso={todayIso()}
+        title="When is it?"
+        onSelect={iso => setHeroField('when', iso)}
+        onClose={() => setOpenSheet(null)}
+      />
+
+      <RangeSheet
+        visible={openSheet === 'budget'}
+        title="Budget range"
+        subtitle="Organizers quote to this."
+        value={budget}
+        options={budgetOptions}
+        onSelect={value => setHeroField('budget', value)}
+        onClose={() => setOpenSheet(null)}
+      />
+
+      <GuestsSheet
+        visible={openSheet === 'guests'}
+        value={heroDraft.guests}
+        options={banner?.options.guests ?? []}
+        onSelect={value => setHeroField('guests', value)}
+        onClose={() => setOpenSheet(null)}
+      />
 
       <NameGateSheet onNameSaved={refetch} />
       <CouponSheet coupon={openCoupon} onClose={() => setOpenCoupon(null)} />

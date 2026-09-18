@@ -1,4 +1,9 @@
-import { ActivityIndicator, TouchableOpacity, type StyleProp, type ViewStyle } from 'react-native';
+import {
+  ActivityIndicator,
+  TouchableOpacity,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 import { colors } from '../theme';
 import { EventlyText } from './EventlyText';
 import { eventlyButtonStyles } from './styles';
@@ -38,23 +43,39 @@ export function EventlyButton({
     ? variant === 'primary'
       ? { backgroundColor: accentColor }
       : variant === 'outline'
-        ? { borderColor: accentColor }
-        : null
+      ? { borderColor: accentColor }
+      : null
     : null;
-  const accentTextStyle = accentColor && variant === 'outline' ? { color: accentColor } : null;
+  const accentTextStyle =
+    accentColor && variant === 'outline' ? { color: accentColor } : null;
 
   return (
     <TouchableOpacity
-      style={[eventlyButtonStyles.base, eventlyButtonStyles[variant], accentStyle, isDisabled && eventlyButtonStyles.disabled, style]}
+      style={[
+        eventlyButtonStyles.base,
+        eventlyButtonStyles[variant],
+        accentStyle,
+        isDisabled && eventlyButtonStyles.disabled,
+        style,
+      ]}
       onPress={onPress}
       disabled={isDisabled}
       accessibilityRole="button"
       accessibilityState={{ disabled: isDisabled, busy: loading }}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'primary' ? colors.onPrimary : (accentColor ?? colors.primary)} />
+        <ActivityIndicator
+          color={
+            variant === 'primary'
+              ? colors.onPrimary
+              : accentColor ?? colors.primary
+          }
+        />
       ) : (
-        <EventlyText variant="subtitle" style={[TEXT_STYLE_BY_VARIANT[variant], accentTextStyle]}>
+        <EventlyText
+          variant="button"
+          style={[TEXT_STYLE_BY_VARIANT[variant], accentTextStyle]}
+        >
           {title}
         </EventlyText>
       )}

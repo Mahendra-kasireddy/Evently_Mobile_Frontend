@@ -28,7 +28,12 @@ interface ConfettiProps {
 
 export function Confetti({ width = '100%', height = '100%' }: ConfettiProps) {
   return (
-    <Svg width={width} height={height} viewBox="0 0 188 250" preserveAspectRatio="xMidYMid slice">
+    <Svg
+      width={width}
+      height={height}
+      viewBox="0 0 188 250"
+      preserveAspectRatio="xMidYMid slice"
+    >
       {SPECKS.map(([x, y, c], i) =>
         i % 2 === 0 ? (
           <Rect

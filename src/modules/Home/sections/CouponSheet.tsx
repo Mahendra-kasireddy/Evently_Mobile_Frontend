@@ -32,7 +32,11 @@ export function CouponSheet({ coupon, onClose }: CouponSheetProps) {
       accessibilityViewIsModal
     >
       {/* Tapping the dimmed area closes it — the expected way out of a sheet. */}
-      <Pressable style={s.backdrop} onPress={onClose} accessibilityLabel="Close" />
+      <Pressable
+        style={s.backdrop}
+        onPress={onClose}
+        accessibilityLabel="Close"
+      />
 
       {coupon ? (
         <View style={s.sheet}>
@@ -66,7 +70,7 @@ export function CouponSheet({ coupon, onClose }: CouponSheetProps) {
           ) : null}
 
           <View style={s.rows}>
-            {coupon.details.map((row) => (
+            {coupon.details.map(row => (
               <View key={row.label} style={s.row}>
                 <EventlyText variant="body" style={s.rowLabel}>
                   {row.label}
@@ -83,8 +87,8 @@ export function CouponSheet({ coupon, onClose }: CouponSheetProps) {
           <View style={s.note}>
             <EventlyIcon name="information-outline" size={16} color="#5b6470" />
             <EventlyText variant="caption" style={s.noteText}>
-              Enter this code when you confirm a booking. We will check it applies before anything
-              is charged.
+              Enter this code when you confirm a booking. We will check it
+              applies before anything is charged.
             </EventlyText>
           </View>
         </View>

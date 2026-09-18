@@ -24,7 +24,13 @@ import {
   type StepIndices,
 } from './utils';
 import type { NormalizedApiError } from '../../services/errors';
-import type { PlanDraft, PlanOrganizerDTO, PlanScreenDTO, RecommendationArgs, SubmitPhase } from './types';
+import type {
+  PlanDraft,
+  PlanOrganizerDTO,
+  PlanScreenDTO,
+  RecommendationArgs,
+  SubmitPhase,
+} from './types';
 
 const DEFAULT_DRAFT: PlanDraft = {
   occasionId: 'wedding',
@@ -48,7 +54,10 @@ const DEFAULT_DRAFT: PlanDraft = {
  * the review step is deliberate — the organizer still needs the brief, and a
  * quote request with no occasion is one they cannot price.
  */
-function buildInitialDraft(initialOccasionId?: string, initialOrganizerId?: string): PlanDraft {
+function buildInitialDraft(
+  initialOccasionId?: string,
+  initialOrganizerId?: string,
+): PlanDraft {
   return {
     ...DEFAULT_DRAFT,
     ...(initialOccasionId ? { occasionId: initialOccasionId } : {}),
@@ -76,7 +85,10 @@ export interface PlanContainerResult {
   // Draft + navigation
   draft: PlanDraft;
   selectOccasion: (id: string) => void;
-  setField: (field: 'city' | 'area' | 'eventDate' | 'ideas', value: string) => void;
+  setField: (
+    field: 'city' | 'area' | 'eventDate' | 'ideas',
+    value: string,
+  ) => void;
   selectGuests: (value: string) => void;
   selectBudget: (value: string) => void;
   addIdea: (suggestion: string) => void;
@@ -128,10 +140,17 @@ export function usePlanContainer(
   initialOccasionId?: string,
   initialOrganizerId?: string,
 ): PlanContainerResult {
-  const { data: screenDataRaw, loading: screenLoading, error: screenError, refetch: refetchScreen } = usePlanScreenData();
+  const {
+    data: screenDataRaw,
+    loading: screenLoading,
+    error: screenError,
+    refetch: refetchScreen,
+  } = usePlanScreenData();
   const { data: myDraft } = useMyDraft();
 
-  const [draft, setDraft] = useState<PlanDraft>(() => buildInitialDraft(initialOccasionId, initialOrganizerId));
+  const [draft, setDraft] = useState<PlanDraft>(() =>
+    buildInitialDraft(initialOccasionId, initialOrganizerId),
+  );
   const hydratedRef = useRef(false);
 
   // Resume a previously saved draft once it arrives — only patch fields the
@@ -148,7 +167,8 @@ export function usePlanContainer(
     if (myDraft.budget) patch.budget = myDraft.budget;
     if (myDraft.ideas) patch.ideas = myDraft.ideas;
     if (myDraft.categories?.length) patch.categories = myDraft.categories;
-    if (Object.keys(patch).length > 0) setDraft((prev) => ({ ...prev, ...patch }));
+    if (Object.keys(patch).length > 0)
+      setDraft(prev => ({ ...prev, ...patch }));
   }, [myDraft]);
 
   const saveDraftCall = useSaveDraftCallback();
@@ -162,46 +182,82 @@ export function usePlanContainer(
   }, [draft]);
 
   const screenData = screenDataRaw ?? EMPTY_SCREEN;
-  const occasions = useMemo(() => mapOccasions(screenData.occasions ?? []), [screenData.occasions]);
-  const categories = useMemo(() => mapCategories(screenData.categories ?? []), [screenData.categories]);
-  const steps = useMemo(() => ensureReviewStep(screenData.steps ?? []), [screenData.steps]);
+  const occasions = useMemo(
+    () => mapOccasions(screenData.occasions ?? []),
+    [screenData.occasions],
+  );
+  const categories = useMemo(
+    () => mapCategories(screenData.categories ?? []),
+    [screenData.categories],
+  );
+  const steps = useMemo(
+    () => ensureReviewStep(screenData.steps ?? []),
+    [screenData.steps],
+  );
   const stepIndices = useMemo(() => resolveStepIndices(steps), [steps]);
   const currentOccasion = useMemo(
-    () => occasions.find((o) => o.id === draft.occasionId) ?? occasions[0] ?? null,
+    () =>
+      occasions.find(o => o.id === draft.occasionId) ?? occasions[0] ?? null,
     [occasions, draft.occasionId],
   );
 
   const blockReason = blockReasonFor(draft.step, stepIndices, draft);
   const canContinue = !blockReason;
 
-  const selectOccasion = useCallback((id: string) => setDraft((prev) => ({ ...prev, occasionId: id })), []);
-  const setField = useCallback(
-    (field: 'city' | 'area' | 'eventDate' | 'ideas', value: string) => setDraft((prev) => ({ ...prev, [field]: value })),
+  const selectOccasion = useCallback(
+    (id: string) => setDraft(prev => ({ ...prev, occasionId: id })),
     [],
   );
-  const selectGuests = useCallback((value: string) => setDraft((prev) => ({ ...prev, guests: value })), []);
+  const setField = useCallback(
+    (field: 'city' | 'area' | 'eventDate' | 'ideas', value: string) =>
+      setDraft(prev => ({ ...prev, [field]: value })),
+    [],
+  );
+  const selectGuests = useCallback(
+    (value: string) => setDraft(prev => ({ ...prev, guests: value })),
+    [],
+  );
   const selectBudget = useCallback(
-    (value: string) => setDraft((prev) => ({ ...prev, budget: value === prev.budget ? '' : value })),
+    (value: string) =>
+      setDraft(prev => ({
+        ...prev,
+        budget: value === prev.budget ? '' : value,
+      })),
     [],
   );
   const addIdea = useCallback(
-    (suggestion: string) => setDraft((prev) => ({ ...prev, ideas: prev.ideas ? `${prev.ideas}, ${suggestion}` : suggestion })),
+    (suggestion: string) =>
+      setDraft(prev => ({
+        ...prev,
+        ideas: prev.ideas ? `${prev.ideas}, ${suggestion}` : suggestion,
+      })),
     [],
   );
   const toggleCategory = useCallback(
     (id: string) =>
-      setDraft((prev) => ({
+      setDraft(prev => ({
         ...prev,
-        categories: prev.categories.includes(id) ? prev.categories.filter((c) => c !== id) : [...prev.categories, id],
+        categories: prev.categories.includes(id)
+          ? prev.categories.filter(c => c !== id)
+          : [...prev.categories, id],
       })),
     [],
   );
 
-  const goToStep = useCallback((index: number) => setDraft((prev) => ({ ...prev, step: index })), []);
-  const goBack = useCallback(() => setDraft((prev) => ({ ...prev, step: Math.max(prev.step - 1, 0) })), []);
+  const goToStep = useCallback(
+    (index: number) => setDraft(prev => ({ ...prev, step: index })),
+    [],
+  );
+  const goBack = useCallback(
+    () => setDraft(prev => ({ ...prev, step: Math.max(prev.step - 1, 0) })),
+    [],
+  );
   const continueStep = useCallback(() => {
     if (!canContinue) return;
-    setDraft((prev) => ({ ...prev, step: Math.min(prev.step + 1, steps.length - 1) }));
+    setDraft(prev => ({
+      ...prev,
+      step: Math.min(prev.step + 1, steps.length - 1),
+    }));
   }, [canContinue, steps.length]);
 
   const organizersCallback = useOrganizersCallback();
@@ -212,7 +268,12 @@ export function usePlanContainer(
   );
 
   const selectOrganizer = useCallback(
-    (id: string) => setDraft((prev) => ({ ...prev, selectedOrganizerId: id, step: stepIndices.reviewIndex })),
+    (id: string) =>
+      setDraft(prev => ({
+        ...prev,
+        selectedOrganizerId: id,
+        step: stepIndices.reviewIndex,
+      })),
     [stepIndices.reviewIndex],
   );
 
@@ -221,7 +282,9 @@ export function usePlanContainer(
   // queries with only the base plan context, not the Organizers step's
   // tier/rating/category filters or sort order.
   const reviewOrganizersCallback = useOrganizersCallback();
-  const [reviewOrganizers, setReviewOrganizers] = useState<PlanOrganizerDTO[]>([]);
+  const [reviewOrganizers, setReviewOrganizers] = useState<PlanOrganizerDTO[]>(
+    [],
+  );
   useEffect(() => {
     if (draft.step !== stepIndices.reviewIndex) return;
     reviewOrganizersCallback
@@ -235,10 +298,19 @@ export function usePlanContainer(
       .then(setReviewOrganizers)
       .catch(() => undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [draft.step, stepIndices.reviewIndex, draft.categories, draft.occasionId, draft.guests, draft.city, draft.budget]);
+  }, [
+    draft.step,
+    stepIndices.reviewIndex,
+    draft.categories,
+    draft.occasionId,
+    draft.guests,
+    draft.city,
+    draft.budget,
+  ]);
 
   const recommendedOrganizer = reviewOrganizers[0] ?? null;
-  const selectedOrganizerDetails = reviewOrganizers.find((o) => o.id === draft.selectedOrganizerId) ?? null;
+  const selectedOrganizerDetails =
+    reviewOrganizers.find(o => o.id === draft.selectedOrganizerId) ?? null;
 
   // ----- Submit: two-phase (save plan, then request quote), retry-safe -----
   const createPlanCall = useCreatePlanCallback();
@@ -252,7 +324,13 @@ export function usePlanContainer(
     if (!selectedOrganizerDetails) return;
     setSubmitError(null);
 
-    const runQuoteRequest = async () => {
+    /*
+     * The plan id is a parameter rather than read from state: on a first
+     * submission this runs inside the `createPlan` promise, and `savedPlanId`
+     * has not re-rendered yet — reading it there would send `null` and quietly
+     * leave the brief unlinked from the plan it came from.
+     */
+    const runQuoteRequest = async (planId: string | null) => {
       setSubmitPhase('quoting');
       try {
         await requestQuoteCall.execute({
@@ -261,6 +339,20 @@ export function usePlanContainer(
           when: draft.eventDate || undefined,
           where: locationLabel(draft.area, draft.city, '') || undefined,
           guests: draft.guests || undefined,
+          /*
+           * The rest of the brief. It used to stop at the headcount, so an
+           * organizer received a request with no services on it and no idea
+           * what they were being asked to price — the categories the customer
+           * picked in step 2 never left the phone.
+           *
+           * `planId` matters for a different reason: without it the plan and
+           * the request it produced are two unrelated records, and the
+           * customer's single event is listed twice.
+           */
+          planId: planId ?? undefined,
+          budget: draft.budget || undefined,
+          categories: draft.categories.length ? draft.categories : undefined,
+          ideas: draft.ideas.trim() || undefined,
         });
         setSubmitPhase('idle');
         setSubmitSucceeded(true);
@@ -276,16 +368,16 @@ export function usePlanContainer(
     };
 
     if (savedPlanId) {
-      runQuoteRequest().catch(() => undefined);
+      runQuoteRequest(savedPlanId).catch(() => undefined);
       return;
     }
 
     setSubmitPhase('saving');
     createPlanCall
       .execute(draftToUpsert(draft))
-      .then((plan) => {
+      .then(plan => {
         setSavedPlanId(plan.id);
-        return runQuoteRequest();
+        return runQuoteRequest(plan.id);
       })
       .catch((err: unknown) => {
         setSubmitPhase('idle');

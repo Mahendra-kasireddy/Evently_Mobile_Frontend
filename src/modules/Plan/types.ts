@@ -6,7 +6,15 @@ export interface PlanOccasionDTO {
   art: OccasionArtKey;
 }
 
-export type CategoryIcon = 'food' | 'water' | 'decor' | 'photo' | 'music' | 'priest' | 'mehendi' | 'transport';
+export type CategoryIcon =
+  | 'food'
+  | 'water'
+  | 'decor'
+  | 'photo'
+  | 'music'
+  | 'priest'
+  | 'mehendi'
+  | 'transport';
 
 export interface PlanCategoryDTO {
   id: string;
@@ -40,7 +48,13 @@ export interface PlanOrganizerDTO {
   concierge?: boolean;
 }
 
-export type RecommendationSort = 'best' | 'rating' | 'price' | 'events' | 'response' | 'nearest';
+export type RecommendationSort =
+  | 'best'
+  | 'rating'
+  | 'price'
+  | 'events'
+  | 'response'
+  | 'nearest';
 
 export interface PlanFiltersDTO {
   tiers: OrgTier[];
@@ -99,7 +113,12 @@ export interface PlanScreenDTO {
   filters: PlanFiltersDTO;
 }
 
-export type PlanStatus = 'draft' | 'submitted' | 'quoted' | 'booked' | 'cancelled';
+export type PlanStatus =
+  | 'draft'
+  | 'submitted'
+  | 'quoted'
+  | 'booked'
+  | 'cancelled';
 
 /** A persisted event plan returned by the backend (getMyDraft/createPlan/saveDraft). */
 export interface PlanSubmissionDTO {
@@ -147,12 +166,33 @@ export interface RecommendationArgs {
   availableOnly?: boolean;
 }
 
+/**
+ * POST /quote/requestQuoteFromOrganizer — the brief, addressed to one
+ * organizer.
+ *
+ * The four optional fields below used to be missing, and the wizard sent only
+ * the occasion, date, place and headcount: an organizer opened a request for a
+ * wedding and could not see which services had been asked for, because the
+ * customer's choices never left the phone. `RequestQuotesDto` on the server
+ * has accepted all of them the whole time.
+ */
 export interface RequestQuoteFromOrganizerDTO {
   organizerId: string;
   occasion: string;
   when?: string;
   where?: string;
   guests?: string;
+  /**
+   * The plan this brief was raised from. Without it the plan and the request
+   * are two unrelated records, and the customer's one event is listed twice —
+   * once as a plan in progress, once as a brief awaiting replies.
+   */
+  planId?: string;
+  budget?: string;
+  /** The service categories chosen in step 2 — what the organizer is quoting for. */
+  categories?: string[];
+  /** The customer's own words, from "Your ideas & special requests". */
+  ideas?: string;
 }
 
 // ---- Client-only wizard draft (not a DTO — local state, persisted via PlanUpsertDTO) ----

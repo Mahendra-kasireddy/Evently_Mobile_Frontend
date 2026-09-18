@@ -787,6 +787,62 @@ export function mapTools(feed: HomeFeedDTO): ToolsViewModel | null {
   };
 }
 
+/**
+ * Every live event, leading one included, de-duplicated the same way Home's
+ * rows are.
+ *
+ * Home splits the feed into a card and a list of rows; the All events screen
+ * wants them back as one sequence. Composed from the same two mappers rather
+ * than re-reading the DTO, so a de-dupe rule fixed for Home is fixed here too.
+ */
+/**
+ * The day a quick-date chip means, as an ISO date.
+ *
+ * "This weekend" is the coming Saturday — and today when today is already the
+ * weekend, because a customer tapping it on a Saturday means this one.
+ */
+export function quickDateIso(
+  kind: 'weekend' | 'months',
+  months: number,
+  from: Date = new Date(),
+): string {
+  const date = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+
+  if (kind === 'weekend') {
+    const day = date.getDay();
+    // 6 = Saturday, 0 = Sunday. Already there: keep today.
+    const ahead = day === 6 || day === 0 ? 0 : 6 - day;
+    date.setDate(date.getDate() + ahead);
+  } else {
+    date.setMonth(date.getMonth() + months);
+  }
+
+  const pad = (n: number) => (n < 10 ? `0${n}` : String(n));
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+    date.getDate(),
+  )}`;
+}
+
+/**
+ * A date the card can show. `2026-09-21` is a value, not an answer to "when".
+ */
+export function formatWhen(iso: string): string {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso;
+  const [year, month, day] = iso.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  if (Number.isNaN(date.getTime())) return iso;
+  return date.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
+export function mapAllEvents(feed: HomeFeedDTO): CurrentEventViewModel[] {
+  const leading = mapCurrentEvent(feed);
+  return leading ? [leading, ...mapOtherEvents(feed)] : mapOtherEvents(feed);
+}
+
 export function mapHomeFeed(feed: HomeFeedDTO): HomeViewModel {
   return {
     banner: mapBanner(feed),

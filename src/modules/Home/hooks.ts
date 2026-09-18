@@ -2,17 +2,24 @@ import { useCallback, useMemo, useState } from 'react';
 import { fetchSavedPackages } from '../SavedPackages/services';
 import { useSaveAction, useUnsaveAction } from '../SavedPackages/hooks';
 import { useAsync, type AsyncResult } from '../../hooks/useAsync';
-import { useAsyncCallback, type AsyncCallbackResult } from '../../hooks/useAsyncCallback';
-import { fetchHomeFeed, fetchOrganizerProfile, requestQuotes } from './services';
+import {
+  useAsyncCallback,
+  type AsyncCallbackResult,
+} from '../../hooks/useAsyncCallback';
+import {
+  fetchHomeFeed,
+  fetchOrganizerProfile,
+  requestQuotes,
+} from './services';
 import { requestQuoteFromOrganizer } from '../Plan/services';
 import type { RequestQuoteFromOrganizerDTO } from '../Plan/types';
-import type { HeroDraft, HomeFeedDTO, OrganizerProfileDTO } from './types';
+import type { HeroBrief, HomeFeedDTO, OrganizerProfileDTO } from './types';
 
 export function useHomeFeed(): AsyncResult<HomeFeedDTO> {
   return useAsync(fetchHomeFeed, []);
 }
 
-export function useRequestQuotes(): AsyncCallbackResult<[HeroDraft], void> {
+export function useRequestQuotes(): AsyncCallbackResult<[HeroBrief], void> {
   return useAsyncCallback(requestQuotes);
 }
 
@@ -29,7 +36,10 @@ export function useRequestQuoteFromOrganizer(): AsyncCallbackResult<
 }
 
 /** "View Profile" — loaded on demand, when the sheet opens. */
-export function useOrganizerProfile(): AsyncCallbackResult<[string], OrganizerProfileDTO> {
+export function useOrganizerProfile(): AsyncCallbackResult<
+  [string],
+  OrganizerProfileDTO
+> {
   return useAsyncCallback(fetchOrganizerProfile);
 }
 
@@ -54,7 +64,7 @@ export function useSavedPackageIds() {
   const [overrides, setOverrides] = useState<Record<string, boolean>>({});
 
   const savedPackageIds = useMemo(() => {
-    const fromServer = (data ?? []).map((item) => item.id);
+    const fromServer = (data ?? []).map(item => item.id);
     const set = new Set(fromServer);
     Object.entries(overrides).forEach(([id, saved]) => {
       if (saved) set.add(id);
@@ -66,12 +76,12 @@ export function useSavedPackageIds() {
   const toggleSavedPackage = useCallback(
     (packageId: string) => {
       const nextSaved = !savedPackageIds.includes(packageId);
-      setOverrides((current) => ({ ...current, [packageId]: nextSaved }));
+      setOverrides(current => ({ ...current, [packageId]: nextSaved }));
 
       const call = nextSaved ? save : unsave;
       call.execute(packageId).catch(() => {
         // Put the heart back the way it was; the server did not accept it.
-        setOverrides((current) => ({ ...current, [packageId]: !nextSaved }));
+        setOverrides(current => ({ ...current, [packageId]: !nextSaved }));
       });
     },
     [save, unsave, savedPackageIds],

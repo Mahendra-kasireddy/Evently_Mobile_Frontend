@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 1.1,
   },
-  amount: { color: colors.onPrimary, fontSize: 38, fontWeight: '800', marginTop: 8, letterSpacing: -1 },
+  amount: { color: colors.onPrimary, fontSize: 38, fontWeight: '700', marginTop: 8, letterSpacing: -1 },
   totalLine: { color: 'rgba(255,255,255,0.62)', fontSize: 14, marginTop: 6, lineHeight: 20 },
   couponLine: { color: '#7fd6b3', fontSize: 13.5, fontWeight: '600', marginTop: 8 },
 

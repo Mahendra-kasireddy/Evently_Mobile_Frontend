@@ -15,7 +15,13 @@ interface EventHeroProps {
 }
 
 /** One organizer's reply, priced against the cheapest one. */
-function QuoteRowView({ quote, onPress }: { quote: QuoteRow; onPress?: () => void }) {
+function QuoteRowView({
+  quote,
+  onPress,
+}: {
+  quote: QuoteRow;
+  onPress?: () => void;
+}) {
   const body = (
     <>
       <View style={[s.quoteAvatar, { backgroundColor: quote.avatarColor }]}>
@@ -86,7 +92,12 @@ export function EventHero({
   onPressQuote,
 }: EventHeroProps) {
   const hasQuotes = event.quoteRows.length > 0;
-  const spoken = [event.stageLabel, event.title, event.factsLine, event.reachLine]
+  const spoken = [
+    event.stageLabel,
+    event.title,
+    event.factsLine,
+    event.reachLine,
+  ]
     .filter(Boolean)
     .join('. ');
 
@@ -121,7 +132,11 @@ export function EventHero({
       {/* Only while the brief is still taking quotes. */}
       {event.closesLabel && hasQuotes ? (
         <View style={s.closesPill}>
-          <EventlyIcon name="clock-outline" size={15} color={colors.onPrimary} />
+          <EventlyIcon
+            name="clock-outline"
+            size={15}
+            color={colors.onPrimary}
+          />
           <EventlyText variant="caption" style={s.closesText}>
             {event.closesLabel}
           </EventlyText>
@@ -130,7 +145,7 @@ export function EventHero({
 
       {hasQuotes ? (
         <>
-          {event.quoteRows.map((quote) => (
+          {event.quoteRows.map(quote => (
             <QuoteRowView
               key={quote.id}
               quote={quote}
@@ -141,7 +156,11 @@ export function EventHero({
           {event.awaitingLabel ? (
             <View style={s.awaitingRow}>
               <View style={s.awaitingSlot} />
-              <EventlyText variant="body" style={s.awaitingText} numberOfLines={2}>
+              <EventlyText
+                variant="body"
+                style={s.awaitingText}
+                numberOfLines={2}
+              >
                 {event.awaitingLabel}
               </EventlyText>
             </View>

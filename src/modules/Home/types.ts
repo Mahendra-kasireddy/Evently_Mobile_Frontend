@@ -18,6 +18,17 @@ export interface HeroDraft {
   guests: string;
 }
 
+/**
+ * What "Get quotes" actually posts.
+ *
+ * `HeroDraft` stays the four rows the card draws — several maps are keyed on
+ * it — and the budget rides along separately, because it is optional to the
+ * customer and therefore optional on the wire.
+ */
+export interface HeroBrief extends HeroDraft {
+  budget?: string;
+}
+
 export interface HeroOptions {
   occasion: string[];
   when: string[];
@@ -44,9 +55,21 @@ export interface HeroContentDTO {
   trust: TrustItemDTO[];
 }
 
-export type OccasionIcon = 'heart' | 'gift' | 'home' | 'sparkles' | 'star' | 'briefcase';
+export type OccasionIcon =
+  | 'heart'
+  | 'gift'
+  | 'home'
+  | 'sparkles'
+  | 'star'
+  | 'briefcase';
 
-export type OccasionArtKey = 'wedding' | 'birthday' | 'housewarming' | 'naming' | 'anniversary' | 'corporate';
+export type OccasionArtKey =
+  | 'wedding'
+  | 'birthday'
+  | 'housewarming'
+  | 'naming'
+  | 'anniversary'
+  | 'corporate';
 
 export interface OccasionCardDTO {
   id: string;
@@ -259,7 +282,11 @@ export interface QuoteRowDTO {
  * Statuses a live booking can be in behind the Home "BOOKED" card. Mirrors the
  * backend's LIVE_BOOKING_STATUSES — terminal states never reach this card.
  */
-export type BookedEventStatus = 'pending' | 'awaiting_organizer' | 'confirmed' | 'in_progress';
+export type BookedEventStatus =
+  | 'pending'
+  | 'awaiting_organizer'
+  | 'confirmed'
+  | 'in_progress';
 
 export interface BookedStepDTO {
   label: string;

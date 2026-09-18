@@ -106,7 +106,7 @@ describe('the workspace back arrow', () => {
   });
 });
 
-describe("the home card's buttons", () => {
+describe('where an event opens', () => {
   /*
    * "See your request" opened the Plan wizard.
    *
@@ -116,7 +116,10 @@ describe("the home card's buttons", () => {
    * — fell through to `navigate('Plan')`. So the commonest state of a brand
    * new request, the one the label is written for, opened a blank new plan.
    */
-  const home = () => read('modules', 'Home', 'HomeScreen.tsx');
+  /* One handler, shared by Home's card and the All events list — two screens
+     that led to different places for the same event would be drift nobody
+     notices until a customer reports it. */
+  const home = () => read('modules', 'Home', 'useOpenEvent.ts');
 
   it('opens a request on its own screen, replied to or not', () => {
     // CompareQuotes loads one request and every quote on it. None is still a
@@ -144,6 +147,26 @@ describe("the home card's buttons", () => {
     // One `navigate('Plan')`, in the fall-through — the case that genuinely
     // has nothing else to open.
     expect(home().match(/navigate\('Plan'\)/g) ?? []).toHaveLength(1);
+  });
+
+  it('decides in one place, so the two lists cannot drift', () => {
+    /*
+     * Home's card and the All events list show the same events. Routing them
+     * separately is the kind of divergence nobody notices until a customer
+     * reports that one of them goes somewhere else, so both defer to the hook
+     * and neither reimplements the per-source branch.
+     */
+    const screen = read('modules', 'Home', 'HomeScreen.tsx');
+    const list = read('modules', 'Home', 'SeeAllScreen.tsx');
+
+    expect(screen).toContain('useOpenEvent');
+    expect(list).toContain('useOpenEvent');
+    // The branch itself — `source === 'booking'` deciding a destination —
+    // appears only in the hook. (Both screens may still link to a screen
+    // directly for something that is not "open this event": the hero's
+    // per-quote rows, the booked card's own tap.)
+    expect(screen).not.toContain("source === 'booking'");
+    expect(list).not.toContain("source === 'booking'");
   });
 });
 

@@ -14,7 +14,13 @@ import Svg, {
 
 // Ported verbatim from the web app's shared/reusable/OccasionArt/OccasionArt.tsx —
 // same viewBoxes/coordinates/gradient stops/colors per occasion, just RN SVG element names.
-export type OccasionArtKey = 'wedding' | 'birthday' | 'housewarming' | 'naming' | 'anniversary' | 'corporate';
+export type OccasionArtKey =
+  | 'wedding'
+  | 'birthday'
+  | 'housewarming'
+  | 'naming'
+  | 'anniversary'
+  | 'corporate';
 
 const FLOWER_PETALS: Array<[number, number]> = [
   [0, -3.3],
@@ -24,7 +30,17 @@ const FLOWER_PETALS: Array<[number, number]> = [
   [-3.1, -1],
 ];
 
-function Flower({ x, y, c, s = 1 }: { x: number; y: number; c: string; s?: number }) {
+function Flower({
+  x,
+  y,
+  c,
+  s = 1,
+}: {
+  x: number;
+  y: number;
+  c: string;
+  s?: number;
+}) {
   return (
     <G transform={`translate(${x} ${y}) scale(${s})`}>
       {FLOWER_PETALS.map(([px, py], i) => (
@@ -36,7 +52,11 @@ function Flower({ x, y, c, s = 1 }: { x: number; y: number; c: string; s?: numbe
 }
 
 function Sparkle({ x, y, r = 3 }: { x: number; y: number; r?: number }) {
-  const d = `M${x} ${y - r} L${x + r * 0.32} ${y - r * 0.32} L${x + r} ${y} L${x + r * 0.32} ${y + r * 0.32} L${x} ${y + r} L${x - r * 0.32} ${y + r * 0.32} L${x - r} ${y} L${x - r * 0.32} ${y - r * 0.32} Z`;
+  const d = `M${x} ${y - r} L${x + r * 0.32} ${y - r * 0.32} L${x + r} ${y} L${
+    x + r * 0.32
+  } ${y + r * 0.32} L${x} ${y + r} L${x - r * 0.32} ${y + r * 0.32} L${
+    x - r
+  } ${y} L${x - r * 0.32} ${y - r * 0.32} Z`;
   return <Path d={d} fill="#fff" opacity={0.85} />;
 }
 
@@ -46,7 +66,11 @@ interface OccasionArtProps {
   height?: number | string;
 }
 
-export function OccasionArt({ art, width = '100%', height = '100%' }: OccasionArtProps) {
+export function OccasionArt({
+  art,
+  width = '100%',
+  height = '100%',
+}: OccasionArtProps) {
   switch (art) {
     case 'wedding': {
       const flowers: Array<[number, number, string, number]> = [
@@ -71,7 +95,12 @@ export function OccasionArt({ art, width = '100%', height = '100%' }: OccasionAr
             </RadialGradient>
           </Defs>
           <Ellipse cx={60} cy={64} rx={52} ry={40} fill="url(#wedGlow)" />
-          <Path d="M18 92 A46 50 0 0 1 102 92" stroke="rgba(255,255,255,0.14)" strokeWidth={2} fill="none" />
+          <Path
+            d="M18 92 A46 50 0 0 1 102 92"
+            stroke="rgba(255,255,255,0.14)"
+            strokeWidth={2}
+            fill="none"
+          />
           {flowers.map(([x, y, c, s], i) => (
             <Flower key={i} x={x} y={y} c={c} s={s} />
           ))}
@@ -96,7 +125,14 @@ export function OccasionArt({ art, width = '100%', height = '100%' }: OccasionAr
           </Defs>
           {balloons.map(([x, y, c], i) => (
             <G key={i}>
-              <Line x1={x} y1={y + 13} x2={57} y2={74} stroke="rgba(255,255,255,0.22)" strokeWidth={1} />
+              <Line
+                x1={x}
+                y1={y + 13}
+                x2={57}
+                y2={74}
+                stroke="rgba(255,255,255,0.22)"
+                strokeWidth={1}
+              />
               <Ellipse cx={x} cy={y} rx={8.6} ry={11} fill={c} />
               <Ellipse cx={x} cy={y} rx={8.6} ry={11} fill="url(#balHi)" />
               <Path d={`M${x} ${y + 11} l-2 3 h4 z`} fill={c} />
@@ -105,7 +141,12 @@ export function OccasionArt({ art, width = '100%', height = '100%' }: OccasionAr
           <Rect x={45} y={74} width={27} height={16} rx={2} fill="#e8633a" />
           <Rect x={45} y={74} width={27} height={5.5} rx={2} fill="#f4d35e" />
           <Rect x={56} y={74} width={5} height={16} fill="#f4d35e" />
-          <Path d="M55 74 q3.5 -7 3.5 0 q0 -7 3.5 0" fill="none" stroke="#f4d35e" strokeWidth={1.6} />
+          <Path
+            d="M55 74 q3.5 -7 3.5 0 q0 -7 3.5 0"
+            fill="none"
+            stroke="#f4d35e"
+            strokeWidth={1.6}
+          />
         </Svg>
       );
     }
@@ -144,8 +185,18 @@ export function OccasionArt({ art, width = '100%', height = '100%' }: OccasionAr
               <Stop offset={1} stopColor="#f3b63f" />
             </LinearGradient>
           </Defs>
-          <Path d="M46 24 a18 18 0 1 0 16 29 A15 15 0 1 1 46 24Z" fill="url(#nMoon)" />
-          <Line x1={78} y1={36} x2={78} y2={52} stroke="rgba(255,255,255,0.4)" strokeWidth={1.2} />
+          <Path
+            d="M46 24 a18 18 0 1 0 16 29 A15 15 0 1 1 46 24Z"
+            fill="url(#nMoon)"
+          />
+          <Line
+            x1={78}
+            y1={36}
+            x2={78}
+            y2={52}
+            stroke="rgba(255,255,255,0.4)"
+            strokeWidth={1.2}
+          />
           <Circle cx={78} cy={55} r={3.2} fill="#e8633a" />
           <Path
             d="M38 70 a23 13 0 0 0 44 0"
@@ -179,9 +230,32 @@ export function OccasionArt({ art, width = '100%', height = '100%' }: OccasionAr
               <Stop offset={1} stopColor="#c79a36" />
             </LinearGradient>
           </Defs>
-          <Circle cx={50} cy={56} r={18} stroke="url(#aGold)" strokeWidth={5} fill="none" />
-          <Circle cx={70} cy={56} r={18} stroke="url(#aGold)" strokeWidth={5} opacity={0.92} fill="none" />
-          <Ellipse cx={44} cy={49} rx={3} ry={6} fill="#fff" opacity={0.4} transform="rotate(-30 44 49)" />
+          <Circle
+            cx={50}
+            cy={56}
+            r={18}
+            stroke="url(#aGold)"
+            strokeWidth={5}
+            fill="none"
+          />
+          <Circle
+            cx={70}
+            cy={56}
+            r={18}
+            stroke="url(#aGold)"
+            strokeWidth={5}
+            opacity={0.92}
+            fill="none"
+          />
+          <Ellipse
+            cx={44}
+            cy={49}
+            rx={3}
+            ry={6}
+            fill="#fff"
+            opacity={0.4}
+            transform="rotate(-30 44 49)"
+          />
           {(
             [
               [34, 30, '#e8633a'],
@@ -192,7 +266,9 @@ export function OccasionArt({ art, width = '100%', height = '100%' }: OccasionAr
           ).map(([x, y, c], i) => (
             <Path
               key={i}
-              d={`M${x} ${y + 3.4} l-3.4 -3.4 a2.2 2.2 0 0 1 3.4 -3.4 a2.2 2.2 0 0 1 3.4 3.4 z`}
+              d={`M${x} ${
+                y + 3.4
+              } l-3.4 -3.4 a2.2 2.2 0 0 1 3.4 -3.4 a2.2 2.2 0 0 1 3.4 3.4 z`}
               fill={c}
               opacity={0.9}
             />

@@ -23,10 +23,14 @@ export const fontFamilies = {
 } as const;
 
 /**
- * The face for a weight. Poppins ships nine; five are bundled, and anything
- * between them rounds to the nearest bundled face rather than falling back to
- * the system font — a missing face on Android renders as Roboto, which is far
- * more visible than a weight being 100 heavier than asked for.
+ * The face for a weight.
+ *
+ * Poppins ships nine and five are bundled. The design system uses four — 400,
+ * 500, 600, 700 — and ExtraBold stays mapped for anything that still asks for
+ * it, so a weight always resolves to a real face. Anything between the
+ * bundled ones rounds to the nearest rather than falling back to the system
+ * font: a missing face on Android renders as Roboto, which is far more visible
+ * than a weight being 100 heavier than asked for.
  */
 export function fontFor(weight: TextStyle['fontWeight']): string {
   switch (weight) {

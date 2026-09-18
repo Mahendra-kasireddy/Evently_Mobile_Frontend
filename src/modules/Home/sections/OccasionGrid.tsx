@@ -13,7 +13,13 @@ interface OccasionGridProps {
 }
 
 /** The gradient layer, filling the tile behind its content. */
-const FILL = { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 } as const;
+const FILL = {
+  position: 'absolute',
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0,
+} as const;
 
 function Tile({ tile, onPress }: { tile: OccasionTile; onPress: () => void }) {
   const [start, end] = CATEGORY_GRADIENT[tile.art];
@@ -29,7 +35,9 @@ function Tile({ tile, onPress }: { tile: OccasionTile; onPress: () => void }) {
       activeOpacity={0.9}
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={tile.note ? `${tile.label}. ${tile.note}.` : tile.label}
+      accessibilityLabel={
+        tile.note ? `${tile.label}. ${tile.note}.` : tile.label
+      }
     >
       {/*
         The gradient is painted either way. With a photo it is what the image
@@ -37,20 +45,35 @@ function Tile({ tile, onPress }: { tile: OccasionTile; onPress: () => void }) {
         tile is never a blank rectangle, whatever happens to the file.
       */}
       <View style={FILL}>
-        <Svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <Svg
+          width="100%"
+          height="100%"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+        >
           <Defs>
             <LinearGradient id={gradientId} x1="12%" y1="0%" x2="88%" y2="100%">
               <Stop offset="0" stopColor={start} />
               <Stop offset="1" stopColor={end} />
             </LinearGradient>
           </Defs>
-          <Rect x={0} y={0} width={100} height={100} fill={`url(#${gradientId})`} />
+          <Rect
+            x={0}
+            y={0}
+            width={100}
+            height={100}
+            fill={`url(#${gradientId})`}
+          />
         </Svg>
       </View>
 
       {tile.photoUrl ? (
         <>
-          <Image source={{ uri: tile.photoUrl }} style={FILL} resizeMode="cover" />
+          <Image
+            source={{ uri: tile.photoUrl }}
+            style={FILL}
+            resizeMode="cover"
+          />
           {/*
             The label and the price line sit on top of whatever was uploaded, so
             they need a guaranteed dark ground rather than luck with the photo.
@@ -61,7 +84,11 @@ function Tile({ tile, onPress }: { tile: OccasionTile; onPress: () => void }) {
 
       <View style={s.tileBody}>
         <View style={s.iconChip}>
-          <EventlyIcon name={CATEGORY_ICON_NAME[tile.icon]} size={21} color={colors.onPrimary} />
+          <EventlyIcon
+            name={CATEGORY_ICON_NAME[tile.icon]}
+            size={21}
+            color={colors.onPrimary}
+          />
         </View>
         <View>
           <EventlyText variant="h2" style={s.label} numberOfLines={1}>
@@ -93,8 +120,12 @@ export function OccasionGrid({ data, onPressOccasion }: OccasionGridProps) {
     <View>
       <SectionHead title={data.title} subtitle={data.subtitle} />
       <View style={s.grid}>
-        {data.items.map((tile) => (
-          <Tile key={tile.id} tile={tile} onPress={() => onPressOccasion(tile.id)} />
+        {data.items.map(tile => (
+          <Tile
+            key={tile.id}
+            tile={tile}
+            onPress={() => onPressOccasion(tile.id)}
+          />
         ))}
       </View>
     </View>

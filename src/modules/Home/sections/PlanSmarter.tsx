@@ -14,7 +14,11 @@ function ToolCard({ item }: { item: ToolItem }) {
   return (
     <View style={planSmarterStyles.card}>
       <View style={[planSmarterStyles.iconBadge, { backgroundColor: accent }]}>
-        <EventlyIcon name={TOOL_ICON_NAME[item.icon]} size={20} color={colors.onPrimary} />
+        <EventlyIcon
+          name={TOOL_ICON_NAME[item.icon]}
+          size={20}
+          color={colors.onPrimary}
+        />
       </View>
       <EventlyText variant="subtitle" style={planSmarterStyles.cardTitle}>
         {item.title}
@@ -36,7 +40,7 @@ export function PlanSmarter({ data }: PlanSmarterProps) {
         {data.subtitle}
       </EventlyText>
       <View style={planSmarterStyles.list}>
-        {data.tools.map((tool) => (
+        {data.tools.map(tool => (
           <ToolCard key={tool.id} item={tool} />
         ))}
       </View>

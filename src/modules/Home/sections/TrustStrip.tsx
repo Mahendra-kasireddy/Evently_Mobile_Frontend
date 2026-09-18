@@ -20,9 +20,13 @@ export function TrustStrip({ items }: TrustStripProps) {
 
   return (
     <View style={s.row}>
-      {items.map((item) => (
+      {items.map(item => (
         <View key={item.label} style={s.card}>
-          <EventlyIcon name={TRUST_ICON_NAME[item.icon]} size={19} color={HOME_GREEN} />
+          <EventlyIcon
+            name={TRUST_ICON_NAME[item.icon]}
+            size={19}
+            color={HOME_GREEN}
+          />
           <EventlyText variant="caption" style={s.label} numberOfLines={3}>
             {item.label}
           </EventlyText>

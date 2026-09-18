@@ -6,19 +6,32 @@ import { SectionHead } from './SectionHead';
 import type { CouponOffer, CouponsViewModel } from '../types';
 
 interface OffersProps {
+  /** Opens the full list. The row is a carousel, so most of it is off screen. */
+  onPressSeeAll: () => void;
   data: CouponsViewModel;
   /** Opens the coupon's full terms. */
   onPressOffer: (coupon: CouponOffer) => void;
 }
 
-function OfferCard({ coupon, onPress }: { coupon: CouponOffer; onPress: () => void }) {
+export function OfferCard({
+  coupon,
+  onPress,
+}: {
+  coupon: CouponOffer;
+  onPress: () => void;
+}) {
   return (
     <TouchableOpacity
       style={[s.card, coupon.tone === 'navy' ? s.cardNavy : s.cardAccent]}
       activeOpacity={0.9}
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={[`Coupon ${coupon.code}`, coupon.title, coupon.terms, coupon.ctaLabel]
+      accessibilityLabel={[
+        `Coupon ${coupon.code}`,
+        coupon.title,
+        coupon.terms,
+        coupon.ctaLabel,
+      ]
         .filter(Boolean)
         .join('. ')}
     >
@@ -59,17 +72,23 @@ function OfferCard({ coupon, onPress }: { coupon: CouponOffer; onPress: () => vo
  * left, and not already used up by this customer, so an empty list means there
  * genuinely are none rather than that something failed to load.
  */
-export function Offers({ data, onPressOffer }: OffersProps) {
+export function Offers({ data, onPressOffer, onPressSeeAll }: OffersProps) {
   return (
     <View>
-      <SectionHead title={data.title} actionLabel={data.countLabel} />
+      <SectionHead
+        title={data.title}
+        actionLabel="See all"
+        onPressAction={onPressSeeAll}
+      />
       <FlatList
         data={data.items}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={s.list}
-        renderItem={({ item }) => <OfferCard coupon={item} onPress={() => onPressOffer(item)} />}
+        renderItem={({ item }) => (
+          <OfferCard coupon={item} onPress={() => onPressOffer(item)} />
+        )}
       />
     </View>
   );

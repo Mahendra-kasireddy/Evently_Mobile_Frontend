@@ -36,7 +36,7 @@ export const statStyles = StyleSheet.create({
     gap: spacing.xs,
   },
   iconBadge: { width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
-  value: { color: OH_NAVY, fontSize: 20, fontWeight: '800' },
+  value: { color: OH_NAVY, fontSize: 20, fontWeight: '700' },
   label: { color: OH_TEXT_MUTED },
   delta: { color: '#1d9e75', fontWeight: '700' },
   deltaDown: { color: '#dc2626' },

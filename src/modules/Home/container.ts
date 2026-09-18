@@ -1,10 +1,26 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { useEnsureLocation } from '../../hooks/useEnsureLocation';
-import { selectLocationPlace, selectLocationStatus } from '../../store/locationSlice';
-import { useAppSelector } from '../../store/hooks';
+import {
+  selectLocationPlace,
+  selectLocationStatus,
+} from '../../store/locationSlice';
+import {
+  seedHeroDraft,
+  selectHeroDraft,
+  setHeroDraftField,
+  setShareBudget,
+  type HeroDraftTextField,
+} from '../../store/heroDraftSlice';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { todayIso } from '../../Components';
+import { DEFAULT_GUESTS } from '../Pickers/constants';
 import { useSavedPackageIds } from './hooks';
-import { useHomeFeed, useRequestQuotes, useRequestQuoteFromOrganizer } from './hooks';
+import {
+  useHomeFeed,
+  useRequestQuotes,
+  useRequestQuoteFromOrganizer,
+} from './hooks';
 import { mapHomeFeed } from './utils';
 import type { HeroDraft, HomeHeaderViewModel, HomeViewModel } from './types';
 
@@ -28,8 +44,12 @@ export interface HomeContainerResult extends HomeViewModel {
   isError: boolean;
   errorMessage: string | null;
   refetch: () => void;
-  heroDraft: HeroDraft | null;
-  setHeroField: (field: keyof HeroDraft, value: string) => void;
+  heroDraft: HeroDraft;
+  /** The range the customer picked, '' while sharing is off. */
+  budget: string;
+  shareBudget: boolean;
+  toggleShareBudget: (enabled: boolean) => void;
+  setHeroField: (field: HeroDraftTextField, value: string) => void;
   submitHeroDraft: () => void;
   isRequestingQuotes: boolean;
   quotesRequested: boolean;
@@ -78,33 +98,83 @@ export function useHomeContainer(): HomeContainerResult {
   // Shared with the Location screen — fetched at most once per session, not
   // re-requested on every Home render.
   useEnsureLocation();
+  const dispatch = useAppDispatch();
   const locationStatus = useAppSelector(selectLocationStatus);
   const locationPlace = useAppSelector(selectLocationPlace);
 
-  const viewModel = useMemo<HomeViewModel>(() => (data ? mapHomeFeed(data) : EMPTY_VIEW_MODEL), [data]);
+  const viewModel = useMemo<HomeViewModel>(
+    () => (data ? mapHomeFeed(data) : EMPTY_VIEW_MODEL),
+    [data],
+  );
 
   // Hero "your event so far" draft — client-side only until "Get quotes" is
-  // submitted, seeded once from the backend's defaultDraft.
-  const [heroDraft, setHeroDraft] = useState<HeroDraft | null>(null);
+  /*
+   * The draft lives in the store, not here.
+   *
+   * Two of its four fields are edited on their own screens — occasion and area
+   * each open a search screen — and a picker that had to hand its answer back
+   * through navigation params would need to know which screen pushed it.
+   */
+  const storedDraft = useAppSelector(selectHeroDraft);
   const [quotesRequested, setQuotesRequested] = useState(false);
   const requestQuotesCall = useRequestQuotes();
 
+  /*
+   * Seeded once, from the feed where it has one and from the app's own
+   * defaults where it does not: today's date and a hundred guests, so the card
+   * opens answerable rather than blank. `seedHeroDraft` ignores a second call,
+   * so a refetch never resets what the customer has since chosen.
+   */
   useEffect(() => {
-    if (viewModel.banner && !heroDraft) {
-      setHeroDraft(viewModel.banner.defaultDraft);
-    }
+    dispatch(
+      seedHeroDraft({
+        ...(viewModel.banner?.defaultDraft ?? {}),
+        when: todayIso(),
+        guests: DEFAULT_GUESTS,
+      }),
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewModel.banner]);
 
-  const setHeroField = useCallback((field: keyof HeroDraft, value: string) => {
-    setHeroDraft((prev) => (prev ? { ...prev, [field]: value } : prev));
-    setQuotesRequested(false);
-  }, []);
+  /* Memoised because it is a dependency of the two submit callbacks, and a
+     fresh object each render would rebuild both on every keystroke elsewhere
+     on the screen. */
+  const heroDraft: HeroDraft = useMemo(
+    () => ({
+      occasion: storedDraft.occasion,
+      when: storedDraft.when,
+      where: storedDraft.where,
+      guests: storedDraft.guests,
+    }),
+    [
+      storedDraft.occasion,
+      storedDraft.when,
+      storedDraft.where,
+      storedDraft.guests,
+    ],
+  );
+
+  const setHeroField = useCallback(
+    (field: HeroDraftTextField, value: string) => {
+      dispatch(setHeroDraftField({ field, value }));
+      setQuotesRequested(false);
+    },
+    [dispatch],
+  );
+
+  const toggleShareBudget = useCallback(
+    (enabled: boolean) => {
+      dispatch(setShareBudget(enabled));
+      setQuotesRequested(false);
+    },
+    [dispatch],
+  );
 
   const submitHeroDraft = useCallback(() => {
-    if (!heroDraft) return;
     requestQuotesCall
-      .execute(heroDraft)
+      /* The budget rides along only while sharing is on — the slice clears it
+         when the switch goes off, so this cannot send a withdrawn value. */
+      .execute({ ...heroDraft, budget: storedDraft.budget || undefined })
       .then(() => {
         setQuotesRequested(true);
         /*
@@ -123,14 +193,18 @@ export function useHomeContainer(): HomeContainerResult {
       .catch(() => {
         // error already captured in requestQuotesCall.error
       });
-  }, [heroDraft, refetch, requestQuotesCall]);
+  }, [heroDraft, storedDraft.budget, refetch, requestQuotesCall]);
 
   const resetQuotesRequest = useCallback(() => setQuotesRequested(false), []);
 
   // --- organizer section --------------------------------------------------
   const organizerQuoteCall = useRequestQuoteFromOrganizer();
-  const [organizerRequestedIds, setOrganizerRequestedIds] = useState<string[]>([]);
-  const [organizerRequestingId, setOrganizerRequestingId] = useState<string | null>(null);
+  const [organizerRequestedIds, setOrganizerRequestedIds] = useState<string[]>(
+    [],
+  );
+  const [organizerRequestingId, setOrganizerRequestingId] = useState<
+    string | null
+  >(null);
 
   /*
    * Sends the customer's current draft to one named organizer. The draft is
@@ -139,7 +213,7 @@ export function useHomeContainer(): HomeContainerResult {
    */
   const requestQuoteFrom = useCallback(
     (organizerId: string) => {
-      if (!heroDraft || organizerRequestingId) return;
+      if (organizerRequestingId) return;
       setOrganizerRequestingId(organizerId);
       organizerQuoteCall
         .execute({
@@ -150,7 +224,9 @@ export function useHomeContainer(): HomeContainerResult {
           guests: heroDraft.guests,
         })
         .then(() => {
-          setOrganizerRequestedIds((prev) => (prev.includes(organizerId) ? prev : [...prev, organizerId]));
+          setOrganizerRequestedIds(prev =>
+            prev.includes(organizerId) ? prev : [...prev, organizerId],
+          );
           // The feed's current-event card should reflect the new request.
           refetch();
         })
@@ -161,7 +237,6 @@ export function useHomeContainer(): HomeContainerResult {
     },
     [heroDraft, organizerRequestingId, organizerQuoteCall, refetch],
   );
-
 
   const { savedPackageIds, toggleSavedPackage } = useSavedPackageIds();
 
@@ -197,6 +272,9 @@ export function useHomeContainer(): HomeContainerResult {
     errorMessage: error?.message ?? null,
     refetch,
     heroDraft,
+    budget: storedDraft.budget,
+    shareBudget: storedDraft.shareBudget,
+    toggleShareBudget,
     setHeroField,
     submitHeroDraft,
     isRequestingQuotes: requestQuotesCall.loading,

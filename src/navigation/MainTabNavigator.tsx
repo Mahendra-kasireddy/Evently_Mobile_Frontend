@@ -29,7 +29,9 @@ interface TabIconProps {
 }
 
 function TabIcon({ routeName, color, size }: TabIconProps) {
-  return <EventlyIcon name={TAB_ICON_NAME[routeName]} color={color} size={size} />;
+  return (
+    <EventlyIcon name={TAB_ICON_NAME[routeName]} color={color} size={size} />
+  );
 }
 
 export function MainTabNavigator() {
@@ -51,13 +53,18 @@ export function MainTabNavigator() {
          */
         tabBarActiveTintColor: BOOKING_ACCENT,
         tabBarInactiveTintColor: colors.textMuted,
-        tabBarIcon: ({ color, size }) => <TabIcon routeName={route.name} color={color} size={size} />,
+        tabBarIcon: ({ color, size }) => (
+          <TabIcon routeName={route.name} color={color} size={size} />
+        ),
       })}
     >
       {/* The organizer dashboard replaces the customer feed only while the
           organizer view is active — switched from Profile. Plan/Chat/Profile
           stay shared for now. */}
-      <Tab.Screen name="Home" component={isOrganizer ? OrganizerHomeScreen : HomeScreen} />
+      <Tab.Screen
+        name="Home"
+        component={isOrganizer ? OrganizerHomeScreen : HomeScreen}
+      />
       <Tab.Screen name="Plan" component={PlanScreen} />
       {/* The customer's events, alongside Plan and Chat — shared for now, in
           the same way those are, rather than hidden behind the view switch. */}
