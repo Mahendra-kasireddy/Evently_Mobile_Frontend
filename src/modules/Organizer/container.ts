@@ -10,6 +10,10 @@ export interface OrganizerContainerResult {
   organizer: OrganizerViewModel | null;
   /** The reviews summary — zeros until any exist, never a failure. */
   summary: ReviewSummaryDTO;
+  /** The histogram, already sized for the bars. */
+  bars: RatingBar[];
+  /** The single review shown inline. Null until one exists. */
+  latestReview: ReviewDTO | null;
   isLoading: boolean;
   isError: boolean;
   errorMessage: string | null;
@@ -20,6 +24,12 @@ export function useOrganizerContainer(organizerId: string): OrganizerContainerRe
   const { data, loading, error, refetch } = useOrganizer(organizerId);
   const categories = useServiceCategories();
   const summary = useReviewSummary(organizerId);
+  /*
+   * The profile shows one review, so it asks for the first page and takes the
+   * head of it. The reviews screen makes the same call, which React Navigation
+   * keeps warm — opening "All reviews" from here costs no second round trip.
+   */
+  const reviews = useReviews(organizerId);
 
   const titles = useMemo(
     () => new Map((categories.data ?? []).map((c) => [c.id, c.title])),
@@ -31,11 +41,15 @@ export function useOrganizerContainer(organizerId: string): OrganizerContainerRe
     [data, titles],
   );
 
+  const resolvedSummary = summary.data ?? NO_SUMMARY;
+
   return {
     organizer,
     // A profile whose reviews could not be counted still opens; the rating
-    // card simply says there are none rather than the screen failing.
-    summary: summary.data ?? NO_SUMMARY,
+    // panel simply says there are none rather than the screen failing.
+    summary: resolvedSummary,
+    bars: useMemo(() => ratingBars(resolvedSummary), [resolvedSummary]),
+    latestReview: reviews.data?.items?.[0] ?? null,
     isLoading: loading,
     isError: error !== null,
     errorMessage: error?.message ?? null,

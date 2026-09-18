@@ -306,6 +306,7 @@ export function mapOtherEvents(feed: HomeFeedDTO): CurrentEventViewModel[] {
 function mapEvent(e: CurrentEventDTO): CurrentEventViewModel {
   return {
     refId: e.refId,
+    quotationId: e.quotationId ?? null,
     title: e.title,
     // Each of these is passed through untouched: a value the backend left
     // blank stays blank, so the card can say "not set" instead of guessing.

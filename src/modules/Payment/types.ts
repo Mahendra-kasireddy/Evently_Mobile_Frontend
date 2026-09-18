@@ -13,6 +13,14 @@ export interface PaymentOrderDTO {
   couponCode: string;
   couponDiscount: number;
   organizerName: string;
+  /**
+   * Whether online payment is possible at all.
+   *
+   * False means `orderId` and `keyId` are empty — the amounts above are still
+   * real, because they are read from the quotation, but Razorpay cannot be
+   * opened. Cash needs no gateway, so it remains.
+   */
+  gatewayAvailable?: boolean;
 }
 
 /** What Razorpay's checkout hands back, and what the server verifies. */
@@ -29,7 +37,16 @@ export interface PaidBookingDTO {
   organizer: { id: string; name: string } | null;
 }
 
-export type PayMethod = 'upi' | 'card' | 'netbanking';
+/**
+  * How the advance is settled.
+  *
+  * The first three open Razorpay's sheet. `cash` does not: the customer hands
+  * the money to the organizer, so nothing is charged here and nothing is held.
+  */
+export type PayMethod = 'upi' | 'card' | 'netbanking' | 'cash';
+
+/** The three that go through the gateway. */
+export type GatewayMethod = Exclude<PayMethod, 'cash'>;
 
 /** One row of the "Pay with" list. */
 export interface PayOption {
@@ -50,5 +67,7 @@ export interface PaymentViewModel {
   couponLine: string;
   /** "Pay ₹2,05,200 advance". */
   ctaLabel: string;
+  /** "Book with ₹2,05,200 in cash" — the same money, handed over instead. */
+  cashCtaLabel: string;
   organizerName: string;
 }

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AUTOSAVE_DEBOUNCE_MS } from './constants';
+import { AUTOSAVE_DEBOUNCE_MS, MAX_ORGANIZERS } from './constants';
 import {
   useCreatePlanCallback,
   useMyDraft,
@@ -41,7 +41,7 @@ const DEFAULT_DRAFT: PlanDraft = {
   budget: '',
   ideas: '',
   categories: [],
-  selectedOrganizerId: '',
+  selectedOrganizerIds: [],
   step: 0,
 };
 
@@ -57,11 +57,16 @@ const DEFAULT_DRAFT: PlanDraft = {
 function buildInitialDraft(
   initialOccasionId?: string,
   initialOrganizerId?: string,
+  initialEventDate?: string,
 ): PlanDraft {
   return {
     ...DEFAULT_DRAFT,
     ...(initialOccasionId ? { occasionId: initialOccasionId } : {}),
-    ...(initialOrganizerId ? { selectedOrganizerId: initialOrganizerId } : {}),
+    ...(initialOrganizerId ? { selectedOrganizerIds: [initialOrganizerId] } : {}),
+    // "Hold date" on an organizer's profile arrives here: the date they are
+    // free, already in the brief, so the customer is not asked to re-enter
+    // the one thing they just tapped.
+    ...(initialEventDate ? { eventDate: initialEventDate } : {}),
   };
 }
 
@@ -101,11 +106,17 @@ export interface PlanContainerResult {
 
   // Organizer search (used directly by the FindOrganizers section)
   searchOrganizers: (args: RecommendationArgs) => Promise<PlanOrganizerDTO[]>;
-  selectOrganizer: (id: string) => void;
+  /** Adds or removes one organizer from the shortlist. Stays on the step. */
+  toggleOrganizer: (id: string) => void;
+  /** Done choosing — moves on to the review. */
+  reviewShortlist: () => void;
+  /** False once the shortlist is full, so the UI can say why. */
+  canAddOrganizer: boolean;
 
   // Review step's own (unfiltered) organizer resolution
   recommendedOrganizer: PlanOrganizerDTO | null;
-  selectedOrganizerDetails: PlanOrganizerDTO | null;
+  /** Every shortlisted organizer, resolved. Empty until the lookup returns. */
+  selectedOrganizers: PlanOrganizerDTO[];
   isLoadingReviewOrganizers: boolean;
 
   // Submit flow
@@ -139,6 +150,7 @@ const EMPTY_SCREEN: PlanScreenDTO = {
 export function usePlanContainer(
   initialOccasionId?: string,
   initialOrganizerId?: string,
+  initialEventDate?: string,
 ): PlanContainerResult {
   const {
     data: screenDataRaw,
@@ -149,7 +161,7 @@ export function usePlanContainer(
   const { data: myDraft } = useMyDraft();
 
   const [draft, setDraft] = useState<PlanDraft>(() =>
-    buildInitialDraft(initialOccasionId, initialOrganizerId),
+    buildInitialDraft(initialOccasionId, initialOrganizerId, initialEventDate),
   );
   const hydratedRef = useRef(false);
 
@@ -267,13 +279,27 @@ export function usePlanContainer(
     [],
   );
 
-  const selectOrganizer = useCallback(
-    (id: string) =>
-      setDraft(prev => ({
-        ...prev,
-        selectedOrganizerId: id,
-        step: stepIndices.reviewIndex,
-      })),
+  /*
+   * Ticking an organizer no longer leaves the step.
+   *
+   * Choosing one used to jump straight to the review, which is right when a
+   * brief goes to exactly one person and wrong the moment it can go to
+   * several — the customer was thrown off the list before they could pick a
+   * second. Moving on is now its own button.
+   */
+  const toggleOrganizer = useCallback((id: string) => {
+    setDraft(prev => {
+      const chosen = prev.selectedOrganizerIds;
+      if (chosen.includes(id)) {
+        return { ...prev, selectedOrganizerIds: chosen.filter(x => x !== id) };
+      }
+      if (chosen.length >= MAX_ORGANIZERS) return prev;
+      return { ...prev, selectedOrganizerIds: [...chosen, id] };
+    });
+  }, []);
+
+  const reviewShortlist = useCallback(
+    () => setDraft(prev => ({ ...prev, step: stepIndices.reviewIndex })),
     [stepIndices.reviewIndex],
   );
 
@@ -309,8 +335,18 @@ export function usePlanContainer(
   ]);
 
   const recommendedOrganizer = reviewOrganizers[0] ?? null;
-  const selectedOrganizerDetails =
-    reviewOrganizers.find(o => o.id === draft.selectedOrganizerId) ?? null;
+  /*
+   * Kept in the order the customer ticked them, not the order the recommender
+   * returned. The review is a read-back of a decision they made, and
+   * re-ranking it there reads as the app having changed their mind.
+   */
+  const selectedOrganizers = useMemo(
+    () =>
+      draft.selectedOrganizerIds
+        .map(id => reviewOrganizers.find(o => o.id === id))
+        .filter((o): o is PlanOrganizerDTO => Boolean(o)),
+    [draft.selectedOrganizerIds, reviewOrganizers],
+  );
 
   // ----- Submit: two-phase (save plan, then request quote), retry-safe -----
   const createPlanCall = useCreatePlanCallback();
@@ -321,7 +357,7 @@ export function usePlanContainer(
   const [submitSucceeded, setSubmitSucceeded] = useState(false);
 
   const submitPlan = useCallback(() => {
-    if (!selectedOrganizerDetails) return;
+    if (draft.selectedOrganizerIds.length === 0) return;
     setSubmitError(null);
 
     /*
@@ -334,7 +370,7 @@ export function usePlanContainer(
       setSubmitPhase('quoting');
       try {
         await requestQuoteCall.execute({
-          organizerId: draft.selectedOrganizerId,
+          organizerIds: draft.selectedOrganizerIds,
           occasion: currentOccasion?.label ?? draft.occasionId,
           when: draft.eventDate || undefined,
           where: locationLabel(draft.area, draft.city, '') || undefined,
@@ -389,7 +425,7 @@ export function usePlanContainer(
         );
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedOrganizerDetails, savedPlanId, draft, currentOccasion]);
+  }, [savedPlanId, draft, currentOccasion]);
 
   const startNewPlan = useCallback(() => {
     hydratedRef.current = true; // don't re-hydrate the old saved draft
@@ -430,17 +466,19 @@ export function usePlanContainer(
     blockReason,
 
     searchOrganizers,
-    selectOrganizer,
+    toggleOrganizer,
+    reviewShortlist,
+    canAddOrganizer: draft.selectedOrganizerIds.length < MAX_ORGANIZERS,
 
     recommendedOrganizer,
-    selectedOrganizerDetails,
+    selectedOrganizers,
     isLoadingReviewOrganizers: reviewOrganizersCallback.loading,
 
     submitPhase,
     submitError,
     planSaved: savedPlanId !== null,
     submitSucceeded,
-    canSubmitPlan: submitPhase === 'idle' && selectedOrganizerDetails !== null,
+    canSubmitPlan: submitPhase === 'idle' && draft.selectedOrganizerIds.length > 0,
     submitPlan,
     startNewPlan,
   };

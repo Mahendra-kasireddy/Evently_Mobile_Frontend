@@ -8,7 +8,9 @@ export type MainTabParamList = {
    * quote" from a profile lands here with them already chosen and the
    * customer only has to write the brief.
    */
-  Plan: { occasionId?: string; organizerId?: string } | undefined;
+  Plan:
+    | { occasionId?: string; organizerId?: string; eventDate?: string }
+    | undefined;
   /**
    * The customer's events. The same screen is also registered on the root
    * stack as `Bookings`, which is where Home's booked card and the workspace's
@@ -104,8 +106,14 @@ export type RootStackParamList = {
    * first" path; neither affects what is charged.
    */
   Payment: { quotationId: string; couponCode?: string; organizerId?: string };
-  /** The receipt, after the advance is settled. */
-  PaymentSuccess: { bookingId: string; organizerName?: string };
+  /**
+   * The receipt, after the advance is settled.
+   *
+   * `inCash` changes what the screen says, not just how it looks: a cash
+   * booking is booked with the advance still owed, and telling that customer
+   * "Advance paid" would report money as having moved when it has not.
+   */
+  PaymentSuccess: { bookingId: string; organizerName?: string; inCash?: boolean };
   /** One organizer's full profile. `name` is only for the first render. */
   Organizer: { organizerId: string; name?: string };
   /** Everything people have said about that organizer. */

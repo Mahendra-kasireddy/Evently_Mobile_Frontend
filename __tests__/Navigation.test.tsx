@@ -125,9 +125,35 @@ describe('where an event opens', () => {
     // CompareQuotes loads one request and every quote on it. None is still a
     // number of quotes, and the brief is on that screen either way.
     const source = home();
+    expect(source).toMatch(/source === 'quote'[\s\S]{0,1400}navigate\('CompareQuotes'/);
+  });
+
+  it('sends an accepted quote to the advance, not back to the comparison', () => {
+    /*
+     * Accepting picks the organizer; the advance is what books it. A customer
+     * who accepted and then closed the app came back to a card reading
+     * "ACCEPTED · ₹83,662 advance to confirm" whose button offered them the
+     * comparison again — a decision they had already made — while the one
+     * thing left to do had no way in at all.
+     */
+    const source = home();
     expect(source).toMatch(
-      /source === 'quote'[\s\S]{0,160}navigate\('CompareQuotes'/,
+      /stage === 'quote_accepted'[\s\S]{0,120}navigate\('Payment'/,
     );
+  });
+
+  it('goes straight to the side-by-side at exactly two quotes', () => {
+    /*
+     * "Compare 2 quotes" promises a comparison, and with two there is nothing
+     * left to choose — a list whose only rows are the two the customer would
+     * have ticked is a screen that asks a question with one answer.
+     *
+     * Exactly two, not "at least two": at three, which pair to open is a real
+     * decision, and making it for them would bury a quote they never saw.
+     */
+    const source = home();
+    expect(source).toMatch(/quoteRows\.length === 2[\s\S]{0,200}navigate\('LineByLine'/);
+    expect(source).not.toContain('quoteRows.length >= 2');
   });
 
   it('no longer gates that on a quote having arrived', () => {

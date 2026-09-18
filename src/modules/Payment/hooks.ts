@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useAsync } from '../../hooks/useAsync';
 import { useAsyncCallback } from '../../hooks/useAsyncCallback';
-import { createPaymentOrder, verifyPayment } from './services';
+import { bookWithCash, createPaymentOrder, verifyPayment } from './services';
 
 /**
  * The order is created on mount.
@@ -20,4 +20,8 @@ export function usePaymentOrder(quotationId: string, couponCode?: string) {
 
 export function useVerifyPayment() {
   return useAsyncCallback(verifyPayment);
+}
+
+export function useBookWithCash() {
+  return useAsyncCallback(bookWithCash);
 }

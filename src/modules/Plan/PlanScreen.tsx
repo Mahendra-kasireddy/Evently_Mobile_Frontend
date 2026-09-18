@@ -59,6 +59,7 @@ export function PlanScreen() {
   const container = usePlanContainer(
     route.params?.occasionId,
     route.params?.organizerId,
+    route.params?.eventDate,
   );
 
   if (container.isLoadingScreen) {
@@ -165,8 +166,10 @@ export function PlanScreen() {
               filters={data.filters}
               draft={container.draft}
               searchOrganizers={container.searchOrganizers}
-              selectedOrganizerId={container.draft.selectedOrganizerId}
-              onSelectOrganizer={container.selectOrganizer}
+              selectedOrganizerIds={container.draft.selectedOrganizerIds}
+              onToggleOrganizer={container.toggleOrganizer}
+              canAddOrganizer={container.canAddOrganizer}
+              onReviewShortlist={container.reviewShortlist}
             />
           ) : isReviewStep ? (
             <ReviewStep
@@ -174,7 +177,7 @@ export function PlanScreen() {
               occasionLabel={occasionLabel}
               categories={container.categories}
               recommendedOrganizer={container.recommendedOrganizer}
-              selectedOrganizerDetails={container.selectedOrganizerDetails}
+              selectedOrganizers={container.selectedOrganizers}
               submitPhase={container.submitPhase}
               submitError={container.submitError}
               planSaved={container.planSaved}

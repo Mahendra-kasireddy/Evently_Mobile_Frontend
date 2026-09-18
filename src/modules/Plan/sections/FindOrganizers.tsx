@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Modal, Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
 import { EventlyButton, EventlyIcon, EventlyText } from '../../../Components';
-import { PLAN_ACCENT, PLAN_GREEN, PLAN_NAVY, PLAN_TEXT_MUTED, SORT_OPTIONS, TIER_COLOR } from '../constants';
+import { MAX_ORGANIZERS, PLAN_ACCENT, PLAN_GREEN, PLAN_NAVY, PLAN_TEXT_MUTED, SORT_OPTIONS, TIER_COLOR } from '../constants';
 import { filterModalStyles, organizersStyles } from '../styles';
 import { colors } from '../../../theme';
 import { ratingThreshold } from '../utils';
@@ -11,20 +11,30 @@ interface FindOrganizersProps {
   filters: PlanFiltersDTO;
   draft: PlanDraft;
   searchOrganizers: (args: RecommendationArgs) => Promise<PlanOrganizerDTO[]>;
-  selectedOrganizerId: string;
-  onSelectOrganizer: (id: string) => void;
+  /** Everyone on the shortlist so far, in the order they were ticked. */
+  selectedOrganizerIds: string[];
+  onToggleOrganizer: (id: string) => void;
+  /** False once the shortlist is full — the card then says so. */
+  canAddOrganizer: boolean;
+  /** Done choosing; moves to the review. */
+  onReviewShortlist: () => void;
 }
 
 function OrganizerCard({
   organizer,
   isSelected,
-  onSelect,
+  canAdd,
+  onToggle,
 }: {
   organizer: PlanOrganizerDTO;
   isSelected: boolean;
-  onSelect: () => void;
+  canAdd: boolean;
+  onToggle: () => void;
 }) {
   const unavailable = organizer.available === false;
+  // A full shortlist disables the ones not on it, never the ones that are —
+  // otherwise the customer cannot undo the tick that filled it.
+  const blocked = unavailable || (!isSelected && !canAdd);
 
   return (
     <View style={[organizersStyles.card, unavailable && organizersStyles.cardMuted]}>
@@ -132,9 +142,9 @@ function OrganizerCard({
 
       <View style={organizersStyles.actionsRow}>
         <EventlyButton
-          title={isSelected ? 'Selected · Review' : 'Select & review'}
-          onPress={onSelect}
-          disabled={unavailable}
+          title={isSelected ? 'Added to your brief' : 'Add to brief'}
+          onPress={onToggle}
+          disabled={blocked}
           variant={isSelected ? 'primary' : 'outline'}
           style={organizersStyles.selectButton}
           accentColor={PLAN_ACCENT}
@@ -250,7 +260,15 @@ function FilterModal({
   );
 }
 
-export function FindOrganizers({ filters, draft, searchOrganizers, selectedOrganizerId, onSelectOrganizer }: FindOrganizersProps) {
+export function FindOrganizers({
+  filters,
+  draft,
+  searchOrganizers,
+  selectedOrganizerIds,
+  onToggleOrganizer,
+  canAddOrganizer,
+  onReviewShortlist,
+}: FindOrganizersProps) {
   const [tiers, setTiers] = useState<string[]>([]);
   const [rating, setRating] = useState('');
   const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
@@ -317,6 +335,7 @@ export function FindOrganizers({ filters, draft, searchOrganizers, selectedOrgan
     setCategoryFilters((prev) => (prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]));
 
   const activeFilterCount = tiers.length + (rating ? 1 : 0) + categoryFilters.length;
+  const selectedCount = selectedOrganizerIds.length;
 
   return (
     <View style={organizersStyles.section}>
@@ -352,6 +371,35 @@ export function FindOrganizers({ filters, draft, searchOrganizers, selectedOrgan
         })}
       </ScrollView>
 
+      {/*
+        The running shortlist.
+        Ticking an organizer no longer leaves this screen, so something has to
+        say how many are on the brief and offer the way forward — without it,
+        a customer who has chosen four has no signal that they are done.
+      */}
+      {selectedCount > 0 ? (
+        <View style={organizersStyles.shortlistBar}>
+          <View style={organizersStyles.shortlistText}>
+            <EventlyText variant="subtitle" style={organizersStyles.shortlistCount}>
+              {selectedCount === 1
+                ? '1 organizer on your brief'
+                : `${selectedCount} organizers on your brief`}
+            </EventlyText>
+            <EventlyText variant="caption" style={organizersStyles.shortlistHint}>
+              {canAddOrganizer
+                ? 'They each quote separately, so you can compare.'
+                : `That is the most one brief can go to (${MAX_ORGANIZERS}).`}
+            </EventlyText>
+          </View>
+          <EventlyButton
+            title="Review"
+            onPress={onReviewShortlist}
+            style={organizersStyles.shortlistButton}
+            accentColor={PLAN_ACCENT}
+          />
+        </View>
+      ) : null}
+
       {!isLoading && organizers.length === 0 ? (
         <View style={organizersStyles.emptyState}>
           <EventlyIcon name="magnify-close" size={40} color={PLAN_TEXT_MUTED} />
@@ -376,8 +424,9 @@ export function FindOrganizers({ filters, draft, searchOrganizers, selectedOrgan
             <OrganizerCard
               key={organizer.id}
               organizer={organizer}
-              isSelected={organizer.id === selectedOrganizerId}
-              onSelect={() => onSelectOrganizer(organizer.id)}
+              isSelected={selectedOrganizerIds.includes(organizer.id)}
+              canAdd={canAddOrganizer}
+              onToggle={() => onToggleOrganizer(organizer.id)}
             />
           ))}
         </View>

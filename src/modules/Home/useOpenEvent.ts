@@ -29,6 +29,12 @@ type EventNavigationProp = CompositeNavigationProp<
  * it either way — so a request opens there whether or not anyone has replied,
  * and only a draft, which genuinely has nothing else to open, goes back to the
  * wizard.
+ *
+ * With exactly two quotes it goes one step further and opens them side by
+ * side. "Compare 2 quotes" promises a comparison, and with two there is no
+ * choosing left to do — sending the customer to a list so they can tick the
+ * only two rows on it is a screen that asks a question with one answer. Three
+ * or more is a real choice, so that opens the list.
  */
 export function useOpenEvent(): (event: CurrentEventViewModel) => void {
   const navigation = useNavigation<EventNavigationProp>();
@@ -42,6 +48,33 @@ export function useOpenEvent(): (event: CurrentEventViewModel) => void {
         });
       }
       if (event.source === 'quote') {
+        /*
+         * An accepted quote has one thing left to do, and it is the advance.
+         *
+         * Nothing is booked until it is paid, so sending this customer back to
+         * the comparison would be showing them a decision they have already
+         * made. The quotation id is what the payment screen prices from — the
+         * request id cannot be used, because a request can hold several
+         * quotes and only one of them was accepted.
+         */
+        if (event.stage === 'quote_accepted' && event.quotationId) {
+          return navigation.navigate('Payment', { quotationId: event.quotationId });
+        }
+
+        /*
+         * Exactly two, not "at least two". With three the customer has a
+         * choice to make about which pair to open, and picking it for them
+         * would bury a quote they never saw.
+         */
+        if (event.quoteRows.length === 2) {
+          const [first, second] = event.quoteRows;
+          return navigation.navigate('LineByLine', {
+            requestId: event.refId,
+            leftId: first.id,
+            rightId: second.id,
+            title: event.title,
+          });
+        }
         return navigation.navigate('CompareQuotes', {
           requestId: event.refId,
           title: event.title,

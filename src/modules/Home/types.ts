@@ -228,6 +228,13 @@ export interface CurrentEventDTO {
   stage: CurrentEventStage;
   /** The underlying record's id — the request, plan or booking behind it. */
   refId: string;
+  /**
+   * The accepted quotation, on a request that has one.
+   *
+   * Null everywhere else. It is what the "Pay the advance" button needs: the
+   * advance is priced from the quotation, not from the request.
+   */
+  quotationId?: string | null;
   title: string;
   /**
    * The four facts the Home card shows. Each comes from the underlying record
@@ -412,6 +419,8 @@ export interface HomeFeedDTO {
 export interface CurrentEventViewModel {
   /** The underlying record's id, so the hero's button can open it. */
   refId: string;
+  /** The accepted quotation, when one has been accepted. Null otherwise. */
+  quotationId: string | null;
   title: string;
   occasion: string;
   when: string;

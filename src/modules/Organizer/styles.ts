@@ -1,9 +1,11 @@
 import { StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, fontFor, spacing } from '../../theme';
+import { brand, colors, fontFor, spacing } from '../../theme';
 import {
   ORG_ACCENT,
+  ORG_BAR,
   ORG_CANVAS,
+  ORG_CHECK,
   ORG_GREEN,
   ORG_HAIRLINE,
   ORG_NAVY,
@@ -12,9 +14,28 @@ import {
   ORG_TRACK,
 } from './constants';
 
+/** The cover is this tall before the identity card is pulled up over it. */
+export const COVER_HEIGHT = 208;
+/** How far the identity card overlaps the cover. */
+const CARD_LIFT = 56;
+/** Portfolio tile. Tall rather than square, as the design has it. */
+export const WORK_TILE_WIDTH = 164;
+export const WORK_TILE_HEIGHT = 208;
+
+/** Every card on this screen shares one shape, so the column reads as one thing. */
+/** RN's own absoluteFillObject isn't in this version's types; same thing. */
+const fill = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } as const;
+
+const card = {
+  backgroundColor: brand.surface,
+  borderRadius: 18,
+  borderWidth: 1,
+  borderColor: ORG_HAIRLINE,
+} as const;
+
 export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: ORG_CANVAS },
-  content: { paddingBottom: spacing.xl },
+  content: { paddingBottom: spacing.s40 },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
   loadingText: { color: colors.textMuted, marginTop: spacing.md },
   errorTitle: { color: ORG_NAVY, marginTop: spacing.md, textAlign: 'center' },
@@ -31,186 +52,295 @@ export const styles = StyleSheet.create({
   },
   retryText: { color: ORG_ACCENT, fontWeight: '700' },
 
-  sectionTitle: {
-    color: ORG_NAVY,
-    fontSize: 21,
-    fontWeight: '700',
-    letterSpacing: -0.3,
+  /** Section headings sit in the gutter; the cards they head are inset the same. */
+  sectionHead: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
     paddingHorizontal: spacing.md,
     marginTop: spacing.lg,
+    marginBottom: spacing.s12,
   },
+  sectionTitle: { color: ORG_NAVY, letterSpacing: -0.2 },
+  sectionMeta: { color: brand.textMuted },
   note: {
-    color: colors.textMuted,
-    fontSize: 13,
-    lineHeight: 19,
+    color: brand.textMuted,
     paddingHorizontal: spacing.md,
-    marginTop: 12,
+    marginTop: spacing.s12,
   },
+  /** The rating block carries its own heading, so it needs the gap itself. */
+  ratingSpacing: { marginTop: spacing.lg },
 });
 
-export const heroStyles = StyleSheet.create({
-  hero: { backgroundColor: ORG_NAVY_DEEP, paddingHorizontal: spacing.md, paddingBottom: spacing.lg },
-  topRow: { ...globalStyles.row, justifyContent: 'space-between', paddingTop: spacing.sm },
-  back: {
+// ---------------------------------------------------------------------------
+// Cover
+// ---------------------------------------------------------------------------
+
+export const coverStyles = StyleSheet.create({
+  wrap: { height: COVER_HEIGHT, backgroundColor: ORG_NAVY_DEEP },
+  art: { ...fill },
+  photo: { ...fill },
+  /** Keeps the controls and the badge legible over any uploaded photo. */
+  scrim: { ...fill, backgroundColor: 'rgba(14,26,51,0.34)' },
+  topRow: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.s12,
+  },
+  actions: { ...globalStyles.row, gap: spacing.sm },
+  circle: {
     width: 40,
     height: 40,
     borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(16,26,49,0.55)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  allReviews: {
+  badge: {
+    position: 'absolute',
+    left: spacing.md,
+    // Clear of the identity card, which is lifted over the cover's bottom edge.
+    bottom: CARD_LIFT + spacing.s12,
+    ...globalStyles.row,
+    gap: 6,
     borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    paddingHorizontal: 18,
-    paddingVertical: 10,
+    paddingVertical: 7,
+    paddingHorizontal: spacing.s12,
+    backgroundColor: 'rgba(16,26,49,0.62)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.16)',
   },
-  allReviewsText: { color: colors.onPrimary, fontSize: 14.5, fontWeight: '600' },
+  badgeText: { color: brand.onNavy },
+});
 
-  identity: { ...globalStyles.row, gap: 14, marginTop: spacing.lg },
-  avatar: { width: 76, height: 76, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { color: colors.onPrimary, fontSize: 25, fontWeight: '700' },
-  identityText: { flex: 1 },
-  name: { color: colors.onPrimary, fontSize: 25, fontWeight: '700', letterSpacing: -0.4, lineHeight: 32 },
-  metaRow: { ...globalStyles.row, gap: spacing.sm, marginTop: 6, flexWrap: 'wrap' },
+// ---------------------------------------------------------------------------
+// Identity
+// ---------------------------------------------------------------------------
+
+export const identityStyles = StyleSheet.create({
+  card: {
+    ...card,
+    marginHorizontal: spacing.md,
+    marginTop: -CARD_LIFT,
+    padding: spacing.md,
+  },
+  head: { ...globalStyles.row, alignItems: 'flex-start', gap: spacing.s12 },
+  avatar: {
+    width: 68,
+    height: 68,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    // Lifts the monogram over the card's top edge, as the design has it.
+    marginTop: -spacing.xl,
+    borderWidth: 3,
+    borderColor: brand.surface,
+  },
+  avatarText: { color: brand.onNavy, fontSize: 24, lineHeight: 30, fontWeight: '700' },
+  headText: { flex: 1, gap: 6 },
+  name: { color: ORG_NAVY, fontSize: 23, lineHeight: 29, letterSpacing: -0.4, fontWeight: '700' },
   tierChip: {
     ...globalStyles.row,
+    alignSelf: 'flex-start',
     gap: 5,
     borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    paddingHorizontal: 11,
-    paddingVertical: 5,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    backgroundColor: brand.coolSoft,
   },
-  tierText: { color: colors.onPrimary, fontSize: 13, fontWeight: '600' },
-  place: { color: 'rgba(255,255,255,0.72)', fontSize: 14.5, flexShrink: 1 },
-  headline: { color: ORG_ACCENT, fontSize: 14.5, fontWeight: '600', marginTop: 8 },
+  tierText: { color: brand.textMuted },
+  place: { color: brand.textMuted },
 
-  stats: { flexDirection: 'row', gap: 10, marginTop: spacing.lg },
-  stat: { flex: 1, backgroundColor: ORG_NAVY_PANEL, borderRadius: 14, padding: 14 },
-  /*
-   * A lone stat sizes to its content instead of spanning the row. Stretched,
-   * "24h / avg reply" in a full-width box reads as a panel that failed to
-   * fill rather than as the one figure this organizer has published.
-   */
-  statAlone: { flex: 0, minWidth: 132 },
-  statValue: { color: colors.onPrimary, fontSize: 22, fontWeight: '700', letterSpacing: -0.3 },
-  statLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 12.5, marginTop: 2 },
+  divider: { height: 1, backgroundColor: ORG_HAIRLINE, marginVertical: spacing.md },
+
+  stats: { ...globalStyles.row, justifyContent: 'space-between' },
+  stat: { flex: 1, gap: 2 },
+  statValue: { color: ORG_NAVY, fontSize: 21, lineHeight: 26, letterSpacing: -0.3, fontWeight: '700' },
+  statLabel: { color: brand.textMuted },
 });
+
+// ---------------------------------------------------------------------------
+// Availability
+// ---------------------------------------------------------------------------
+
+export const availabilityStyles = StyleSheet.create({
+  card: {
+    ...globalStyles.row,
+    gap: spacing.s12,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.s12,
+    padding: spacing.md,
+    borderRadius: 18,
+    backgroundColor: '#e9f3ee',
+    borderWidth: 1,
+    borderColor: '#d7e8df',
+  },
+  text: { flex: 1, gap: 3 },
+  title: { color: '#1c3f33', fontWeight: '600' },
+  detail: { color: '#476155' },
+  hold: {
+    borderRadius: 999,
+    paddingVertical: 9,
+    paddingHorizontal: spacing.md,
+    backgroundColor: brand.surface,
+    borderWidth: 1,
+    borderColor: '#cfe2d8',
+  },
+  holdText: { color: ORG_GREEN, fontWeight: '600' },
+});
+
+// ---------------------------------------------------------------------------
+// Assurances
+// ---------------------------------------------------------------------------
+
+export const assuranceStyles = StyleSheet.create({
+  card: { ...card, marginHorizontal: spacing.md, marginTop: spacing.s12 },
+  row: { ...globalStyles.row, gap: spacing.s12, padding: spacing.md },
+  divider: { height: 1, backgroundColor: ORG_HAIRLINE, marginHorizontal: spacing.md },
+  text: { flex: 1, color: ORG_NAVY },
+});
+
+// ---------------------------------------------------------------------------
+// Recent work
+// ---------------------------------------------------------------------------
 
 export const workStyles = StyleSheet.create({
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    paddingHorizontal: spacing.md,
-    marginTop: 14,
-  },
-  /*
-    * No flexGrow. With it, a lone photo stretched to the full row and
-    * aspectRatio then made it as tall as the screen was wide — one upload
-    * filled the whole page and pushed everything under it out of sight.
-    * A fixed share keeps three to a row however many there are.
-    */
+  strip: { paddingHorizontal: spacing.md, gap: spacing.s12 },
   tile: {
-    width: '31.5%',
-    aspectRatio: 1,
-    borderRadius: 14,
+    width: WORK_TILE_WIDTH,
+    height: WORK_TILE_HEIGHT,
+    borderRadius: 16,
     overflow: 'hidden',
-    backgroundColor: ORG_TRACK,
+    backgroundColor: ORG_NAVY_PANEL,
   },
-  photo: { width: '100%', height: '100%' },
+  photo: { ...fill, borderRadius: 16 },
+  art: { ...fill },
 });
+
+// ---------------------------------------------------------------------------
+// What they handle
+// ---------------------------------------------------------------------------
 
 export const chipStyles = StyleSheet.create({
   wrap: {
-    flexDirection: 'row',
+    ...globalStyles.row,
     flexWrap: 'wrap',
-    gap: 10,
+    gap: spacing.sm,
     paddingHorizontal: spacing.md,
-    marginTop: 14,
   },
   chip: {
+    ...globalStyles.row,
+    gap: 6,
     borderRadius: 999,
+    paddingVertical: 9,
+    paddingHorizontal: spacing.s12,
+    backgroundColor: brand.surface,
     borderWidth: 1,
     borderColor: ORG_HAIRLINE,
-    backgroundColor: colors.background,
-    paddingHorizontal: 18,
-    paddingVertical: 11,
   },
-  chipText: { color: ORG_NAVY, fontSize: 15, fontWeight: '500' },
+  chipText: { color: ORG_NAVY },
+  check: { color: ORG_CHECK },
 });
 
-export const ratingCardStyles = StyleSheet.create({
+// ---------------------------------------------------------------------------
+// Rating
+// ---------------------------------------------------------------------------
+
+export const ratingStyles = StyleSheet.create({
   card: {
-    backgroundColor: colors.background,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: ORG_HAIRLINE,
-    padding: spacing.md,
+    ...card,
+    ...globalStyles.row,
+    alignItems: 'flex-start',
+    gap: spacing.md,
     marginHorizontal: spacing.md,
-    marginTop: 14,
+    padding: spacing.md,
   },
-  head: { ...globalStyles.row, justifyContent: 'space-between' },
-  title: { color: ORG_NAVY, fontSize: 18, fontWeight: '700' },
-  reviewsLink: { color: ORG_ACCENT, fontSize: 14.5, fontWeight: '600' },
-  body: { ...globalStyles.row, gap: 14, marginTop: 12 },
-  score: { color: ORG_NAVY, fontSize: 40, fontWeight: '700', letterSpacing: -1 },
-  stars: { ...globalStyles.row, gap: 3 },
-  completed: { color: colors.textMuted, fontSize: 14, marginTop: 4 },
-  emptyBody: { color: colors.textMuted, fontSize: 14, lineHeight: 20, marginTop: 8 },
+  left: { alignItems: 'flex-start', gap: 4, minWidth: 92 },
+  score: { color: ORG_NAVY, fontSize: 46, lineHeight: 52, letterSpacing: -1.4, fontWeight: '700' },
+  stars: { ...globalStyles.row, gap: 1 },
+  reviews: { color: ORG_ACCENT, fontWeight: '600' },
+  bars: { flex: 1, gap: 6, paddingTop: 6 },
+  barRow: { ...globalStyles.row, gap: spacing.sm },
+  barStars: { color: brand.textMuted, width: 10 },
+  track: { flex: 1, height: 7, borderRadius: 999, backgroundColor: ORG_TRACK, overflow: 'hidden' },
+  fill: { height: '100%', borderRadius: 999, backgroundColor: ORG_BAR },
+  barCount: { color: brand.textMuted, width: 26, textAlign: 'right' },
+
+  emptyBody: { color: brand.textMuted, flex: 1 },
+  completed: { color: brand.textMuted, marginTop: 2 },
 });
+
+/** The one review shown inline, as a taste of the full page. */
+export const previewStyles = StyleSheet.create({
+  card: { ...card, marginHorizontal: spacing.md, marginTop: spacing.s12, padding: spacing.md },
+  head: { ...globalStyles.row, gap: spacing.s12 },
+  avatar: {
+    width: 38,
+    height: 38,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarText: { color: brand.onNavy },
+  headText: { flex: 1, gap: 1 },
+  name: { color: ORG_NAVY },
+  context: { color: brand.textMuted },
+  scoreRow: { ...globalStyles.row, gap: 3 },
+  score: { color: ORG_NAVY, fontWeight: '600' },
+  comment: { color: brand.textMuted, marginTop: spacing.s12 },
+  all: { ...globalStyles.row, gap: 3, alignSelf: 'flex-start', marginTop: spacing.s12 },
+  allText: { color: ORG_ACCENT },
+});
+
+// ---------------------------------------------------------------------------
+// Footer
+// ---------------------------------------------------------------------------
 
 export const footerStyles = StyleSheet.create({
   bar: {
+    backgroundColor: brand.surface,
     borderTopWidth: 1,
     borderTopColor: ORG_HAIRLINE,
-    backgroundColor: colors.background,
     paddingHorizontal: spacing.md,
-    paddingTop: 12,
-    paddingBottom: spacing.md,
+    paddingTop: spacing.s12,
+    paddingBottom: spacing.s12,
+    gap: spacing.s12,
   },
-  row: { ...globalStyles.row, justifyContent: 'space-between', gap: spacing.sm },
-  typicalRow: { ...globalStyles.row, gap: 8 },
-  typicalLabel: {
-    color: colors.textMuted,
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 0.7,
-    textTransform: 'uppercase',
-  },
-  typicalValue: { color: ORG_NAVY, fontSize: 19, fontWeight: '700', letterSpacing: -0.3 },
-  reassurance: { color: ORG_GREEN, fontSize: 14, fontWeight: '500', flexShrink: 1, textAlign: 'right' },
-  actions: { ...globalStyles.row, gap: 12, marginTop: 12 },
-  /** Square, so the quote button keeps the width it needs for its label. */
+  row: { ...globalStyles.row, justifyContent: 'space-between' },
+  typicalRow: { ...globalStyles.row, gap: 6 },
+  typicalLabel: { color: brand.textPlaceholder, letterSpacing: 0.6 },
+  typicalValue: { color: ORG_NAVY, fontSize: 17, lineHeight: 22, fontWeight: '700' },
+  replyRow: { ...globalStyles.row, gap: 6 },
+  dot: { width: 7, height: 7, borderRadius: 999, backgroundColor: ORG_CHECK },
+  reassurance: { color: brand.textMuted },
+
+  actions: { ...globalStyles.row, gap: spacing.s12 },
   message: {
-    width: 54,
-    height: 54,
+    width: 56,
+    height: 56,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: ORG_HAIRLINE,
-    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
-    flexShrink: 0,
+    backgroundColor: brand.surface,
   },
   cta: {
     flex: 1,
+    height: 56,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 54,
-    borderRadius: 16,
     backgroundColor: ORG_ACCENT,
   },
-  ctaBusy: { opacity: 0.6 },
-  ctaDone: { backgroundColor: '#e8f6ef' },
-  ctaText: { color: colors.onPrimary, fontSize: 17, fontWeight: '600' },
-  ctaDoneText: { color: ORG_GREEN },
-  error: { color: colors.danger, fontSize: 13, textAlign: 'center', marginTop: 8 },
+  ctaBusy: { opacity: 0.7 },
+  ctaDone: { backgroundColor: brand.disabledBg },
+  ctaText: { color: brand.onAccent, fontSize: 17, lineHeight: 22, fontWeight: '600' },
+  ctaNote: { color: 'rgba(255,255,255,0.86)' },
+  ctaDoneText: { color: brand.textMuted },
+  error: { color: colors.danger },
 });
-
-// ---------------------------------------------------------------------------
-// Reviews
-// ---------------------------------------------------------------------------
 
 export const reviewsStyles = StyleSheet.create({
   container: { flex: 1, backgroundColor: ORG_CANVAS },

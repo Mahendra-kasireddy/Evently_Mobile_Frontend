@@ -1,11 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer, { setActiveView, setAuthHydrated, setToken, type AppView } from './authSlice';
+import authReducer, { setActiveView, setAuthHydrated, setSession, type AppView } from './authSlice';
 import heroDraftReducer from './heroDraftSlice';
 import locationReducer from './locationSlice';
 import onboardingReducer, { setHasSeenOnboarding, setOnboardingHydrated } from './onboardingSlice';
 
 const AUTH_TOKEN_KEY = 'evently.auth.token';
+const AUTH_REFRESH_TOKEN_KEY = 'evently.auth.refreshToken';
 const ACTIVE_VIEW_KEY = 'evently.auth.activeView';
 const ONBOARDING_SEEN_KEY = 'evently.onboarding.seen';
 
@@ -36,6 +37,21 @@ store.subscribe(() => {
   }
 });
 
+// The refresh token is what actually keeps the person signed in between app
+// launches, so it is mirrored the same way. It is removed only when the
+// session is cleared — an explicit logout, or a refresh the server rejected.
+let lastPersistedRefreshToken: string | null = null;
+store.subscribe(() => {
+  const refreshToken = store.getState().auth.refreshToken;
+  if (refreshToken === lastPersistedRefreshToken) return;
+  lastPersistedRefreshToken = refreshToken;
+  if (refreshToken === null) {
+    AsyncStorage.removeItem(AUTH_REFRESH_TOKEN_KEY).catch(() => undefined);
+  } else {
+    AsyncStorage.setItem(AUTH_REFRESH_TOKEN_KEY, refreshToken).catch(() => undefined);
+  }
+});
+
 // Same mirror-to-disk pattern, so switching to the organizer dashboard sticks
 // across an app restart. It is cleared with the session on sign-out.
 let lastPersistedView: AppView = 'customer';
@@ -60,10 +76,14 @@ store.subscribe(() => {
 /** Restores the persisted token into the store. Runs once, at import time. */
 async function hydrateAuth(): Promise<void> {
   try {
-    const token = await AsyncStorage.getItem(AUTH_TOKEN_KEY);
+    const [token, refreshToken] = await Promise.all([
+      AsyncStorage.getItem(AUTH_TOKEN_KEY),
+      AsyncStorage.getItem(AUTH_REFRESH_TOKEN_KEY),
+    ]);
     if (token) {
       lastPersistedToken = token;
-      store.dispatch(setToken(token));
+      lastPersistedRefreshToken = refreshToken;
+      store.dispatch(setSession({ token, refreshToken }));
       // Only meaningful with a session; a stored view without a token is stale.
       const view = await AsyncStorage.getItem(ACTIVE_VIEW_KEY);
       if (view === 'organizer') {

@@ -177,7 +177,13 @@ export interface RecommendationArgs {
  * has accepted all of them the whole time.
  */
 export interface RequestQuoteFromOrganizerDTO {
-  organizerId: string;
+  /**
+   * Every organizer the customer chose. A brief can go to several now, so
+   * this is a list even when they picked one — the server records the same
+   * recipient list either way, and "went to 1 organizer" and "went to 4" are
+   * then the same code path rather than two.
+   */
+  organizerIds: string[];
   occasion: string;
   when?: string;
   where?: string;
@@ -206,7 +212,15 @@ export interface PlanDraft {
   budget: string;
   ideas: string;
   categories: string[];
-  selectedOrganizerId: string;
+  /**
+   * The organizers this brief will be sent to, in the order they were ticked.
+   *
+   * A list rather than one id: a customer comparing quotes needs more than one
+   * to compare, and sending the same brief four times by hand was the only way
+   * to get that before. Capped in the UI at MAX_ORGANIZERS, which matches the
+   * server's own ceiling.
+   */
+  selectedOrganizerIds: string[];
   step: number;
 }
 

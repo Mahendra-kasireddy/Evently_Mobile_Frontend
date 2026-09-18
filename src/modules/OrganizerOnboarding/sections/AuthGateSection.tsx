@@ -9,7 +9,7 @@ import {
 } from '../../../Components';
 import { isValidMobile, isValidOtpCode } from '../../Login/utils';
 import { useSendOtp, useVerifyOtp } from '../../Login/hooks';
-import { setToken } from '../../../store/authSlice';
+import { setSession } from '../../../store/authSlice';
 import { useAppDispatch } from '../../../store/hooks';
 import { ONB_COPY, ORG_ACCENT, ORG_GREEN } from '../constants';
 import { authGateStyles } from '../styles';
@@ -73,7 +73,12 @@ export function AuthGateSection() {
     verifyOtpCall
       .execute(requestId, code)
       .then(response => {
-        dispatch(setToken(response.token));
+        dispatch(
+          setSession({
+            token: response.token,
+            refreshToken: response.refreshToken ?? null,
+          }),
+        );
         // No manual navigation — RootNavigator swaps to the authenticated stack,
         // which still contains this same screen name, so the wizard renders next.
       })

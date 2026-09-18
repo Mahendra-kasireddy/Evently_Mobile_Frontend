@@ -88,7 +88,24 @@ export const styles = StyleSheet.create({
     backgroundColor: PAY_GREEN_SOFT,
     padding: 14,
   },
+  /* Cash carries no Evently guarantee, so it does not get the green panel
+     that on every other screen means "we have got this". */
+  assuranceCash: { backgroundColor: '#f4f1ec' },
+
+  /* A method that exists but cannot be used right now — dimmed, not hidden. */
+  optionOff: { opacity: 0.45 },
+  gatewayOff: {
+    ...globalStyles.row,
+    alignItems: 'flex-start',
+    gap: 10,
+    marginBottom: 10,
+    borderRadius: 14,
+    backgroundColor: '#f4f1ec',
+    padding: 12,
+  },
+  gatewayOffText: { color: '#4a4740', flex: 1, fontSize: 13, lineHeight: 18 },
   assuranceText: { color: '#2f6b57', flex: 1, fontSize: 13.5, lineHeight: 19 },
+  assuranceTextCash: { color: '#4a4740' },
 
   /* The way out for somebody not ready to commit. Quiet, but present. */
   talk: { ...globalStyles.row, alignItems: 'center', gap: 8, marginTop: 18, paddingVertical: 4 },

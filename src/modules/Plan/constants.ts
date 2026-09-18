@@ -138,3 +138,13 @@ export const SORT_OPTIONS: Array<{ label: string; value: RecommendationSort }> =
   { label: 'Fastest response', value: 'response' },
   { label: 'Nearest', value: 'nearest' },
 ];
+
+/**
+ * How many organizers one brief may be sent to.
+ *
+ * Matches the server's own cap (RequestQuoteFromOrganizerDto). Every recipient
+ * is a person who is notified and expected to price the job, so this is a
+ * limit on how much of the supply side one customer can occupy — not a
+ * screen-space decision.
+ */
+export const MAX_ORGANIZERS = 6;

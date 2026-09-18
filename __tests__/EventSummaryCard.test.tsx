@@ -36,6 +36,7 @@ const fs: { writeFileSync(p: string, d: string, e: string): void; existsSync(p: 
 const noop = () => {};
 
 const fullEvent: CurrentEventViewModel = {
+  quotationId: null,
   title: "Meera & Arjun's Reception",
   occasion: 'Reception',
   when: '12 December 2026',

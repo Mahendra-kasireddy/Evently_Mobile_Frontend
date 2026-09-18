@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -27,18 +28,28 @@ type CompareNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 export function CompareQuotesScreen() {
   const navigation = useNavigation<CompareNavigationProp>();
   const { params } = useRoute<CompareRouteProp>();
-  const { model, isLoading, isError, errorMessage, acceptingId, acceptError, accept, refetch } =
-    useCompareContainer(params.requestId, params.title ?? COPY.title, (quotationId) => {
-      /*
-       * Accepting is the decision; paying the advance is what makes it a
-       * booking. Sending them straight there means the quote cannot sit
-       * accepted-but-unpaid without the customer knowing why.
-       */
-      const quote = model?.quotes.find((q) => q.id === quotationId);
+  /**
+   * Opens the advance for one quote.
+   *
+   * Used both straight after accepting and from the accepted card afterwards,
+   * because they are the same step: accepting is the decision, and paying the
+   * advance is what makes it a booking. Backing out of the payment screen
+   * leaves the quote accepted and unpaid, and the card has to be able to bring
+   * the customer back.
+   */
+  const openAdvance = useCallback(
+    (quotationId: string, organizerId?: string) =>
       navigation.navigate('Payment', {
         quotationId,
-        ...(quote?.organizerId ? { organizerId: quote.organizerId } : {}),
-      });
+        ...(organizerId ? { organizerId } : {}),
+      }),
+    [navigation],
+  );
+
+  const { model, isLoading, isError, errorMessage, acceptingId, acceptError, accept, refetch } =
+    useCompareContainer(params.requestId, params.title ?? COPY.title, (quotationId) => {
+      const quote = model?.quotes.find((q) => q.id === quotationId);
+      openAdvance(quotationId, quote?.organizerId);
     });
 
   /* Named for what the customer actually has: one reply is theirs to read,
@@ -174,6 +185,7 @@ export function CompareQuotesScreen() {
             isOnly={model.quotes.length === 1}
             isAccepting={acceptingId === quote.id}
             onAccept={() => accept(quote.id)}
+            onPay={() => openAdvance(quote.id, quote.organizerId)}
           />
         ))}
       </ScrollView>

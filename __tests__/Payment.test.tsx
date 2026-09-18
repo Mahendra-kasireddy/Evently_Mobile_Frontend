@@ -119,11 +119,57 @@ describe('copy', () => {
 
 describe('methods', () => {
   it('offers the three Razorpay opens on, each a real method name', () => {
-    // These are passed through as `prefill.method`, so a label here that is
-    // not a Razorpay method would open the sheet on a menu instead.
-    expect(PAY_OPTIONS.map((o) => o.id)).toEqual(['upi', 'card', 'netbanking']);
+    // The first three are passed through as `prefill.method`, so a label here
+    // that is not a Razorpay method would open the sheet on a menu instead.
+    expect(PAY_OPTIONS.map((o) => o.id).slice(0, 3)).toEqual(['upi', 'card', 'netbanking']);
+  });
+
+  it('offers cash last, and never sends it to the gateway', () => {
+    /*
+     * Cash is on the same list because it is the same decision — how the
+     * advance reaches the organizer — and burying it under "other options"
+     * would make the one path that works without a gateway the hardest to
+     * find. Last, because it is the one Evently cannot stand behind.
+     */
+    const ids = PAY_OPTIONS.map((o) => o.id);
+    expect(ids).toEqual(['upi', 'card', 'netbanking', 'cash']);
+    expect(ids[ids.length - 1]).toBe('cash');
+  });
+
+  it('promises nothing about cash that Evently could not keep', () => {
+    // Evently never holds this money, so the gateway's refund promise must not
+    // appear anywhere near it.
+    expect(PAYMENT_COPY.cashAssurance).toContain('Nothing is charged now');
+    expect(PAYMENT_COPY.cashAssurance).toContain('does not hold this money');
+    expect(PAYMENT_COPY.cashAssurance).not.toContain('Razorpay');
+    // The organizer's own deadline is unchanged, and worth saying so the
+    // option does not read as second-class.
+    expect(PAYMENT_COPY.cashAssurance).toContain('48 hours');
+  });
+
+  it('says which half of payment is down, not that all of it is', () => {
+    /*
+     * With no gateway configured the screen used to fail outright — "payments
+     * are not available" — and take the cash option down with it, which is the
+     * one path that needs no gateway. An accepted quote then had no way at all
+     * to become a booking.
+     */
+    expect(PAYMENT_COPY.gatewayOff).toContain('Online payment is unavailable');
+    expect(PAYMENT_COPY.gatewayOff).toContain('still book');
+    expect(PAYMENT_COPY.gatewayOff).not.toMatch(/^Payments are not available/);
+  });
+
+  it('does not tell a cash customer their advance is paid', () => {
+    expect(SUCCESS_COPY.cashHeading).not.toBe(SUCCESS_COPY.heading);
+    expect(SUCCESS_COPY.cashHeading).toContain('cash');
+    expect(SUCCESS_COPY.cashHeading).not.toContain('paid');
+    expect(SUCCESS_COPY.cashBody('Mahendra Events')).toContain('Mahendra Events');
+    expect(SUCCESS_COPY.cashBody('Mahendra Events')).toContain('once they confirm');
   });
 });
+
+/** True for the last row, which is cash. */
+const isCash = (index: number) => PAY_OPTIONS[index]?.id === 'cash';
 
 describe('render dump', () => {
   it('writes an HTML rendering when EVENTLY_RENDER_OUT is set', () => {
@@ -132,7 +178,8 @@ describe('render dump', () => {
 
     const m = mapPayment(order());
 
-    const payment = (
+    /** The screen, with whichever method is selected. */
+    const screenWith = (selected: number) => (
       <View style={s.container}>
         <View style={s.header}>
           <View style={s.back}>
@@ -160,7 +207,7 @@ describe('render dump', () => {
             {PAYMENT_COPY.payWith}
           </EventlyText>
           {PAY_OPTIONS.map((option, index) => (
-            <View key={option.id} style={[s.option, index === 0 && s.optionOn]}>
+            <View key={option.id} style={[s.option, index === selected && s.optionOn]}>
               <View style={s.optionIcon}>
                 <EventlyIcon name={option.icon} size={20} color="#0e1a33" />
               </View>
@@ -172,16 +219,23 @@ describe('render dump', () => {
                   {option.hint}
                 </EventlyText>
               </View>
-              <View style={[s.radio, index === 0 && s.radioOn]}>
-                {index === 0 ? <View style={s.radioDot} /> : null}
+              <View style={[s.radio, index === selected && s.radioOn]}>
+                {index === selected ? <View style={s.radioDot} /> : null}
               </View>
             </View>
           ))}
 
-          <View style={s.assurance}>
-            <EventlyIcon name="shield-check-outline" size={18} color="#1d9e75" />
-            <EventlyText variant="caption" style={s.assuranceText}>
-              {PAYMENT_COPY.assurance}
+          <View style={[s.assurance, isCash(selected) && s.assuranceCash]}>
+            <EventlyIcon
+              name={isCash(selected) ? 'hand-coin-outline' : 'shield-check-outline'}
+              size={18}
+              color={isCash(selected) ? '#0e1a33' : '#1d9e75'}
+            />
+            <EventlyText
+              variant="caption"
+              style={[s.assuranceText, isCash(selected) && s.assuranceTextCash]}
+            >
+              {isCash(selected) ? PAYMENT_COPY.cashAssurance : PAYMENT_COPY.assurance}
             </EventlyText>
           </View>
 
@@ -199,24 +253,27 @@ describe('render dump', () => {
         <View style={s.foot}>
           <View style={s.pay}>
             <EventlyText variant="subtitle" style={s.payText}>
-              {m.ctaLabel}
+              {isCash(selected) ? m.cashCtaLabel : m.ctaLabel}
             </EventlyText>
           </View>
         </View>
       </View>
     );
 
-    const success = (
+    const payment = screenWith(0);
+    const paymentCash = screenWith(PAY_OPTIONS.length - 1);
+
+    const successPanel = (heading: string, body: string) => (
       <View style={successStyles.container}>
         <View style={successStyles.body}>
           <View style={successStyles.tick}>
             <EventlyIcon name="check" size={44} color="#1d9e75" />
           </View>
           <EventlyText variant="h1" style={successStyles.heading}>
-            {SUCCESS_COPY.heading}
+            {heading}
           </EventlyText>
           <EventlyText variant="body" style={successStyles.text}>
-            {SUCCESS_COPY.body('Mahendra Events')}
+            {body}
           </EventlyText>
         </View>
         <View style={successStyles.foot}>
@@ -227,6 +284,12 @@ describe('render dump', () => {
           </View>
         </View>
       </View>
+    );
+
+    const success = successPanel(SUCCESS_COPY.heading, SUCCESS_COPY.body('Mahendra Events'));
+    const successCash = successPanel(
+      SUCCESS_COPY.cashHeading,
+      SUCCESS_COPY.cashBody('Mahendra Events'),
     );
 
     const render = (node: React.ReactElement) => {
@@ -242,7 +305,9 @@ describe('render dump', () => {
       page(
         [
           ['Payment', render(payment)],
+          ['Payment · cash', render(paymentCash)],
           ['Advance paid', render(success)],
+          ['Booked · advance due in cash', render(successCash)],
         ],
         { title: 'Payment', width: 390, background: '#faf8f7', padding: 0 },
       ),

@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { setToken } from '../../store/authSlice';
+import { clearSession } from '../../store/authSlice';
 import { useAppDispatch } from '../../store/hooks';
 import { useLogoutAction, useProfileBadges, useUserDetails } from './hooks';
 import { groupsFor, mapProfile } from './utils';
@@ -38,7 +38,7 @@ export function useProfileContainer(): ProfileContainerResult {
         // Backend unreachable/failed — still proceed to clear the local session below.
       })
       .finally(() => {
-        dispatch(setToken(null));
+        dispatch(clearSession());
       });
   }, [logoutAction, dispatch]);
 

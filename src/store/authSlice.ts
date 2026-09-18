@@ -15,23 +15,63 @@ export type AppView = 'customer' | 'organizer';
 
 interface AuthState {
   token: string | null;
-  /** True once the persisted token has been read from AsyncStorage at startup. */
+  /**
+   * The long-lived half of the session.
+   *
+   * The access token is deliberately short-lived (the backend signs it for an
+   * hour), so it is NOT what keeps someone signed in — this is. Storing only
+   * the access token is what used to sign people out roughly an hour after
+   * login: the next request 401'd and there was nothing left to recover with.
+   */
+  refreshToken: string | null;
+  /** True once the persisted session has been read from AsyncStorage at startup. */
   isHydrated: boolean;
   /** The view the person chose. Customer unless they explicitly switch. */
   activeView: AppView;
 }
 
-const initialState: AuthState = { token: null, isHydrated: false, activeView: 'customer' };
+export interface SessionTokens {
+  token: string;
+  refreshToken?: string | null;
+}
+
+const initialState: AuthState = {
+  token: null,
+  refreshToken: null,
+  isHydrated: false,
+  activeView: 'customer',
+};
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setToken(state, action: PayloadAction<string | null>) {
+    /**
+     * Records a whole session at once. Every sign-in path must use this rather
+     * than `setToken`, or the refresh token is lost and the session dies with
+     * the access token.
+     */
+    setSession(state, action: PayloadAction<SessionTokens>) {
+      state.token = action.payload.token;
+      if (action.payload.refreshToken !== undefined) {
+        state.refreshToken = action.payload.refreshToken;
+      }
+    },
+    /** Replaces only the access token — used after a silent refresh. */
+    setAccessToken(state, action: PayloadAction<string>) {
       state.token = action.payload;
+    },
+    /**
+     * Ends the session. This is the ONLY thing that signs someone out, and it
+     * should only ever be reached from an explicit logout or from a refresh
+     * token the server has rejected.
+     */
+    clearSession(state) {
+      state.token = null;
+      state.refreshToken = null;
       // Signing out drops the chosen view with the session, so the next person
       // on this device doesn't inherit it.
-      if (action.payload === null) state.activeView = 'customer';
+      state.activeView = 'customer';
     },
     setAuthHydrated(state) {
       state.isHydrated = true;
@@ -42,9 +82,12 @@ const authSlice = createSlice({
   },
 });
 
-export const { setToken, setAuthHydrated, setActiveView } = authSlice.actions;
+export const { setSession, setAccessToken, clearSession, setAuthHydrated, setActiveView } =
+  authSlice.actions;
 
 export const selectAuthToken = (state: { auth: AuthState }): string | null => state.auth.token;
+export const selectRefreshToken = (state: { auth: AuthState }): string | null =>
+  state.auth.refreshToken;
 export const selectIsAuthHydrated = (state: { auth: AuthState }): boolean => state.auth.isHydrated;
 
 /** Derived from the token itself (not separately persisted) — always reflects whatever token is currently active. */

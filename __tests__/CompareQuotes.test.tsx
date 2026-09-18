@@ -117,6 +117,60 @@ describe('one organizer has replied', () => {
   });
 });
 
+describe('after a quote is accepted', () => {
+  /*
+   * The dead end this prevents.
+   *
+   * Accepting navigated straight to the payment screen, and every card lost
+   * its button the moment any quote was accepted. So a customer who backed out
+   * of payment — or closed the app and came back — landed on a card reading
+   * "ACCEPTED · ₹83,662 advance to confirm" with nothing on it to press, and
+   * the one thing left to do had no way in from anywhere.
+   */
+  const decided = () => {
+    const accepted = quotation({ id: 'q2', status: 'accepted', grandTotal: 240000 });
+    return mapCompare(request([quotation(), accepted]), 'Anniversary');
+  };
+
+  it('still names the advance the accepted card owes', () => {
+    // The button is labelled from this, so losing it silently unlabels it.
+    const card = decided().quotes.find((q) => q.isAccepted);
+    expect(card?.isAccepted).toBe(true);
+    expect(card?.advanceLabel).toBeTruthy();
+  });
+
+  it('marks exactly one card accepted, and no other', () => {
+    // Only the accepted card gets a button afterwards; the rest are closed.
+    const m = decided();
+    expect(m.quotes.filter((q) => q.isAccepted)).toHaveLength(1);
+    expect(m.isDecided).toBe(true);
+  });
+
+  it('labels the advance button with the amount when there is one', () => {
+    expect(COMPARE_COPY.payAdvance('₹83,662')).toBe('Pay ₹83,662 advance');
+    // An organizer who set no advance leaves nothing to name.
+    expect(COMPARE_COPY.payAdvance('')).toBe('Pay the advance');
+  });
+
+  it('says the advance is still outstanding, not just that the rest are closed', () => {
+    /*
+     * "The others are closed" was the whole message, which reads as "you are
+     * done" to somebody who is not. Accepting is the choice; the advance is
+     * what books it.
+     */
+    expect(COMPARE_COPY.decidedNote).toMatch(/advance/i);
+    expect(COMPARE_COPY.decidedNote).toMatch(/confirm/i);
+  });
+
+  it('no longer promises accepting creates the booking on its own', () => {
+    // It picks the organizer. The advance is what turns that into a booking,
+    // and saying otherwise is what made the accepted state read as finished.
+    expect(COMPARE_COPY.acceptNote).not.toMatch(/creates your booking/i);
+    expect(COMPARE_COPY.acceptNoteOnly).not.toMatch(/creates your booking/i);
+    expect(COMPARE_COPY.acceptNote).toMatch(/advance/i);
+  });
+});
+
 describe('what counts as a quote', () => {
   it('drops a withdrawn quote, which is not an option any more', () => {
     const pulled = quotation({ id: 'q2', status: 'withdrawn' });

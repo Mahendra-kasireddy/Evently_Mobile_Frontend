@@ -250,7 +250,12 @@ export const CURRENT_EVENT_CTA: Record<CurrentEventStage, string> = {
   draft: 'Finish your plan',
   submitted: 'See your request',
   quotes_received: 'Compare quotes',
-  quote_accepted: 'See your booking',
+  /*
+   * Not "See your booking" — there is no booking yet. Accepting picks the
+   * organizer; the advance is what books it, and a button promising a booking
+   * that does not exist sent customers looking for one.
+   */
+  quote_accepted: 'Pay the advance',
   booking_created: 'Open workspace',
   booking_confirmed: 'Open workspace',
   in_progress: 'Open workspace',

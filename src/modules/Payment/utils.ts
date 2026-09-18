@@ -23,6 +23,9 @@ export function mapPayment(order: PaymentOrderDTO): PaymentViewModel {
         ? `${order.couponCode} saved ${formatINR(order.couponDiscount)}`
         : '',
     ctaLabel: `Pay ${formatINR(order.advanceAmount)} advance`,
+    /* Says "book", not "pay": tapping it moves no money, it commits the
+       customer to handing over that amount in person. */
+    cashCtaLabel: `Book with ${formatINR(order.advanceAmount)} in cash`,
     organizerName: order.organizerName || 'your organizer',
   };
 }

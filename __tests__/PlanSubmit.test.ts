@@ -29,7 +29,7 @@ const draft = (over: Partial<PlanDraft> = {}): PlanDraft => ({
   budget: '5-10L',
   ideas: 'Live dosa counter for the cousins',
   categories: ['photography', 'music'],
-  selectedOrganizerId: 'org1',
+  selectedOrganizerIds: ['org1'],
   step: 3,
   ...over,
 });
@@ -45,7 +45,7 @@ const payloadFor = (
   d: PlanDraft,
   planId: string | null,
 ): RequestQuoteFromOrganizerDTO => ({
-  organizerId: d.selectedOrganizerId,
+  organizerIds: d.selectedOrganizerIds,
   occasion: d.occasionId,
   when: d.eventDate || undefined,
   where: [d.area, d.city].filter(Boolean).join(', ') || undefined,

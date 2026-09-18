@@ -1,5 +1,9 @@
 import { apiClient } from '../../services/apiClient';
-import { PAYMENT_ORDER_ENDPOINT, PAYMENT_VERIFY_ENDPOINT } from './constants';
+import {
+  PAYMENT_CASH_ENDPOINT,
+  PAYMENT_ORDER_ENDPOINT,
+  PAYMENT_VERIFY_ENDPOINT,
+} from './constants';
 import type { PaidBookingDTO, PaymentOrderDTO, RazorpayResult } from './types';
 
 /**
@@ -27,6 +31,24 @@ export async function createPaymentOrder(
  * payment that happened. The booking is created there, in the same call, so
  * there is no moment where the money has moved and no event exists.
  */
+/**
+ * Books the event with the advance owed to the organizer in cash.
+ *
+ * No gateway, so there is nothing to verify afterwards — the server writes the
+ * booking here and hands it straight back. It still prices the advance itself
+ * from the quotation, so this app never names the figure the customer owes.
+ */
+export async function bookWithCash(
+  quotationId: string,
+  couponCode?: string,
+): Promise<PaidBookingDTO> {
+  const { data } = await apiClient.post<PaidBookingDTO>(PAYMENT_CASH_ENDPOINT, {
+    quotationId,
+    ...(couponCode ? { couponCode } : {}),
+  });
+  return data;
+}
+
 export async function verifyPayment(result: RazorpayResult): Promise<PaidBookingDTO> {
   const { data } = await apiClient.post<PaidBookingDTO>(PAYMENT_VERIFY_ENDPOINT, {
     razorpayOrderId: result.razorpay_order_id,

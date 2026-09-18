@@ -9,11 +9,15 @@ import type { RootStackParamList } from '../../navigation/types';
 import { useOpenWithOrganizer } from '../Chat';
 import { ORGANIZER_COPY as COPY, ORG_ACCENT } from './constants';
 import { useOrganizerContainer } from './container';
+import { AssuranceCard } from './sections/AssuranceCard';
+import { AvailabilityCard } from './sections/AvailabilityCard';
+import { CoverBanner } from './sections/CoverBanner';
 import { Handles } from './sections/Handles';
-import { ProfileHero } from './sections/ProfileHero';
+import { IdentityCard } from './sections/IdentityCard';
 import { QuoteFooter } from './sections/QuoteFooter';
-import { RatingCard } from './sections/RatingCard';
+import { RatingPanel } from './sections/RatingPanel';
 import { RecentWork } from './sections/RecentWork';
+import { ReviewPreview } from './sections/ReviewPreview';
 import { styles } from './styles';
 
 type OrganizerRouteProp = RouteProp<RootStackParamList, 'Organizer'>;
@@ -27,15 +31,17 @@ type OrganizerNavigationProp = NativeStackNavigationProp<RootStackParamList>;
  * body of reviews — and it gave the customer nowhere to act from without
  * dismissing what they were reading.
  *
- * Every section removes itself when the organizer has not supplied it, so an
- * incomplete profile reads as short rather than as a column of blanks.
+ * The column is ordered the way the decision is made: who they are, whether
+ * they are free, what Evently guarantees, what their work looks like, what
+ * they take on, and what other customers said. Every section removes itself
+ * when the organizer has not supplied it, so an incomplete profile reads as
+ * short rather than as a column of blanks.
  */
 export function OrganizerScreen() {
   const navigation = useNavigation<OrganizerNavigationProp>();
   const { params } = useRoute<OrganizerRouteProp>();
-  const { organizer, summary, isLoading, isError, errorMessage, refetch } = useOrganizerContainer(
-    params.organizerId,
-  );
+  const { organizer, summary, bars, latestReview, isLoading, isError, errorMessage, refetch } =
+    useOrganizerContainer(params.organizerId);
 
   /*
    * "Request a quote" opens the plan wizard with this organizer already
@@ -47,13 +53,16 @@ export function OrganizerScreen() {
    * request nobody can answer into an organizer's inbox, and tell the
    * customer it had been "sent".
    */
-  const requestQuote = useCallback(() => {
-    if (!organizer) return;
-    navigation.navigate('Main', {
-      screen: 'Plan',
-      params: { organizerId: organizer.id },
-    });
-  }, [navigation, organizer]);
+  const openPlan = useCallback(
+    (eventDate?: string) => {
+      if (!organizer) return;
+      navigation.navigate('Main', {
+        screen: 'Plan',
+        params: { organizerId: organizer.id, ...(eventDate ? { eventDate } : {}) },
+      });
+    },
+    [navigation, organizer],
+  );
 
   const openThread = useOpenWithOrganizer();
 
@@ -78,12 +87,13 @@ export function OrganizerScreen() {
       .catch(() => {});
   }, [navigation, openThread, organizer]);
 
-  const openReviews = () =>
-    organizer &&
+  const openReviews = useCallback(() => {
+    if (!organizer) return;
     navigation.navigate('OrganizerReviews', {
       organizerId: organizer.id,
       name: organizer.name,
     });
+  }, [navigation, organizer]);
 
   if (isLoading && !organizer) {
     return (
@@ -102,7 +112,7 @@ export function OrganizerScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.centered}>
-          <EventlyText variant="h2" style={styles.errorTitle}>
+          <EventlyText variant="sectionTitle" style={styles.errorTitle}>
             {COPY.errorTitle}
           </EventlyText>
           {isError ? (
@@ -117,7 +127,7 @@ export function OrganizerScreen() {
             accessibilityRole="button"
           >
             <EventlyIcon name="refresh" size={16} color={ORG_ACCENT} />
-            <EventlyText variant="caption" style={styles.retryText}>
+            <EventlyText variant="label" style={styles.retryText}>
               {COPY.retry}
             </EventlyText>
           </TouchableOpacity>
@@ -129,28 +139,55 @@ export function OrganizerScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <ProfileHero
-          organizer={organizer}
-          showAllReviews={summary.total > 0}
+        <CoverBanner
+          name={organizer.name}
+          coverUrl={organizer.coverUrl}
+          verification={organizer.verification}
           onBack={() => navigation.goBack()}
-          onPressAllReviews={openReviews}
         />
-        <RecentWork photos={organizer.gallery} />
+
+        <IdentityCard organizer={organizer} />
+
+        {organizer.availability ? (
+          <AvailabilityCard
+            availability={organizer.availability}
+            onHoldDate={() => openPlan(organizer.availability?.dateIso)}
+          />
+        ) : null}
+
+        <AssuranceCard items={organizer.assurances} />
+
+        <RecentWork
+          tiles={organizer.work}
+          isPlaceholder={organizer.workIsPlaceholder}
+          events={organizer.events}
+        />
+
         <Handles items={organizer.handles} />
-        <RatingCard
+
+        <RatingPanel
           rating={summary.total > 0 ? summary.average : organizer.rating}
           reviews={summary.total}
-          events={organizer.events}
+          bars={bars}
           onPressReviews={openReviews}
         />
+
+        {latestReview ? (
+          <ReviewPreview
+            review={latestReview}
+            showAll={summary.total > 1}
+            onPressAll={openReviews}
+          />
+        ) : null}
       </ScrollView>
 
       <QuoteFooter
         typicalLabel={organizer.typicalLabel}
+        responseHours={organizer.responseHours}
         hasRequested={false}
         isRequesting={false}
         errorMessage={null}
-        onPress={requestQuote}
+        onPress={() => openPlan()}
         onPressMessage={messageOrganizer}
         isOpeningMessage={openThread.loading}
       />

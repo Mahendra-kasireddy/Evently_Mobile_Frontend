@@ -217,7 +217,10 @@ export function useHomeContainer(): HomeContainerResult {
       setOrganizerRequestingId(organizerId);
       organizerQuoteCall
         .execute({
-          organizerId,
+          // A list of one: "Get quote" on a card is still a brief the
+          // customer addressed themselves, recorded the same way as a
+          // shortlist of four.
+          organizerIds: [organizerId],
           occasion: heroDraft.occasion,
           when: heroDraft.when,
           where: heroDraft.where,

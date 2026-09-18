@@ -28,9 +28,21 @@ export const COMPARE_COPY = {
    * organizer has replied — and a customer who is told their other quotes were
    * declined will go looking for quotes that never existed.
    */
-  acceptNote: 'Accepting creates your booking with this organizer and declines the rest.',
-  acceptNoteOnly: 'Accepting creates your booking with this organizer.',
-  decidedNote: 'You have accepted a quote for this event. The others are closed.',
+  acceptNote: 'Accepting picks this organizer and declines the rest. The advance confirms it.',
+  acceptNoteOnly: 'Accepting picks this organizer. The advance confirms it.',
+  /*
+   * What is actually true between accepting and paying.
+   *
+   * "The others are closed" was the whole message, which left a customer
+   * looking at an accepted quote with nothing to do and no idea anything was
+   * outstanding. Accepting is the choice; the advance is what books it, and
+   * until it is paid the organizer has not been asked to hold the date.
+   */
+  decidedNote:
+    'You have accepted this quote and the others are closed. Pay the advance to confirm the booking.',
+  /** On the accepted card, in place of the accept button. */
+  payAdvance: (advance: string) => (advance ? `Pay ${advance} advance` : 'Pay the advance'),
+  payAdvanceNote: 'Your organizer is asked to confirm once the advance is in.',
   acceptFailed: "We couldn't accept that quote. Please try again.",
 
   loading: 'Loading your quotes…',

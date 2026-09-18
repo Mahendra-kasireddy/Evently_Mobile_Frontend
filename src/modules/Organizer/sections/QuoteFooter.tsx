@@ -1,12 +1,13 @@
 import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
-import { ORG_NAVY } from '../constants';
-import { ORGANIZER_COPY as COPY } from '../constants';
+import { ORG_NAVY, ORGANIZER_COPY as COPY } from '../constants';
 import { footerStyles as s } from '../styles';
 
 interface QuoteFooterProps {
   /** "₹6.5L – 8L" — the row is dropped when there is no published estimate. */
   typicalLabel: string;
+  /** Their own median reply time. 0 drops the line rather than promising "0h". */
+  responseHours: number;
   hasRequested: boolean;
   isRequesting: boolean;
   errorMessage: string | null;
@@ -21,14 +22,16 @@ interface QuoteFooterProps {
  *
  * Pinned rather than scrolled past, because a customer who has read to the
  * bottom of a profile should not have to scroll back to act on it. The
- * reassurance beside the price is there because "request a quote" reads like
- * a commitment to people who have not used the app before, and it is not one.
+ * "free · no card needed" line sits inside the button because "request a
+ * quote" reads like a commitment to people who have not used the app before,
+ * and it is not one.
  *
  * Once a request has gone out the button becomes a receipt — pressing it
  * again would raise a second request for the same event.
  */
 export function QuoteFooter({
   typicalLabel,
+  responseHours,
   hasRequested,
   isRequesting,
   errorMessage,
@@ -42,18 +45,22 @@ export function QuoteFooter({
         {typicalLabel ? (
           <View style={s.typicalRow}>
             <EventlyText variant="caption" style={s.typicalLabel}>
-              {COPY.typical}
+              {COPY.typical.toUpperCase()}
             </EventlyText>
-            <EventlyText variant="h2" style={s.typicalValue}>
-              {typicalLabel}
-            </EventlyText>
+            <EventlyText style={s.typicalValue}>{typicalLabel}</EventlyText>
           </View>
         ) : (
           <View />
         )}
-        <EventlyText variant="body" style={s.reassurance} numberOfLines={1}>
-          {COPY.freeToAsk}
-        </EventlyText>
+
+        {responseHours > 0 ? (
+          <View style={s.replyRow}>
+            <View style={s.dot} />
+            <EventlyText variant="small" style={s.reassurance} numberOfLines={1}>
+              {COPY.usuallyReplies(responseHours)}
+            </EventlyText>
+          </View>
+        ) : null}
       </View>
 
       <View style={s.actions}>
@@ -85,9 +92,14 @@ export function QuoteFooter({
           accessibilityRole="button"
           accessibilityLabel={hasRequested ? COPY.requested : COPY.requestQuote}
         >
-          <EventlyText variant="subtitle" style={[s.ctaText, hasRequested && s.ctaDoneText]}>
+          <EventlyText style={[s.ctaText, hasRequested && s.ctaDoneText]}>
             {hasRequested ? COPY.requested : isRequesting ? COPY.requesting : COPY.requestQuote}
           </EventlyText>
+          {hasRequested || isRequesting ? null : (
+            <EventlyText variant="caption" style={s.ctaNote}>
+              {COPY.requestQuoteNote}
+            </EventlyText>
+          )}
         </TouchableOpacity>
       </View>
 

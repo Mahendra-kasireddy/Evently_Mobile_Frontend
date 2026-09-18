@@ -160,8 +160,26 @@ export function HomeScreen() {
   const openEvent = useOpenEvent();
   const handlePressHeroCta = openEvent;
 
-  /* "See all quotes & your brief" promises the same screen the button opens. */
-  const handlePressHeroDetails = openEvent;
+  /**
+   * Every way into a request that is not the main button: the "see all quotes
+   * & your brief" link, and tapping one organizer's reply.
+   *
+   * These always open the list, even where the button would go straight to the
+   * side-by-side. The button's job is to carry the customer to the next
+   * decision; the link's job is the one it names — all of the quotes, and the
+   * brief they answer. A link reading "see all quotes" that opens two of them
+   * is a link that lied.
+   */
+  const openRequest = useCallback(
+    (event: CurrentEventViewModel) => {
+      if (event.source !== 'quote') return openEvent(event);
+      return navigation.navigate('CompareQuotes', {
+        requestId: event.refId,
+        title: event.title,
+      });
+    },
+    [navigation, openEvent],
+  );
 
   /**
    * One event's hero.
@@ -176,18 +194,10 @@ export function HomeScreen() {
       event={event}
       ctaLabel={event.ctaLabel}
       onPressCta={() => handlePressHeroCta(event)}
-      onPressDetails={() => handlePressHeroDetails(event)}
-      /* Tapping one reply opens the comparison rather than that quote
-         alone — the decision is between them, not about one. */
-      onPressQuote={
-        event.source === 'quote'
-          ? () =>
-              navigation.navigate('CompareQuotes', {
-                requestId: event.refId,
-                title: event.title,
-              })
-          : undefined
-      }
+      onPressDetails={() => openRequest(event)}
+      /* Tapping one reply opens the list rather than that quote alone — the
+         decision is between them, not about one. */
+      onPressQuote={event.source === 'quote' ? () => openRequest(event) : undefined}
     />
   );
 

@@ -12,7 +12,8 @@ interface ReviewStepProps {
   occasionLabel: string;
   categories: CategoryOption[];
   recommendedOrganizer: PlanOrganizerDTO | null;
-  selectedOrganizerDetails: PlanOrganizerDTO | null;
+  /** Everyone the brief will go to, in the order the customer ticked them. */
+  selectedOrganizers: PlanOrganizerDTO[];
   submitPhase: SubmitPhase;
   submitError: string | null;
   planSaved: boolean;
@@ -73,7 +74,7 @@ export function ReviewStep({
   occasionLabel,
   categories,
   recommendedOrganizer,
-  selectedOrganizerDetails,
+  selectedOrganizers,
   submitPhase,
   submitError,
   planSaved,
@@ -108,8 +109,22 @@ export function ReviewStep({
           ? 'Retry quote request'
           : 'Submit plan & request quote';
 
+  /*
+   * The top match is offered only when the customer has not already picked it.
+   * Showing it under a shortlist that contains it reads as a second, different
+   * organizer with the same name.
+   */
   const showRecommended =
-    recommendedOrganizer && (!selectedOrganizerDetails || recommendedOrganizer.id !== selectedOrganizerDetails.id);
+    recommendedOrganizer && !selectedOrganizers.some((o) => o.id === recommendedOrganizer.id);
+
+  /** "Mahendra Events", "Mahendra Events and Sruthi", "… and 3 others". */
+  const organizerNames = (() => {
+    const names = selectedOrganizers.map((o) => o.name);
+    if (names.length === 0) return 'your organizer';
+    if (names.length === 1) return names[0];
+    if (names.length === 2) return `${names[0]} and ${names[1]}`;
+    return `${names[0]} and ${names.length - 1} others`;
+  })();
 
   return (
     <View style={reviewStyles.section}>
@@ -155,12 +170,18 @@ export function ReviewStep({
         <View style={reviewStyles.sectionDivider} />
 
         <View style={reviewStyles.sectionBlock}>
-          <SectionHead title="Organizer" actionLabel="Change" onPress={onEditOrganizer} />
-          {selectedOrganizerDetails ? (
-            <OrganizerRow organizer={selectedOrganizerDetails} tagLabel="Selected" />
+          <SectionHead
+            title={selectedOrganizers.length > 1 ? 'Organizers' : 'Organizer'}
+            actionLabel="Change"
+            onPress={onEditOrganizer}
+          />
+          {selectedOrganizers.length > 0 ? (
+            selectedOrganizers.map((organizer) => (
+              <OrganizerRow key={organizer.id} organizer={organizer} tagLabel="On your brief" />
+            ))
           ) : (
             <EventlyText variant="body" style={reviewStyles.emptyText}>
-              No organizer selected — go back and pick one.
+              No organizer selected — go back and pick at least one.
             </EventlyText>
           )}
           {showRecommended && recommendedOrganizer ? <OrganizerRow organizer={recommendedOrganizer} tagLabel="Top match" /> : null}
@@ -208,7 +229,10 @@ export function ReviewStep({
           Ready to submit?
         </EventlyText>
         <EventlyText variant="body" style={reviewStyles.submitText}>
-          We&rsquo;ll save your plan and send a quote request to {selectedOrganizerDetails ? selectedOrganizerDetails.name : 'your organizer'}. You&rsquo;ll get a tailored quote within a day.
+          We&rsquo;ll save your plan and send the same brief to {organizerNames}.{' '}
+          {selectedOrganizers.length > 1
+            ? 'Each one quotes separately, so you can compare them line by line.'
+            : 'You&rsquo;ll get a tailored quote within a day.'}
         </EventlyText>
 
         {planSaved && !submitError ? (

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { setActiveView, setToken } from '../../store/authSlice';
+import { setActiveView, setSession } from '../../store/authSlice';
 import { useAppDispatch } from '../../store/hooks';
 import { setHasSeenOnboarding } from '../../store/onboardingSlice';
 import {
@@ -99,7 +99,14 @@ export function useLoginContainer(): LoginContainerResult {
     verifyOtpCall
       .execute(requestId, code)
       .then(response => {
-        dispatch(setToken(response.token));
+        // Both halves of the session: the refresh token is what keeps the
+        // person signed in past the access token's one-hour life.
+        dispatch(
+          setSession({
+            token: response.token,
+            refreshToken: response.refreshToken ?? null,
+          }),
+        );
         // This screen is the customer entry point, so land in the customer app
         // even for an account that also holds the organizer role. Organizers
         // switch from Profile.

@@ -1,39 +1,74 @@
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { EventlyImage, EventlyText } from '../../../Components';
 import { ORGANIZER_COPY as COPY } from '../constants';
-import { styles, workStyles as s } from '../styles';
+import { styles, WORK_TILE_HEIGHT, WORK_TILE_WIDTH, workStyles as s } from '../styles';
+import { CoverArt } from './CoverArt';
+import type { WorkTile } from '../types';
 
 interface RecentWorkProps {
-  /** The organizer's uploaded portfolio photos. */
-  photos: string[];
+  tiles: WorkTile[];
+  /** True when these are drawn gradients rather than the organizer's uploads. */
+  isPlaceholder: boolean;
+  /** "89 events run" — dropped for an organizer who has run none. */
+  events: number;
 }
 
 /**
- * The organizer's own portfolio.
+ * The organizer's own portfolio, side by side.
  *
- * These are their real uploads, read from the profile's gallery. There is no
- * caption strip under each tile because nothing records what occasion or
- * locality a photo is from — labelling them would be this app inventing a
- * claim about somebody else's work.
+ * A strip rather than a grid: ten uploads should cost one swipe, not half a
+ * screen of scrolling before the services and reviews a customer came for.
  *
- * The section disappears entirely for an organizer who has uploaded nothing,
- * rather than showing a grid of empty frames that reads as a broken screen.
+ * There is no caption under a tile. Nothing records what occasion or locality
+ * a photo is from, and captioning them "Wedding · Jubilee Hills" would be
+ * this app inventing a claim about somebody else's work. When the organizer
+ * has uploaded nothing the strip runs as three abstract gradients with a line
+ * saying exactly that, rather than vanishing mid-profile.
  */
-export function RecentWork({ photos }: RecentWorkProps) {
-  if (photos.length === 0) return null;
+export function RecentWork({ tiles, isPlaceholder, events }: RecentWorkProps) {
+  if (tiles.length === 0) return null;
 
   return (
     <View>
-      <EventlyText variant="h2" style={styles.sectionTitle}>
-        {COPY.recentWork}
-      </EventlyText>
-      <View style={s.grid}>
-        {photos.map((url) => (
-          <View key={url} style={s.tile}>
-            <EventlyImage source={{ uri: url }} style={s.photo} resizeMode="cover" />
+      <View style={styles.sectionHead}>
+        <EventlyText variant="sectionTitle" style={styles.sectionTitle}>
+          {COPY.recentWork}
+        </EventlyText>
+        {events > 0 ? (
+          <EventlyText variant="small" style={styles.sectionMeta}>
+            {COPY.eventsRun(events)}
+          </EventlyText>
+        ) : null}
+      </View>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={s.strip}
+      >
+        {tiles.map((tile) => (
+          <View key={tile.key} style={s.tile}>
+            {tile.photo ? (
+              <EventlyImage source={{ uri: tile.photo }} style={s.photo} resizeMode="cover" />
+            ) : (
+              <CoverArt
+                width={WORK_TILE_WIDTH}
+                height={WORK_TILE_HEIGHT}
+                from={tile.gradient[0]}
+                to={tile.gradient[1]}
+                plain
+                style={s.art}
+              />
+            )}
           </View>
         ))}
-      </View>
+      </ScrollView>
+
+      {isPlaceholder ? (
+        <EventlyText variant="small" style={styles.note}>
+          {COPY.workPlaceholderNote}
+        </EventlyText>
+      ) : null}
     </View>
   );
 }

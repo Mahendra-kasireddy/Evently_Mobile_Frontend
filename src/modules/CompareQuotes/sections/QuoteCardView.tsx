@@ -13,6 +13,8 @@ interface QuoteCardViewProps {
   isOnly: boolean;
   isAccepting: boolean;
   onAccept: () => void;
+  /** Opens the advance for this quote. Only the accepted card offers it. */
+  onPay: () => void;
 }
 
 /**
@@ -23,11 +25,24 @@ interface QuoteCardViewProps {
  * eight line items each is forty lines to scroll before the totals can be
  * compared at all.
  *
- * The accept button says what accepting does before it is pressed. It creates
- * a booking and declines the others, and there is no undo — that belongs on
- * the button, not in a toast afterwards.
+ * The accept button says what accepting does before it is pressed. It picks
+ * this organizer and declines the others, and there is no undo — that belongs
+ * on the button, not in a toast afterwards.
+ *
+ * Afterwards the accepted card keeps a button, and it is the advance. Without
+ * one, a customer who accepted and then backed out of the payment screen — or
+ * simply reopened the app — came back to a card reading "ACCEPTED · ₹83,662
+ * advance to confirm" with nothing on it to press, and no way to confirm
+ * anything. The other cards are genuinely closed and stay buttonless.
  */
-export function QuoteCardView({ quote, decided, isOnly, isAccepting, onAccept }: QuoteCardViewProps) {
+export function QuoteCardView({
+  quote,
+  decided,
+  isOnly,
+  isAccepting,
+  onAccept,
+  onPay,
+}: QuoteCardViewProps) {
   const [open, setOpen] = useState(false);
   const acceptNote = isOnly ? COPY.acceptNoteOnly : COPY.acceptNote;
   const badge = quote.isAccepted ? COPY.accepted : quote.isLowest ? COPY.lowest : '';
@@ -140,8 +155,30 @@ export function QuoteCardView({ quote, decided, isOnly, isAccepting, onAccept }:
         </>
       ) : null}
 
-      {/* Once a quote is accepted the others are closed, so no card offers it. */}
-      {decided ? null : (
+      {/*
+        Three states, and only one of them is blank: an unaccepted card offers
+        accepting, the accepted one offers the advance that confirms it, and a
+        card closed by somebody else's acceptance offers nothing, because there
+        is nothing left to do with it.
+      */}
+      {quote.isAccepted ? (
+        <>
+          <TouchableOpacity
+            style={s.accept}
+            activeOpacity={0.85}
+            onPress={onPay}
+            accessibilityRole="button"
+            accessibilityLabel={`${COPY.payAdvance(quote.advanceLabel)} to ${quote.organizerName}`}
+          >
+            <EventlyText variant="subtitle" style={s.acceptText}>
+              {COPY.payAdvance(quote.advanceLabel)}
+            </EventlyText>
+          </TouchableOpacity>
+          <EventlyText variant="caption" style={s.acceptNote}>
+            {COPY.payAdvanceNote}
+          </EventlyText>
+        </>
+      ) : decided ? null : (
         <>
           <TouchableOpacity
             style={[s.accept, isAccepting && s.acceptDisabled]}

@@ -19,15 +19,24 @@ jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
 });
 
 import { page, toHtml } from '../test-utils/rn-to-html';
+import { AssuranceCard } from '../src/modules/Organizer/sections/AssuranceCard';
+import { AvailabilityCard } from '../src/modules/Organizer/sections/AvailabilityCard';
+import { CoverBanner } from '../src/modules/Organizer/sections/CoverBanner';
 import { Handles } from '../src/modules/Organizer/sections/Handles';
-import { ProfileHero } from '../src/modules/Organizer/sections/ProfileHero';
+import { IdentityCard } from '../src/modules/Organizer/sections/IdentityCard';
 import { QuoteFooter } from '../src/modules/Organizer/sections/QuoteFooter';
-import { RatingCard } from '../src/modules/Organizer/sections/RatingCard';
+import { RatingPanel } from '../src/modules/Organizer/sections/RatingPanel';
 import { RecentWork } from '../src/modules/Organizer/sections/RecentWork';
+import { ReviewPreview } from '../src/modules/Organizer/sections/ReviewPreview';
 import { ReviewCard } from '../src/modules/Organizer/sections/ReviewCard';
 import { ReviewSummaryCard } from '../src/modules/Organizer/sections/ReviewSummaryCard';
-import { filledStars, mapOrganizer, ratingBars } from '../src/modules/Organizer/utils';
-import { workStyles } from '../src/modules/Organizer/styles';
+import {
+  filledStars,
+  formatDayMonthYear,
+  mapOrganizer,
+  ratingBars,
+} from '../src/modules/Organizer/utils';
+import { WORK_TILE_WIDTH, workStyles } from '../src/modules/Organizer/styles';
 import { absoluteFileUrl } from '../src/services/urls';
 import type {
   OrganizerDetailDTO,
@@ -79,6 +88,12 @@ const dto = (over: Partial<OrganizerDetailDTO> = {}): OrganizerDetailDTO =>
       { url: 'https://cdn.test/a.jpg', key: 'a', originalName: 'a.jpg' },
       { url: 'https://cdn.test/b.jpg', key: 'b', originalName: 'b.jpg' },
     ],
+    coverPhoto: null,
+    verified: true,
+    kycOnFile: true,
+    gstOnFile: true,
+    nextFreeDate: '2026-09-05',
+    slotsLeftThatWeek: 2,
     ...over,
   }) as OrganizerDetailDTO;
 
@@ -172,9 +187,42 @@ describe('mapOrganizer', () => {
     expect(model({ reviews: 0, events: 0, responseHours: 0 }).stats).toEqual([]);
   });
 
-  it('says nothing about price when none is published', () => {
-    expect(model().headlineLabel).toBe('From ₹6,50,000');
-    expect(model({ basePrice: 0 }).headlineLabel).toBe('');
+  it('calls verified only an organizer an admin actually passed', () => {
+    /*
+     * The pill is the strongest claim on this screen. It is drawn from
+     * onboardingStatus === approved, never from the mere presence of
+     * paperwork — an organizer who uploaded a PAN is not thereby checked.
+     */
+    expect(model().verification).toEqual({
+      title: 'Evently verified',
+      detail: 'KYC & GST on file',
+    });
+    expect(model({ verified: false }).verification).toBeNull();
+    // Verified, but only one of the two documents on file: say only that one.
+    expect(model({ gstOnFile: false }).verification?.detail).toBe('KYC on file');
+    expect(model({ kycOnFile: false, gstOnFile: false }).verification?.detail).toBe('');
+  });
+
+  it('claims a free date only when the server worked one out', () => {
+    expect(model().availability).toEqual({
+      dateLabel: '5 Sep 2026',
+      dateIso: '2026-09-05',
+      detail: 'Handles events up to 500 guests · 2 slots left that week',
+    });
+    // Booked out past the horizon: no card. An empty availability strip reads
+    // as "fully booked", which is a different claim from "we do not know".
+    expect(model({ nextFreeDate: null }).availability).toBeNull();
+    expect(model({ slotsLeftThatWeek: 0, capacityMax: 0 }).availability?.detail).toBe('');
+  });
+
+  it('promises a reply time only when the organizer has one on record', () => {
+    // "Replies to 0% of requests within 0 hours" is worse than saying nothing.
+    expect(model().assurances.map((a) => a.key)).toEqual(['replies', 'advance', 'itemised']);
+    expect(model().assurances[0].text).toBe('Replies to 92% of requests within 2 hours');
+    expect(model({ responseRate: 0 }).assurances.map((a) => a.key)).toEqual([
+      'advance',
+      'itemised',
+    ]);
   });
 
   it('names only the services it can actually name', () => {
@@ -213,23 +261,46 @@ describe('absoluteFileUrl', () => {
   });
 
   it('is applied to the gallery, so a portfolio photo can actually load', () => {
-    const gallery = model({
+    const work = model({
       gallery: [{ url: '/api/upload/file/a.jpg', key: 'a', originalName: 'a.jpg' }],
-    }).gallery;
-    expect(gallery[0].startsWith('/')).toBe(false);
+    }).work;
+    expect(work[0].photo?.startsWith('/')).toBe(false);
   });
 });
 
-describe('the work grid', () => {
-  it('never lets one photo stretch across the row', () => {
+describe('the work strip', () => {
+  it('gives every tile the same fixed width', () => {
     /*
-     * With flexGrow, a single upload filled the full width and aspectRatio
-     * made it as tall as the screen was wide — one photo pushed the whole
-     * rest of the profile below the fold.
+     * A strip, not a grid: ten uploads should cost one swipe rather than half
+     * a screen of scrolling before the services and reviews a customer came
+     * for. A percentage width in a horizontal ScrollView measures against the
+     * content, not the screen, which is how tiles used to collapse to nothing.
      */
     const tile = workStyles.tile as Record<string, unknown>;
-    expect(tile.flexGrow).toBeUndefined();
-    expect(tile.width).toBe('31.5%');
+    expect(tile.width).toBe(WORK_TILE_WIDTH);
+    expect(typeof tile.width).toBe('number');
+  });
+
+  it('falls back to abstract tiles rather than somebody else\'s photos', () => {
+    // A stock wedding photo on a profile is a claim about work this
+    // organizer did not do.
+    const empty = model({ gallery: [] });
+    expect(empty.workIsPlaceholder).toBe(true);
+    expect(empty.work.every((t) => t.photo === null)).toBe(true);
+    expect(model().workIsPlaceholder).toBe(false);
+  });
+});
+
+describe('formatDayMonthYear', () => {
+  it('reads a date the way the design writes it', () => {
+    expect(formatDayMonthYear('2026-09-05')).toBe('5 Sep 2026');
+    expect(formatDayMonthYear('2026-12-31')).toBe('31 Dec 2026');
+  });
+
+  it('says nothing rather than guessing at something unparseable', () => {
+    expect(formatDayMonthYear('')).toBe('');
+    expect(formatDayMonthYear('next Tuesday')).toBe('');
+    expect(formatDayMonthYear('2026-13-01')).toBe('');
   });
 });
 
@@ -265,88 +336,150 @@ describe('filledStars', () => {
   });
 });
 
-describe('ProfileHero', () => {
+describe('CoverBanner and IdentityCard', () => {
   it('shows who they are and the figures they have earned', () => {
-    const text = textOf(
-      render(
-        <ProfileHero organizer={model()} showAllReviews onBack={noop} onPressAllReviews={noop} />,
-      ),
-    );
+    const text = textOf(render(<IdentityCard organizer={model()} />));
 
     expect(text).toContain('Mahendra Events');
-    expect(text).toContain('Silver');
+    expect(text).toContain('Silver partner');
     expect(text).toContain('Kukatpally, Hyderabad');
-    expect(text).toContain('From ₹6,50,000');
     expect(text).toContain('126 reviews');
     expect(text).toContain('events run');
     expect(text).toContain('avg reply');
   });
 
-  it('does not stretch a lone stat across the row', () => {
-    // Full-width, "24h / avg reply" reads as a panel that failed to fill.
-    const tree = render(
-      <ProfileHero
-        organizer={model({ reviews: 0, events: 0 })}
-        showAllReviews={false}
-        onBack={noop}
-        onPressAllReviews={noop}
-      />,
+  it('drops the whole stat strip rather than printing zeros', () => {
+    const text = textOf(
+      render(<IdentityCard organizer={model({ reviews: 0, events: 0, responseHours: 0 })} />),
     );
-    const flat = (style: any): Record<string, unknown> =>
-      Array.isArray(style) ? Object.assign({}, ...style.filter(Boolean).map(flat)) : (style ?? {});
-    const tiles = tree.root
-      .findAllByProps({ accessible: undefined })
-      .map((n: any) => flat(n.props?.style))
-      .filter((st) => st.backgroundColor === '#1b2a49');
-
-    expect(tiles.length).toBeGreaterThan(0);
-    expect(tiles.every((st) => st.flex === 0)).toBe(true);
+    expect(text).toContain('Mahendra Events');
+    expect(text).not.toContain('avg reply');
   });
 
-  it('offers "All reviews" only when there are some to read', () => {
-    const without = render(
-      <ProfileHero
-        organizer={model({ reviews: 0 })}
-        showAllReviews={false}
-        onBack={noop}
-        onPressAllReviews={noop}
-      />,
+  it('carries the verification pill only when there is one to carry', () => {
+    const verified = textOf(
+      render(
+        <CoverBanner
+          name="Mahendra Events"
+          coverUrl={null}
+          verification={model().verification}
+          onBack={noop}
+        />,
+      ),
     );
-    expect(textOf(without)).not.toContain('All reviews');
-    // Just the back button.
-    expect(drawnButtons(without)).toHaveLength(1);
+    expect(verified).toContain('Evently verified · KYC & GST on file');
+
+    const unverified = textOf(
+      render(
+        <CoverBanner name="Mahendra Events" coverUrl={null} verification={null} onBack={noop} />,
+      ),
+    );
+    // Not "not yet verified" — that is a verdict this app has not reached.
+    expect(unverified).not.toContain('verified');
+  });
+
+  it('offers no favourite control, because nothing would remember it', () => {
+    const tree = render(
+      <CoverBanner name="Mahendra Events" coverUrl={null} verification={null} onBack={noop} />,
+    );
+    const labels = drawnButtons(tree).map((b) => b.props.accessibilityLabel);
+    expect(labels).toEqual(['Go back', 'Share this organizer']);
   });
 });
 
-describe('RatingCard', () => {
+describe('AvailabilityCard', () => {
+  it('reads as an offer to ask, not as a reservation', () => {
+    /*
+     * Nothing in the API reserves a date. "Hold date" opens the brief with
+     * that date filled in — the only thing that actually puts a claim on it is
+     * a request the organizer can accept.
+     */
+    const availability = model().availability!;
+    const tree = render(<AvailabilityCard availability={availability} onHoldDate={noop} />);
+    const text = textOf(tree);
+
+    expect(text).toContain('Free on 5 Sep 2026');
+    expect(text).toContain('Handles events up to 500 guests · 2 slots left that week');
+    expect(drawnButtons(tree)[0].props.accessibilityLabel).toBe('Hold date — 5 Sep 2026');
+  });
+});
+
+describe('AssuranceCard', () => {
+  it('lists only promises the record supports', () => {
+    const text = textOf(render(<AssuranceCard items={model().assurances} />));
+    expect(text).toContain('Replies to 92% of requests within 2 hours');
+    expect(text).toContain('Advance refunded by Evently if the booking falls through');
+    expect(text).toContain('Itemised quotes');
+  });
+
+  it('draws nothing at all when there is nothing to promise', () => {
+    expect(render(<AssuranceCard items={[]} />).toJSON()).toBeNull();
+  });
+});
+
+describe('RatingPanel', () => {
   it('tells a new organizer apart from a badly rated one', () => {
     /*
      * "0.0" beside five grey stars reads as a bad rating rather than as no
      * rating — a materially different thing to tell somebody choosing who to
      * trust with a wedding.
      */
-    const text = textOf(render(<RatingCard rating={0} reviews={0} events={0} onPressReviews={noop} />));
+    const text = textOf(
+      render(<RatingPanel rating={0} reviews={0} bars={[]} onPressReviews={noop} />),
+    );
     expect(text).not.toContain('0.0');
     expect(text).toContain('has not been reviewed yet');
   });
 
-  it('shows the score and what it is built on', () => {
-    const text = textOf(render(<RatingCard rating={4.8} reviews={126} events={89} onPressReviews={noop} />));
+  it('shows the score, what it is built on, and every bar', () => {
+    const s = summary();
+    const text = textOf(
+      render(
+        <RatingPanel rating={4.8} reviews={126} bars={ratingBars(s)} onPressReviews={noop} />,
+      ),
+    );
     expect(text).toContain('4.8');
     expect(text).toContain('126 reviews');
-    expect(text).toContain('89 events completed');
+    ['98', '19', '6', '2', '1'].forEach((n) => expect(text).toContain(n));
+  });
+});
+
+describe('ReviewPreview', () => {
+  it('shows one review and a way to the rest', () => {
+    const tree = render(<ReviewPreview review={review()} showAll onPressAll={noop} />);
+    const text = textOf(tree);
+    expect(text).toContain('Sandhya P.');
+    expect(text).toContain('Naming ceremony · June 2026');
+    expect(text).toContain('5.0');
+    expect(drawnButtons(tree).map((b) => b.props.accessibilityLabel)).toContain('All reviews');
+  });
+
+  it('does not offer "all reviews" when this is the only one', () => {
+    const tree = render(<ReviewPreview review={review()} showAll={false} onPressAll={noop} />);
+    expect(textOf(tree)).not.toContain('All reviews');
   });
 });
 
 describe('RecentWork and Handles', () => {
-  it('disappear entirely rather than showing empty frames', () => {
-    expect(render(<RecentWork photos={[]} />).toJSON()).toBeNull();
+  it('Handles disappears rather than showing an empty row of chips', () => {
     expect(render(<Handles items={[]} />).toJSON()).toBeNull();
   });
 
-  it('draw one tile per uploaded photo', () => {
-    const tree = render(<RecentWork photos={['a', 'b', 'c']} />);
-    expect(tree.root.findAllByProps({ resizeMode: 'cover' }).length).toBeGreaterThanOrEqual(3);
+  it('draws one tile per uploaded photo', () => {
+    const tree = render(
+      <RecentWork tiles={model().work} isPlaceholder={false} events={89} />,
+    );
+    expect(tree.root.findAllByProps({ resizeMode: 'cover' }).length).toBeGreaterThanOrEqual(2);
+    // No invented caption: nothing records what occasion a photo is from.
+    expect(textOf(tree)).not.toContain('Jubilee Hills');
+  });
+
+  it('says so, in as many words, when the tiles are placeholders', () => {
+    const text = textOf(
+      render(<RecentWork tiles={model({ gallery: [] }).work} isPlaceholder events={89} />),
+    );
+    expect(text).toContain('Placeholders');
+    expect(text).toContain('89 events run');
   });
 });
 
@@ -357,6 +490,7 @@ describe('QuoteFooter', () => {
     const tree = render(
       <QuoteFooter
         typicalLabel="₹6.5L – 8L"
+        responseHours={2}
         hasRequested={false}
         isRequesting={false}
         errorMessage={null}
@@ -373,7 +507,16 @@ describe('QuoteFooter', () => {
   it('drops the typical range when nothing is published', () => {
     const text = textOf(
       render(
-        <QuoteFooter typicalLabel="" hasRequested={false} isRequesting={false} errorMessage={null} onPress={noop} onPressMessage={noop} isOpeningMessage={false} />,
+        <QuoteFooter
+          typicalLabel=""
+          responseHours={0}
+          hasRequested={false}
+          isRequesting={false}
+          errorMessage={null}
+          onPress={noop}
+          onPressMessage={noop}
+          isOpeningMessage={false}
+        />,
       ),
     );
     expect(text).not.toContain('Typical');
@@ -384,6 +527,7 @@ describe('QuoteFooter', () => {
     const tree = render(
       <QuoteFooter
         typicalLabel="₹6.5L – 8L"
+        responseHours={2}
         hasRequested
         isRequesting={false}
         errorMessage={null}
@@ -438,16 +582,31 @@ describe('render dump', () => {
         toHtml(
           render(
             <>
-              <ProfileHero organizer={organizer} showAllReviews onBack={noop} onPressAllReviews={noop} />
+              <CoverBanner
+                name={organizer.name}
+                coverUrl={organizer.coverUrl}
+                verification={organizer.verification}
+                onBack={noop}
+              />
+              <IdentityCard organizer={organizer} />
+              <AvailabilityCard availability={organizer.availability!} onHoldDate={noop} />
+              <AssuranceCard items={organizer.assurances} />
+              <RecentWork
+                tiles={organizer.work}
+                isPlaceholder={organizer.workIsPlaceholder}
+                events={organizer.events}
+              />
               <Handles items={organizer.handles} />
-              <RatingCard
+              <RatingPanel
                 rating={s.average}
                 reviews={s.total}
-                events={organizer.events}
+                bars={ratingBars(s)}
                 onPressReviews={noop}
               />
+              <ReviewPreview review={review()} showAll onPressAll={noop} />
               <QuoteFooter
                 typicalLabel={organizer.typicalLabel}
+                responseHours={organizer.responseHours}
                 hasRequested={false}
                 isRequesting={false}
                 errorMessage={null}
@@ -500,13 +659,16 @@ describe('render dump', () => {
         toHtml(
           render(
             <>
-              <ProfileHero
-                organizer={model({ reviews: 0, rating: 0, events: 0 })}
-                showAllReviews={false}
-                onBack={noop}
-                onPressAllReviews={noop}
+              <CoverBanner name="New Events Co" coverUrl={null} verification={null} onBack={noop} />
+              <IdentityCard
+                organizer={model({ reviews: 0, rating: 0, events: 0, responseHours: 0 })}
               />
-              <RatingCard rating={0} reviews={0} events={0} onPressReviews={noop} />
+              <RecentWork
+                tiles={model({ gallery: [] }).work}
+                isPlaceholder
+                events={0}
+              />
+              <RatingPanel rating={0} reviews={0} bars={[]} onPressReviews={noop} />
             </>,
           ).toJSON(),
         ),

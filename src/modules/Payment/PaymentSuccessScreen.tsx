@@ -62,6 +62,7 @@ export function PaymentSuccessScreen() {
   };
 
   const organizer = params.organizerName?.trim() || 'Your organizer';
+  const inCash = params.inCash === true;
 
   return (
     <SafeAreaView style={s.container} edges={['top']}>
@@ -71,10 +72,10 @@ export function PaymentSuccessScreen() {
         </View>
 
         <EventlyText variant="h1" style={s.heading}>
-          {COPY.heading}
+          {inCash ? COPY.cashHeading : COPY.heading}
         </EventlyText>
         <EventlyText variant="body" style={s.text}>
-          {COPY.body(organizer)}
+          {inCash ? COPY.cashBody(organizer) : COPY.body(organizer)}
         </EventlyText>
       </View>
 

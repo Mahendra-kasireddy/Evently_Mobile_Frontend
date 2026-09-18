@@ -18,19 +18,23 @@ type PaymentNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 function MethodRow({
   option,
   selected,
+  disabled,
   onPress,
 }: {
   option: PayOption;
   selected: boolean;
+  /** True for an online method while no gateway is configured. */
+  disabled: boolean;
   onPress: () => void;
 }) {
   return (
     <TouchableOpacity
-      style={[s.option, selected && s.optionOn]}
+      style={[s.option, selected && s.optionOn, disabled && s.optionOff]}
       activeOpacity={0.85}
+      disabled={disabled}
       onPress={onPress}
       accessibilityRole="radio"
-      accessibilityState={{ selected }}
+      accessibilityState={{ selected, disabled }}
       accessibilityLabel={`${option.label}. ${option.hint}`}
     >
       <View style={s.optionIcon}>
@@ -70,7 +74,7 @@ export function PaymentScreen() {
   const openThread = useOpenWithOrganizer();
 
   const onPaid = useCallback(
-    (booking: PaidBookingDTO) =>
+    (booking: PaidBookingDTO, inCash: boolean) =>
       /*
        * `replace`, not `navigate`: once the advance is paid there is nothing to
        * go back to. The payment screen would re-price a quotation that has
@@ -79,6 +83,7 @@ export function PaymentScreen() {
       navigation.replace('PaymentSuccess', {
         bookingId: booking.id,
         organizerName: booking.organizer?.name ?? '',
+        inCash,
       }),
     [navigation],
   );
@@ -185,19 +190,46 @@ export function PaymentScreen() {
         <EventlyText variant="h2" style={s.sectionTitle}>
           {COPY.payWith}
         </EventlyText>
+        {/*
+          With no gateway the online rows are shown but inert, rather than
+          removed. A customer who came here to pay by UPI needs to see that the
+          option exists and is down — a list that silently lost three of its
+          four rows looks like the app forgot how to take money.
+        */}
+        {!c.gatewayAvailable ? (
+          <View style={s.gatewayOff}>
+            <EventlyIcon name="information-outline" size={16} color={PAY_NAVY_DEEP} />
+            <EventlyText variant="caption" style={s.gatewayOffText}>
+              {COPY.gatewayOff}
+            </EventlyText>
+          </View>
+        ) : null}
         {PAY_OPTIONS.map((option) => (
           <MethodRow
             key={option.id}
             option={option}
             selected={c.method === option.id}
+            disabled={!c.gatewayAvailable && option.id !== 'cash'}
             onPress={() => c.setMethod(option.id)}
           />
         ))}
 
-        <View style={s.assurance}>
-          <EventlyIcon name="shield-check-outline" size={18} color={PAY_GREEN} />
-          <EventlyText variant="caption" style={s.assuranceText}>
-            {COPY.assurance}
+        {/*
+          The promise changes with the method, because what Evently can promise
+          changes with it. Leaving the gateway's protection on screen while the
+          customer has chosen cash would be the most expensive lie here.
+        */}
+        <View style={[s.assurance, c.isCash && s.assuranceCash]}>
+          <EventlyIcon
+            name={c.isCash ? 'hand-coin-outline' : 'shield-check-outline'}
+            size={18}
+            color={c.isCash ? PAY_NAVY_DEEP : PAY_GREEN}
+          />
+          <EventlyText
+            variant="caption"
+            style={[s.assuranceText, c.isCash && s.assuranceTextCash]}
+          >
+            {c.isCash ? COPY.cashAssurance : COPY.assurance}
           </EventlyText>
         </View>
 
@@ -235,10 +267,10 @@ export function PaymentScreen() {
           disabled={c.isPaying}
           onPress={c.pay}
           accessibilityRole="button"
-          accessibilityLabel={c.model.ctaLabel}
+          accessibilityLabel={c.ctaLabel}
         >
           <EventlyText variant="subtitle" style={s.payText}>
-            {c.isPaying ? 'Working…' : c.model.ctaLabel}
+            {c.isPaying ? 'Working…' : c.ctaLabel}
           </EventlyText>
         </TouchableOpacity>
       </View>
