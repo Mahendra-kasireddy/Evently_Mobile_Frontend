@@ -80,6 +80,7 @@ export const INVITATION_COPY = {
   preview: 'Preview',
   personalize: 'Personalize',
   share: 'Share',
+  guestList: 'Guest list',
   shareAll: 'Share invitation',
 
   bannerTitle: 'Your organizer built this invitation for you.',
@@ -134,6 +135,19 @@ export const INVITATION_COPY = {
   previewEmptySection: 'This section has nothing in it yet, so guests see only its heading.',
 
   // Share
+  /* The sheet, as the design words it. "Share", not "Send": nothing leaves
+     until the customer picks who, and the button says so. */
+  shareHeading: (section?: string) => (section ? `Share “${section}”` : 'Share the invitation'),
+  shareLead: 'Guests open this straight from the WhatsApp link. No app needed.',
+  shareSelected: (n: number) => `${n} selected`,
+  shareSelectAll: 'Select all',
+  shareClearAll: 'Clear',
+  /* The primary button before anything is ticked — it names the step rather
+     than offering a send that would do nothing. */
+  sharePickFirst: 'Pick who receives it',
+  shareSendTo: (n: number) => `Send to ${n} ${n === 1 ? 'guest' : 'guests'}`,
+  shareManageGuests: 'Manage guest list',
+  shareEmptyGroup: (label: string) => `Nobody is filed under ${label} yet.`,
   shareTitle: 'Send to guests',
   shareIntro: 'Pick who to send it to, or add someone new. Guests need no account.',
   shareLoading: 'Loading your guest list…',

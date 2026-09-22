@@ -36,6 +36,9 @@ export const PROFILE_GROUPS: ProfileGroupSpec[] = [
       { action: 'bookings', icon: 'clipboard-text-outline', label: 'Bookings' },
       { action: 'savedPackages', icon: 'heart-outline', label: 'Saved packages' },
       { action: 'invitations', icon: 'card-account-details-outline', label: 'Invitations' },
+      // Separate from Invitations on purpose: that is the card itself, and
+      // this is who receives it — work a host does long before anything is sent.
+      { action: 'guestList', icon: 'account-multiple-outline', label: 'Guest list' },
       { action: 'payments', icon: 'credit-card-outline', label: 'Payments' },
     ],
   },

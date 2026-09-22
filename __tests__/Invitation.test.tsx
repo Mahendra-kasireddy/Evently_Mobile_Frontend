@@ -277,6 +277,7 @@ describe('ShareSheet', () => {
         outcomes={null}
         onSend={noop}
         onOpenHandoff={noop}
+        onManageGuests={noop}
         onClose={noop}
         {...props}
       />,
@@ -298,16 +299,47 @@ describe('ShareSheet', () => {
     expect(text).not.toContain('Already sent');
   });
 
-  it('refuses to send to nobody', () => {
+  it('cannot send to nobody, and names the step that is missing', () => {
+    /*
+     * The button used to offer "Send on WhatsApp" with nobody ticked and then
+     * refuse with an error underneath. It now says what is missing before it
+     * is pressed, and cannot be pressed at all — a control that looks live and
+     * answers with a complaint is a worse way to say the same thing.
+     */
     const onSend = jest.fn();
     const tree = sheet({ onSend });
     const send = tree.root
-      .findAllByProps({ accessibilityRole: 'button' })
-      .find((n) => n.props.accessibilityLabel === 'Send on WhatsApp');
+      .findAll(
+        (n) =>
+          n.props?.accessibilityLabel === 'Pick who receives it' &&
+          typeof n.props?.disabled === 'boolean',
+      )
+      .at(0);
 
-    ReactTestRenderer.act(() => send!.props.onPress());
+    expect(send).toBeTruthy();
+    expect(send!.props.disabled).toBe(true);
+    // And the words are the missing step, not a send it cannot perform.
+    expect(textOf(tree)).toContain('Pick who receives it');
+    expect(textOf(tree)).not.toContain('Send on WhatsApp');
     expect(onSend).not.toHaveBeenCalled();
-    expect(textOf(tree)).toContain('Choose at least one guest, or add a new one.');
+  });
+
+  it('offers the guest list rather than a second add-guest form', () => {
+    // Adding and filing guests belongs on the screen that also groups them —
+    // two add forms is two places for the phone rules to drift.
+    const tree = sheet();
+    const manage = tree.root
+      .findAllByProps({ accessibilityRole: 'button' })
+      .find((n) => n.props.accessibilityLabel === 'Manage guest list');
+    expect(manage).toBeTruthy();
+  });
+
+  it('selects only the guests the active chip is showing', () => {
+    // Ticking Family and pressing "Select all" must not quietly select the
+    // sixty people the host has just filtered out.
+    const text = textOf(sheet());
+    expect(text).toContain('0 selected');
+    expect(text).toContain('Select all');
   });
 
   it('reports each send, and offers the handoff link where one is needed', () => {
@@ -511,8 +543,37 @@ describe('render dump', () => {
       </>
     );
 
+    const shareGuests = [
+      guest({ id: 'g1', name: 'Sruthi Reddy', phoneDisplay: '+91 98490 11234', group: 'family' }),
+      guest({ id: 'g2', name: 'Venkat Rao', phoneDisplay: '+91 99590 44821', group: 'family' }),
+      guest({ id: 'g3', name: 'Anitha Naidu', phoneDisplay: '+91 90000 77231', group: 'family' }),
+      guest({ id: 'g4', name: 'Ravi Kumar', phoneDisplay: '+91 97010 22187', group: 'friends' }),
+      guest({ id: 'g5', name: 'Deepa Shetty', phoneDisplay: '+91 98861 55490', group: 'friends' }),
+    ];
+
     const panels: Array<[string, string]> = [
       ['Review — before approval', toHtml(render(review).toJSON())],
+      [
+        'Share one section',
+        toHtml(
+          render(
+            <ShareSheet
+              visible
+              sectionKey="story"
+              sectionTitle="How it began"
+              guests={shareGuests}
+              isLoadingGuests={false}
+              isSending={false}
+              errorMessage={null}
+              outcomes={null}
+              onSend={noop}
+              onOpenHandoff={noop}
+              onManageGuests={noop}
+              onClose={noop}
+            />,
+          ).toJSON(),
+        ),
+      ],
       [
         'The eye on one section — approved',
         toHtml(

@@ -1,3 +1,5 @@
+import type { GuestGroup } from '../GuestList/types';
+
 export type InvitationStatus = 'draft' | 'sent' | 'approved';
 
 /** Who owns a section: the organizer builds it, or the customer writes it. */
@@ -101,6 +103,8 @@ export interface GuestDTO {
   name: string;
   phone: string;
   phoneDisplay: string;
+  /** Absent on a record written before groups existed. */
+  group?: GuestGroup;
   /** Section keys already sent; '' means the complete invitation. */
   sharedSections: string[];
   lastSharedAt: string | null;

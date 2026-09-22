@@ -61,6 +61,8 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSContactsUsageDescription</key>
+	<string>Evently reads your contacts so you can pick who to invite to your event. Nothing leaves your phone until you add them.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Evently uses your location to show your current location and match you with organizers near you.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

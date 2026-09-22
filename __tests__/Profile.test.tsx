@@ -215,7 +215,15 @@ describe('ProfileGroup', () => {
 
     expect(drawnButtons(tree)).toHaveLength(events.rows.length);
     ReactTestRenderer.act(() => pressables(tree).forEach((b) => b.props.onPress()));
-    expect(pressed).toEqual(['bookings', 'savedPackages', 'invitations', 'payments']);
+    expect(pressed).toEqual([
+      'bookings',
+      'savedPackages',
+      'invitations',
+      // The guest list is its own row: Invitations is the card, this is who
+      // receives it, and a host keeps the list long before anything is sent.
+      'guestList',
+      'payments',
+    ]);
   });
 
   it('shows a badge only for a count that is really there', () => {

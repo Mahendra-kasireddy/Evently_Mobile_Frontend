@@ -18,6 +18,7 @@ export type ProfileAction =
   | 'bookings'
   | 'savedPackages'
   | 'invitations'
+  | 'guestList'
   | 'payments'
   | 'location'
   | 'notifications'

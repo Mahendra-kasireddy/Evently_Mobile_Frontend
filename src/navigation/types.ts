@@ -74,6 +74,23 @@ export type RootStackParamList = {
    */
   OccasionPicker: undefined;
   AreaPicker: undefined;
+  /**
+   * Everyone the customer is inviting, for one booking's invitation.
+   *
+   * Takes the booking rather than the invitation: the guest list belongs to
+   * the invitation, but every screen that leads here holds a booking id, and
+   * the API is keyed the same way.
+   *
+   * Optional, because Profile has no booking in hand. Without one the screen
+   * asks which event first — the same shape as `Invitations`, which lists them
+   * when it is opened from Profile and opens one when it is given an id.
+   *
+   * `title` is the event's own name, shown as the header. Passed rather than
+   * fetched so the header is right on the first frame: every screen that opens
+   * this already knows the name, and reading it from a request that has not
+   * returned yet would flash "Guest list" and then replace it.
+   */
+  GuestList: { bookingId?: string; title?: string } | undefined;
   /** What the customer has kept for later, from the Home carousel. */
   SavedPackages: undefined;
   /**

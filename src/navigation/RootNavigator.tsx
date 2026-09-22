@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SeeAllScreen } from '../modules/Home';
 import { AreaPickerScreen, OccasionPickerScreen } from '../modules/Pickers';
 import { ConversationScreen } from '../modules/Chat';
+import { GuestListScreen } from '../modules/GuestList';
 import { ComingSoonScreen } from '../modules/ComingSoon';
 import {
   CompareQuotesScreen,
@@ -54,6 +55,7 @@ export function RootNavigator() {
           <Stack.Screen name="Workspace" component={WorkspaceScreen} />
           <Stack.Screen name="IdeaBoard" component={IdeaBoardScreen} />
           <Stack.Screen name="Invitations" component={InvitationScreen} />
+          <Stack.Screen name="GuestList" component={GuestListScreen} />
           <Stack.Screen name="SeeAll" component={SeeAllScreen} />
           <Stack.Screen
             name="OccasionPicker"

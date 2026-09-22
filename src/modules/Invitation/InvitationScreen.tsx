@@ -189,6 +189,7 @@ function InvitationList() {
  * reaches a guest before the customer decides it should.
  */
 function InvitationDetail({ bookingId, organizerName }: { bookingId: string; organizerName?: string }) {
+  const navigation = useNavigation<InvitationNavigationProp>();
   const { data, loading, error, refetch } = useInvitation(bookingId);
   const approve = useApproveInvitation();
   const personalize = usePersonalizeBlock();
@@ -371,6 +372,31 @@ function InvitationDetail({ bookingId, organizerName }: { bookingId: string; org
             )}
           </View>
 
+          {/*
+            The guest list, on its own screen.
+            Separate from the share sheet on purpose: the sheet is for deciding
+            who receives something now, and this is for keeping the list itself
+            — adding people, filing them into groups, fixing a wrong number —
+            which is work a host does long before anything is sent.
+          */}
+          <TouchableOpacity
+            style={a.secondary}
+            activeOpacity={0.85}
+            onPress={() =>
+              navigation.navigate('GuestList', {
+                bookingId,
+                title: invitation.bookingTitle || invitation.occasion,
+              })
+            }
+            accessibilityRole="button"
+            accessibilityLabel={COPY.guestList}
+          >
+            <EventlyIcon name="account-multiple-outline" size={16} color={INV_NAVY} />
+            <EventlyText variant="caption" style={a.secondaryText}>
+              {COPY.guestList}
+            </EventlyText>
+          </TouchableOpacity>
+
           {approve.error ? (
             <EventlyText variant="caption" style={a.errorText}>
               {approve.error.message}
@@ -489,6 +515,15 @@ function InvitationDetail({ bookingId, organizerName }: { bookingId: string; org
             .catch(() => {
               // error surfaces in the sheet
             });
+        }}
+        onManageGuests={() => {
+          /* Closing first, so backing out of the guest list lands on the
+             invitation rather than on a sheet the customer had finished with. */
+          setSheet(null);
+          navigation.navigate('GuestList', {
+            bookingId,
+            title: invitation.bookingTitle || invitation.occasion,
+          });
         }}
         onOpenHandoff={(url) => {
           Linking.openURL(url).catch(() => {

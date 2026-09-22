@@ -37,6 +37,9 @@ export function ProfileScreen() {
         return navigation.navigate('SavedPackages');
       case 'invitations':
         return navigation.navigate('Invitations');
+      /* No booking in hand here, so the screen asks which event first. */
+      case 'guestList':
+        return navigation.navigate('GuestList');
       case 'payments':
         return navigation.navigate('Payments');
       case 'location':

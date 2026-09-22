@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ActivityIndicator, Modal, Pressable, ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
 import { colors } from '../../../theme';
@@ -6,6 +6,9 @@ import { INVITATION_COPY as COPY, INV_ACCENT, INV_GREEN, INV_NAVY } from '../con
 import { previewSheetStyles as p, sheetStyles as s } from '../styles';
 import type { BlockPatch, GuestDTO, InvitationBlockDTO, InvitationDTO, ShareOutcomeDTO } from '../types';
 import { GuestPreview } from './InvitationParts';
+import { GroupFilter } from '../../GuestList/sections/GroupFilter';
+import { avatarColorFor, groupFilters, groupOf, initialsOf } from '../../GuestList/utils';
+import type { GuestGroup } from '../../GuestList/types';
 
 function Sheet({ visible, onClose, children }: { visible: boolean; onClose: () => void; children: React.ReactNode }) {
   return (
@@ -309,6 +312,8 @@ interface ShareSheetProps {
   outcomes: ShareOutcomeDTO[] | null;
   onSend: (guestIds: string[], newGuest: { name: string; phone: string } | null) => void;
   onOpenHandoff: (url: string) => void;
+  /** Opens the guest-list screen, where guests are added and filed. */
+  onManageGuests: () => void;
   onClose: () => void;
 }
 
@@ -334,43 +339,56 @@ export function ShareSheet({
   outcomes,
   onSend,
   onOpenHandoff,
+  onManageGuests,
   onClose,
 }: ShareSheetProps) {
   const [selected, setSelected] = useState<string[]>([]);
-  const [adding, setAdding] = useState(false);
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [localError, setLocalError] = useState('');
+  const [activeGroup, setActiveGroup] = useState<GuestGroup | null>(null);
+
+  const filters = useMemo(() => groupFilters(guests), [guests]);
+  const shown = useMemo(
+    () => (activeGroup ? guests.filter((g) => groupOf(g) === activeGroup) : guests),
+    [guests, activeGroup],
+  );
+  const activeLabel = filters.find((f) => f.key === activeGroup)?.label ?? '';
+
+  /*
+   * "Select all" means the chip that is showing, not the whole list. Ticking
+   * Family and pressing it must not quietly select the sixty people the host
+   * has just filtered out.
+   */
+  const allShown = shown.length > 0 && shown.every((g) => selected.includes(g.id));
 
   const toggle = (id: string) =>
     setSelected((prev) => (prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id]));
 
-  const send = () => {
-    setLocalError('');
-    const newGuest = adding && (name.trim() || phone.trim()) ? { name: name.trim(), phone: phone.trim() } : null;
-    if (newGuest && !newGuest.name) {
-      setLocalError(COPY.shareNeedName);
-      return;
-    }
-    if (newGuest && !newGuest.phone) {
-      setLocalError(COPY.shareNeedPhone);
-      return;
-    }
-    if (selected.length === 0 && !newGuest) {
-      setLocalError(COPY.shareNeedGuest);
-      return;
-    }
-    onSend(selected, newGuest);
+  const toggleAll = () => {
+    const ids = shown.map((g) => g.id);
+    setSelected((prev) =>
+      allShown ? prev.filter((id) => !ids.includes(id)) : [...new Set([...prev, ...ids])],
+    );
   };
 
   return (
     <Sheet visible={visible} onClose={onClose}>
-      <EventlyText variant="h2" style={s.title}>
-        {sectionTitle ? `Send “${sectionTitle}”` : COPY.shareTitle}
-      </EventlyText>
-      <EventlyText variant="caption" style={s.subtitle}>
-        {COPY.shareIntro}
-      </EventlyText>
+      <View style={s.shareHead}>
+        <View style={s.shareHeadText}>
+          <EventlyText variant="h2" style={s.title}>
+            {COPY.shareHeading(sectionTitle)}
+          </EventlyText>
+          <EventlyText variant="caption" style={s.subtitle}>
+            {COPY.shareLead}
+          </EventlyText>
+        </View>
+        <TouchableOpacity
+          style={s.shareClose}
+          onPress={onClose}
+          accessibilityRole="button"
+          accessibilityLabel="Close"
+        >
+          <EventlyIcon name="close" size={17} color={colors.textMuted} />
+        </TouchableOpacity>
+      </View>
 
       {/* Results replace the picker: the send has happened, and what matters
           now is which of them actually went. */}
@@ -430,14 +448,36 @@ export function ShareSheet({
         </>
       ) : (
         <>
+          {/* The same chips as the guest-list screen, so a group means the
+              same thing on both and the filter is not learnt twice. */}
+          <GroupFilter options={filters} active={activeGroup} onChange={setActiveGroup} />
+
+          <View style={s.selectRow}>
+            <EventlyText variant="caption" style={s.selectCount}>
+              {COPY.shareSelected(selected.length)}
+            </EventlyText>
+            {shown.length > 0 ? (
+              <TouchableOpacity
+                onPress={toggleAll}
+                accessibilityRole="button"
+                accessibilityLabel={allShown ? COPY.shareClearAll : COPY.shareSelectAll}
+              >
+                <EventlyText variant="caption" style={s.selectAll}>
+                  {allShown ? COPY.shareClearAll : COPY.shareSelectAll}
+                </EventlyText>
+              </TouchableOpacity>
+            ) : null}
+          </View>
+
           {isLoadingGuests ? (
             <ActivityIndicator size="small" color={colors.primary} style={s.guestsLoading} />
-          ) : guests.length === 0 ? (
+          ) : shown.length === 0 ? (
             <EventlyText variant="body" style={s.emptyGuests}>
-              {COPY.shareNoGuests}
+              {/* Which empty is it — nobody at all, or nobody under this chip? */}
+              {guests.length === 0 ? COPY.shareNoGuests : COPY.shareEmptyGroup(activeLabel)}
             </EventlyText>
           ) : (
-            guests.map((guest) => {
+            shown.map((guest) => {
               const on = selected.includes(guest.id);
               const already = sectionKey
                 ? guest.sharedSections.includes(sectionKey)
@@ -452,65 +492,33 @@ export function ShareSheet({
                   accessibilityState={{ checked: on }}
                   accessibilityLabel={`${guest.name}, ${guest.phoneDisplay}`}
                 >
-                  <View style={[s.checkbox, on && s.checkboxOn]}>
-                    {on ? <EventlyIcon name="check" size={14} color={colors.onPrimary} /> : null}
+                  <View style={[s.guestAvatar, { backgroundColor: avatarColorFor(guest.name) }]}>
+                    <EventlyText variant="caption" style={s.guestAvatarText}>
+                      {initialsOf(guest.name)}
+                    </EventlyText>
                   </View>
                   <View style={s.guestText}>
-                    <EventlyText variant="body" style={s.guestName}>
+                    <EventlyText variant="body" style={s.guestName} numberOfLines={1}>
                       {guest.name}
                     </EventlyText>
-                    <EventlyText variant="caption" style={s.guestMeta}>
+                    <EventlyText variant="caption" style={s.guestMeta} numberOfLines={1}>
                       {guest.phoneDisplay}
-                      {guest.viewed ? ` · ${COPY.shareViewed}` : ''}
                     </EventlyText>
                   </View>
+                  {/* Said on the row rather than as a badge column: it is the
+                      one fact that changes whether ticking them again is a
+                      duplicate message or a first one. */}
                   {already ? (
                     <EventlyText variant="caption" style={s.guestSent}>
                       {COPY.shareAlreadySent}
                     </EventlyText>
                   ) : null}
+                  <View style={[s.checkbox, on && s.checkboxOn]}>
+                    {on ? <EventlyIcon name="check" size={13} color={colors.onPrimary} /> : null}
+                  </View>
                 </TouchableOpacity>
               );
             })
-          )}
-
-          {adding ? (
-            <>
-              <EventlyText variant="body" style={s.label}>
-                {COPY.shareGuestName}
-              </EventlyText>
-              <TextInput
-                style={s.input}
-                value={name}
-                onChangeText={setName}
-                maxLength={80}
-                accessibilityLabel={COPY.shareGuestName}
-              />
-              <EventlyText variant="body" style={s.label}>
-                {COPY.shareGuestPhone}
-              </EventlyText>
-              <TextInput
-                style={s.input}
-                value={phone}
-                onChangeText={setPhone}
-                keyboardType="phone-pad"
-                accessibilityLabel={COPY.shareGuestPhone}
-              />
-              <EventlyText variant="caption" style={s.hint}>
-                {COPY.sharePhoneHint}
-              </EventlyText>
-            </>
-          ) : (
-            <TouchableOpacity
-              style={s.secondary}
-              activeOpacity={0.8}
-              onPress={() => setAdding(true)}
-              accessibilityRole="button"
-            >
-              <EventlyText variant="subtitle" style={s.secondaryText}>
-                {COPY.shareAddGuest}
-              </EventlyText>
-            </TouchableOpacity>
           )}
 
           <View style={s.caveat}>
@@ -520,27 +528,62 @@ export function ShareSheet({
             </EventlyText>
           </View>
 
-          {localError || errorMessage ? (
+          {errorMessage ? (
             <EventlyText variant="caption" style={s.errorText}>
-              {localError || errorMessage}
+              {errorMessage}
             </EventlyText>
           ) : null}
 
+          {/*
+            Disabled until somebody is ticked, and it says which step is
+            missing rather than offering a send that would do nothing.
+          */}
           <TouchableOpacity
-            style={[s.primary, isSending && s.primaryDisabled]}
+            style={[
+              s.primary,
+              isSending && s.primaryDisabled,
+              selected.length === 0 && !isSending && s.primaryInert,
+            ]}
             activeOpacity={0.85}
-            disabled={isSending}
-            onPress={send}
+            disabled={isSending || selected.length === 0}
+            onPress={() => onSend(selected, null)}
             accessibilityRole="button"
-            accessibilityLabel={COPY.shareSend}
+            accessibilityLabel={
+              selected.length === 0 ? COPY.sharePickFirst : COPY.shareSendTo(selected.length)
+            }
           >
             {isSending ? (
               <ActivityIndicator size="small" color={colors.onPrimary} />
             ) : (
-              <EventlyIcon name="whatsapp" size={18} color={colors.onPrimary} />
+              <EventlyIcon
+                name={selected.length === 0 ? 'arrow-right' : 'whatsapp'}
+                size={18}
+                color={selected.length === 0 ? colors.textMuted : colors.onPrimary}
+              />
             )}
-            <EventlyText variant="subtitle" style={s.primaryText}>
-              {isSending ? COPY.shareSending : COPY.shareSend}
+            <EventlyText
+              variant="subtitle"
+              style={[s.primaryText, selected.length === 0 && s.primaryTextDisabled]}
+            >
+              {isSending
+                ? COPY.shareSending
+                : selected.length === 0
+                  ? COPY.sharePickFirst
+                  : COPY.shareSendTo(selected.length)}
+            </EventlyText>
+          </TouchableOpacity>
+
+          {/* Adding and correcting guests belongs on its own screen, which
+              also files them into the groups this sheet filters by. */}
+          <TouchableOpacity
+            style={s.manageGuests}
+            activeOpacity={0.7}
+            onPress={onManageGuests}
+            accessibilityRole="button"
+            accessibilityLabel={COPY.shareManageGuests}
+          >
+            <EventlyText variant="subtitle" style={s.manageGuestsText}>
+              {COPY.shareManageGuests}
             </EventlyText>
           </TouchableOpacity>
         </>

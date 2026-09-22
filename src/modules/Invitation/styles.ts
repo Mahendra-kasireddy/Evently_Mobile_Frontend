@@ -323,6 +323,41 @@ export const previewSheetStyles = StyleSheet.create({
 });
 
 export const sheetStyles = StyleSheet.create({
+  /* The sheet's head: title and lead on the left, a close control on the right. */
+  shareHead: { ...globalStyles.row, alignItems: 'flex-start', gap: spacing.s12 },
+  shareHeadText: { flex: 1 },
+  shareClose: {
+    width: 32,
+    height: 32,
+    borderRadius: 999,
+    backgroundColor: '#efede8',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  selectRow: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    marginBottom: spacing.sm,
+  },
+  selectCount: { color: colors.textMuted },
+  selectAll: { color: INV_ACCENT, fontWeight: '600' },
+
+  /* A squircle, matching the guest-list screen's monograms. */
+  guestAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  guestAvatarText: { color: colors.onPrimary, fontWeight: '700' },
+
+  primaryTextDisabled: { color: colors.textMuted },
+
+  manageGuests: { alignItems: 'center', paddingVertical: spacing.s12 },
+  manageGuestsText: { color: INV_ACCENT, fontWeight: '600' },
+
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
   container: {
     backgroundColor: colors.background,
@@ -382,6 +417,12 @@ export const sheetStyles = StyleSheet.create({
     marginTop: spacing.lg,
   },
   primaryDisabled: { opacity: 0.45 },
+  /*
+   * Nothing picked yet. Neutral rather than a faded accent: a washed-out
+   * orange bar still reads as the primary action and invites the tap it will
+   * refuse, where a grey one reads as a step that is not ready.
+   */
+  primaryInert: { backgroundColor: '#e7e3da', opacity: 1 },
   primaryText: { color: colors.onPrimary, fontSize: 16, fontWeight: '700' },
   secondary: {
     ...globalStyles.row,
@@ -398,12 +439,17 @@ export const sheetStyles = StyleSheet.create({
   caveatText: { color: colors.textMuted, flex: 1, lineHeight: 18 },
 
   // Guest list.
+  /* A card each, not hairline-separated rows: every row here is a tap target
+     with a checkbox, and a bordered card is what says so before it is read. */
   guestRow: {
     ...globalStyles.row,
-    gap: spacing.sm,
-    paddingVertical: spacing.sm + 2,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
+    gap: spacing.s12,
+    padding: spacing.s12,
+    marginBottom: spacing.sm,
+    borderRadius: 14,
+    backgroundColor: colors.background,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   guestText: { flex: 1 },
   guestName: { color: INV_NAVY, fontWeight: '700' },
