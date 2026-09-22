@@ -6,6 +6,8 @@ export const PLAN_SCREEN_ENDPOINT = '/plan/getPlanScreen';
 export const PLAN_ORGANIZERS_ENDPOINT = '/plan/getOrganizers';
 export const MY_DRAFT_ENDPOINT = '/plan/getMyDraft';
 export const SAVE_DRAFT_ENDPOINT = '/plan/saveDraft';
+/** PATCH /quote/updateRequest/:id — revising a brief already sent. */
+export const UPDATE_REQUEST_ENDPOINT = '/quote/updateRequest';
 export const CREATE_PLAN_ENDPOINT = '/plan/createPlan';
 export const REQUEST_QUOTE_FROM_ORGANIZER_ENDPOINT = '/quote/requestQuoteFromOrganizer';
 

@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { FlatList, TouchableOpacity, View } from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
-import { colors } from '../../../theme';
+import { HERO_ACCENT_COLOR } from '../constants';
 import { offersStyles as s } from '../styles';
 import { SectionHead } from './SectionHead';
 import type { CouponOffer, CouponsViewModel } from '../types';
@@ -20,44 +21,89 @@ export function OfferCard({
   coupon: CouponOffer;
   onPress: () => void;
 }) {
+  /*
+   * Most coupon titles already carry the figure — "10% off on Birthday" — and
+   * setting it large underneath said the same number twice, in two sizes, on
+   * a card 340 points wide. So the big figure is drawn only when the title
+   * does not already state it; a coupon called "Diwali bonanza" still gets
+   * one. The cap is never lost either way: when the figure is dropped it
+   * joins the conditions, because "up to ₹10,000" is the part of the offer
+   * the title does not say.
+   */
+  const stripped = (text: string) => text.replace(/\s+/g, '').toLowerCase();
+  const titleSaysIt = stripped(coupon.title).includes(
+    stripped(coupon.valueLabel),
+  );
+  const capNote = coupon.valueNote.replace(/^off,\s*/, '');
+  const conditions = titleSaysIt
+    ? [capNote === 'off' ? '' : capNote, coupon.terms]
+        .filter(Boolean)
+        .join(' · ')
+    : coupon.terms;
+
   return (
     <TouchableOpacity
-      style={[s.card, coupon.tone === 'navy' ? s.cardNavy : s.cardAccent]}
+      style={s.card}
       activeOpacity={0.9}
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={[
         `Coupon ${coupon.code}`,
         coupon.title,
+        titleSaysIt ? capNote : `${coupon.valueLabel} ${coupon.valueNote}`,
         coupon.terms,
         coupon.ctaLabel,
       ]
         .filter(Boolean)
         .join('. ')}
     >
-      {/* The code, where a category label would otherwise sit. It is the part
-          the customer has to carry to a checkout, so it is the part the card
-          leads with. */}
-      <EventlyText variant="caption" style={s.eyebrow} numberOfLines={1}>
-        {coupon.code}
-      </EventlyText>
-      <EventlyText variant="h2" style={s.title} numberOfLines={2}>
-        {coupon.title}
-      </EventlyText>
-      {/* Dropped rather than left as an empty line when a coupon has neither a
-          minimum nor an end date. */}
-      {coupon.terms ? (
-        // Two lines, not three: the conditions are a reminder of what to check,
-        // and the sheet behind "See details" is where they are read in full.
-        <EventlyText variant="caption" style={s.terms} numberOfLines={2}>
-          {coupon.terms}
+      <View style={s.art} pointerEvents="none">
+        <View style={s.artInner}>
+          <EventlyIcon
+            name="ticket-percent"
+            size={68}
+            color={HERO_ACCENT_COLOR}
+          />
+        </View>
+      </View>
+
+      <View style={s.body}>
+        {/* The code, where a category label would otherwise sit. It is the
+            part the customer has to carry to a checkout, so it is the part
+            the card leads with. */}
+        <EventlyText variant="caption" style={s.code} numberOfLines={1}>
+          {coupon.code}
         </EventlyText>
-      ) : null}
-      <View style={s.ctaRow}>
-        <EventlyText variant="body" style={s.ctaText}>
-          {coupon.ctaLabel}
+
+        <EventlyText variant="h2" style={s.title} numberOfLines={2}>
+          {coupon.title}
         </EventlyText>
-        <EventlyIcon name="chevron-right" size={17} color={colors.onPrimary} />
+
+        {titleSaysIt ? null : (
+          <View style={s.valueRow}>
+            <EventlyText variant="h1" style={s.value}>
+              {coupon.valueLabel}
+            </EventlyText>
+            <EventlyText variant="caption" style={s.valueNote}>
+              {coupon.valueNote}
+            </EventlyText>
+          </View>
+        )}
+
+        {/* The conditions stay on the card. The reference has none to show;
+            a discount does — a 15% code that quietly needs a ₹1,50,000
+            booking is an offer the customer finds out about at checkout. */}
+        {conditions ? (
+          <EventlyText variant="caption" style={s.terms} numberOfLines={2}>
+            {conditions}
+          </EventlyText>
+        ) : null}
+
+        <View style={s.cta}>
+          <EventlyText variant="caption" style={s.ctaText}>
+            {coupon.ctaLabel}
+          </EventlyText>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -73,6 +119,8 @@ export function OfferCard({
  * genuinely are none rather than that something failed to load.
  */
 export function Offers({ data, onPressOffer, onPressSeeAll }: OffersProps) {
+  const [page, setPage] = useState(0);
+
   return (
     <View>
       <SectionHead
@@ -86,10 +134,30 @@ export function Offers({ data, onPressOffer, onPressSeeAll }: OffersProps) {
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={s.list}
+        /* One card to a screen, so it settles on a card rather than between
+           two — which is what makes the dots below mean anything. */
+        pagingEnabled
+        onMomentumScrollEnd={event => {
+          const { contentOffset, layoutMeasurement } = event.nativeEvent;
+          setPage(
+            Math.round(contentOffset.x / Math.max(1, layoutMeasurement.width)),
+          );
+        }}
         renderItem={({ item }) => (
           <OfferCard coupon={item} onPress={() => onPressOffer(item)} />
         )}
       />
+
+      {data.items.length > 1 ? (
+        <View style={s.dots}>
+          {data.items.map((item, index) => (
+            <View
+              key={item.id}
+              style={[s.dot, index === page && s.dotActive]}
+            />
+          ))}
+        </View>
+      ) : null}
     </View>
   );
 }

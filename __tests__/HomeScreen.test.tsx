@@ -97,13 +97,13 @@ const booked = {
     { label: 'Final walkthrough', state: 'pending' },
   ],
   ctaLabel: 'Open workspace',
-} as unknown as HomeContainerResult['bookedEvent'];
+} as unknown as HomeContainerResult['bookedEvents'][number];
 
 /** The container's answer, with only the parts this screen reads set. */
 const result = (over: Partial<HomeContainerResult> = {}): HomeContainerResult =>
   ({
     banner: null,
-    bookedEvent: null,
+    bookedEvents: [],
     currentEvent: null,
     otherEvents: [],
     categories: null,
@@ -113,7 +113,7 @@ const result = (over: Partial<HomeContainerResult> = {}): HomeContainerResult =>
     topOrganizers: null,
     howItWorks: null,
     tools: null,
-    header: { locationLabel: 'Hyderabad', unreadCount: 0, savedCount: 0 },
+    header: { initials: 'HK', displayName: 'Hem Kumar', unreadCount: 0, savedCount: 0 },
     isLoading: false,
     isError: false,
     errorMessage: null,
@@ -201,23 +201,68 @@ describe('the basics form', () => {
       ...over,
     });
 
+  /*
+   * Looked for by the form's own rows, not by a heading. The block used to
+   * open with "What shall we celebrate next?" and an "or tell us the basics"
+   * divider; the rows below them say what they want by their own labels, so
+   * the framing went and the assertions moved onto the thing being tested.
+   */
+  const BASICS_ROW = 'Occasion';
+
   it('is on screen for an account with nothing on', () => {
     mockContainer.mockReturnValue(withBanner());
-    expect(render()).toContain('celebrate');
+    expect(render()).toContain(BASICS_ROW);
   });
 
   it('stays on screen for an account with a live request', () => {
     mockContainer.mockReturnValue(withBanner({ currentEvent: event() }));
     const text = render();
-    expect(text).toContain('celebrate');
+    expect(text).toContain(BASICS_ROW);
     expect(text).toContain('Anniversary');
   });
 
   it('stays on screen for an account with a booking', () => {
-    mockContainer.mockReturnValue(withBanner({ bookedEvent: booked }));
+    mockContainer.mockReturnValue(withBanner({ bookedEvents: [booked] }));
     const text = render();
-    expect(text).toContain('celebrate');
+    expect(text).toContain(BASICS_ROW);
     expect(text).toContain('EVT-2026-1977');
+  });
+
+  it('sits on the hero photograph rather than under it', () => {
+    /*
+     * The reference has its card lifted over the picture's bottom edge. Two
+     * styles have to agree on how far — the photo's bottom padding and the
+     * card's negative margin — so the distance is one exported number rather
+     * than the same value typed twice.
+     */
+    const {
+      HERO_PHOTO_OVERLAP,
+      styles: homeStyles,
+      homeHeroPhotoStyles,
+    } = require('../src/modules/Home/styles');
+    const sheet = homeStyles.sheet as Record<string, unknown>;
+
+    expect(sheet.marginTop).toBe(-HERO_PHOTO_OVERLAP);
+
+    /*
+     * The photograph is a band, not a backdrop.
+     *
+     * It reappeared hundreds of points down the page — between the form and
+     * the booked card — because only the first block covered it and the rest
+     * of the feed let it through. A fixed height on the band and an opaque,
+     * flex-growing sheet over everything below are what keep "the picture is
+     * at the top" true rather than nearly true.
+     */
+    expect((homeHeroPhotoStyles.wrap as Record<string, unknown>).height).toBe(268);
+    expect(sheet.backgroundColor).toBeTruthy();
+    expect(sheet.flexGrow).toBe(1);
+  });
+
+  it('opens with the form itself, not with a heading above it', () => {
+    mockContainer.mockReturnValue(withBanner());
+    const text = render();
+    expect(text).not.toContain('celebrate');
+    expect(text).not.toContain('or tell us the basics');
   });
 });
 
@@ -231,7 +276,7 @@ describe('the event cards Home draws', () => {
      */
     mockContainer.mockReturnValue(
       result({
-        bookedEvent: booked,
+        bookedEvents: [booked],
         currentEvent: null,
         otherEvents: [event()],
       }),
@@ -244,12 +289,36 @@ describe('the event cards Home draws', () => {
 
   it('draws the booked card alone when nothing else is live', () => {
     mockContainer.mockReturnValue(
-      result({ bookedEvent: booked, otherEvents: [] }),
+      result({ bookedEvents: [booked], otherEvents: [] }),
     );
 
     const text = render();
     expect(text).toContain('EVT-2026-1977');
     expect(text).not.toContain('Anniversary');
+  });
+
+  it('puts two bookings side by side rather than stacking them', () => {
+    /*
+     * A second confirmed booking used to be dropped to a one-line row among
+     * the "other events" — the treatment a brief still collecting quotes gets
+     * — because the feed could only carry one. Both are cards now, and the
+     * row is horizontal so the second one does not cost Home a whole card of
+     * height.
+     */
+    const second = {
+      ...booked,
+      id: 'bk-2',
+      ref: 'EVT-2026-2088',
+      title: 'Housewarming',
+    } as typeof booked;
+
+    mockContainer.mockReturnValue(
+      result({ bookedEvents: [booked, second], otherEvents: [] }),
+    );
+
+    const text = render();
+    expect(text).toContain('EVT-2026-1977');
+    expect(text).toContain('EVT-2026-2088');
   });
 
   it('draws the hero for an account with a brief and no booking', () => {
@@ -274,7 +343,7 @@ describe('the event cards Home draws', () => {
   it('draws every live event, not just the second', () => {
     mockContainer.mockReturnValue(
       result({
-        bookedEvent: booked,
+        bookedEvents: [booked],
         otherEvents: [event(), event({ refId: 'req-wed', title: 'Wedding' })],
       }),
     );
@@ -313,35 +382,104 @@ describe('the event cards Home draws', () => {
     expect(text).not.toContain('Event 3');
   });
 
-  it('links out with the real total, not the number on screen', () => {
-    // Eleven events: the leading card plus ten others. A link reading "See all
-    // 3" would be counting what it already showed.
+  it('offers Edit only while the brief can still be changed', () => {
+    /*
+     * A request nobody has been hired off yet can be revised; a booking
+     * cannot. Editing a brief an organizer has already been paid an advance
+     * against would change what they agreed to deliver, so the pencil is not
+     * offered there at all.
+     */
+    const brief = event({ title: 'Housewarming' });
     mockContainer.mockReturnValue(
-      result({
-        currentEvent: event({ title: 'Leading' }),
-        otherEvents: many(10),
-      }),
+      result({ currentEvent: event({ title: 'Leading' }), otherEvents: [brief] }),
     );
-
-    const link = renderTree().root.findAll(
+    const pencil = renderTree().root.findAll(
       node =>
-        node.props?.testID === 'see-all-events' &&
+        typeof node.props?.testID === 'string' &&
+        node.props.testID.startsWith('edit-brief-') &&
         node.props?.accessibilityRole === 'button',
       { deep: true },
     )[0];
-    expect(link.props.accessibilityLabel).toBe('See all 11 events');
+    pencil.props.onPress();
+    expect(mockNavigate).toHaveBeenCalledWith('Plan', {
+      requestId: brief.refId,
+    });
+
+    const booked = {
+      ...brief,
+      source: 'booking',
+      stage: 'booking_confirmed',
+    } as typeof brief;
+    mockContainer.mockReturnValue(
+      result({ currentEvent: event({ title: 'Leading' }), otherEvents: [booked] }),
+    );
+    expect(
+      renderTree().root.findAll(
+        node =>
+          typeof node.props?.testID === 'string' &&
+          node.props.testID.startsWith('edit-brief-'),
+        { deep: true },
+      ),
+    ).toHaveLength(0);
   });
 
-  it('offers no link when every event is already on screen', () => {
+  it('closes the page with the three promises', () => {
+    /*
+     * The strip existed and nothing mounted it, so the commitments the
+     * business makes — verified organizers, the advance held until the
+     * booking is confirmed — were written in the admin and read by nobody.
+     * Last on the page on purpose: it is what somebody reads after the
+     * organizers and before they decide to put money down.
+     */
+    mockContainer.mockReturnValue(
+      result({
+        banner: {
+          greeting: '',
+          headingLead: '',
+          headingAccent: '',
+          headingTail: '',
+          subtitle: '',
+          draftLabel: '',
+          defaultDraft: { occasion: '', when: '', where: '', guests: '' },
+          options: { occasion: [], when: [], where: [], guests: [] },
+          trust: [{ icon: 'shield', label: 'Verified organizers only' }],
+        } as unknown as HomeContainerResult['banner'],
+      }),
+    );
+    expect(render()).toContain('Verified organizers only');
+  });
+
+  it('always offers the link, and it opens the full list', () => {
+    /*
+     * The link used to appear only when there were more events than the three
+     * on screen, and to count them — "See all 11". A customer with exactly
+     * three had no way out of the preview at all, and the count was a fact
+     * about the section rather than a description of where the link went. It
+     * is a plain "See all" now, to the events list this section previews, and
+     * it is there whenever the section is.
+     */
     mockContainer.mockReturnValue(
       result({
         currentEvent: event({ title: 'Leading' }),
         otherEvents: many(2),
       }),
     );
+    expect(hasControl(renderTree(), 'see-all-events')).toBe(true);
 
-    const tree = renderTree();
-    expect(textOf(tree)).toContain('Event 1');
-    expect(hasControl(tree, 'see-all-events')).toBe(false);
+    mockContainer.mockReturnValue(
+      result({
+        currentEvent: event({ title: 'Leading' }),
+        otherEvents: many(10),
+      }),
+    );
+    const link = renderTree().root.findAll(
+      node =>
+        node.props?.testID === 'see-all-events' &&
+        node.props?.accessibilityRole === 'button',
+      { deep: true },
+    )[0];
+    link.props.onPress();
+    expect(mockNavigate).toHaveBeenCalledWith('SeeAll', { kind: 'events' });
   });
+
 });

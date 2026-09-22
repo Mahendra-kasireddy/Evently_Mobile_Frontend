@@ -1,20 +1,21 @@
 import { TouchableOpacity, View } from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
 import { colors } from '../../../theme';
-import { HERO_ACCENT_COLOR, HOME_NAVY } from '../constants';
+import { HOME_NAVY } from '../constants';
 import { homeHeaderStyles as s } from '../styles';
 
 interface HomeHeaderProps {
-  locationLabel: string;
+  /** The monogram on the avatar — the account's own, never an organizer's. */
+  initials: string;
+  /** Only for the avatar's label, so it names who it opens. */
+  displayName: string;
   unreadCount: number;
-  /** How many packages the account has kept — the heart's badge. */
-  savedCount: number;
-  searchPlaceholder: string;
-  onPressLocation: () => void;
-  onPressSaved: () => void;
+  /** True when the header is drawn over the hero photograph. */
+  onPhoto?: boolean;
+  onPressProfile: () => void;
   onPressNotifications: () => void;
+  /** Opens the search screen, where the results and the filters live. */
   onPressSearch: () => void;
-  onPressFilters: () => void;
 }
 
 /** A count worth showing, capped so a big number cannot stretch the dot. */
@@ -30,67 +31,62 @@ function Badge({ count }: { count: number }) {
 }
 
 /**
- * The bar above everything: where the customer is, what is waiting for them,
+ * The bar above everything: whose account this is, what is waiting for them,
  * and the way into search.
  *
- * The location is the account's own city where one is set, falling back to the
- * city reverse-geocoded from the device's position — never a street, which
- * would name where somebody is standing rather than where they want events.
- * Both badges are real counts and disappear at zero.
+ * The avatar on the left is the way into Profile, which is no longer a tab:
+ * the account is one destination reached from one place, not a peer of the
+ * feed. It carries the account's initials, because the API has no photograph
+ * for a customer — a stock face would be somebody else's. The badge on the
+ * bell is a real count and disappears at zero.
  *
- * The search field is a button drawn to look like an input. Typing happens on
- * the search screen, where the results and the filters live; a field here that
- * focused in place would leave the customer typing into a home screen with
- * nowhere for the results to go.
+ * One row, not two. Search is an icon here rather than a field drawn to look
+ * like an input: typing happens on the search screen, where the results and
+ * the filters live, so the field on Home was a button pretending to be
+ * something it was not — and it cost a whole row of the fold to say what a
+ * glyph says.
  */
 export function HomeHeader({
-  locationLabel,
+  initials,
+  displayName,
   unreadCount,
-  savedCount,
-  searchPlaceholder,
-  onPressLocation,
-  onPressSaved,
+  onPhoto = false,
+  onPressProfile,
   onPressNotifications,
   onPressSearch,
-  onPressFilters,
 }: HomeHeaderProps) {
+  /* On the photo everything is white and each control gets its own tinted
+     disc; on the canvas it is navy and unadorned. */
+  const tint = onPhoto ? colors.onPrimary : HOME_NAVY;
+  const iconButton = [s.iconButton, onPhoto && s.iconButtonOnPhoto];
   return (
     <View style={s.container}>
       <View style={s.topRow}>
         <TouchableOpacity
-          style={s.locationButton}
-          onPress={onPressLocation}
+          style={[s.avatar, onPhoto && s.avatarOnPhoto]}
+          onPress={onPressProfile}
           accessibilityRole="button"
-          accessibilityLabel={`Location: ${locationLabel}. Change it.`}
+          accessibilityLabel={
+            displayName ? `Your profile, ${displayName}` : 'Your profile'
+          }
         >
-          <EventlyIcon name="map-marker" size={20} color={HERO_ACCENT_COLOR} />
-          <EventlyText
-            variant="subtitle"
-            style={s.locationLabel}
-            numberOfLines={1}
-          >
-            {locationLabel}
+          <EventlyText variant="subtitle" style={s.avatarText}>
+            {initials}
           </EventlyText>
-          <EventlyIcon name="chevron-down" size={19} color={HOME_NAVY} />
         </TouchableOpacity>
 
         <View style={s.actions}>
           <TouchableOpacity
-            style={s.iconButton}
-            onPress={onPressSaved}
+            style={iconButton}
+            onPress={onPressSearch}
             accessibilityRole="button"
-            accessibilityLabel={
-              savedCount > 0
-                ? `Saved packages, ${savedCount} saved`
-                : 'Saved packages'
-            }
+            accessibilityLabel="Search"
           >
-            <EventlyIcon name="heart-outline" size={23} color={HOME_NAVY} />
-            <Badge count={savedCount} />
+            <EventlyIcon name="magnify" size={23} color={tint} />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={s.iconButton}
+            style={iconButton}
             onPress={onPressNotifications}
             accessibilityRole="button"
             accessibilityLabel={
@@ -99,40 +95,12 @@ export function HomeHeader({
                 : 'Notifications'
             }
           >
-            <EventlyIcon name="bell-outline" size={23} color={HOME_NAVY} />
+            <EventlyIcon name="bell-outline" size={23} color={tint} />
             <Badge count={unreadCount} />
           </TouchableOpacity>
         </View>
       </View>
 
-      <View style={s.searchRow}>
-        <TouchableOpacity
-          style={s.searchField}
-          activeOpacity={0.8}
-          onPress={onPressSearch}
-          accessibilityRole="button"
-          accessibilityLabel={searchPlaceholder}
-        >
-          <EventlyIcon name="magnify" size={21} color={colors.textMuted} />
-          <EventlyText
-            variant="body"
-            style={s.searchPlaceholder}
-            numberOfLines={1}
-          >
-            {searchPlaceholder}
-          </EventlyText>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={s.filterButton}
-          activeOpacity={0.85}
-          onPress={onPressFilters}
-          accessibilityRole="button"
-          accessibilityLabel="Filters"
-        >
-          <EventlyIcon name="tune-variant" size={21} color={colors.onPrimary} />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }

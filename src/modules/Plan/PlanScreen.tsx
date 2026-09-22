@@ -60,6 +60,7 @@ export function PlanScreen() {
     route.params?.occasionId,
     route.params?.organizerId,
     route.params?.eventDate,
+    route.params?.requestId,
   );
 
   if (container.isLoadingScreen) {
@@ -99,11 +100,15 @@ export function PlanScreen() {
         <View style={styles.successCard}>
           <EventlyIcon name="check-circle" size={48} color={PLAN_GREEN} />
           <EventlyText variant="h2" style={styles.successTitle}>
-            Quote requested!
+            {container.isEditingBrief ? 'Brief updated!' : 'Quote requested!'}
           </EventlyText>
           <EventlyText variant="body" style={styles.successSubtitle}>
-            Your plan is saved and the quote request is on its way. You&rsquo;ll
-            hear back within a day.
+            {container.isEditingBrief
+              ? /* Said plainly, because it is the cost of editing: a quote
+                   priced against the old brief is not a quote for this event
+                   any more, and the customer should not go looking for it. */
+                'The organizers you asked have your new brief. Any quote they had already sent no longer applies, so they will send a fresh one.'
+              : 'Your plan is saved and the quote request is on its way. You’ll hear back within a day.'}
           </EventlyText>
         </View>
         <EventlyButton
@@ -182,6 +187,7 @@ export function PlanScreen() {
               submitError={container.submitError}
               planSaved={container.planSaved}
               canSubmitPlan={container.canSubmitPlan}
+              isEditing={container.isEditingBrief}
               footnote={data.footnote}
               whatNext={data.whatNext ?? []}
               quoteNote={data.quoteNote}

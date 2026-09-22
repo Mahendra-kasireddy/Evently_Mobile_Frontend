@@ -4,16 +4,16 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { EventlyIcon, EventlyText } from '../../../Components';
 import { colors } from '../../../theme';
-import { BASICS_DIVIDER, GET_QUOTES_CTA } from '../constants';
+import { CTA_GRADIENT, GET_QUOTES_CTA } from '../constants';
 import { basicsStyles as s } from '../styles';
-import type { BannerViewModel, HeroDraft } from '../types';
+import type { HeroDraft } from '../types';
 import { BasicsCard } from './BasicsCard';
 import { BudgetToggleCard } from './BudgetToggleCard';
 
 interface BannerProps {
-  data: BannerViewModel;
   heroDraft: HeroDraft;
   onEditField: (field: keyof HeroDraft) => void;
   onPickDate: (iso: string) => void;
@@ -29,16 +29,14 @@ interface BannerProps {
 }
 
 /**
- * "What shall we celebrate next?" — the pitch, the four basics, and the button
- * that turns them into a brief.
+ * The four basics, and the button that turns them into a brief.
  *
- * It sits on the page rather than on a navy card. It used to be a dark hero
- * with confetti and a garland behind it, and the form is the point of the
- * block: the decoration was competing with the only thing the customer is
- * meant to look at.
+ * It sits on the page rather than on a navy card, and it leads with the form
+ * itself. It used to open with a heading, a strapline and an "or tell us the
+ * basics" divider — three lines of framing above rows whose own labels say
+ * what they want, and three lines between the customer and the fold.
  */
 export function Banner({
-  data,
   heroDraft,
   onEditField,
   onPickDate,
@@ -78,25 +76,12 @@ export function Banner({
 
   return (
     <View style={s.wrap}>
-      <EventlyText style={s.heading}>
-        {data.headingLead}{' '}
-        <EventlyText style={[s.heading, s.headingAccent]}>
-          {data.headingAccent}
-        </EventlyText>{' '}
-        {data.headingTail}
-      </EventlyText>
-      <EventlyText variant="body" style={s.subtitle}>
-        {data.subtitle}
-      </EventlyText>
-
-      <View style={s.dividerRow}>
-        <View style={s.dividerLine} />
-        <EventlyText variant="caption" style={s.dividerText}>
-          {BASICS_DIVIDER}
-        </EventlyText>
-        <View style={s.dividerLine} />
-      </View>
-
+      {/*
+        No heading, no strapline, no "or tell us the basics" divider.
+        The four rows below say what they want by their own labels, and three
+        lines of framing above a form the customer can already read is three
+        lines between them and the fold.
+      */}
       <BasicsCard
         draft={heroDraft}
         onEditField={onEditField}
@@ -126,18 +111,31 @@ export function Banner({
         }}
         testID="get-quotes"
       >
+        {/* Always, in both states — the idle button is the same sweep at
+            half opacity, so a fresh Home still shows the colour. */}
+        <View style={s.ctaGradient} pointerEvents="none">
+          <Svg
+            width="100%"
+            height="100%"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+          >
+            <Defs>
+              <LinearGradient id="ctaWarm" x1="0%" y1="0%" x2="100%" y2="0%">
+                <Stop offset="0" stopColor={CTA_GRADIENT[0]} />
+                <Stop offset="1" stopColor={CTA_GRADIENT[1]} />
+              </LinearGradient>
+            </Defs>
+            <Rect x={0} y={0} width={100} height={100} fill="url(#ctaWarm)" />
+          </Svg>
+        </View>
+
         {isSubmitting ? (
           <ActivityIndicator color={colors.onPrimary} />
         ) : (
           <>
-            <EventlyIcon
-              name="magnify"
-              size={20}
-              color={ready ? colors.onPrimary : colors.textMuted}
-            />
-            <EventlyText style={[s.ctaText, !ready && s.ctaTextIdle]}>
-              {GET_QUOTES_CTA}
-            </EventlyText>
+            <EventlyIcon name="magnify" size={20} color={colors.onPrimary} />
+            <EventlyText style={s.ctaText}>{GET_QUOTES_CTA}</EventlyText>
           </>
         )}
       </Pressable>

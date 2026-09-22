@@ -5,9 +5,9 @@ import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   ActivityIndicator,
+  FlatList,
   RefreshControl,
   ScrollView,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,13 +16,14 @@ import type {
   MainTabParamList,
   RootStackParamList,
 } from '../../navigation/types';
-import type { CouponOffer, CurrentEventViewModel, HeroDraft } from './types';
+import type {
+  BookedEventViewModel,
+  CouponOffer,
+  CurrentEventViewModel,
+  HeroDraft,
+} from './types';
 import { NameGateSheet } from '../NameCapture';
-import {
-  HERO_ACCENT_COLOR,
-  OTHER_EVENTS_ON_HOME,
-  SEARCH_PLACEHOLDER,
-} from './constants';
+import { HERO_ACCENT_COLOR, OTHER_EVENTS_ON_HOME } from './constants';
 import { useOpenWithOrganizer } from '../Chat';
 import { useHomeContainer } from './container';
 import { useOpenEvent } from './useOpenEvent';
@@ -33,13 +34,20 @@ import { Banner } from './sections/Banner';
 import { BookedEventCard } from './sections/BookedEventCard';
 import { EventRow } from './sections/EventRow';
 import { EventHero } from './sections/EventHero';
+import { HomeHeroPhoto } from './sections/HomeHeroPhoto';
 import { HomeHeader } from './sections/HomeHeader';
 import { OccasionGrid } from './sections/OccasionGrid';
 import { Offers } from './sections/Offers';
 import { CouponSheet } from './sections/CouponSheet';
 import { Packages } from './sections/Packages';
+import { SectionHead } from './sections/SectionHead';
 import { TopOrganizers } from './sections/TopOrganizers';
-import { sectionStyles, styles } from './styles';
+import { TrustStrip } from './sections/TrustStrip';
+import {
+  bookedEventStyles as bookedRowStyles,
+  sectionStyles,
+  styles,
+} from './styles';
 
 type HomeNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<MainTabParamList, 'Home'>,
@@ -81,7 +89,7 @@ export function HomeScreen() {
   );
   const {
     banner,
-    bookedEvent,
+    bookedEvents,
     currentEvent,
     otherEvents,
     occasions,
@@ -134,10 +142,9 @@ export function HomeScreen() {
   };
 
   const visibleOtherEvents = otherEvents.slice(0, OTHER_EVENTS_ON_HOME);
-  const hiddenEventCount = otherEvents.length - visibleOtherEvents.length;
 
   const hasAnyContent = Boolean(
-    bookedEvent ||
+    bookedEvents.length > 0 ||
       currentEvent ||
       occasions ||
       offers ||
@@ -146,16 +153,52 @@ export function HomeScreen() {
   );
 
   const headerProps = {
-    locationLabel: header.locationLabel,
+    initials: header.initials,
+    displayName: header.displayName,
     unreadCount: header.unreadCount,
-    savedCount: header.savedCount,
-    searchPlaceholder: SEARCH_PLACEHOLDER,
-    onPressLocation: () => navigation.navigate('Location'),
-    onPressSaved: () => navigation.navigate('SavedPackages'),
+    /* Profile is no longer a tab — this avatar is the way in, and it pushes,
+       so the back arrow returns to the feed the customer left. */
+    onPressProfile: () => navigation.navigate('Profile'),
     onPressNotifications: () => navigation.navigate('Notification'),
+    /* The same place the search field used to open. Saved packages are still
+       reachable from Profile, which is where the rest of the account's own
+       lists live. */
     onPressSearch: () => navigation.navigate('Search'),
-    onPressFilters: () => navigation.navigate('Search', { openFilters: true }),
   };
+
+  /**
+   * Whether this event is still a brief the customer owns outright.
+   *
+   * A quote request, before anybody's quote was accepted. Everything else —
+   * an accepted quote, a created booking, an event under way — has an
+   * organizer on the other side of it, and editing the brief under them would
+   * change what somebody has already been paid an advance to deliver.
+   */
+  const isBriefEditable = (event: CurrentEventViewModel) =>
+    event.source === 'quote' &&
+    (event.stage === 'submitted' || event.stage === 'quotes_received');
+
+  const renderBooked = (booking: BookedEventViewModel, inRow = false) => (
+    <BookedEventCard
+      key={booking.id}
+      data={booking}
+      inRow={inRow}
+      onPress={() =>
+        navigation.navigate('Workspace', {
+          bookingId: booking.id,
+          workspaceName: booking.title,
+        })
+      }
+      /* Offered only when there is an organizer to message. A booking with
+         none — older rows — gets no button rather than one that fails on
+         tap. */
+      onMessageOrganizer={
+        booking.organizerId
+          ? () => messageOrganizer(booking.organizerId, booking.organizerName)
+          : undefined
+      }
+    />
+  );
 
   const openEvent = useOpenEvent();
   const handlePressHeroCta = openEvent;
@@ -197,7 +240,9 @@ export function HomeScreen() {
       onPressDetails={() => openRequest(event)}
       /* Tapping one reply opens the list rather than that quote alone — the
          decision is between them, not about one. */
-      onPressQuote={event.source === 'quote' ? () => openRequest(event) : undefined}
+      onPressQuote={
+        event.source === 'quote' ? () => openRequest(event) : undefined
+      }
     />
   );
 
@@ -231,8 +276,13 @@ export function HomeScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <HomeHeader {...headerProps} />
+    /*
+     * No top safe-area edge here, deliberately: the hero photograph runs under
+     * the status bar, and insetting the screen would draw a canvas-coloured
+     * strip above the picture. The inset is applied inside HomeHeroPhoto, as
+     * padding on the controls rather than on the image.
+     */
+    <View style={styles.container}>
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
@@ -241,7 +291,22 @@ export function HomeScreen() {
           <RefreshControl refreshing={isLoading} onRefresh={refetch} />
         }
       >
+        <HomeHeroPhoto>
+          <HomeHeader {...headerProps} onPhoto />
+        </HomeHeroPhoto>
+
         {/*
+          Everything below the photograph sits on one opaque sheet, lifted over
+          the picture's bottom edge.
+
+          One sheet rather than a lifted first card: the photo is the scroll
+          view's own backdrop, so anything that is not covered lets it through
+          — which is how it reappeared between the form and the booked card,
+          hundreds of points below where it belongs. The sheet is what makes
+          "the picture is at the top" true rather than nearly true.
+        */}
+        <View style={styles.sheet}>
+          {/*
           "Tell us the basics" — the four fields a brief needs, and the button
           that sends it.
 
@@ -250,58 +315,75 @@ export function HomeScreen() {
           request in flight — most people who use the app twice — never saw it
           again. Planning a second event is the thing Home is for.
         */}
-        {banner ? (
-          <Banner
-            data={banner}
-            heroDraft={heroDraft}
-            onEditField={editField}
-            onPickDate={iso => setHeroField('when', iso)}
-            shareBudget={shareBudget}
-            budget={budget}
-            onToggleBudget={toggleShareBudget}
-            onPressBudgetRange={() => setOpenSheet('budget')}
-            onSubmit={submitHeroDraft}
-            isSubmitting={isRequestingQuotes}
-            quotesRequested={quotesRequested}
-            quotesErrorMessage={quotesErrorMessage}
-            onEditAgain={resetQuotesRequest}
-          />
-        ) : null}
+          {banner ? (
+            <Banner
+              heroDraft={heroDraft}
+              onEditField={editField}
+              onPickDate={iso => setHeroField('when', iso)}
+              shareBudget={shareBudget}
+              budget={budget}
+              onToggleBudget={toggleShareBudget}
+              onPressBudgetRange={() => setOpenSheet('budget')}
+              onSubmit={submitHeroDraft}
+              isSubmitting={isRequestingQuotes}
+              quotesRequested={quotesRequested}
+              quotesErrorMessage={quotesErrorMessage}
+              onEditAgain={resetQuotesRequest}
+            />
+          ) : null}
 
-        {/*
+          {/*
+          The occasions, straight under the button that sends a brief.
+
+          They are the same action the form is — start planning something —
+          and they are the way in for a customer who would rather tap
+          "Wedding" than fill four fields. Down at the bottom they arrived
+          after the events, the coupons and the packages, which is well past
+          the point where somebody who did not want the form had given up.
+        */}
+          {occasions && (
+            <View style={sectionStyles.block}>
+              <OccasionGrid
+                data={occasions}
+                onPressOccasion={occasionId =>
+                  navigation.navigate('Plan', { occasionId })
+                }
+              />
+            </View>
+          )}
+
+          {/*
           The booked card replaces the hero for the booking itself — the two are
           two renderings of one event, and stacking them would summarise it
           twice. Any OTHER live event follows below on its own hero: a customer
           with a confirmed booking in December and a brief still collecting
           quotes for September has two events, and Home showed only the first.
         */}
-        {bookedEvent ? (
-          <BookedEventCard
-            data={bookedEvent}
-            onPress={() =>
-              navigation.navigate('Workspace', {
-                bookingId: bookedEvent.id,
-                workspaceName: bookedEvent.title,
-              })
-            }
-            /* Offered only when there is an organizer to message. A booking
-               with none — older rows — gets no button rather than one that
-               fails on tap. */
-            onMessageOrganizer={
-              bookedEvent.organizerId
-                ? () =>
-                    messageOrganizer(
-                      bookedEvent.organizerId,
-                      bookedEvent.organizerName,
-                    )
-                : undefined
-            }
-          />
-        ) : currentEvent ? (
-          renderHero(currentEvent)
-        ) : null}
+          {bookedEvents.length === 1 ? (
+            renderBooked(bookedEvents[0])
+          ) : bookedEvents.length > 1 ? (
+            /*
+             * Two bookings and up, side by side.
+             *
+             * Stacked, a second confirmed booking pushed everything else on Home
+             * a full card down; demoted to a row it read like a draft. A swipe
+             * keeps both of them the same size as each other and costs the page
+             * the height of one.
+             */
+            <FlatList
+              style={bookedRowStyles.row}
+              contentContainerStyle={bookedRowStyles.rowContent}
+              data={bookedEvents}
+              keyExtractor={item => item.id}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item }) => renderBooked(item, true)}
+            />
+          ) : currentEvent ? (
+            renderHero(currentEvent)
+          ) : null}
 
-        {/*
+          {/*
           Every other live event, one row each.
 
           These used to be full heroes, and ten events meant ten screens of
@@ -310,105 +392,113 @@ export function HomeScreen() {
           them, then a link — Home stays the same length whether the customer
           has four events or forty, and the Events tab is already the full list.
         */}
-        {visibleOtherEvents.length ? (
+          {visibleOtherEvents.length ? (
           <View style={sectionStyles.block}>
-            <View style={sectionStyles.headRow}>
-              <EventlyText variant="h2" style={sectionStyles.title}>
-                Your other events
-              </EventlyText>
-              {hiddenEventCount > 0 ? (
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate('Main', { screen: 'Events' })
-                  }
-                  accessibilityRole="button"
-                  accessibilityLabel={`See all ${
-                    otherEvents.length + 1
-                  } events`}
-                  testID="see-all-events"
-                >
-                  <EventlyText variant="subtitle" style={sectionStyles.action}>
-                    See all {otherEvents.length + 1}
-                  </EventlyText>
-                </TouchableOpacity>
-              ) : null}
-            </View>
+            {/*
+              "See all", always — the same head every other section on Home
+              uses.
+
+              It used to appear only once there were more events than the
+              three shown, and count them: "See all 11". So a customer with
+              exactly three had no link at all, and the one thing the section
+              could not do was take them to the full list. It opens the
+              events list now rather than the Events tab, which is the
+              screen this section is a preview of.
+            */}
+            <SectionHead
+              title="Your other events"
+              actionLabel="See all"
+              testID="see-all-events"
+              onPressAction={() =>
+                navigation.navigate('SeeAll', { kind: 'events' })
+              }
+            />
 
             {visibleOtherEvents.map(event => (
               <EventRow
                 key={`${event.source}:${event.refId}`}
                 event={event}
                 onPress={() => openEvent(event)}
+                /* Only a brief nobody has been hired off yet: past
+                   acceptance there is a booking, and changing the terms is a
+                   conversation with the organizer rather than a form. */
+                onEdit={
+                  isBriefEditable(event)
+                    ? () =>
+                        navigation.navigate('Plan', { requestId: event.refId })
+                    : undefined
+                }
               />
             ))}
           </View>
         ) : null}
 
         {offers && (
-          <View style={sectionStyles.block}>
-            <Offers
-              data={offers}
-              /*
-               * Opens the coupon's terms rather than "claiming" it. A coupon is
-               * a code that does its work at checkout, and a tap that claimed
-               * something would be promising a discount no booking has agreed
-               * to yet.
-               */
-              onPressOffer={setOpenCoupon}
-              /* The row is a carousel, so most of the coupons are off screen. */
-              onPressSeeAll={() =>
-                navigation.navigate('SeeAll', { kind: 'offers' })
-              }
-            />
-          </View>
-        )}
+            <View style={sectionStyles.block}>
+              <Offers
+                data={offers}
+                /*
+                 * Opens the coupon's terms rather than "claiming" it. A coupon is
+                 * a code that does its work at checkout, and a tap that claimed
+                 * something would be promising a discount no booking has agreed
+                 * to yet.
+                 */
+                onPressOffer={setOpenCoupon}
+                /* The row is a carousel, so most of the coupons are off screen. */
+                onPressSeeAll={() =>
+                  navigation.navigate('SeeAll', { kind: 'offers' })
+                }
+              />
+            </View>
+          )}
 
-        {occasions && (
-          <View style={sectionStyles.block}>
-            <OccasionGrid
-              data={occasions}
-              onPressOccasion={occasionId =>
-                navigation.navigate('Plan', { occasionId })
-              }
-            />
-          </View>
-        )}
+          {packages && (
+            <View style={sectionStyles.block}>
+              <Packages
+                data={packages}
+                // A package's art key is its occasion id, so opening one lands
+                // the planner on that occasion rather than a blank first step.
+                onPressPackage={item =>
+                  navigation.navigate('Plan', { occasionId: item.art })
+                }
+                onPressSeeAll={() =>
+                  navigation.navigate('Search', { kind: 'packages' })
+                }
+                savedIds={savedPackageIds}
+                onToggleSaved={toggleSavedPackage}
+              />
+            </View>
+          )}
 
-        {packages && (
-          <View style={sectionStyles.block}>
-            <Packages
-              data={packages}
-              // A package's art key is its occasion id, so opening one lands
-              // the planner on that occasion rather than a blank first step.
-              onPressPackage={item =>
-                navigation.navigate('Plan', { occasionId: item.art })
-              }
-              onPressSeeAll={() =>
-                navigation.navigate('Search', { kind: 'packages' })
-              }
-              savedIds={savedPackageIds}
-              onToggleSaved={toggleSavedPackage}
-            />
-          </View>
-        )}
+          {topOrganizers && (
+            <View style={sectionStyles.block}>
+              <TopOrganizers
+                data={topOrganizers}
+                // The full profile screen, not the old sheet: a sheet was the
+                // right size for four facts and the wrong size for a portfolio,
+                // a service list and a body of reviews.
+                onPressOrganizer={organizerId =>
+                  navigation.navigate('Organizer', { organizerId })
+                }
+                onPressSeeAll={() =>
+                  navigation.navigate('Search', { kind: 'organizers' })
+                }
+                onPressChangeCity={() => navigation.navigate('Location')}
+              />
+            </View>
+          )}
 
-        {topOrganizers && (
-          <View style={sectionStyles.block}>
-            <TopOrganizers
-              data={topOrganizers}
-              // The full profile screen, not the old sheet: a sheet was the
-              // right size for four facts and the wrong size for a portfolio,
-              // a service list and a body of reviews.
-              onPressOrganizer={organizerId =>
-                navigation.navigate('Organizer', { organizerId })
-              }
-              onPressSeeAll={() =>
-                navigation.navigate('Search', { kind: 'organizers' })
-              }
-              onPressChangeCity={() => navigation.navigate('Location')}
-            />
-          </View>
-        )}
+          {/*
+            The three promises, at the foot of the screen.
+
+            Last, deliberately: they are what somebody reads after they have
+            seen the organizers and before they decide whether to trust the
+            platform with a deposit. Admin-editable copy from the feed — the
+            strip disappears entirely when nothing is configured, rather than
+            making promises the business has not written.
+          */}
+          {banner ? <TrustStrip items={banner.trust} /> : null}
+        </View>
       </ScrollView>
 
       <CalendarSheet
@@ -440,7 +530,7 @@ export function HomeScreen() {
 
       <NameGateSheet onNameSaved={refetch} />
       <CouponSheet coupon={openCoupon} onClose={() => setOpenCoupon(null)} />
-    </SafeAreaView>
+    </View>
   );
 }
 

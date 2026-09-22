@@ -49,10 +49,8 @@ export const TRUST_ICON_NAME: Record<TrustIcon, string> = {
 // Web's actual Hero.module.css tokens — a deep navy hero with warm-orange
 // accents, not the app's bright indigo primary. Scoped to this section only.
 /** The one line in the header's search field — what can actually be searched. */
-export const SEARCH_PLACEHOLDER = 'Search packages, organizers, decor';
 
 /** The rule above the card, which separates the pitch from the form. */
-export const BASICS_DIVIDER = 'or tell us the basics';
 
 /**
  * Shortcuts under the four rows.
@@ -127,6 +125,18 @@ export const HERO_BACKGROUND_COLOR = '#0e1a33'; // --color-navy-deep
  */
 export const OTHER_EVENTS_ON_HOME = 3;
 
+/*
+ * The package card's action and the line above its price.
+ *
+ * "Get quotes", not "Book" or "Get ticket": tapping it opens the planner with
+ * this package's occasion filled in, and what comes back is organizers' prices
+ * for the customer's own event. Nothing on this card is bookable as it stands
+ * — the figure beside it is where that organizer's pricing starts, which is
+ * exactly what "Start from" says.
+ */
+export const PACKAGE_CTA = 'Get quotes';
+export const PACKAGE_PRICE_CAPTION = 'Start from';
+
 export const HOME_NAVY = '#1a2e5a';
 export const HOME_NAVY_DEEP = '#0e1a33';
 /** One step lighter than the hero, for a panel sitting on it. */
@@ -139,6 +149,15 @@ export const HOME_CANVAS = '#faf8f7';
 export const HOME_HAIRLINE = '#efe9e5';
 export const HOME_TRACK = '#f0ecea';
 export const HERO_ACCENT_COLOR = '#e8633a'; // --color-primary
+/*
+ * The warm sweep on "Get quotes", left to right.
+ *
+ * It starts on the brand coral and runs into amber. The reference it comes
+ * from ends much paler than this — a near-cream — and white type on that is
+ * not readable, so the run stops where the label still holds. Same colour
+ * family, same movement, a button you can still read at the right-hand end.
+ */
+export const CTA_GRADIENT: [string, string] = ['#e8633a', '#f0913f'];
 export const HERO_ACCENT_WARM_COLOR = '#ff8b5e'; // --color-accent-warm
 export const HERO_FIELD_ICON_BG = '#fdeee7'; // --color-primary-soft
 export const HERO_DECOR_CIRCLE_COLOR = 'rgba(232, 99, 58, 0.45)';

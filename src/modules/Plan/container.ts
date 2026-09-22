@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AUTOSAVE_DEBOUNCE_MS, MAX_ORGANIZERS } from './constants';
+import { fetchBriefToEdit } from './services';
 import {
   useCreatePlanCallback,
   useMyDraft,
@@ -7,6 +8,7 @@ import {
   usePlanScreenData,
   useRequestQuoteCallback,
   useSaveDraftCallback,
+  useUpdateRequestCallback,
 } from './hooks';
 import {
   blockReasonFor,
@@ -71,6 +73,13 @@ function buildInitialDraft(
 }
 
 export interface PlanContainerResult {
+  /**
+   * True when the wizard is revising a brief that was already sent, rather
+   * than composing a new one. It changes what submitting does — a revision,
+   * not a second request — and what the screen says about it.
+   */
+  isEditingBrief: boolean;
+
   // Screen-level state
   isLoadingScreen: boolean;
   isScreenError: boolean;
@@ -151,7 +160,10 @@ export function usePlanContainer(
   initialOccasionId?: string,
   initialOrganizerId?: string,
   initialEventDate?: string,
+  /** A brief already sent, to revise rather than write a new one. */
+  editRequestId?: string,
 ): PlanContainerResult {
+  const editing = Boolean(editRequestId);
   const {
     data: screenDataRaw,
     loading: screenLoading,
@@ -348,8 +360,59 @@ export function usePlanContainer(
     [draft.selectedOrganizerIds, reviewOrganizers],
   );
 
+  /*
+   * The brief being edited, loaded once.
+   *
+   * It overwrites whatever draft was resumed: the customer asked to change a
+   * request that exists, and showing them last week's abandoned draft with
+   * that request's id attached would edit one brief using another's answers.
+   * The occasion arrives as the label the customer picked, so it is matched
+   * back to an occasion id — and left alone when nothing matches, rather than
+   * guessing at one.
+   */
+  const editLoadedRef = useRef(false);
+  useEffect(() => {
+    if (!editRequestId || editLoadedRef.current || occasions.length === 0) {
+      return;
+    }
+    editLoadedRef.current = true;
+    hydratedRef.current = true; // don't let the saved draft land on top of it
+    fetchBriefToEdit(editRequestId)
+      .then(brief => {
+        const matched = occasions.find(
+          o => o.label.toLowerCase() === (brief.occasion ?? '').toLowerCase(),
+        );
+        // "Area, City" comes back as one string; the wizard keeps them apart.
+        const where = (brief.where ?? '').trim();
+        const comma = where.lastIndexOf(',');
+        const area = comma > -1 ? where.slice(0, comma).trim() : '';
+        const city = comma > -1 ? where.slice(comma + 1).trim() : where;
+        setDraft(prev => ({
+          ...prev,
+          occasionId: matched ? matched.id : prev.occasionId,
+          eventDate: brief.when || prev.eventDate,
+          area,
+          city,
+          guests: brief.guests ?? '',
+          budget: brief.budget ?? '',
+          categories: brief.categories ?? [],
+          ideas: brief.ideas ?? '',
+          step: 0,
+        }));
+      })
+      .catch(() => {
+        // Left on whatever the wizard had; the submit still targets the right
+        // request, and the customer can see the rows are not theirs.
+        setSubmitError(
+          "We couldn't load that brief. Check the answers below before you send the update.",
+        );
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editRequestId, occasions]);
+
   // ----- Submit: two-phase (save plan, then request quote), retry-safe -----
   const createPlanCall = useCreatePlanCallback();
+  const updateRequestCall = useUpdateRequestCallback();
   const requestQuoteCall = useRequestQuoteCallback();
   const [savedPlanId, setSavedPlanId] = useState<string | null>(null);
   const [submitPhase, setSubmitPhase] = useState<SubmitPhase>('idle');
@@ -357,8 +420,42 @@ export function usePlanContainer(
   const [submitSucceeded, setSubmitSucceeded] = useState(false);
 
   const submitPlan = useCallback(() => {
-    if (draft.selectedOrganizerIds.length === 0) return;
     setSubmitError(null);
+
+    /*
+     * Editing sends the revision and nothing else — no plan is saved and no
+     * second request is raised. The organizers who already priced it are told
+     * server-side that their quote no longer applies.
+     */
+    if (editRequestId) {
+      setSubmitPhase('quoting');
+      updateRequestCall
+        .execute(editRequestId, {
+          occasion: currentOccasion?.label ?? draft.occasionId,
+          when: draft.eventDate || '',
+          where: locationLabel(draft.area, draft.city, ''),
+          guests: draft.guests || '',
+          budget: draft.budget || '',
+          categories: draft.categories,
+          ideas: draft.ideas.trim(),
+        })
+        .then(() => {
+          setSubmitPhase('idle');
+          setSubmitSucceeded(true);
+        })
+        .catch((err: unknown) => {
+          setSubmitPhase('idle');
+          const detail = detailOf(err as NormalizedApiError);
+          setSubmitError(
+            detail
+              ? `Couldn't update the brief: ${detail}. Nothing was changed.`
+              : "We couldn't update the brief. Nothing was changed — please try again.",
+          );
+        });
+      return;
+    }
+
+    if (draft.selectedOrganizerIds.length === 0) return;
 
     /*
      * The plan id is a parameter rather than read from state: on a first
@@ -425,7 +522,7 @@ export function usePlanContainer(
         );
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [savedPlanId, draft, currentOccasion]);
+  }, [savedPlanId, draft, currentOccasion, editRequestId]);
 
   const startNewPlan = useCallback(() => {
     hydratedRef.current = true; // don't re-hydrate the old saved draft
@@ -438,6 +535,7 @@ export function usePlanContainer(
   }, []);
 
   return {
+    isEditingBrief: editing,
     isLoadingScreen: screenLoading && !screenDataRaw,
     isScreenError: screenError !== null && !screenDataRaw,
     screenErrorMessage: screenError?.message ?? null,
@@ -478,7 +576,11 @@ export function usePlanContainer(
     submitError,
     planSaved: savedPlanId !== null,
     submitSucceeded,
-    canSubmitPlan: submitPhase === 'idle' && draft.selectedOrganizerIds.length > 0,
+    /* A revision goes to the organizers the request already has, so it does
+       not need a shortlist the way a new brief does. */
+    canSubmitPlan:
+      submitPhase === 'idle' &&
+      (editing || draft.selectedOrganizerIds.length > 0),
     submitPlan,
     startNewPlan,
   };

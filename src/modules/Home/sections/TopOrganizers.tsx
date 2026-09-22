@@ -1,6 +1,7 @@
 import { TouchableOpacity, View } from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
-import { TIER_COLOR } from '../constants';
+import { colors } from '../../../theme';
+import { HOME_GREEN, TIER_COLOR } from '../constants';
 import { organizerRowStyles as s } from '../styles';
 import { SectionHead } from './SectionHead';
 import type { OrganizerItem, TopOrganizersViewModel } from '../types';
@@ -48,36 +49,27 @@ function OrganizerRow({
       </View>
 
       <View style={s.text}>
-        <EventlyText variant="body" style={s.name} numberOfLines={1}>
-          {item.name.toUpperCase()}
-        </EventlyText>
-
         <View style={s.metaRow}>
           {/* A score with no reviews behind it is not a rating — the old card
               drew five filled stars for an organizer nobody had reviewed. */}
           {item.reviews > 0 ? (
             <>
-              <EventlyIcon name="star" size={14} color="#e8a33a" />
+              <EventlyIcon name="star" size={13} color="#e8a33a" />
               <EventlyText variant="caption" style={s.rating}>
                 {item.rating.toFixed(1)}
               </EventlyText>
               <EventlyText variant="caption" style={s.reviews}>
                 {`(${item.reviews})`}
               </EventlyText>
-              <EventlyText variant="caption" style={s.dot}>
-                ·
-              </EventlyText>
             </>
           ) : (
-            <>
-              <EventlyText variant="caption" style={s.reviews}>
-                No reviews yet
-              </EventlyText>
-              <EventlyText variant="caption" style={s.dot}>
-                ·
-              </EventlyText>
-            </>
+            <EventlyText variant="caption" style={s.reviews}>
+              No reviews yet
+            </EventlyText>
           )}
+          <EventlyText variant="caption" style={s.dot}>
+            ·
+          </EventlyText>
           <EventlyText
             variant="caption"
             style={[s.tier, { color: TIER_COLOR[item.tier] }]}
@@ -86,31 +78,45 @@ function OrganizerRow({
           </EventlyText>
         </View>
 
-        {item.bookedLabel ? (
-          <EventlyText variant="caption" style={s.booked}>
-            {item.bookedLabel}
-          </EventlyText>
-        ) : null}
-      </View>
+        {/* Their own name, as they wrote it. It used to be set in capitals,
+            which is a shout rather than a name. */}
+        <EventlyText variant="body" style={s.name} numberOfLines={2}>
+          {item.name}
+        </EventlyText>
 
-      <View style={s.right}>
-        {/* Both lines drop when the organizer has not published the figure —
-            "FROM ₹0" and "Replies in 0h" are worse than saying nothing. */}
-        {item.fromLabel ? (
-          <>
-            <EventlyText variant="caption" style={s.fromLabel}>
-              From
-            </EventlyText>
-            <EventlyText variant="h2" style={s.fromValue}>
-              {item.fromLabel}
-            </EventlyText>
-          </>
-        ) : null}
-        {item.repliesLabel ? (
-          <EventlyText variant="caption" style={s.replies}>
-            {item.repliesLabel}
-          </EventlyText>
-        ) : null}
+        <View style={s.factRow}>
+          {/* What they have done lately, or how fast they answer — whichever
+              they have. Both drop rather than reading "0 booked". */}
+          {item.bookedLabel || item.repliesLabel ? (
+            <>
+              <EventlyIcon
+                name={item.bookedLabel ? 'calendar-check' : 'clock-outline'}
+                size={14}
+                color={item.bookedLabel ? colors.textMuted : HOME_GREEN}
+              />
+              <EventlyText
+                variant="caption"
+                style={item.bookedLabel ? s.booked : s.replies}
+                numberOfLines={1}
+              >
+                {item.bookedLabel || item.repliesLabel}
+              </EventlyText>
+            </>
+          ) : null}
+
+          {/* Dropped when the organizer has published no figure — "From ₹0"
+              is worse than saying nothing. */}
+          {item.fromLabel ? (
+            <View style={s.right}>
+              <EventlyText variant="caption" style={s.fromLabel}>
+                From
+              </EventlyText>
+              <EventlyText variant="subtitle" style={s.fromValue}>
+                {item.fromLabel}
+              </EventlyText>
+            </View>
+          ) : null}
+        </View>
       </View>
     </TouchableOpacity>
   );

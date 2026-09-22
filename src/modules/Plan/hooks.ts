@@ -1,6 +1,14 @@
 import { useAsync } from '../../hooks/useAsync';
 import { useAsyncCallback } from '../../hooks/useAsyncCallback';
-import { createPlan, fetchMyDraft, fetchOrganizers, fetchPlanScreen, requestQuoteFromOrganizer, saveDraft } from './services';
+import {
+  createPlan,
+  fetchMyDraft,
+  fetchOrganizers,
+  fetchPlanScreen,
+  requestQuoteFromOrganizer,
+  saveDraft,
+  updateQuoteRequest,
+} from './services';
 
 export function usePlanScreenData() {
   return useAsync(fetchPlanScreen, []);
@@ -25,4 +33,8 @@ export function useCreatePlanCallback() {
 
 export function useRequestQuoteCallback() {
   return useAsyncCallback(requestQuoteFromOrganizer);
+}
+
+export function useUpdateRequestCallback() {
+  return useAsyncCallback(updateQuoteRequest);
 }

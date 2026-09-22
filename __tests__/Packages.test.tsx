@@ -183,6 +183,15 @@ describe('Packages', () => {
     expect(text).toContain('18 booked this month');
   });
 
+  it('drops the strapline: the cards say what they are', () => {
+    const text = textOf(render(<Packages {...base} data={section()} />)).join(
+      '|',
+    );
+    expect(text).toContain('Curated packages by budget');
+    // A sentence about the cards, above cards that show what they are.
+    expect(text).not.toContain('Pre-matched bundles');
+  });
+
   it('gives each card its own gradient id', () => {
     // A shared SVG id would make every banner on the screen paint whichever
     // gradient rendered last.

@@ -35,6 +35,7 @@ import { View } from 'react-native';
 import { HomeHeader } from '../src/modules/Home/sections/HomeHeader';
 import { OccasionGrid } from '../src/modules/Home/sections/OccasionGrid';
 import { Offers } from '../src/modules/Home/sections/Offers';
+import { TopOrganizers } from '../src/modules/Home/sections/TopOrganizers';
 import { TrustStrip } from '../src/modules/Home/sections/TrustStrip';
 import {
   formatCompactINR,
@@ -45,7 +46,6 @@ import {
   mapCoupons,
   mapPackages,
 } from '../src/modules/Home/utils';
-import { SEARCH_PLACEHOLDER } from '../src/modules/Home/constants';
 import type { HomeFeedDTO } from '../src/modules/Home/types';
 
 declare const process: { env: Record<string, string | undefined> };
@@ -352,7 +352,11 @@ describe('a second event on Home', () => {
   it('keeps what tells one event from another', () => {
     const text = textIn(row());
     expect(text).toContain('Anniversary');
-    expect(text).toContain('5 Sep 2026');
+    // The date rides on the picture as a chip now — "SEP" over "5" — rather
+    // than inside a facts line, which is the thing people scan a list of
+    // events for.
+    expect(text).toContain('SEP');
+    expect(text).toContain('5');
     expect(text).toContain('Kukatpally');
   });
 
@@ -572,6 +576,36 @@ describe('mapCoupons', () => {
   });
   const coupons = (items: Array<Record<string, unknown>>) =>
     mapCoupons(feed({ coupons: items as unknown as HomeFeedDTO['coupons'] }));
+
+  it('never prints the discount twice on one card', () => {
+    /*
+     * Most coupon titles already state the figure — "10% off decor" — and the
+     * card set it large again underneath, so a 340-point card said "10%"
+     * twice in two sizes. The big figure is for a coupon whose title does not
+     * say it; the cap still appears either way, because "up to ₹10,000" is
+     * the part the title leaves out.
+     */
+    const data = coupons([
+      coupon({ title: '10% off decor', maxDiscount: 10000 }),
+      coupon({ id: 'c2', title: 'Diwali bonanza', discountValue: 15 }),
+    ]);
+    const text = textOf(
+      render(
+        <Offers
+          data={data as NonNullable<typeof data>}
+          onPressOffer={noop}
+          onPressSeeAll={noop}
+        />,
+      ),
+    );
+
+    // The title says it, so the figure is not set a second time — but its cap
+    // survives, among the conditions.
+    expect(text.split('10%')).toHaveLength(2);
+    expect(text).toContain('up to ₹10,000');
+    // This title does not say it, so the card does.
+    expect(text).toContain('15%');
+  });
 
   it('counts the cards actually on screen', () => {
     // A header saying "3 live" over two cards is the kind of small lie that
@@ -801,40 +835,166 @@ describe('EventHero', () => {
 
 describe('HomeHeader', () => {
   const base = {
-    locationLabel: 'Hyderabad',
-    searchPlaceholder: SEARCH_PLACEHOLDER,
-    onPressLocation: noop,
-    onPressSaved: noop,
+    initials: 'HK',
+    displayName: 'Hem Kumar',
+    onPressProfile: noop,
     onPressNotifications: noop,
     onPressSearch: noop,
-    onPressFilters: noop,
   };
 
-  it('badges both counts, and neither at zero', () => {
-    const withCounts = textOf(
-      render(<HomeHeader {...base} savedCount={1} unreadCount={2} />),
-    );
-    expect(withCounts).toContain('1');
-    expect(withCounts).toContain('2');
-
+  it('badges the unread count, and nothing at zero', () => {
+    expect(textOf(render(<HomeHeader {...base} unreadCount={2} />))).toContain('2');
     // A badge reading "0" is noise.
-    const bare = render(
-      <HomeHeader {...base} savedCount={0} unreadCount={0} />,
-    );
-    expect(textOf(bare)).not.toContain('0');
+    expect(textOf(render(<HomeHeader {...base} unreadCount={0} />))).not.toContain('0');
   });
 
   it('caps a big count rather than stretching the dot', () => {
-    expect(
-      textOf(render(<HomeHeader {...base} savedCount={0} unreadCount={42} />)),
-    ).toContain('9+');
+    expect(textOf(render(<HomeHeader {...base} unreadCount={42} />))).toContain('9+');
   });
 
-  it('names what can actually be searched', () => {
-    const text = textOf(
-      render(<HomeHeader {...base} savedCount={0} unreadCount={0} />),
+  it('is one row: a search glyph, not a field pretending to be an input', () => {
+    /*
+     * The field on Home never accepted a keystroke — it was a button drawn as
+     * an input, because typing belongs on the search screen where the results
+     * and filters are. It cost a whole row of the fold to say what a glyph
+     * says, so the row is gone and the icon carries it.
+     */
+    const tree = render(<HomeHeader {...base} unreadCount={0} />);
+    expect(textOf(tree)).not.toContain('Search packages, organizers, decor');
+
+    const labels = tree.root
+      .findAll((n) => typeof n.props?.accessibilityLabel === 'string')
+      .map((n) => n.props.accessibilityLabel as string);
+    expect(labels).toContain('Search');
+    // The filter button went with the field; the search screen has its own.
+    expect(labels).not.toContain('Filters');
+  });
+
+  it('opens the account from the avatar, which is where Profile lives now', () => {
+    /*
+     * Profile was a fifth tab for a screen nobody navigates between. The
+     * avatar is the one way in — and it carries the account's initials, not a
+     * photograph, because the customer feed has no avatar image to send.
+     */
+    let opened = 0;
+    const tree = render(
+      <HomeHeader {...base} unreadCount={0} onPressProfile={() => { opened += 1; }} />,
     );
-    expect(text).toContain('Search packages, organizers, decor');
+    expect(textOf(tree)).toContain('HK');
+    // The city picker went with it; the account's city is set in Profile.
+    expect(textOf(tree)).not.toContain('Hyderabad');
+
+    const avatar = tree.root.find(
+      (n) =>
+        typeof n.props?.accessibilityLabel === 'string' &&
+        n.props.accessibilityLabel.startsWith('Your profile'),
+    );
+    avatar.props.onPress();
+    expect(opened).toBe(1);
+  });
+
+  it('no longer offers saved packages from Home', () => {
+    // Still reachable from Profile, where the account's own lists live.
+    const tree = render(<HomeHeader {...base} unreadCount={0} />);
+    const labels = tree.root
+      .findAll((n) => typeof n.props?.accessibilityLabel === 'string')
+      .map((n) => n.props.accessibilityLabel as string);
+    expect(labels.some((l) => l.includes('Saved packages'))).toBe(false);
+  });
+});
+
+describe('the occasion grid', () => {
+  it('never grows past two rows', () => {
+    /*
+     * Height is the thing being protected. Eleven occasions as a wrapping
+     * grid is three rows, and every row this section grows is a row the
+     * sections under it lose — as half-width cards, which is what it used to
+     * be, it was six. Anything past the eighth is one swipe away instead.
+     */
+    const { OCCASION_ROWS, occasionGridStyles } = require('../src/modules/Home/styles');
+    expect(OCCASION_ROWS).toBe(2);
+
+    /* A horizontal scroll view with no height of its own claims the column's
+       leftover space and stretches its tiles down the page. */
+    expect(
+      (occasionGridStyles.scroll as Record<string, unknown>).flexGrow,
+    ).toBe(0);
+
+    /* Points, not a percentage: inside a horizontal scroll view a percentage
+       measures against the content, so every tile would collapse. */
+    expect(typeof (occasionGridStyles.tile as Record<string, unknown>).width).toBe(
+      'number',
+    );
+  });
+
+  it('lays each page out four across, in reading order', () => {
+    /*
+     * It used to chunk column-first — two tiles down, then across — which
+     * with six occasions drew three columns, not the four the design asks
+     * for. Pages of eight filled left-to-right put four on the top row
+     * whatever the count is, and reading order matches the feed order.
+     */
+    const {
+      OCCASION_COLUMNS,
+      OCCASION_ROWS,
+      OCCASIONS_PER_PAGE,
+      occasionGridStyles,
+    } = require('../src/modules/Home/styles');
+    expect(OCCASION_COLUMNS).toBe(4);
+    expect(OCCASIONS_PER_PAGE).toBe(OCCASION_COLUMNS * OCCASION_ROWS);
+
+    const items = Array.from({ length: 11 }, (_, n) => ({
+      id: `occasion-${n}`,
+      icon: 'ring',
+      art: 'wedding',
+      label: `Occasion ${n}`,
+      note: '',
+      photoUrl: '',
+    }));
+    const data = {
+      title: 'Plan something new',
+      items,
+    } as unknown as React.ComponentProps<typeof OccasionGrid>['data'];
+
+    const tree = render(<OccasionGrid data={data} onPressOccasion={noop} />);
+    // Host nodes only: findAll matches the composite View and its host twin.
+    const pages = tree.root.findAll(
+      (n) => typeof n.type === 'string' && n.props?.style === occasionGridStyles.page,
+    );
+    // Eleven is eight on screen and three a swipe away, never a third row.
+    expect(pages.map((node) => node.children.length)).toEqual([
+      OCCASIONS_PER_PAGE,
+      3,
+    ]);
+
+    // Each page wraps at four, so the first four labels are the top row.
+    const labels = textOf(tree);
+    expect(labels.indexOf('Occasion 0')).toBeLessThan(labels.indexOf('Occasion 1'));
+    expect(labels).toContain('Occasion 10');
+  });
+
+  it('drops the strapline: the tiles are the instruction', () => {
+    const data = {
+      title: 'Plan something new',
+      subtitle: 'Pick an occasion — get an instant estimate.',
+      items: [
+        {
+          id: 'wedding',
+          icon: 'ring',
+          art: 'wedding',
+          label: 'Wedding',
+          note: 'Most planned',
+          photoUrl: '',
+        },
+      ],
+    } as unknown as React.ComponentProps<typeof OccasionGrid>['data'];
+
+    const text = textOf(render(<OccasionGrid data={data} onPressOccasion={noop} />));
+    expect(text).toContain('Plan something new');
+    expect(text).toContain('Wedding');
+    // The strapline is gone, and so is the per-tile line that had no room.
+    expect(text).not.toContain('instant estimate');
+    expect(text).not.toContain('Most planned');
   });
 });
 
@@ -883,7 +1043,6 @@ describe('render dump', () => {
         content: {
           planSection: {
             title: 'Plan something new',
-            subtitle: 'Pick an occasion — the brief takes about two minutes.',
           },
         } as HomeFeedDTO['content'],
         occasions: [
@@ -940,15 +1099,12 @@ describe('render dump', () => {
           render(
             <>
               <HomeHeader
-                locationLabel="Kukatpally, Hyderabad"
-                savedCount={1}
+                initials="HK"
+                displayName="Hem Kumar"
                 unreadCount={2}
-                searchPlaceholder={SEARCH_PLACEHOLDER}
-                onPressLocation={noop}
-                onPressSaved={noop}
+                onPressProfile={noop}
                 onPressNotifications={noop}
                 onPressSearch={noop}
-                onPressFilters={noop}
               />
               <EventHero
                 event={quoteEvent()}
@@ -1045,6 +1201,54 @@ describe('render dump', () => {
         toHtml(
           render(
             <OccasionGrid data={occasions} onPressOccasion={noop} />,
+          ).toJSON(),
+        ),
+      ],
+      [
+        'Home — organizers near you',
+        toHtml(
+          render(
+            <TopOrganizers
+              data={{
+                title: 'Organizers near you',
+                city: 'Hyderabad',
+                scope: 'city' as const,
+                scopeNote: '',
+                items: [
+                  {
+                    id: 'o1',
+                    name: 'Sreeja Wedding Co.',
+                    initials: 'SW',
+                    avatarColor: '#1d9e75',
+                    tier: 'Gold',
+                    rating: 4.8,
+                    reviews: 51,
+                    events: 0,
+                    tags: [],
+                    fromLabel: '₹7L',
+                    repliesLabel: 'Replies in 1h',
+                    bookedLabel: '19 booked this month',
+                  },
+                  {
+                    id: 'o2',
+                    name: 'Mahendra Events',
+                    initials: 'ME',
+                    avatarColor: '#e8633a',
+                    tier: 'Silver',
+                    rating: 0,
+                    reviews: 0,
+                    events: 0,
+                    tags: [],
+                    fromLabel: '',
+                    repliesLabel: 'Replies in 3h',
+                    bookedLabel: '',
+                  },
+                ],
+              }}
+              onPressOrganizer={noop}
+              onPressSeeAll={noop}
+              onPressChangeCity={noop}
+            />,
           ).toJSON(),
         ),
       ],

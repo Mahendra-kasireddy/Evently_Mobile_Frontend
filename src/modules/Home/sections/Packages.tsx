@@ -6,7 +6,13 @@ import {
   EventlyText,
   OccasionArt,
 } from '../../../Components';
-import { CATEGORY_GRADIENT, HERO_ACCENT_COLOR, HOME_NAVY } from '../constants';
+import {
+  CATEGORY_GRADIENT,
+  HERO_ACCENT_COLOR,
+  HOME_NAVY,
+  PACKAGE_CTA,
+  PACKAGE_PRICE_CAPTION,
+} from '../constants';
 import { packageCardStyles as s } from '../styles';
 import { SectionHead } from './SectionHead';
 import type { PackageItem, PackagesViewModel } from '../types';
@@ -43,6 +49,17 @@ function PackageCard({
   const gradientId = `packageBanner-${item.id}`;
   const rating =
     item.organizer && item.organizer.reviews > 0 ? item.organizer : null;
+  /*
+   * Who runs it, and how busy they have been — one line, because the panel
+   * has one line to give. The bookings are the organizer's own (nothing links
+   * a booking back to the package that inspired it), which is why they sit
+   * against their name rather than under the price.
+   */
+  const metaLabel = item.organizer
+    ? [item.organizer.name, item.organizer.bookedLabel]
+        .filter(Boolean)
+        .join(' · ')
+    : item.bannerNote;
 
   return (
     <View style={s.card}>
@@ -122,35 +139,10 @@ function PackageCard({
             </View>
           ) : null}
 
-          {item.bannerNote ? (
-            <EventlyText
-              variant="caption"
-              style={s.bannerNote}
-              numberOfLines={1}
-            >
-              {item.bannerNote}
-            </EventlyText>
-          ) : null}
-        </View>
-
-        <View style={s.body}>
-          <EventlyText variant="subtitle" style={s.title} numberOfLines={2}>
-            {item.title}
-          </EventlyText>
-          {item.organizer ? (
-            <EventlyText
-              variant="caption"
-              style={s.organizer}
-              numberOfLines={1}
-            >
-              {item.organizer.name}
-            </EventlyText>
-          ) : null}
-
           {/* A score with no reviews behind it is not a rating. */}
           {rating ? (
-            <View style={s.ratingRow}>
-              <EventlyIcon name="star" size={15} color="#e8a33a" />
+            <View style={s.ratingChip}>
+              <EventlyIcon name="star" size={13} color="#f2c14e" />
               <EventlyText variant="caption" style={s.rating}>
                 {rating.rating.toFixed(1)}
               </EventlyText>
@@ -159,25 +151,60 @@ function PackageCard({
               </EventlyText>
             </View>
           ) : null}
+        </View>
+
+        <View style={s.body}>
+          <EventlyText variant="subtitle" style={s.title} numberOfLines={2}>
+            {item.title}
+          </EventlyText>
+
+          {/* Who runs it, or — for a package with no organizer on it yet —
+              what the picture is of. Never a location: a package is not held
+              anywhere until somebody books it. */}
+          {metaLabel ? (
+            <View style={s.metaRow}>
+              <EventlyIcon
+                name={item.organizer ? 'storefront-outline' : 'party-popper'}
+                size={14}
+                color="rgba(255,255,255,0.76)"
+              />
+              <EventlyText variant="caption" style={s.meta} numberOfLines={1}>
+                {metaLabel}
+              </EventlyText>
+            </View>
+          ) : null}
 
           <View style={s.priceRow}>
-            <EventlyText variant="h2" style={s.price}>
-              {item.priceLabel || item.budget}
-            </EventlyText>
-            {/* Only a genuine reduction; the server refuses a "was" figure
-                that is not above the current price. */}
-            {item.listPriceLabel ? (
-              <EventlyText variant="caption" style={s.listPrice}>
-                {item.listPriceLabel}
+            <View style={s.priceText}>
+              <EventlyText variant="caption" style={s.priceCaption}>
+                {PACKAGE_PRICE_CAPTION}
               </EventlyText>
-            ) : null}
-          </View>
+              <View style={s.metaRow}>
+                <EventlyText variant="h2" style={s.price}>
+                  {item.priceLabel || item.budget}
+                </EventlyText>
+                {/* Only a genuine reduction; the server refuses a "was" figure
+                    that is not above the current price. */}
+                {item.listPriceLabel ? (
+                  <EventlyText variant="caption" style={s.listPrice}>
+                    {item.listPriceLabel}
+                  </EventlyText>
+                ) : null}
+              </View>
+            </View>
 
-          {item.organizer?.bookedLabel ? (
-            <EventlyText variant="caption" style={s.booked}>
-              {item.organizer.bookedLabel}
-            </EventlyText>
-          ) : null}
+            {/*
+              Not a button of its own: the whole card already opens the
+              planner, and two controls doing the same thing is two ways to
+              be told the same news. It is drawn as one because the reference
+              is, and because a card with nothing to press reads as a poster.
+            */}
+            <View style={s.cta}>
+              <EventlyText variant="caption" style={s.ctaText}>
+                {PACKAGE_CTA}
+              </EventlyText>
+            </View>
+          </View>
         </View>
       </TouchableOpacity>
 
@@ -219,9 +246,11 @@ export function Packages({
 }: PackagesProps) {
   return (
     <View>
+      {/* No strapline. "Pre-matched bundles to kick-start your planning" is a
+          sentence about the cards, sitting above cards that show what they
+          are — and it cost a line of the fold to say it. */}
       <SectionHead
         title={data.title}
-        subtitle={data.subtitle}
         actionLabel="See all"
         onPressAction={onPressSeeAll}
       />

@@ -1,4 +1,5 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EventlyIcon } from '../Components';
 import { BookingScreen } from '../modules/Booking';
 import { BOOKING_ACCENT } from '../modules/Booking/constants';
@@ -6,7 +7,6 @@ import { ChatScreen } from '../modules/Chat';
 import { HomeScreen } from '../modules/Home';
 import { OrganizerHomeScreen } from '../modules/OrganizerHome';
 import { PlanScreen } from '../modules/Plan';
-import { ProfileScreen } from '../modules/Profile';
 import { selectIsOrganizerView } from '../store/authSlice';
 import { useAppSelector } from '../store/hooks';
 import { colors } from '../theme';
@@ -17,8 +17,10 @@ const TAB_ICON_NAME: Record<keyof MainTabParamList, string> = {
   Plan: 'clipboard-text',
   Events: 'calendar-month',
   Chat: 'chat',
-  Profile: 'account-circle',
 };
+
+/** The bar's own height, before the home-indicator inset is added to it. */
+const TAB_BAR_HEIGHT = 62;
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -41,6 +43,13 @@ export function MainTabNavigator() {
    * forced into the organizer dashboard on every login.
    */
   const isOrganizer = useAppSelector(selectIsOrganizerView);
+  /*
+   * A taller bar than the platform default, and the home-indicator inset on
+   * top of it rather than inside it: setting an explicit height turns off the
+   * navigator's own inset handling, so the labels would sit under the
+   * indicator on a notched phone.
+   */
+  const insets = useSafeAreaInsets();
 
   return (
     <Tab.Navigator
@@ -53,14 +62,21 @@ export function MainTabNavigator() {
          */
         tabBarActiveTintColor: BOOKING_ACCENT,
         tabBarInactiveTintColor: colors.textMuted,
+        tabBarStyle: {
+          height: TAB_BAR_HEIGHT + insets.bottom,
+          paddingTop: 8,
+          paddingBottom: insets.bottom + 8,
+        },
+        tabBarLabelStyle: { fontSize: 11.5, marginTop: 2 },
+        tabBarIconStyle: { marginTop: 2 },
         tabBarIcon: ({ color, size }) => (
           <TabIcon routeName={route.name} color={color} size={size} />
         ),
       })}
     >
       {/* The organizer dashboard replaces the customer feed only while the
-          organizer view is active — switched from Profile. Plan/Chat/Profile
-          stay shared for now. */}
+          organizer view is active — switched from Profile. Plan/Chat stay
+          shared for now. */}
       <Tab.Screen
         name="Home"
         component={isOrganizer ? OrganizerHomeScreen : HomeScreen}
@@ -70,7 +86,10 @@ export function MainTabNavigator() {
           the same way those are, rather than hidden behind the view switch. */}
       <Tab.Screen name="Events" component={BookingScreen} />
       <Tab.Screen name="Chat" component={ChatScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      {/* Profile is not a tab. It is one destination reached from one place —
+          the avatar at the top of Home — and a tab for it spent a fifth of the
+          bar on a screen nobody navigates between. It lives on the root stack
+          now, where it pushes and pops like the screens it leads to. */}
     </Tab.Navigator>
   );
 }

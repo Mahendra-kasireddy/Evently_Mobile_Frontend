@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ActivityIndicator, ScrollView, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText } from '../../Components';
+import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
 import { PROFILE_ACCENT, PROFILE_COPY as COPY } from './constants';
 import { useProfileContainer } from './container';
@@ -116,6 +116,9 @@ export function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      {/* Pushed from Home's avatar rather than selected in the tab bar, so it
+          needs the back arrow every other pushed screen has. */}
+      <AppHeader title={COPY.title} />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <ProfileIdentity profile={profile} onEdit={openSettings} />
         {groups.map((group) => (

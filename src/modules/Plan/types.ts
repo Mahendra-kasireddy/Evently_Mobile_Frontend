@@ -225,3 +225,39 @@ export interface PlanDraft {
 }
 
 export type SubmitPhase = 'idle' | 'saving' | 'quoting';
+
+/**
+ * A revision of a brief already sent. Every field is optional — the customer
+ * may have changed one row — and the recipients are deliberately absent:
+ * editing changes what is asked for, never who it was asked of.
+ */
+export interface UpdateRequestBody {
+  occasion?: string;
+  when?: string;
+  where?: string;
+  guests?: string;
+  budget?: string;
+  categories?: string[];
+  ideas?: string;
+}
+
+/** What the server says it did with the revision. */
+export interface UpdateRequestResult {
+  id: string;
+  status: string;
+  /** How many quotes the edit invalidated, so the screen can say so. */
+  supersededQuotes: number;
+}
+
+/** GET /quote/getQuoteRequest/:id, as the wizard reads it back for editing. */
+export interface EditableBriefDTO {
+  id: string;
+  occasion: string;
+  when: string;
+  where: string;
+  guests: string;
+  budget?: string;
+  categories?: string[];
+  ideas?: string;
+  status: string;
+}

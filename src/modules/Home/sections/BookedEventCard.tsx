@@ -1,11 +1,13 @@
 import { TouchableOpacity, View } from 'react-native';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { EventlyIcon, EventlyText } from '../../../Components';
 import {
   BOOKED_CTA,
   BOOKED_STATUS_LABEL,
-  BOOKED_STEP_DONE_COLOR,
+  CTA_GRADIENT,
   HERO_ACCENT_COLOR,
 } from '../constants';
+import { colors } from '../../../theme';
 import { bookedEventStyles as s } from '../styles';
 import type { BookedEventViewModel } from '../types';
 
@@ -15,6 +17,11 @@ interface BookedEventCardProps {
   onPress: () => void;
   /** Opens the thread with the organizer. Dropped when there is none to open. */
   onMessageOrganizer?: () => void;
+  /**
+   * True when this card is one of several in the horizontal row, which fixes
+   * its width and leaves the row's own padding to the list.
+   */
+  inRow?: boolean;
 }
 
 /**
@@ -35,19 +42,48 @@ export function BookedEventCard({
   data,
   onPress,
   onMessageOrganizer,
+  inRow = false,
 }: BookedEventCardProps) {
   const nextIndex = data.steps.findIndex(step => !step.done);
+  /* Per card: two of these on screen would otherwise both resolve the same
+     gradient id, and the second would inherit the first one's box. */
+  const gradientId = `booked-${data.id}`;
 
-  return (
-    <View style={s.section}>
-      <View style={s.card}>
+  const card = (
+    <View style={[s.card, inRow && s.cardInRow]}>
+      <View style={s.head}>
+        <View style={s.headGradient} pointerEvents="none">
+          <Svg
+            width="100%"
+            height="100%"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+          >
+            <Defs>
+              <LinearGradient
+                id={gradientId}
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
+                <Stop offset="0" stopColor={CTA_GRADIENT[0]} />
+                <Stop offset="1" stopColor={CTA_GRADIENT[1]} />
+              </LinearGradient>
+            </Defs>
+            <Rect
+              x={0}
+              y={0}
+              width={100}
+              height={100}
+              fill={`url(#${gradientId})`}
+            />
+          </Svg>
+        </View>
+
         <View style={s.topRow}>
           <View style={s.statusPill}>
-            <EventlyIcon
-              name="check"
-              size={13}
-              color={BOOKED_STEP_DONE_COLOR}
-            />
+            <EventlyIcon name="check" size={13} color={colors.onPrimary} />
             <EventlyText variant="caption" style={s.statusText}>
               {BOOKED_STATUS_LABEL[data.status]}
             </EventlyText>
@@ -84,7 +120,9 @@ export function BookedEventCard({
             {data.factsLine}
           </EventlyText>
         ) : null}
+      </View>
 
+      <View style={s.body}>
         <View style={s.organizer}>
           <View
             style={[s.avatar, { backgroundColor: data.organizerAvatarColor }]}
@@ -197,6 +235,10 @@ export function BookedEventCard({
       </View>
     </View>
   );
+
+  /* In the row the list supplies the gutters and the gap; on its own the card
+     still brings its own section spacing. */
+  return inRow ? card : <View style={s.section}>{card}</View>;
 }
 
 export default BookedEventCard;

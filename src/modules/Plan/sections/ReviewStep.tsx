@@ -18,6 +18,8 @@ interface ReviewStepProps {
   submitError: string | null;
   planSaved: boolean;
   canSubmitPlan: boolean;
+  /** Revising a brief already sent, rather than sending a new one. */
+  isEditing?: boolean;
   footnote: string;
   whatNext: WhatNextItemDTO[];
   quoteNote: QuoteNoteDTO;
@@ -79,6 +81,7 @@ export function ReviewStep({
   submitError,
   planSaved,
   canSubmitPlan,
+  isEditing = false,
   footnote,
   whatNext,
   quoteNote,
@@ -100,8 +103,11 @@ export function ReviewStep({
     { label: 'Special requests', value: draft.ideas || 'None added', muted: !draft.ideas, full: true },
   ];
 
-  const submitLabel =
-    submitPhase === 'saving'
+  const submitLabel = isEditing
+    ? submitPhase === 'idle'
+      ? 'Update brief'
+      : 'Updating brief…'
+    : submitPhase === 'saving'
       ? 'Saving your plan…'
       : submitPhase === 'quoting'
         ? 'Requesting quote…'

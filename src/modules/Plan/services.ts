@@ -1,4 +1,5 @@
 import { apiClient } from '../../services/apiClient';
+import { QUOTE_REQUEST_ENDPOINT } from '../CompareQuotes/constants';
 import {
   CREATE_PLAN_ENDPOINT,
   MY_DRAFT_ENDPOINT,
@@ -6,14 +7,18 @@ import {
   PLAN_SCREEN_ENDPOINT,
   REQUEST_QUOTE_FROM_ORGANIZER_ENDPOINT,
   SAVE_DRAFT_ENDPOINT,
+  UPDATE_REQUEST_ENDPOINT,
 } from './constants';
 import type {
+  EditableBriefDTO,
   PlanOrganizerDTO,
   PlanScreenDTO,
   PlanSubmissionDTO,
   PlanUpsertDTO,
   RecommendationArgs,
   RequestQuoteFromOrganizerDTO,
+  UpdateRequestBody,
+  UpdateRequestResult,
 } from './types';
 
 export async function fetchPlanScreen(): Promise<PlanScreenDTO> {
@@ -60,5 +65,29 @@ export async function createPlan(body: PlanUpsertDTO): Promise<PlanSubmissionDTO
 
 export async function requestQuoteFromOrganizer(body: RequestQuoteFromOrganizerDTO): Promise<{ id: string }> {
   const { data } = await apiClient.post<{ id: string }>(REQUEST_QUOTE_FROM_ORGANIZER_ENDPOINT, body);
+  return data;
+}
+
+/**
+ * The brief behind a request the customer wants to change.
+ *
+ * Same endpoint the compare screen reads — ownership is checked server-side,
+ * so somebody else's request id is a 404 rather than a leak.
+ */
+export async function fetchBriefToEdit(requestId: string): Promise<EditableBriefDTO> {
+  const { data } = await apiClient.get<EditableBriefDTO>(
+    `${QUOTE_REQUEST_ENDPOINT}/${requestId}`,
+  );
+  return data;
+}
+
+export async function updateQuoteRequest(
+  requestId: string,
+  body: UpdateRequestBody,
+): Promise<UpdateRequestResult> {
+  const { data } = await apiClient.patch<UpdateRequestResult>(
+    `${UPDATE_REQUEST_ENDPOINT}/${requestId}`,
+    body,
+  );
   return data;
 }

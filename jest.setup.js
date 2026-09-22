@@ -1,3 +1,11 @@
+// Safe-area insets come from the native view; under Jest there is no native
+// view, so `useSafeAreaInsets` throws rather than returning zeros. The
+// library's own mock returns a plausible set of insets for every screen that
+// reads them — Home's hero photograph pads itself with them.
+jest.mock('react-native-safe-area-context', () =>
+  require('react-native-safe-area-context/jest/mock').default,
+);
+
 // Native modules with no JS-side fallback under Jest's fake native environment.
 jest.mock('react-native-permissions', () => require('react-native-permissions/mock'));
 

@@ -7,6 +7,7 @@ import {
 } from './constants';
 import type {
   BannerViewModel,
+  BookedEventDTO,
   BookedEventStatus,
   BookedEventViewModel,
   CategoriesViewModel,
@@ -66,8 +67,8 @@ const BOOKED_STATUSES: BookedEventStatus[] = [
  * reference or title cannot be drawn as a booking, and a milestone with no
  * label would render as a blank chip, so it is dropped rather than shown.
  */
-/** Two letters from a business name, for the avatar the server did not send. */
-function initialsOf(name: string): string {
+/** Two letters from a name, for the avatar the server did not send. */
+export function initialsOf(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return '·';
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
@@ -90,8 +91,29 @@ function organizerNote(confirmed: boolean, vendorCount: number): string {
   } for you`;
 }
 
+/**
+ * Every live booking the feed carries.
+ *
+ * `bookings` where the server sends it, the single `booking` where it does
+ * not — the app runs against both while a deploy rolls out.
+ */
+export function mapBookedEvents(feed: HomeFeedDTO): BookedEventViewModel[] {
+  const rows = isNonEmptyArray(feed.bookings)
+    ? feed.bookings
+    : feed.booking
+      ? [feed.booking]
+      : [];
+  return rows
+    .map(mapBooking)
+    .filter((row): row is BookedEventViewModel => row !== null);
+}
+
+/** The newest live booking, or null — the first of {@link mapBookedEvents}. */
 export function mapBookedEvent(feed: HomeFeedDTO): BookedEventViewModel | null {
-  const b = feed.booking;
+  return mapBookedEvents(feed)[0] ?? null;
+}
+
+function mapBooking(b: BookedEventDTO | null): BookedEventViewModel | null {
   /*
    * The card's whole action is opening this booking's workspace, so a record
    * with no id cannot be drawn as one, and one with no title has nothing to
@@ -281,6 +303,39 @@ export function mapCurrentEvent(
  * should check — a customer seeing their single event twice cannot tell
  * whether they created it twice.
  */
+/**
+ * The illustration an event's row draws.
+ *
+ * Matched from the occasion the customer picked — an event has no artwork of
+ * its own and no photograph, so the alternative was a grey box. Anything that
+ * does not match a known occasion falls back rather than indexing the gradient
+ * map to undefined.
+ */
+export function eventArtFor(occasion: string): OccasionArtKey {
+  const key = (occasion ?? '').trim().toLowerCase();
+  return (PACKAGE_ART_KEYS as string[]).includes(key)
+    ? (key as OccasionArtKey)
+    : 'wedding';
+}
+
+/**
+ * The date, as the chip on the row's picture says it: "SEP" over "5".
+ *
+ * Read off the display string the rest of the app uses ("5 September 2026"),
+ * so a row can never show a date the facts line disagrees with. Null for an
+ * event with no date, which gets no chip rather than an empty one.
+ */
+export function eventDateChip(
+  when: string,
+): { month: string; day: string } | null {
+  const parts = (when ?? '').trim().split(/\s+/);
+  if (parts.length < 2) return null;
+  const day = parts[0].replace(/\D/g, '');
+  const month = parts[1].slice(0, 3).toUpperCase();
+  if (!day || month.length < 3) return null;
+  return { month, day };
+}
+
 export function mapOtherEvents(feed: HomeFeedDTO): CurrentEventViewModel[] {
   const seen = new Set<string>();
   for (const leading of [feed.currentEvent]) {
@@ -537,6 +592,31 @@ function endsOn(iso: string | null, style: 'short' | 'long' = 'long'): string {
       });
 }
 
+/**
+ * The discount, split for the card that sets the figure big.
+ *
+ * No lead-in word. "Flat 10% off" sat under a title that already read "10%
+ * off on Birthday", so the card said the same number twice in two sizes —
+ * and "Flat" earned none of the width it took. The cap stays: a 40% coupon
+ * capped at ₹5,000 and an uncapped one are different offers, and the figure
+ * alone cannot tell them apart.
+ */
+export function discountParts(coupon: ClaimableCouponDTO): {
+  value: string;
+  note: string;
+} {
+  if (coupon.discountType === 'fixed') {
+    return { value: formatINR(coupon.discountValue), note: 'off' };
+  }
+  return {
+    value: `${coupon.discountValue}%`,
+    note:
+      coupon.maxDiscount > 0
+        ? `off, up to ${formatINR(coupon.maxDiscount)}`
+        : 'off',
+  };
+}
+
 /** "10% off", "10% off up to ₹5,000", "₹2,000 off". */
 function discountLine(coupon: ClaimableCouponDTO): string {
   if (coupon.discountType === 'fixed')
@@ -611,6 +691,8 @@ export function mapCoupons(feed: HomeFeedDTO): CouponsViewModel | null {
       code: coupon.code,
       title: coupon.title,
       terms: termsLine(coupon),
+      valueLabel: discountParts(coupon).value,
+      valueNote: discountParts(coupon).note,
       ctaLabel: 'See details',
       // Alternating, so a run of cards reads as a row rather than a block.
       tone: index % 2 === 0 ? ('accent' as const) : ('navy' as const),
@@ -847,7 +929,7 @@ export function mapAllEvents(feed: HomeFeedDTO): CurrentEventViewModel[] {
 export function mapHomeFeed(feed: HomeFeedDTO): HomeViewModel {
   return {
     banner: mapBanner(feed),
-    bookedEvent: mapBookedEvent(feed),
+    bookedEvents: mapBookedEvents(feed),
     currentEvent: mapCurrentEvent(feed),
     otherEvents: mapOtherEvents(feed),
     categories: mapCategories(feed),

@@ -390,8 +390,16 @@ export interface HomeFeedDTO {
   /**
    * The ongoing booking behind Home's rich "BOOKED" card. Null at every other
    * stage, where the `currentEvent` hero carries the event instead.
+   *
+   * Superseded by `bookings`, and still sent: a client that predates the array
+   * would otherwise blank its booked card.
    */
   booking: BookedEventDTO | null;
+  /**
+   * Every ongoing booking, newest first. Absent from a server that predates
+   * it, which is why the mapper falls back to `booking`.
+   */
+  bookings?: BookedEventDTO[] | null;
   currentEvent: CurrentEventDTO | null;
   /**
    * The customer's other live events, furthest along first, never repeating
@@ -583,6 +591,16 @@ export interface CouponOffer {
   title: string;
   /** "On bookings over ₹50,000 · ends 30 September", or '' when unbounded. */
   terms: string;
+  /**
+   * The discount, split so the card can set the number big.
+   *
+   * `valueLabel` is the figure itself ("40%", "₹2,000") and `valueNote` what
+   * follows it — "off", or "off, up to ₹5,000" where there is a cap. The cap
+   * is never dropped: a capped percentage and an uncapped one are different
+   * offers.
+   */
+  valueLabel: string;
+  valueNote: string;
   ctaLabel: string;
   tone: 'accent' | 'navy';
   description: string;
@@ -683,7 +701,12 @@ export interface ToolsViewModel {
 
 export interface HomeViewModel {
   banner: BannerViewModel | null;
-  bookedEvent: BookedEventViewModel | null;
+  /**
+   * Every live booking. One draws a full-width card; two or more draw a
+   * swipeable row, because a paid booking should not be demoted to a one-line
+   * row just because the customer has two of them.
+   */
+  bookedEvents: BookedEventViewModel[];
   currentEvent: CurrentEventViewModel | null;
   /** The live events the big card is not already about. Usually empty. */
   otherEvents: CurrentEventViewModel[];
@@ -701,5 +724,8 @@ export interface HomeHeaderViewModel {
   unreadCount: number;
   /** How many packages the account has kept — the heart's badge. */
   savedCount: number;
-  locationLabel: string;
+  /** The monogram on the header's avatar. */
+  initials: string;
+  /** The account's own name, for the avatar's accessibility label. */
+  displayName: string;
 }

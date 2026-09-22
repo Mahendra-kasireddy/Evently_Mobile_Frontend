@@ -2,10 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { useEnsureLocation } from '../../hooks/useEnsureLocation';
 import {
-  selectLocationPlace,
-  selectLocationStatus,
-} from '../../store/locationSlice';
-import {
   seedHeroDraft,
   selectHeroDraft,
   setHeroDraftField,
@@ -21,12 +17,12 @@ import {
   useRequestQuotes,
   useRequestQuoteFromOrganizer,
 } from './hooks';
-import { mapHomeFeed } from './utils';
+import { initialsOf, mapHomeFeed } from './utils';
 import type { HeroDraft, HomeHeaderViewModel, HomeViewModel } from './types';
 
 const EMPTY_VIEW_MODEL: HomeViewModel = {
   banner: null,
-  bookedEvent: null,
+  bookedEvents: [],
   currentEvent: null,
   otherEvents: [],
   categories: null,
@@ -99,8 +95,6 @@ export function useHomeContainer(): HomeContainerResult {
   // re-requested on every Home render.
   useEnsureLocation();
   const dispatch = useAppDispatch();
-  const locationStatus = useAppSelector(selectLocationStatus);
-  const locationPlace = useAppSelector(selectLocationPlace);
 
   const viewModel = useMemo<HomeViewModel>(
     () => (data ? mapHomeFeed(data) : EMPTY_VIEW_MODEL),
@@ -248,23 +242,15 @@ export function useHomeContainer(): HomeContainerResult {
       unreadCount: data?.unreadCount ?? 0,
       savedCount: data?.savedPackageCount ?? 0,
       /*
-       * The account's own city first, the detected one second.
-       *
-       * Both name a city, but they answer different questions. The account's
-       * city is a decision the customer made about where they want events —
-       * somebody planning a wedding back home browses from another state and
-       * still means home. The detected city is only where the phone is right
-       * now. So travelling never silently repoints the feed; detection fills
-       * the gap for an account that has not set a city yet, which is the case
-       * where the alternative was the unhelpful 'Set your city'.
+       * The server's monogram first, one derived from the name second — and a
+       * neutral dot for an account that has neither yet, rather than a letter
+       * picked out of nothing. The feed sends both fields, but a fresh account
+       * that has not been named still has to draw something.
        */
-      locationLabel:
-        data?.user?.location?.trim() ||
-        locationPlace?.locality ||
-        locationPlace?.label ||
-        (locationStatus === 'error' ? 'Location unavailable' : 'Set your city'),
+      initials: data?.user?.initials?.trim() || initialsOf(data?.user?.name ?? ''),
+      displayName: data?.user?.name?.trim() ?? '',
     }),
-    [data, locationStatus, locationPlace],
+    [data],
   );
 
   return {

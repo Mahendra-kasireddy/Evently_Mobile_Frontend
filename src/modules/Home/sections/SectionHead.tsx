@@ -8,6 +8,8 @@ interface SectionHeadProps {
   /** The right-hand link — "See all", "3 live". Omitted when there is none. */
   actionLabel?: string;
   onPressAction?: () => void;
+  /** On the action, so a section's link can be found without its label. */
+  testID?: string;
 }
 
 /**
@@ -24,6 +26,7 @@ export function SectionHead({
   subtitle,
   actionLabel,
   onPressAction,
+  testID,
 }: SectionHeadProps) {
   return (
     <View>
@@ -37,6 +40,7 @@ export function SectionHead({
               onPress={onPressAction}
               accessibilityRole="button"
               accessibilityLabel={`${actionLabel}: ${title}`}
+              testID={testID}
             >
               <EventlyText variant="button" style={s.action}>
                 {actionLabel}

@@ -1,9 +1,6 @@
-import { Image, TouchableOpacity, View } from 'react-native';
-import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
-import { EventlyIcon, EventlyText } from '../../../Components';
-import { colors } from '../../../theme';
-import { CATEGORY_GRADIENT, CATEGORY_ICON_NAME } from '../constants';
-import { occasionGridStyles as s } from '../styles';
+import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
+import { EventlyText, OccasionArt } from '../../../Components';
+import { OCCASIONS_PER_PAGE, OCCASION_TILE_ART, occasionGridStyles as s } from '../styles';
 import type { OccasionTile, OccasionsViewModel } from '../types';
 import { SectionHead } from './SectionHead';
 
@@ -12,122 +9,96 @@ interface OccasionGridProps {
   onPressOccasion: (occasionId: string) => void;
 }
 
-/** The gradient layer, filling the tile behind its content. */
-const FILL = {
-  position: 'absolute',
-  top: 0,
-  right: 0,
-  bottom: 0,
-  left: 0,
-} as const;
-
+/**
+ * One occasion: an illustrated tile, and its name under it.
+ *
+ * The organizer's own photograph when there is one, and the app's per-occasion
+ * drawing when there is not — never a blank square. At this size the drawing
+ * does the work a monochrome pictogram cannot: telling "ceremony" from
+ * "reception" at a glance is the whole job of the tile.
+ */
 function Tile({ tile, onPress }: { tile: OccasionTile; onPress: () => void }) {
-  const [start, end] = CATEGORY_GRADIENT[tile.art];
-  /*
-   * SVG ids are global to the document, so a shared id would make every tile
-   * on the screen paint whichever gradient rendered last. Scoped per occasion.
-   */
-  const gradientId = `occasionTile-${tile.id}`;
-
   return (
     <TouchableOpacity
       style={s.tile}
-      activeOpacity={0.9}
+      activeOpacity={0.8}
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={
-        tile.note ? `${tile.label}. ${tile.note}.` : tile.label
-      }
+      accessibilityLabel={tile.note ? `${tile.label}. ${tile.note}.` : tile.label}
     >
+      <View style={s.tileArt}>
+        {tile.photoUrl ? (
+          <Image source={{ uri: tile.photoUrl }} style={s.tilePhoto} resizeMode="cover" />
+        ) : (
+          <OccasionArt art={tile.art} width={OCCASION_TILE_ART} height={OCCASION_TILE_ART} />
+        )}
+      </View>
       {/*
-        The gradient is painted either way. With a photo it is what the image
-        sits on while it loads, and what shows again if the image fails — so a
-        tile is never a blank rectangle, whatever happens to the file.
+        Two lines, not one. "Housewarming" and "Naming ceremony" do not fit a
+        quarter of a phone on one line, and ellipsising them to "Naming…"
+        leaves the customer guessing at half the grid.
       */}
-      <View style={FILL}>
-        <Svg
-          width="100%"
-          height="100%"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-        >
-          <Defs>
-            <LinearGradient id={gradientId} x1="12%" y1="0%" x2="88%" y2="100%">
-              <Stop offset="0" stopColor={start} />
-              <Stop offset="1" stopColor={end} />
-            </LinearGradient>
-          </Defs>
-          <Rect
-            x={0}
-            y={0}
-            width={100}
-            height={100}
-            fill={`url(#${gradientId})`}
-          />
-        </Svg>
-      </View>
-
-      {tile.photoUrl ? (
-        <>
-          <Image
-            source={{ uri: tile.photoUrl }}
-            style={FILL}
-            resizeMode="cover"
-          />
-          {/*
-            The label and the price line sit on top of whatever was uploaded, so
-            they need a guaranteed dark ground rather than luck with the photo.
-          */}
-          <View style={[FILL, s.photoScrim]} />
-        </>
-      ) : null}
-
-      <View style={s.tileBody}>
-        <View style={s.iconChip}>
-          <EventlyIcon
-            name={CATEGORY_ICON_NAME[tile.icon]}
-            size={21}
-            color={colors.onPrimary}
-          />
-        </View>
-        <View>
-          <EventlyText variant="h2" style={s.label} numberOfLines={1}>
-            {tile.label}
-          </EventlyText>
-          {/* No line at all when no organizer serving this occasion has
-              published a price and it is not the most-planned one. */}
-          {tile.note ? (
-            <EventlyText variant="caption" style={s.note} numberOfLines={1}>
-              {tile.note}
-            </EventlyText>
-          ) : null}
-        </View>
-      </View>
+      <EventlyText variant="small" style={s.tileLabel} numberOfLines={2}>
+        {tile.label}
+      </EventlyText>
     </TouchableOpacity>
   );
 }
 
 /**
- * "Plan something new" — every occasion the platform serves.
+ * "Plan something new" — every occasion the platform serves, at once.
  *
- * The line under each label is earned: "Most planned" goes to whichever
- * occasion has the most real submissions, and the price is the lowest an
- * organizer serving it has actually published. An occasion with neither shows
- * its name alone.
+ * Two rows, always — four across, and the rest scroll sideways.
+ *
+ * Height is the thing being protected. Eleven occasions as a wrapping grid is
+ * three rows, and every row this section grows is a row the sections under it
+ * lose; as half-width cards, which is what this used to be, it was six. Two
+ * rows is enough to read the shape of the list, and anything past the eighth
+ * is one swipe away rather than a taller screen for everybody.
+ *
+ * Laid out as pages of eight rather than as columns of two. A column-major
+ * fill keeps neighbours together when you swipe, but it also means six
+ * occasions draw as three columns — three across the top, not four — and the
+ * first row of a category list is the row people actually read. Each page is
+ * a full-width four-by-two grid filled the way it is read: across, then down.
+ *
+ * With eight or fewer there is one page and nothing scrolls, so the common
+ * case is a plain static grid and the scroller only appears when there is
+ * genuinely something off-screen.
+ *
+ * The earned line each tile used to carry — "Most planned", or the lowest
+ * price an organizer actually published — has no room at this size and is
+ * kept for the screen reader rather than invented somewhere else.
  */
 export function OccasionGrid({ data, onPressOccasion }: OccasionGridProps) {
+  if (data.items.length === 0) return null;
+
+  const pages: OccasionTile[][] = [];
+  for (let i = 0; i < data.items.length; i += OCCASIONS_PER_PAGE) {
+    pages.push(data.items.slice(i, i + OCCASIONS_PER_PAGE));
+  }
+
   return (
     <View>
-      <SectionHead title={data.title} subtitle={data.subtitle} />
-      <View style={s.grid}>
-        {data.items.map(tile => (
-          <Tile
-            key={tile.id}
-            tile={tile}
-            onPress={() => onPressOccasion(tile.id)}
-          />
+      {/* No strapline: the tiles are the instruction. */}
+      <SectionHead title={data.title} />
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={s.scroll}
+        contentContainerStyle={s.scrollContent}
+        /* A page at a time, so a swipe never leaves half a column showing. */
+        pagingEnabled={pages.length > 1}
+        scrollEnabled={pages.length > 1}
+      >
+        {pages.map((page) => (
+          <View key={page[0].id} style={s.page}>
+            {page.map((tile) => (
+              <Tile key={tile.id} tile={tile} onPress={() => onPressOccasion(tile.id)} />
+            ))}
+          </View>
         ))}
-      </View>
+      </ScrollView>
     </View>
   );
 }

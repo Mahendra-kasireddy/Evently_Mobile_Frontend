@@ -9,7 +9,17 @@ export type MainTabParamList = {
    * customer only has to write the brief.
    */
   Plan:
-    | { occasionId?: string; organizerId?: string; eventDate?: string }
+    | {
+        occasionId?: string;
+        organizerId?: string;
+        eventDate?: string;
+        /**
+         * An existing brief to revise rather than a new one to write. The
+         * wizard loads that request, and submitting sends the revision instead
+         * of raising a second request — see PlanContainer's edit mode.
+         */
+        requestId?: string;
+      }
     | undefined;
   /**
    * The customer's events. The same screen is also registered on the root
@@ -19,7 +29,6 @@ export type MainTabParamList = {
    */
   Events: undefined;
   Chat: undefined;
-  Profile: undefined;
 };
 
 export type JoinRole = 'organizer' | 'subvendor';
@@ -139,6 +148,14 @@ export type RootStackParamList = {
   Conversation: { conversationId: string; withName?: string };
   /** Every event's agreed amount, what has been paid and what is still owed. */
   Payments: undefined;
+  /**
+   * The account, and everything reached from it.
+   *
+   * On the root stack, not the tab bar: it is opened from the avatar at the
+   * top of Home, so it pushes with a back arrow like every other screen the
+   * customer visits and comes back from.
+   */
+  Profile: undefined;
   Settings: undefined;
   LegalSupport: undefined;
   /** Contact the Evently team — a real message, not a mailto. */

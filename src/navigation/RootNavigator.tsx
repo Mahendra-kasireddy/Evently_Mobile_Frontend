@@ -19,6 +19,7 @@ import { OrganizerScreen, ReviewsScreen } from '../modules/Organizer';
 import { PaymentsScreen } from '../modules/Payments';
 import { OnboardingScreen } from '../modules/Onboarding';
 import { OrganizerOnboardingScreen } from '../modules/OrganizerOnboarding';
+import { ProfileScreen } from '../modules/Profile';
 import { SavedPackagesScreen } from '../modules/SavedPackages';
 import { SearchScreen } from '../modules/Search';
 import { SettingsScreen } from '../modules/Settings';
@@ -78,6 +79,7 @@ export function RootNavigator() {
           <Stack.Screen name="OrganizerReviews" component={ReviewsScreen} />
           <Stack.Screen name="Conversation" component={ConversationScreen} />
           <Stack.Screen name="Payments" component={PaymentsScreen} />
+          <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen name="LegalSupport" component={LegalSupportScreen} />
           <Stack.Screen name="Contact" component={ContactScreen} />
