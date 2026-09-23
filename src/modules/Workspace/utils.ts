@@ -4,6 +4,7 @@ import {
   WORKSPACE_COPY,
   WORKSPACE_STATUS_LABEL,
 } from './constants';
+import type { OccasionArtKey } from '../../Components/OccasionArt';
 import type {
   BookingDetailDTO,
   TaskStatus,
@@ -56,6 +57,34 @@ const TASK_STATUSES: TaskStatus[] = ['pending', 'in_progress', 'done', 'blocked'
  * meta are each filtered — rather than a row reading "—" or "₹0", which the
  * customer would read as a real figure.
  */
+/**
+ * The banner's illustration, matched from the occasion the booking was made
+ * for. Anything unrecognised falls back rather than indexing the gradient map
+ * to undefined.
+ */
+const ART_KEYS: OccasionArtKey[] = [
+  'wedding',
+  'birthday',
+  'housewarming',
+  'naming',
+  'anniversary',
+  'corporate',
+];
+
+export function artFor(occasion: string): OccasionArtKey {
+  const key = (occasion ?? '').trim().toLowerCase();
+  return (ART_KEYS as string[]).includes(key) ? (key as OccasionArtKey) : 'wedding';
+}
+
+/** "5 September 2026" -> { month: 'SEP', day: '5' }, for the date chip. */
+export function chipFor(label: string): { month: string; day: string } | null {
+  const parts = (label ?? '').trim().split(/\s+/);
+  if (parts.length < 2) return null;
+  const day = parts[0].replace(/\D/g, '');
+  const month = parts[1].slice(0, 3).toUpperCase();
+  return day && month.length === 3 ? { month, day } : null;
+}
+
 export function mapWorkspace(dto: BookingDetailDTO): WorkspaceViewModel {
   const occasion = titleize(dto.occasion);
   const eventDate = dateLabel(dto.eventDate);
@@ -117,6 +146,13 @@ export function mapWorkspace(dto: BookingDetailDTO): WorkspaceViewModel {
     tasks,
     timeline,
     organizerName: dto.organizer?.name ?? null,
+    organizerId: dto.organizer?.id ?? '',
+    organizerInitials: dto.organizer?.initials ?? '',
+    organizerAvatarColor: dto.organizer?.avatarColor || '#1a2e5a',
+    art: artFor(dto.occasion),
+    dateLabel: eventDate,
+    dateChip: chipFor(eventDate),
+    venue: (dto.location ?? '').trim(),
     customerName: dto.customer?.name ?? null,
   };
 }

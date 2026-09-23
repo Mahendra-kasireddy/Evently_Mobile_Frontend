@@ -15,13 +15,15 @@ export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: PAY_CANVAS },
 
   header: { ...globalStyles.row, alignItems: 'center', gap: 12, paddingHorizontal: spacing.md, paddingVertical: 10 },
+  /* Just the chevron. The disc behind it was a second shape to notice for a
+     control every screen has in the same corner, and the touch target is the
+     box, not the paint. */
   back: {
     width: 40,
     height: 40,
-    borderRadius: 999,
-    backgroundColor: '#f2efed',
     alignItems: 'center',
     justifyContent: 'center',
+    marginLeft: -10,
   },
   title: { color: PAY_NAVY_DEEP, fontSize: 22, fontWeight: '700', letterSpacing: -0.3 },
 

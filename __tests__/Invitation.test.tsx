@@ -20,8 +20,15 @@ jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
 });
 
 import { page, toHtml } from '../test-utils/rn-to-html';
-import { GuestPreview, InvitationHero, OwnerBanner, blockIcon } from '../src/modules/Invitation/sections/InvitationParts';
-import { SectionRow } from '../src/modules/Invitation/sections/SectionRow';
+import {
+  GuestPreview,
+  InvitationHero,
+  blockIcon,
+} from '../src/modules/Invitation/sections/InvitationParts';
+import {
+  BlockCanvas,
+  InvitationHeaderCard,
+} from '../src/modules/Invitation/sections/BlockCanvas';
 import { PreviewSheet, ShareSheet } from '../src/modules/Invitation/sections/Sheets';
 import { mapInvitationList } from '../src/modules/Invitation/utils';
 import type {
@@ -43,6 +50,7 @@ const block = (over: Partial<InvitationBlockDTO> = {}): InvitationBlockDTO => ({
   hidden: false,
   heading: '',
   body: '',
+  approved: false,
   ...over,
 });
 
@@ -123,6 +131,100 @@ function labels(tree: ReactTestRenderer.ReactTestRenderer): string[] {
 
 const noop = () => {};
 
+import { ApproveRow } from '../src/modules/Invitation/sections/ApproveRow';
+
+describe('the approval pass', () => {
+  it('shows the section itself, not a summary of it', () => {
+    /*
+     * Approving something you have not read is the one thing this screen must
+     * not make easy, so the row carries the words a guest would read.
+     */
+    const tree = render(
+      <ApproveRow
+        block={block({
+          title: 'How it began',
+          body: 'Two families, one long evening of chai and plans.',
+        })}
+        isApproving={false}
+        canShare={false}
+        onShare={() => {}}
+        onAccept={() => {}}
+        onRequestChange={() => {}}
+      />,
+    );
+    const text = textOf(tree);
+    expect(text).toContain('Two families, one long evening of chai');
+    expect(text).toContain('WAITING ON YOU');
+  });
+
+  it('says so, and offers nothing to press, once a section is signed off', () => {
+    const tree = render(
+      <ApproveRow
+        block={block({ approved: true })}
+        isApproving={false}
+        canShare={false}
+        onShare={() => {}}
+        onAccept={() => {}}
+        onRequestChange={() => {}}
+      />,
+    );
+    expect(textOf(tree)).toContain('Approved by you');
+    expect(
+      tree.root.findAll(
+        (n) =>
+          typeof n.props?.testID === 'string' &&
+          n.props.testID.startsWith('approve-block-'),
+      ),
+    ).toHaveLength(0);
+  });
+
+  it('offers to send a section only once the invitation is published', () => {
+    /*
+     * Signing one section off does not publish the invitation — the API
+     * refuses to send anything off an unapproved one — so the button appears
+     * with the last approval, not the first.
+     */
+    const approved = block({ approved: true });
+    const locked = render(
+      <ApproveRow
+        block={approved}
+        isApproving={false}
+        canShare={false}
+        onShare={() => {}}
+        onAccept={() => {}}
+        onRequestChange={() => {}}
+      />,
+    );
+    expect(textOf(locked)).not.toContain('Share this block');
+
+    const live = render(
+      <ApproveRow
+        block={approved}
+        isApproving={false}
+        canShare
+        onShare={() => {}}
+        onAccept={() => {}}
+        onRequestChange={() => {}}
+      />,
+    );
+    expect(textOf(live)).toContain('Share this block');
+  });
+
+  it('names the empty section rather than asking for approval of nothing', () => {
+    const tree = render(
+      <ApproveRow
+        block={block({ body: '' })}
+        isApproving={false}
+        canShare={false}
+        onShare={() => {}}
+        onAccept={() => {}}
+        onRequestChange={() => {}}
+      />,
+    );
+    expect(textOf(tree)).toContain('has not written this section yet');
+  });
+});
+
 describe('InvitationHero', () => {
   it('says plainly whether anything is live yet', () => {
     expect(textOf(render(<InvitationHero invitation={invitation()} organizerName="MAHENDRA EVENTS" />))).toContain(
@@ -139,67 +241,89 @@ describe('InvitationHero', () => {
   });
 });
 
-describe('SectionRow', () => {
-  const row = (b: InvitationBlockDTO, canShare = false, pending = 0) =>
-    render(
-      <SectionRow
-        block={b}
-        pendingRequests={pending}
-        canShare={canShare}
-        onPersonalize={noop}
-        onRequestChange={noop}
-        onShare={noop}
-        onPreview={noop}
+describe('the invitation header', () => {
+  it('never heads the invitation with the booking list title', () => {
+    /*
+     * "Corporate · 2026-09-29" is composed for a list of bookings. On an
+     * invitation it reads as a database row, so the occasion stands in until
+     * the customer writes their names.
+     */
+    const tree = render(
+      <InvitationHeaderCard
+        invitation={invitation({
+          bookingTitle: 'Corporate · 2026-09-29',
+          occasion: 'corporate',
+          details: {
+            ...invitation().details,
+            hostOne: '',
+            hostTwo: '',
+          },
+        })}
+        onEdit={noop}
       />,
     );
-
-  it('lets the customer edit only what they own', () => {
-    // The API rejects personalizing a block the customer does not own, so the
-    // row must not offer an edit that would 403.
-    expect(labels(row(block()))).toContain('Personalize: Our story');
-    expect(labels(row(block({ owner: 'organizer' })))).not.toContain('Personalize: Our story');
+    const text = textOf(tree);
+    expect(text).toContain('Corporate');
+    expect(text).not.toContain('2026-09-29');
   });
 
-  it("offers a change request on the organizer's sections", () => {
-    expect(labels(row(block({ owner: 'organizer' })))).toContain('Request change: Our story');
-    // The customer's own section is theirs to change directly.
-    expect(labels(row(block()))).not.toContain('Request change: Our story');
-  });
-
-  it('offers sharing only once the invitation is published', () => {
-    expect(labels(row(block(), false))).not.toContain('Share: Our story');
-    expect(labels(row(block(), true))).toContain('Share: Our story');
-  });
-
-  it('never offers to share a hidden section', () => {
-    // It is not part of the published invitation; the API rejects it too.
-    expect(labels(row(block({ hidden: true }), true))).not.toContain('Share: Our story');
-  });
-
-  it('marks a section as hidden rather than silently dropping it', () => {
-    expect(textOf(row(block({ hidden: true })))).toContain('Hidden from guests');
-    expect(textOf(row(block()))).toContain('Ready');
-  });
-
-  it('says when an ask is already with the organizer', () => {
-    expect(textOf(row(block({ owner: 'organizer' }), false, 1))).toContain(
-      '1 change request with your organizer',
+  it('prints one venue when the name and the address are the same place', () => {
+    // Organizers routinely paste the full address into both fields.
+    const full = 'Hi-tech city, Patrika Nagar, Hyderabad';
+    const text = textOf(
+      render(
+        <InvitationHeaderCard
+          invitation={invitation({
+            details: {
+              ...invitation().details,
+              venueName: full,
+              venueAddress: full,
+            },
+          })}
+          onEdit={noop}
+        />,
+      ),
     );
-    expect(textOf(row(block({ owner: 'organizer' }), false, 2))).toContain('2 change requests');
+    expect(text.split('Patrika Nagar')).toHaveLength(2);
+  });
+});
+
+describe('the invitation page', () => {
+  const page = (b: InvitationBlockDTO) =>
+    render(<BlockCanvas block={b} onEdit={noop} />);
+
+  it('shows the section, not a description of it', () => {
+    /*
+     * The list of cards this replaced named each section, badged it and hung
+     * two buttons off it — without ever showing the words being approved.
+     */
+    const text = textOf(page(block({ body: 'Two families, one long evening.' })));
+    expect(text).toContain('Two families, one long evening.');
   });
 
-  it('shows the heading the customer wrote, falling back to the section name', () => {
-    expect(textOf(row(block({ heading: 'How we met' })))).toContain('How we met');
-    expect(textOf(row(block()))).toContain('Our story');
+  it('offers the customer an edit on their own section and an ask on the rest', () => {
+    // The API rejects personalizing a block the customer does not own, so the
+    // page must not offer an edit that would 403.
+    expect(textOf(page(block()))).toContain('Edit');
+    expect(textOf(page(block({ owner: 'organizer' })))).toContain('Ask');
   });
 
-  it('offers a guest preview of every section, hidden ones included', () => {
-    // "What does this look like to a guest" is a question about a row, so the
-    // answer lives on the row — including for a hidden section, where the
-    // answer is that guests never see it.
-    expect(labels(row(block()))).toContain('Preview: Our story');
-    expect(labels(row(block({ hidden: true })))).toContain('Preview: Our story');
-    expect(labels(row(block({ owner: 'organizer' })))).toContain('Preview: Our story');
+  it('leads with the heading the customer wrote, falling back to the name', () => {
+    expect(textOf(page(block({ heading: 'How we met' })))).toContain('HOW WE MET');
+    expect(textOf(page(block()))).toContain('OUR STORY');
+  });
+
+  it('addresses an empty section to whoever can fill it', () => {
+    /*
+     * It used to tell the customer their organizer had not written a section
+     * the customer owns — with an Edit button beside it proving otherwise.
+     */
+    expect(textOf(page(block({ body: '', owner: 'customer' })))).toContain(
+      'tap Edit to write it',
+    );
+    expect(textOf(page(block({ body: '', owner: 'organizer' })))).toContain(
+      'has not written this section yet',
+    );
   });
 });
 
@@ -526,19 +650,9 @@ describe('render dump', () => {
 
     const review = (
       <>
-        <InvitationHero invitation={full} organizerName="MAHENDRA EVENTS" />
-        <OwnerBanner />
+        <InvitationHeaderCard invitation={full} onEdit={noop} />
         {full.blocks.map((b) => (
-          <SectionRow
-            key={b.key}
-            block={b}
-            pendingRequests={b.key === 'countdown' ? 1 : 0}
-            canShare={false}
-            onPersonalize={noop}
-            onRequestChange={noop}
-            onShare={noop}
-            onPreview={noop}
-          />
+          <BlockCanvas key={b.key} block={b} onEdit={noop} />
         ))}
       </>
     );

@@ -18,9 +18,8 @@ jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
 
 import { page, toHtml } from '../test-utils/rn-to-html';
 import { mapWorkspace, formatINR } from '../src/modules/Workspace/utils';
-import { WorkspaceHero } from '../src/modules/Workspace/sections/WorkspaceHero';
+import { WorkspaceOverview } from '../src/modules/Workspace/sections/WorkspaceOverview';
 import {
-  EventFacts,
   Milestones,
   Payment,
   Tasks,
@@ -192,11 +191,20 @@ describe('render dump', () => {
       invitation: Parameters<typeof InvitationSummary>[0]['invitation'];
     }) => (
       <View>
-        <WorkspaceHero data={data} />
+        <WorkspaceOverview
+          data={data}
+          onBack={() => {}}
+          tab="details"
+          tabs={[
+            { key: 'details', label: 'Details' },
+            { key: 'plan', label: 'Plan' },
+            { key: 'payment', label: 'Payment' },
+          ]}
+          onSelectTab={() => {}}
+        />
         <Milestones data={data} />
         <IdeasSummary counts={counts} organizerName={data.organizerName} onPress={() => {}} />
         <InvitationSummary invitation={invitation} organizerName={data.organizerName} onPress={() => {}} />
-        <EventFacts data={data} />
         <Payment data={data} />
         <Tasks data={data} />
         <Timeline data={data} />

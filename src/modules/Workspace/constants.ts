@@ -67,6 +67,20 @@ export const WORKSPACE_ACCENT = '#e8633a';
 export const WORKSPACE_NAVY = '#1a2e5a';
 export const WORKSPACE_NAVY_DEEP = '#0e1a33';
 export const WORKSPACE_ACCENT_SOFT = '#fdeee7';
+/*
+ * Three tints, one per figure on the strip under the title, and reused by the
+ * cards that belong to each: coral for time (how long is left), green for
+ * progress (how much is done), violet for money (what has been paid).
+ *
+ * A workspace opened six months before an event is mostly waiting, and a page
+ * of white cards with one orange button gave the customer nothing to read at
+ * a glance. Colour here is doing a job — each figure is findable by its own
+ * colour before the words are read — rather than decorating.
+ */
+export const WORKSPACE_GREEN = '#1d9e75';
+export const WORKSPACE_GREEN_SOFT = '#e8f6ef';
+export const WORKSPACE_VIOLET = '#5b46c9';
+export const WORKSPACE_VIOLET_SOFT = '#eeeaff';
 export const WORKSPACE_RING_TRACK = 'rgba(255,255,255,0.18)';
 
 /** Ring geometry for the hero: a 78px ring inside the navy header. */
@@ -78,7 +92,15 @@ export const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 export const WORKSPACE_COPY = {
   /** Used when the booking carries no occasion to name the workspace after. */
   fallbackName: 'Your event workspace',
+  /** On the banner, beside the way back. */
+  screenTitle: 'Workspace',
   milestones: 'Milestones',
+  /* The three tabs, and the two actions on the bar under them. */
+  tabDetails: 'Details',
+  tabPlan: 'Plan',
+  tabPayment: 'Payment',
+  inviteAction: 'Invitation',
+  ideasAction: 'Ideas & planning',
   details: 'Event details',
   payment: 'Payment',
   vendors: 'Vendors & tasks',
@@ -156,10 +178,7 @@ export const IDEA_TEXT_MAX = 4000;
 
 export const IDEAS_COPY = {
   title: 'Ideas & planning board',
-  heroPill: 'IDEAS BOARD',
   heroTitle: 'Plan your day, together',
-  heroSubtitle: (organizer: string) =>
-    `Share how you imagine your day. ${organizer} turns each idea into a real plan — you just review and approve.`,
   statShared: 'shared',
   statPlanned: 'Planned',
   statAwaiting: 'Awaiting you',
@@ -184,7 +203,6 @@ export const IDEAS_COPY = {
   plan: 'Turned into a plan',
   you: 'You',
   visionTitle: 'Your event vision',
-  visionSubtitle: (organizer: string) => `What ${organizer} captured from your ideas.`,
   visionEmpty: (organizer: string) =>
     `${organizer} hasn't summarised your event yet. It will appear here as they work through your ideas.`,
   visionSlotEmpty: 'Not captured yet',

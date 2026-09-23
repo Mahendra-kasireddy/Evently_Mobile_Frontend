@@ -1,9 +1,8 @@
 import { View } from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
 import { colors } from '../../../theme';
-import { TASK_STATUS_COLOR, WORKSPACE_ACCENT, WORKSPACE_COPY } from '../constants';
+import { TASK_STATUS_COLOR, WORKSPACE_COPY } from '../constants';
 import {
-  factStyles,
   milestoneStyles,
   paymentStyles,
   sectionStyles,
@@ -44,31 +43,6 @@ export function Milestones({ data }: { data: WorkspaceViewModel }) {
           >
             {step.label}
           </EventlyText>
-        </View>
-      ))}
-    </Section>
-  );
-}
-
-/** Date, place, organizer and reference — whichever the booking carries. */
-export function EventFacts({ data }: { data: WorkspaceViewModel }) {
-  if (data.facts.length === 0) return null;
-
-  return (
-    <Section title={WORKSPACE_COPY.details}>
-      {data.facts.map((fact, i) => (
-        <View key={fact.label} style={[factStyles.row, i > 0 && factStyles.divider]}>
-          <View style={factStyles.iconChip}>
-            <EventlyIcon name={fact.icon} size={17} color={WORKSPACE_ACCENT} />
-          </View>
-          <View style={factStyles.text}>
-            <EventlyText variant="caption" style={factStyles.label}>
-              {fact.label}
-            </EventlyText>
-            <EventlyText variant="body" style={factStyles.value} numberOfLines={2}>
-              {fact.value}
-            </EventlyText>
-          </View>
         </View>
       ))}
     </Section>

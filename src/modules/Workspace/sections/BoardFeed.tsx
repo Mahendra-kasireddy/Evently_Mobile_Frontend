@@ -1,6 +1,13 @@
 import { ScrollView, TouchableOpacity, View } from 'react-native';
 import { ActivityIndicator } from 'react-native';
-import { EventlyIcon, EventlyImage, EventlyText } from '../../../Components';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  Confetti,
+  EventlyIcon,
+  EventlyImage,
+  EventlyText,
+} from '../../../Components';
 import { absoluteFileUrl } from '../../../services/urls';
 import { colors } from '../../../theme';
 import {
@@ -12,6 +19,7 @@ import {
   IDEA_TYPE_META,
   VISION_SLOTS,
   WORKSPACE_ACCENT,
+  WORKSPACE_VIOLET,
   initials,
   matchesBoardFilter,
 } from '../constants';
@@ -19,40 +27,108 @@ import { boardStyles as s } from '../styles';
 import { relativeTime } from '../constants';
 import type { BoardFilter, BoardVision, IdeaCounts, IdeaDTO } from '../types';
 
-/** The board's banner. Every figure is the server's own count. */
-export function BoardHero({ counts, organizerName }: { counts: IdeaCounts; organizerName: string }) {
-  const stats: Array<[number, string]> = [
-    [counts.shared, counts.shared === 1 ? 'Idea shared' : 'Ideas shared'],
-    [counts.planned, IDEAS_COPY.statPlanned],
-    [counts.awaitingApproval, IDEAS_COPY.statAwaiting],
+/**
+ * The board's banner: a violet head with the way back on it, and the three
+ * counts as tinted tiles on the sheet under it.
+ *
+ * Violet because that is the colour this board wears on the workspace card
+ * that opens it — the card tapped and the screen arrived at should be the
+ * same colour. Every figure is the server's own count, so the banner cannot
+ * claim more activity than the feed beneath it contains.
+ */
+export function BoardHero({
+  counts,
+  onBack,
+}: {
+  counts: IdeaCounts;
+  onBack: () => void;
+}) {
+  const insets = useSafeAreaInsets();
+  const stats: Array<[number, string, object, object]> = [
+    [
+      counts.shared,
+      counts.shared === 1 ? 'Idea shared' : 'Ideas shared',
+      s.statShared,
+      s.statValueShared,
+    ],
+    [counts.planned, IDEAS_COPY.statPlanned, s.statPlanned, s.statValuePlanned],
+    [
+      counts.awaitingApproval,
+      IDEAS_COPY.statAwaiting,
+      s.statAwaiting,
+      s.statValueAwaiting,
+    ],
   ];
 
   return (
-    <View style={s.hero}>
-      <View style={s.heroPill}>
-        <EventlyIcon name="creation" size={13} color={colors.onPrimary} />
-        <EventlyText variant="caption" style={s.heroPillText}>
-          {IDEAS_COPY.heroPill}
-        </EventlyText>
-      </View>
-      <EventlyText variant="h1" style={s.heroTitle}>
-        {IDEAS_COPY.heroTitle}
-      </EventlyText>
-      <EventlyText variant="body" style={s.heroSubtitle}>
-        {IDEAS_COPY.heroSubtitle(organizerName)}
-      </EventlyText>
+    <View>
+      <View style={[s.hero, { paddingTop: insets.top + 10 }]}>
+        <View style={s.heroLayer}>
+          <Svg
+            width="100%"
+            height="100%"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+          >
+            <Defs>
+              <LinearGradient id="boardHero" x1="10%" y1="0%" x2="90%" y2="100%">
+                <Stop offset="0" stopColor={WORKSPACE_VIOLET} />
+                <Stop offset="1" stopColor="#2b2158" />
+              </LinearGradient>
+            </Defs>
+            <Rect x={0} y={0} width={100} height={100} fill="url(#boardHero)" />
+          </Svg>
+        </View>
 
-      <View style={s.stats}>
-        {stats.map(([value, label]) => (
-          <View key={label} style={s.stat}>
-            <EventlyText variant="h1" style={s.statValue}>
-              {value}
-            </EventlyText>
-            <EventlyText variant="caption" style={s.statLabel}>
-              {label}
-            </EventlyText>
-          </View>
-        ))}
+        {/* Confetti over the gradient: the app's own artwork rather than a
+            stock photograph, so the banner has something to look at without
+            shipping somebody else's picture. */}
+        <View style={s.heroSpecks} pointerEvents="none">
+          <Confetti />
+        </View>
+
+        {/*
+          The arrow and the title on one row.
+
+          Stacked, the arrow had a line to itself and the title sat under it,
+          which is two rows of banner for one line of information.
+
+          The title is all the banner says. There used to be a label chip
+          above it and two lines under it explaining how the board works —
+          the three counts below and the feed under them say that by
+          existing, and the customer arrived by tapping a card that already
+          named this screen.
+        */}
+        <View style={s.heroBody}>
+          <TouchableOpacity
+            style={s.heroBack}
+            activeOpacity={0.8}
+            onPress={onBack}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <EventlyIcon name="chevron-left" size={21} color={colors.onPrimary} />
+          </TouchableOpacity>
+
+          <EventlyText variant="h1" style={s.heroTitle} numberOfLines={2}>
+            {IDEAS_COPY.heroTitle}
+          </EventlyText>
+        </View>
+      </View>
+
+      <View style={s.statsSheet}>
+        <View style={s.stats}>
+          {stats.map(([value, label, tile, tone]) => (
+            <View key={label} style={[s.stat, tile]}>
+              <EventlyText variant="h2" style={[s.statValue, tone]}>
+                {value}
+              </EventlyText>
+              <EventlyText variant="caption" style={s.statLabel}>
+                {label}
+              </EventlyText>
+            </View>
+          ))}
+        </View>
       </View>
     </View>
   );
@@ -253,9 +329,6 @@ export function VisionCard({ vision, organizerName }: { vision: BoardVision; org
     <View style={s.vision}>
       <EventlyText variant="h2" style={s.visionTitle}>
         {IDEAS_COPY.visionTitle}
-      </EventlyText>
-      <EventlyText variant="caption" style={s.visionSubtitle}>
-        {IDEAS_COPY.visionSubtitle(organizerName)}
       </EventlyText>
 
       {!vision.captured ? (

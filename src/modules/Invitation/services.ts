@@ -37,6 +37,25 @@ export async function approveInvitation(bookingId: string): Promise<InvitationDT
   return data;
 }
 
+/**
+ * Sign off one section.
+ *
+ * The guest link goes live when the last visible one is approved — the server
+ * decides that, not this call, so the returned invitation is the only thing
+ * that says whether it happened.
+ */
+export async function approveBlock(
+  bookingId: string,
+  blockKey: string,
+): Promise<InvitationDTO> {
+  const { data } = await apiClient.post<InvitationDTO>(
+    `${MY_INVITATIONS_ENDPOINT}/${bookingId}/blocks/${encodeURIComponent(
+      blockKey,
+    )}/approve`,
+  );
+  return data;
+}
+
 /** Edit a section the customer owns. */
 export async function personalizeBlock(
   bookingId: string,

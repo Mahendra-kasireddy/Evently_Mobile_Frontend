@@ -1,4 +1,4 @@
-import type { BlockOwner } from './types';
+import type { BlockOwner, InvitationTab } from './types';
 
 export const MY_INVITATIONS_ENDPOINT = '/invitation/mine';
 
@@ -8,7 +8,15 @@ export const INV_NAVY = '#1a2e5a';
 export const INV_NAVY_DEEP = '#0e1a33';
 export const INV_ACCENT_SOFT = '#fdeee7';
 export const INV_GREEN = '#1d9e75';
+/** The one line the screen's chrome is ruled with. */
+export const INV_HAIRLINE = '#efe9e5';
 export const INV_GREEN_SOFT = '#e8f6ef';
+/* The third tint on the banner's tiles — the guest link's own colour, kept
+   apart from "done" green and "waiting on you" coral. */
+/** The screen's own ground: paper, not canvas. */
+export const INV_PAPER = '#fdf9f4';
+export const INV_VIOLET = '#5b46c9';
+export const INV_VIOLET_SOFT = '#eeeaff';
 
 /**
  * The backend names each section's icon in its own vocabulary; this maps them
@@ -57,7 +65,52 @@ export const INVITATION_STATUS_LABEL: Record<string, string> = {
   approved: 'Approved · live',
 };
 
+/**
+ * The three views of one invitation.
+ *
+ * Organizer: what was assembled, section by section, editable where the
+ * customer owns it. Approve: the sign-off pass, one section at a time.
+ *
+ * The guest's view is not a third tab — it is not a way of working on the
+ * invitation, it is a look at the finished thing, so it lives in the menu
+ * beside the guest list.
+ */
+export const INVITATION_TABS: Array<{ key: InvitationTab; label: string }> = [
+  { key: 'organizer', label: 'Organizer' },
+  { key: 'approve', label: 'Approve' },
+];
+
 export const INVITATION_COPY = {
+  approveAll: (n: number) => (n === 1 ? 'Approve the last block' : `Approve all ${n} blocks`),
+  approveAllNote: 'Approve each block, or ask your organizer for a change.',
+  /* Said under the send button because it is the promise the button makes. */
+  shareNote: 'Nothing is shared until you send the link.',
+  shareLockedNote: 'Approve the invitation first — then you can send it.',
+  accept: 'Accept',
+  accepted: 'Approved by you',
+  waitingOnYou: 'WAITING ON YOU',
+  shareBlock: 'Share this block',
+  /* Behind the menu: the guest's view, and the list it would go to. */
+  menuTitle: 'Invitation',
+  menuPreview: 'Preview as a guest',
+  menuPreviewNote: 'Exactly what the link opens',
+  menuGuests: 'Guest list',
+  menuGuestsNote: 'Add people, fix a number, file them into groups',
+  /* Whether anything has reached a guest — the one yes-or-no on this screen. */
+  /* On the page itself: the header's own control, the per-section one, and
+     what a section the organizer owns offers instead. */
+  editHeader: 'Edit header',
+  edit: 'Edit',
+  ask: 'Ask',
+  hiddenCount: (n: number) =>
+    n === 1 ? '1 section is hidden from guests' : `${n} sections are hidden from guests`,
+  /** A section the organizer has not written yet. */
+  blockEmpty: 'Your organizer has not written this section yet.',
+  /** The same state, on a section the customer owns and can write now. */
+  blockEmptyYours: 'Nothing here yet — tap Edit to write it.',
+  /** An invitation with no names on it yet. */
+  headerUnnamed: 'Your celebration',
+
   listTitle: 'My Invitations',
   listNeedsYou: (n: number) =>
     `${n} ${n === 1 ? 'invitation is' : 'invitations are'} waiting on you.`,
@@ -81,7 +134,7 @@ export const INVITATION_COPY = {
   personalize: 'Personalize',
   share: 'Share',
   guestList: 'Guest list',
-  shareAll: 'Share invitation',
+  shareAll: 'Share on WhatsApp',
 
   bannerTitle: 'Your organizer built this invitation for you.',
   bannerBody:

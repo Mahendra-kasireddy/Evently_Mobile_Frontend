@@ -1,7 +1,11 @@
 import { TouchableOpacity, View } from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
 import { colors } from '../../../theme';
-import { WORKSPACE_ACCENT, WORKSPACE_COPY } from '../constants';
+import {
+  WORKSPACE_COPY,
+  WORKSPACE_GREEN,
+  WORKSPACE_VIOLET,
+} from '../constants';
 import { sectionStyles, summaryRowStyles as s } from '../styles';
 import type { IdeaCounts, InvitationDTO } from '../types';
 
@@ -44,8 +48,8 @@ export function IdeasSummary({ counts, organizerName, onPress }: IdeasSummaryPro
   return (
     <Section title={WORKSPACE_COPY.ideas}>
       <View style={s.row}>
-        <View style={s.iconChip}>
-          <EventlyIcon name="lightbulb-on-outline" size={22} color={WORKSPACE_ACCENT} />
+        <View style={[s.iconChip, s.iconChipIdeas]}>
+          <EventlyIcon name="lightbulb-on-outline" size={22} color={WORKSPACE_VIOLET} />
         </View>
         <View style={s.text}>
           <EventlyText variant="body" style={s.title}>
@@ -111,8 +115,8 @@ export function InvitationSummary({ invitation, organizerName, onPress }: Invita
   return (
     <Section title={WORKSPACE_COPY.invitation}>
       <View style={s.row}>
-        <View style={s.iconChip}>
-          <EventlyIcon name="email-heart-outline" size={22} color={WORKSPACE_ACCENT} />
+        <View style={[s.iconChip, s.iconChipInvite]}>
+          <EventlyIcon name="email-heart-outline" size={22} color={WORKSPACE_GREEN} />
         </View>
         <View style={s.text}>
           <EventlyText variant="body" style={s.title}>

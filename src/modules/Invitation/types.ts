@@ -35,6 +35,9 @@ export interface InvitationListItem {
   needsYou: boolean;
 }
 
+/** Which of the three views of the invitation is on screen. */
+export type InvitationTab = 'organizer' | 'approve';
+
 export interface InvitationBlockDTO {
   key: string;
   title: string;
@@ -44,6 +47,14 @@ export interface InvitationBlockDTO {
   hidden: boolean;
   heading: string;
   body: string;
+  /**
+   * The customer has signed this section off.
+   *
+   * Reported true for every section of an already-approved invitation, so an
+   * invitation approved before per-section sign-off existed does not come
+   * back asking to be approved again.
+   */
+  approved: boolean;
 }
 
 export interface InvitationSubEventDTO {

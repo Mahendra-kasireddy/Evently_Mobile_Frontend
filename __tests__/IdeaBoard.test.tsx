@@ -124,12 +124,17 @@ const noUpload = async () => ({ url: 'u', key: 'k', originalName: 'n' });
 describe('BoardHero', () => {
   it('reports the server counts, singular where it matters', () => {
     const text = textOf(
-      render(<BoardHero counts={{ shared: 1, planned: 0, awaitingApproval: 2 }} organizerName="MAHENDRA EVENTS" />),
+      render(<BoardHero counts={{ shared: 1, planned: 0, awaitingApproval: 2 }} onBack={() => {}} />),
     );
 
     expect(text).toContain('1Idea shared');
     expect(text).toContain('2Awaiting you');
-    expect(text).toContain('MAHENDRA EVENTS turns each idea into a real plan');
+    // The banner no longer explains itself: the label chip above the title
+    // and the two lines under it said what the counts and the feed say by
+    // existing, on a screen the customer reached by tapping a card that
+    // already named it.
+    expect(text).not.toContain('turns each idea into a real plan');
+    expect(text).not.toContain('IDEAS BOARD');
   });
 });
 
@@ -349,7 +354,7 @@ describe('render dump', () => {
 
     const feed = (
       <>
-        <BoardHero counts={{ shared: 3, planned: 2, awaitingApproval: 1 }} organizerName="MAHENDRA EVENTS" />
+        <BoardHero counts={{ shared: 3, planned: 2, awaitingApproval: 1 }} onBack={() => {}} />
         <BoardComposer
           authorName="Meera Rao"
           organizerName="MAHENDRA EVENTS"
@@ -390,7 +395,7 @@ describe('render dump', () => {
 
     const empty = (
       <>
-        <BoardHero counts={{ shared: 0, planned: 0, awaitingApproval: 0 }} organizerName="MAHENDRA EVENTS" />
+        <BoardHero counts={{ shared: 0, planned: 0, awaitingApproval: 0 }} onBack={() => {}} />
         <BoardComposer
           authorName="Meera Rao"
           organizerName="MAHENDRA EVENTS"

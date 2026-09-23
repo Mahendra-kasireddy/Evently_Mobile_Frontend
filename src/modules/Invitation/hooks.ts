@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useAsync, type AsyncResult } from '../../hooks/useAsync';
 import { useAsyncCallback, type AsyncCallbackResult } from '../../hooks/useAsyncCallback';
 import {
+  approveBlock,
   approveInvitation,
   fetchGuests,
   fetchInvitation,
@@ -29,6 +30,10 @@ export function useInvitation(bookingId: string): AsyncResult<InvitationDTO | nu
 
 export function useApproveInvitation(): AsyncCallbackResult<[string], InvitationDTO> {
   return useAsyncCallback(approveInvitation);
+}
+
+export function useApproveBlock(): AsyncCallbackResult<[string, string], InvitationDTO> {
+  return useAsyncCallback(approveBlock);
 }
 
 export function usePersonalizeBlock(): AsyncCallbackResult<[string, string, BlockPatch], InvitationDTO> {

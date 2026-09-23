@@ -1,7 +1,16 @@
 import { StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
 import { colors, fontFor, spacing } from '../../theme';
-import { INV_ACCENT, INV_ACCENT_SOFT, INV_GREEN, INV_GREEN_SOFT, INV_NAVY, INV_NAVY_DEEP } from './constants';
+import {
+  INV_ACCENT,
+  INV_ACCENT_SOFT,
+  INV_GREEN,
+  INV_GREEN_SOFT,
+  INV_HAIRLINE,
+  INV_NAVY,
+  INV_NAVY_DEEP,
+  INV_PAPER,
+} from './constants';
 
 export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
@@ -461,4 +470,324 @@ export const sheetStyles = StyleSheet.create({
   outcomeRow: { ...globalStyles.row, gap: spacing.sm, marginTop: spacing.sm },
   outcomeText: { flex: 1, color: colors.text },
   outcomeLink: { color: INV_ACCENT, fontWeight: '700' },
+});
+
+/* ---------------------------------------------------------------------------
+ * The invitation screen's own chrome: one bar at the top saying what this is
+ * and how much of it is waiting, a three-way switch under it, and one action
+ * pinned to the bottom.
+ *
+ * The screen used to open with a stack of six buttons — approve, preview,
+ * request changes, share, guest list — above the sections they act on. The
+ * switch replaces them: the three things a customer does here are read it,
+ * approve it, and see what a guest will see, and each is a view rather than a
+ * button.
+ * ------------------------------------------------------------------------- */
+export const shellStyles = StyleSheet.create({
+  /*
+   * Stationery, not a dashboard.
+   *
+   * This screen is a card somebody is about to send to their family, so its
+   * head is paper: a cream ground, the screen's name, and everything that is
+   * not a way of working on it behind one menu. The coloured slab, the three
+   * figure-tiles and the progress rule that were here belong to the boards —
+   * a workspace and an ideas feed are measured in counts, and an invitation
+   * is read.
+   */
+  paper: {
+    backgroundColor: INV_PAPER,
+    borderBottomWidth: 1,
+    borderBottomColor: INV_HAIRLINE,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.sm,
+    paddingBottom: 14,
+  },
+  bar: { ...globalStyles.row, gap: 6 },
+  /* Just the chevron — the disc behind it was a second shape to notice for a
+     control that sits in the same corner of every screen. */
+  back: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: -9,
+  },
+  barText: { flex: 1 },
+  barTitle: {
+    color: INV_NAVY_DEEP,
+    fontSize: 17,
+    lineHeight: 22,
+    fontWeight: '700',
+    letterSpacing: -0.3,
+  },
+  /* Everything that is not a way of working on the invitation, behind one
+     control at the end of the bar. */
+  menu: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: -9,
+  },
+
+  /* Two words on a rule, the one you are on underlined. The segmented box
+     around them was the control drawn twice — the underline is the control. */
+  tabs: {
+    ...globalStyles.row,
+    paddingHorizontal: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: INV_HAIRLINE,
+  },
+  tab: { alignItems: 'center', paddingVertical: 11, marginRight: 22 },
+  tabOn: {
+    borderBottomWidth: 2.5,
+    borderBottomColor: INV_ACCENT,
+    marginBottom: -1,
+  },
+  tabText: { color: colors.textMuted, fontSize: 14, fontWeight: '600' },
+  tabTextOn: { color: INV_ACCENT, fontWeight: '700' },
+
+  /* The menu's own sheet: two rows, each a place to go. */
+  menuRow: {
+    ...globalStyles.row,
+    gap: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: INV_HAIRLINE,
+    padding: 14,
+    marginTop: 10,
+  },
+  menuIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: INV_ACCENT_SOFT,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  menuText: { flex: 1 },
+  menuLabel: {
+    color: INV_NAVY_DEEP,
+    fontSize: 14,
+    lineHeight: 19,
+    fontWeight: '700',
+  },
+  menuNote: { color: colors.textMuted, fontSize: 12, lineHeight: 16, marginTop: 1 },
+
+  /* One action, always in the same place, whichever view is on screen. */
+  foot: {
+    borderTopWidth: 1,
+    borderTopColor: INV_HAIRLINE,
+    backgroundColor: colors.background,
+    paddingHorizontal: spacing.md,
+    paddingTop: 10,
+  },
+  footButton: {
+    ...globalStyles.row,
+    justifyContent: 'center',
+    gap: 8,
+    borderRadius: 14,
+    backgroundColor: INV_ACCENT,
+    paddingVertical: 14,
+  },
+  footButtonApprove: { backgroundColor: INV_NAVY_DEEP },
+  footButtonDisabled: { opacity: 0.45 },
+  footButtonText: { color: colors.onPrimary, fontSize: 14.5, fontWeight: '700' },
+  /* Said under the button because it is the promise the button makes: nothing
+     has left this phone until the customer sends it. */
+  footNote: {
+    color: colors.textMuted,
+    fontSize: 11.5,
+    lineHeight: 15,
+    textAlign: 'center',
+    marginTop: 7,
+  },
+});
+
+/** One section, as the Approve pass reads it. */
+export const approveStyles = StyleSheet.create({
+  card: {
+    backgroundColor: colors.background,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: INV_HAIRLINE,
+    marginHorizontal: spacing.md,
+    marginTop: 10,
+    padding: 14,
+  },
+  cardTitle: {
+    color: INV_NAVY,
+    fontSize: 14,
+    lineHeight: 19,
+    fontWeight: '700',
+    flexShrink: 1,
+  },
+  head: { ...globalStyles.row, gap: 8, marginBottom: 6 },
+  waiting: {
+    color: INV_ACCENT,
+    fontSize: 10.5,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    marginLeft: 'auto',
+  },
+  approvedChip: { ...globalStyles.row, gap: 5, marginLeft: 'auto' },
+  approvedText: { color: INV_GREEN, fontSize: 10.5, fontWeight: '700', letterSpacing: 0.8 },
+  eyebrow: {
+    color: INV_ACCENT,
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1.2,
+  },
+  body: { color: INV_NAVY, fontSize: 14, lineHeight: 20, marginTop: 6 },
+  bodyEmpty: { color: colors.textMuted, fontStyle: 'italic' },
+  actions: { ...globalStyles.row, gap: 8, marginTop: 12 },
+  accept: {
+    ...globalStyles.row,
+    justifyContent: 'center',
+    gap: 6,
+    flex: 1,
+    borderRadius: 12,
+    backgroundColor: INV_NAVY_DEEP,
+    paddingVertical: 11,
+  },
+  acceptText: { color: colors.onPrimary, fontSize: 13, fontWeight: '700' },
+  ask: {
+    ...globalStyles.row,
+    justifyContent: 'center',
+    gap: 6,
+    flex: 1,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: INV_HAIRLINE,
+    paddingVertical: 11,
+  },
+  askText: { color: INV_NAVY, fontSize: 13, fontWeight: '700' },
+  share: {
+    ...globalStyles.row,
+    justifyContent: 'center',
+    gap: 8,
+    borderRadius: 12,
+    backgroundColor: INV_ACCENT,
+    paddingVertical: 12,
+    marginTop: 12,
+  },
+  shareText: { color: colors.onPrimary, fontSize: 13, fontWeight: '700' },
+});
+
+/* ---------------------------------------------------------------------------
+ * The invitation laid out as the document it is: its own header, then each
+ * section's own words, ruled off from the next.
+ * ------------------------------------------------------------------------- */
+export const canvasStyles = StyleSheet.create({
+  header: {
+    backgroundColor: INV_NAVY_DEEP,
+    borderRadius: 20,
+    marginHorizontal: spacing.md,
+    marginTop: 6,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: 22,
+    alignItems: 'center',
+  },
+  monogram: {
+    width: 54,
+    height: 54,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.35)',
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  monogramText: { color: colors.onPrimary, fontSize: 20, fontWeight: '700' },
+  headerEyebrow: {
+    color: INV_ACCENT,
+    fontSize: 10.5,
+    lineHeight: 15,
+    fontWeight: '700',
+    letterSpacing: 1.4,
+    textAlign: 'center',
+    marginTop: 16,
+  },
+  headerTitle: {
+    color: colors.onPrimary,
+    fontSize: 24,
+    lineHeight: 31,
+    fontWeight: '700',
+    letterSpacing: -0.5,
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  /* One dot wide: the reference's mark between the name and the details. */
+  diamond: {
+    width: 7,
+    height: 7,
+    borderRadius: 2,
+    backgroundColor: INV_ACCENT,
+    transform: [{ rotate: '45deg' }],
+    marginTop: 14,
+  },
+  headerLine: {
+    color: 'rgba(255,255,255,0.86)',
+    fontSize: 13,
+    lineHeight: 19,
+    textAlign: 'center',
+    marginTop: 14,
+  },
+  headerEdit: {
+    ...globalStyles.row,
+    gap: 6,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    marginTop: 18,
+  },
+  headerEditText: { color: colors.onPrimary, fontSize: 12.5, fontWeight: '700' },
+
+  block: { paddingHorizontal: spacing.md, paddingTop: 16 },
+  /* Above the words rather than beside them: the section is what matters on
+     this page, and the control that changes it is not. */
+  edit: {
+    ...globalStyles.row,
+    alignSelf: 'flex-end',
+    gap: 5,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: INV_HAIRLINE,
+    backgroundColor: colors.background,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  editText: { color: INV_ACCENT, fontSize: 12, fontWeight: '700' },
+  eyebrow: {
+    color: INV_ACCENT,
+    fontSize: 10.5,
+    lineHeight: 15,
+    fontWeight: '700',
+    letterSpacing: 1.4,
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  body: {
+    color: INV_NAVY,
+    fontSize: 14.5,
+    lineHeight: 22,
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  bodyEmpty: { color: colors.textMuted, fontStyle: 'italic' },
+
+  /* A hairline with a dot in it, between one section and the next. */
+  rule: { ...globalStyles.row, justifyContent: 'center', gap: 8, marginTop: 18 },
+  ruleLine: { width: 56, height: 1, backgroundColor: INV_HAIRLINE },
+  ruleDot: { width: 4, height: 4, borderRadius: 999, backgroundColor: INV_HAIRLINE },
+
+  hiddenNote: {
+    ...globalStyles.row,
+    alignSelf: 'center',
+    gap: 6,
+    marginTop: 14,
+  },
+  hiddenNoteText: { color: colors.textMuted, fontSize: 12 },
 });

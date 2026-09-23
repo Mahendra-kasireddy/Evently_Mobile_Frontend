@@ -139,8 +139,12 @@ export function IdeaBoardScreen() {
   if (!data) return null;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      {header}
+    /*
+     * No top inset and no bar: the banner runs under the status bar and
+     * carries the back arrow itself, the same way the workspace does. A
+     * header above it would be a second one for a single button.
+     */
+    <View style={styles.container}>
       <KeyboardAvoider style={styles.scroll} keyboardVerticalOffset={90}>
         <ScrollView
           style={styles.scroll}
@@ -150,7 +154,7 @@ export function IdeaBoardScreen() {
             <RefreshControl refreshing={loading} onRefresh={refetch} />
           }
         >
-          <BoardHero counts={data.counts} organizerName={organizer} />
+          <BoardHero counts={data.counts} onBack={() => navigation.goBack()} />
 
           <BoardComposer
             // Passed down from the workspace, which already loaded it — the
@@ -188,7 +192,7 @@ export function IdeaBoardScreen() {
           <VisionCard vision={data.vision} organizerName={organizer} />
         </ScrollView>
       </KeyboardAvoider>
-    </SafeAreaView>
+    </View>
   );
 }
 

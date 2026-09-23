@@ -1,3 +1,4 @@
+import type { OccasionArtKey } from '../../Components/OccasionArt';
 // ---------------------------------------------------------------------------
 // GET /booking/:id — the booking behind a workspace. Only the fields this
 // screen renders are declared; the endpoint returns more.
@@ -99,6 +100,14 @@ export interface WorkspaceTimelineEntry {
   atLabel: string;
 }
 
+/**
+ * Which half of the workspace is on screen.
+ *
+ * Three, not eight cards in a column: what the event is (details), what is
+ * being done about it (plan), and what it costs (payment).
+ */
+export type WorkspaceTab = 'details' | 'plan' | 'payment';
+
 export interface WorkspaceViewModel {
   id: string;
   ref: string;
@@ -124,6 +133,17 @@ export interface WorkspaceViewModel {
   timeline: WorkspaceTimelineEntry[];
   organizerName: string | null;
   customerName: string | null;
+  /** For the organizer line's monogram. '' when the booking has no organizer. */
+  organizerId: string;
+  organizerInitials: string;
+  organizerAvatarColor: string;
+  /** Which illustration the banner draws — matched from the occasion. */
+  art: OccasionArtKey;
+  /** "5 September 2026", and the same date split for the chip. */
+  dateLabel: string;
+  dateChip: { month: string; day: string } | null;
+  /** The venue, or '' when the booking carries none. */
+  venue: string;
 }
 
 // ---------------------------------------------------------------------------

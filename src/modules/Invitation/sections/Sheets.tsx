@@ -3,7 +3,11 @@ import { ActivityIndicator, Modal, Pressable, ScrollView, TextInput, TouchableOp
 import { EventlyIcon, EventlyText } from '../../../Components';
 import { colors } from '../../../theme';
 import { INVITATION_COPY as COPY, INV_ACCENT, INV_GREEN, INV_NAVY } from '../constants';
-import { previewSheetStyles as p, sheetStyles as s } from '../styles';
+import {
+  previewSheetStyles as p,
+  sheetStyles as s,
+  shellStyles as sh,
+} from '../styles';
 import type { BlockPatch, GuestDTO, InvitationBlockDTO, InvitationDTO, ShareOutcomeDTO } from '../types';
 import { GuestPreview } from './InvitationParts';
 import { GroupFilter } from '../../GuestList/sections/GroupFilter';
@@ -22,6 +26,84 @@ function Sheet({ visible, onClose, children }: { visible: boolean; onClose: () =
         </Pressable>
       </Pressable>
     </Modal>
+  );
+}
+
+interface MenuSheetProps {
+  visible: boolean;
+  onPreview: () => void;
+  onGuestList: () => void;
+  onClose: () => void;
+}
+
+/**
+ * Everything that is not a way of working on the invitation.
+ *
+ * Looking at it as a guest, and the list it would go to. Neither is a step in
+ * assembling or approving it — one is a look at the finished thing and the
+ * other is a different screen — so they sit behind the header's menu rather
+ * than as a third tab and a stray button.
+ */
+export function MenuSheet({
+  visible,
+  onPreview,
+  onGuestList,
+  onClose,
+}: MenuSheetProps) {
+  return (
+    <Sheet visible={visible} onClose={onClose}>
+      <EventlyText variant="h2" style={s.title}>
+        {COPY.menuTitle}
+      </EventlyText>
+
+      <TouchableOpacity
+        style={sh.menuRow}
+        activeOpacity={0.85}
+        onPress={onPreview}
+        accessibilityRole="button"
+        accessibilityLabel={COPY.menuPreview}
+        testID="menu-preview"
+      >
+        <View style={sh.menuIcon}>
+          <EventlyIcon name="eye-outline" size={19} color={INV_ACCENT} />
+        </View>
+        <View style={sh.menuText}>
+          <EventlyText variant="subtitle" style={sh.menuLabel}>
+            {COPY.menuPreview}
+          </EventlyText>
+          <EventlyText variant="caption" style={sh.menuNote}>
+            {COPY.menuPreviewNote}
+          </EventlyText>
+        </View>
+        <EventlyIcon name="chevron-right" size={18} color={INV_ACCENT} />
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={sh.menuRow}
+        activeOpacity={0.85}
+        onPress={onGuestList}
+        accessibilityRole="button"
+        accessibilityLabel={COPY.menuGuests}
+        testID="menu-guests"
+      >
+        <View style={sh.menuIcon}>
+          <EventlyIcon
+            name="account-multiple-outline"
+            size={19}
+            color={INV_ACCENT}
+          />
+        </View>
+        <View style={sh.menuText}>
+          <EventlyText variant="subtitle" style={sh.menuLabel}>
+            {COPY.menuGuests}
+          </EventlyText>
+          <EventlyText variant="caption" style={sh.menuNote}>
+            {COPY.menuGuestsNote}
+          </EventlyText>
+        </View>
+        <EventlyIcon name="chevron-right" size={18} color={INV_ACCENT} />
+      </TouchableOpacity>
+    </Sheet>
   );
 }
 

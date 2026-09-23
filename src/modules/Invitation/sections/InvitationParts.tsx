@@ -16,6 +16,18 @@ export function blockIcon(icon: string): string {
   return BLOCK_ICON[icon] ?? BLOCK_ICON_FALLBACK;
 }
 
+/**
+ * "corporate" -> "Corporate".
+ *
+ * The occasion is stored as the key the rest of the platform uses; on an
+ * invitation it is read by the family, so it is set as a word rather than as
+ * a slug.
+ */
+export function titleize(value: string): string {
+  const v = (value ?? '').trim();
+  return v ? v.charAt(0).toUpperCase() + v.slice(1) : '';
+}
+
 export function dateLabel(value: string | null | undefined): string {
   if (!value) return '';
   const date = new Date(value);

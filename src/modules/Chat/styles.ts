@@ -152,13 +152,15 @@ export const threadStyles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: 10,
   },
+  /* Just the chevron. The disc behind it was a second shape to notice for a
+     control every screen has in the same corner, and the touch target is the
+     box, not the paint. */
   back: {
     width: 36,
     height: 36,
-    borderRadius: 999,
-    backgroundColor: '#f2efed',
     alignItems: 'center',
     justifyContent: 'center',
+    marginLeft: -8,
     flexShrink: 0,
   },
   headerAvatar: {
