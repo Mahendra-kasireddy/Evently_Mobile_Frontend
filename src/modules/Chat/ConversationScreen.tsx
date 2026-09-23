@@ -11,8 +11,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import { EventlyIcon, EventlyText, KeyboardAvoider } from '../../Components';
+import { useKeyboardVisible } from '../../hooks/useKeyboardVisible';
 import { colors } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
 import { CHAT_ACCENT, CHAT_COPY as COPY } from './constants';
@@ -47,6 +51,12 @@ export function ConversationScreen() {
 
   const canSend = container.draft.trim().length > 0 && !container.isSending;
   const name = summary?.withName || params.withName || COPY.title;
+
+  /* Clear of the home indicator while the keyboard is down, flush to the keys
+     while it is up. See useKeyboardVisible. */
+  const insets = useSafeAreaInsets();
+  const keyboardVisible = useKeyboardVisible();
+  const footPadding = keyboardVisible ? 10 : Math.max(insets.bottom, 10);
 
   const pickSuggestion = (text: string) => {
     container.useSuggestion(text);
@@ -153,24 +163,29 @@ export function ConversationScreen() {
           </EventlyText>
         ) : null}
 
-        <View style={s.foot}>
+        <View style={[s.foot, { paddingBottom: footPadding }]}>
           <SuggestionBar
             suggestions={container.suggestions}
             onPick={pickSuggestion}
           />
 
           <View style={s.composer}>
-            <TextInput
-              ref={inputRef}
-              style={s.input}
-              value={container.draft}
-              onChangeText={container.setDraft}
-              placeholder={`Message ${name}…`}
-              placeholderTextColor={colors.textMuted}
-              multiline
-              maxLength={2000}
-              accessibilityLabel={COPY.placeholder}
-            />
+            <View style={s.inputWrap}>
+              <TextInput
+                ref={inputRef}
+                style={s.input}
+                value={container.draft}
+                onChangeText={container.setDraft}
+                placeholder={`Message ${name}…`}
+                placeholderTextColor={colors.textMuted}
+                multiline
+                /* Android centres a multiline field's first line otherwise,
+                   so a growing box jumps as the second line arrives. */
+                textAlignVertical="top"
+                maxLength={2000}
+                accessibilityLabel={COPY.placeholder}
+              />
+            </View>
             <TouchableOpacity
               style={[s.send, !canSend && s.sendDisabled]}
               activeOpacity={0.85}
@@ -181,7 +196,7 @@ export function ConversationScreen() {
             >
               <EventlyIcon
                 name="arrow-right"
-                size={22}
+                size={20}
                 color={colors.onPrimary}
               />
             </TouchableOpacity>

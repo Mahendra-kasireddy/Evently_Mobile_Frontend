@@ -67,11 +67,25 @@ export function replyLabel(medianMinutes = 0, samples = 0): string {
   return days <= 1 ? 'Usually replies in a day' : `Usually replies in ${days} days`;
 }
 
+/**
+ * Two letters from the name, for a thread whose record carries no monogram.
+ *
+ * An organizer row created before the field existed sent '' and the inbox
+ * drew a coloured tile with nothing on it — which reads as an avatar that
+ * failed to load rather than as a business.
+ */
+export function initialsOf(name: string): string {
+  const parts = (name ?? '').trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '·';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
 export function mapConversations(dtos: ConversationDTO[], now = new Date()): ConversationItem[] {
   return (dtos ?? []).map((dto) => ({
     id: dto.id,
     withName: dto.withName,
-    withInitials: dto.withInitials,
+    withInitials: dto.withInitials?.trim() || initialsOf(dto.withName),
     withAvatarColor: dto.withAvatarColor || '#1a2e5a',
     organizerId: dto.organizerId,
     preview: dto.lastMessageText ?? '',

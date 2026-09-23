@@ -46,6 +46,8 @@ export const FOLLOW_UP_SUGGESTIONS = [
 
 export const CHAT_COPY = {
   title: 'Messages',
+  /** A thread that exists but nobody has written in yet. */
+  noMessagesYet: 'No messages yet — say hello',
   loading: 'Loading your messages…',
   errorTitle: "We couldn't load your messages",
   retry: 'Try again',

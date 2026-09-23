@@ -35,7 +35,7 @@ export function ThreadHeader({ summary, fallbackName, onBack, onQuote }: ThreadH
         accessibilityRole="button"
         accessibilityLabel="Go back"
       >
-        <EventlyIcon name="chevron-left" size={24} color={CHAT_NAVY_DEEP} />
+        <EventlyIcon name="chevron-left" size={21} color={CHAT_NAVY_DEEP} />
       </TouchableOpacity>
 
       {summary ? (

@@ -193,13 +193,57 @@ describe('ConversationRow', () => {
       .not.toContain('unread');
   });
 
-  it('drops the preview entirely for a thread nobody has written in', () => {
+  it('says a thread is empty rather than showing a name and nothing else', () => {
+    /*
+     * "Message organizer" opens a thread before anybody writes, so an empty
+     * preview is a real state and not a loading one. The row used to drop the
+     * line altogether, which left a coloured square, a name, and no clue
+     * whether the message had failed to load.
+     */
     const item = mapConversations(
       [conversation({ lastMessageText: '', lastMessageAt: null, unread: 0 })],
       NOW,
     )[0];
     const text = textOf(render(<ConversationRow item={item} onPress={noop} />));
-    expect(text).toBe('MEMahendra Events');
+    expect(text).toContain('No messages yet');
+  });
+
+  it('falls back to a monogram the server did not send', () => {
+    // An empty one drew a coloured tile with nothing on it, which reads as an
+    // avatar that failed to load.
+    const item = mapConversations(
+      [conversation({ withInitials: '', withName: 'Mahendra Events' })],
+      NOW,
+    )[0];
+    expect(item.withInitials).toBe('ME');
+  });
+});
+
+describe('the composer', () => {
+  it('states its own height rather than leaving it to the platform', () => {
+    /*
+     * A multiline field sizes itself from its font metrics, and iOS and
+     * Android disagree about them — the same box came out two different
+     * heights on the two platforms. One line plus its padding is 44, said
+     * here, with the line height to match.
+     */
+    const styles = require('../src/modules/Chat/styles').threadStyles;
+    // The box is a View with a stated height; the field inside it carries no
+    // border, padding or line height that the platform could misplace.
+    expect(styles.inputWrap.minHeight).toBe(40);
+    expect(styles.input.padding).toBe(0);
+    expect(styles.input.lineHeight).toBeUndefined();
+    expect(styles.input.borderWidth).toBeUndefined();
+    // The send button and the box are the same height, or the row looks like
+    // the button is falling out of it.
+    expect(styles.send.height).toBe(styles.inputWrap.minHeight);
+  });
+
+  it('leaves the home-indicator inset to render time', () => {
+    // Padding it in the stylesheet would double up once the keyboard is open,
+    // which is a band of white above the keys.
+    const styles = require('../src/modules/Chat/styles').threadStyles;
+    expect(styles.foot.paddingBottom).toBeUndefined();
   });
 });
 

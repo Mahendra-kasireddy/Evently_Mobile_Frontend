@@ -1,5 +1,6 @@
 import { TouchableOpacity, View } from 'react-native';
 import { EventlyText } from '../../../Components';
+import { CHAT_COPY as COPY } from '../constants';
 import { rowStyles as s } from '../styles';
 import type { ConversationItem } from '../types';
 
@@ -30,7 +31,7 @@ export function ConversationRow({ item, onPress }: ConversationRowProps) {
       accessibilityLabel={
         unread
           ? `${item.withName}, ${item.unread} unread. ${item.preview}`
-          : `${item.withName}. ${item.preview}`
+          : `${item.withName}. ${item.preview || COPY.noMessagesYet}`
       }
     >
       <View style={[s.avatar, { backgroundColor: item.withAvatarColor }]}>
@@ -52,15 +53,20 @@ export function ConversationRow({ item, onPress }: ConversationRowProps) {
           ) : null}
         </View>
 
-        {item.preview ? (
-          <EventlyText
-            variant="caption"
-            style={[s.preview, unread && s.previewUnread]}
-            numberOfLines={1}
-          >
-            {item.preview}
-          </EventlyText>
-        ) : null}
+        {/* A thread with no messages is a real state — "Message organizer"
+            opens one before anybody writes — so the row says so rather than
+            collapsing to a name and a coloured square. */}
+        <EventlyText
+          variant="caption"
+          style={[
+            s.preview,
+            unread && s.previewUnread,
+            !item.preview && s.previewEmpty,
+          ]}
+          numberOfLines={1}
+        >
+          {item.preview || COPY.noMessagesYet}
+        </EventlyText>
       </View>
 
       {unread ? (
