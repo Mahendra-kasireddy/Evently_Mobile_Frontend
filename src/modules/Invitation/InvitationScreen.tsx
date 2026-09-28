@@ -11,10 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   AppHeader,
   EventlyIcon,
@@ -24,7 +21,6 @@ import { colors } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
 import {
   INVITATION_COPY as COPY,
-  INVITATION_TABS,
   INV_ACCENT,
   INV_GREEN,
   INV_NAVY_DEEP,
@@ -33,30 +29,27 @@ import {
 } from './constants';
 import { mapInvitationList } from './utils';
 import {
-  useApproveBlock,
   useApproveInvitation,
   useGuests,
   useInvitation,
   useMyInvitations,
-  usePersonalizeBlock,
   useRequestInvitationChange,
   useShareInvitation,
 } from './hooks';
-import { ApproveRow } from './sections/ApproveRow';
 import {
-  BlockCanvas,
-  HiddenNote,
-  InvitationHeaderCard,
-} from './sections/BlockCanvas';
+  ArtworkPending,
+  ArtworkViewer,
+  InvitationArtwork,
+  artworkOf,
+} from './sections/InvitationArtwork';
+import { CountdownBlock } from './sections/CountdownBlock';
+import { LiveBlock } from './sections/LiveBlock';
+import { SaveTheDate } from './sections/SaveTheDate';
+import { StoryBlock } from './sections/StoryBlock';
+import type { Artwork } from './sections/InvitationArtwork';
+import { RequestChangeSheet, ShareSheet } from './sections/Sheets';
 import {
-  MenuSheet,
-  PersonalizeSheet,
-  PreviewSheet,
-  RequestChangeSheet,
-  ShareSheet,
-} from './sections/Sheets';
-import {
-  actionStyles as a,
+  artworkStyles as w,
   listStyles as l,
   shellStyles as sh,
   styles,
@@ -64,7 +57,6 @@ import {
 import type {
   GuestDTO,
   InvitationDTO,
-  InvitationTab,
   ShareOutcomeDTO,
 } from './types';
 
@@ -73,14 +65,10 @@ type InvitationRouteProp = RouteProp<RootStackParamList, 'Invitations'>;
 
 /** Which sheet is open, and what it is about. */
 type Sheet =
-  | { kind: 'personalize'; key: string }
-  | { kind: 'request'; key?: string }
-  /** `key` absent means the whole invitation — one sheet serves both. */
-  | { kind: 'preview'; key?: string }
-  /** The two things behind the header's menu. */
-  | { kind: 'menu' }
-  /** `key` absent means the complete invitation — one sheet serves both. */
-  | { kind: 'share'; key?: string }
+  /** Telling the organizer what to change about the design they sent. */
+  | { kind: 'request' }
+  /** Sending the approved invitation to guests. */
+  | { kind: 'share' }
   | null;
 
 /**
@@ -209,12 +197,50 @@ function InvitationList() {
   );
 }
 
+/** The screen's own row: the arrow, its name, and the guest list. */
+function InvitationBar({ onBack, onGuests }: { onBack: () => void; onGuests?: () => void }) {
+  return (
+    <View style={sh.bar}>
+      <TouchableOpacity
+        style={sh.back}
+        activeOpacity={0.7}
+        onPress={onBack}
+        accessibilityRole="button"
+        accessibilityLabel="Go back"
+        testID="invitation-back"
+      >
+        <EventlyIcon name="chevron-left" size={22} color={INV_NAVY_DEEP} />
+      </TouchableOpacity>
+      <EventlyText variant="subtitle" style={sh.barTitle} numberOfLines={1}>
+        {COPY.artworkTitle}
+      </EventlyText>
+      {/* Only once there is something to send: a guest list on an invitation
+          nobody has approved is a list with nothing to do. */}
+      {onGuests ? (
+        <TouchableOpacity
+          style={sh.barAction}
+          activeOpacity={0.8}
+          onPress={onGuests}
+          accessibilityRole="button"
+          accessibilityLabel={COPY.artworkGuests}
+          testID="invitation-guests"
+        >
+          <EventlyText variant="caption" style={sh.barActionText}>
+            {COPY.artworkGuests}
+          </EventlyText>
+        </TouchableOpacity>
+      ) : null}
+    </View>
+  );
+}
+
 /**
- * One booking's guest invitation — the customer's half of the approval loop.
+ * One booking's guest invitation.
  *
- * Every section the organizer assembled, marked with who owns it, the ones
- * that are theirs editable in place, a preview of exactly what publishing
- * would show, and — once approved — sending it to guests.
+ * The invitation is a design, not a form: the organizer makes it in whatever
+ * they already design in, uploads the finished image or video, and sends it.
+ * So this screen is the artwork and the two decisions the customer has about
+ * it — approve it, or ask for a change — and nothing else.
  *
  * Approving is the only thing that makes the guest link live, so nothing here
  * reaches a guest before the customer decides it should.
@@ -223,7 +249,6 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
   const navigation = useNavigation<InvitationNavigationProp>();
   const { data, loading, error, refetch } = useInvitation(bookingId);
   const approve = useApproveInvitation();
-  const personalize = usePersonalizeBlock();
   const requestChange = useRequestInvitationChange();
   const guestList = useGuests();
   const share = useShareInvitation();
@@ -232,14 +257,29 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
   const [patched, setPatched] = useState<InvitationDTO | null>(null);
   const [sheet, setSheet] = useState<Sheet>(null);
   const [requestSent, setRequestSent] = useState(false);
+  const [viewing, setViewing] = useState(false);
+  /*
+   * What the full-screen viewer is showing. The invitation itself when it is
+   * null, and a story photograph when it is not — one viewer rather than two,
+   * because a story photo full screen is the same thing as the invitation
+   * full screen with a different picture in it.
+   */
+  const [viewingPhoto, setViewingPhoto] = useState<Artwork | null>(null);
   const [guests, setGuests] = useState<GuestDTO[]>([]);
   const [outcomes, setOutcomes] = useState<ShareOutcomeDTO[] | null>(null);
-  const [tab, setTab] = useState<InvitationTab>('organizer');
-  const approveBlock = useApproveBlock();
-  const [approvingKey, setApprovingKey] = useState<string | null>(null);
-  const insets = useSafeAreaInsets();
 
   const invitation = patched ?? data;
+
+  const openShare = () => {
+    setOutcomes(null);
+    setSheet({ kind: 'share' });
+    guestList
+      .execute(bookingId)
+      .then(setGuests)
+      .catch(() => {
+        // error surfaces through guestList.error
+      });
+  };
 
   if (loading && !invitation) {
     return (
@@ -261,7 +301,12 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
         <EventlyText variant="body" style={styles.centeredBody}>
           {error.message}
         </EventlyText>
-        <TouchableOpacity style={styles.retryButton} activeOpacity={0.8} onPress={refetch} accessibilityRole="button">
+        <TouchableOpacity
+          style={styles.retryButton}
+          activeOpacity={0.8}
+          onPress={refetch}
+          accessibilityRole="button"
+        >
           <EventlyIcon name="refresh" size={16} color={INV_ACCENT} />
           <EventlyText variant="caption" style={styles.retryText}>
             {COPY.retry}
@@ -271,355 +316,210 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
     );
   }
 
-  // null rather than an error: the organizer is still drafting it.
+  // null rather than an error: the organizer has not shared anything yet.
   if (!invitation) {
     return (
-      <View style={styles.centered}>
-        <View style={styles.centeredIcon}>
-          <EventlyIcon name="email-fast-outline" size={28} color={INV_ACCENT} />
-        </View>
-        <EventlyText variant="h2" style={styles.centeredTitle}>
-          {COPY.preparingTitle}
-        </EventlyText>
-        <EventlyText variant="body" style={styles.centeredBody}>
-          {COPY.preparingBody}
-        </EventlyText>
-      </View>
+      <>
+        <InvitationBar onBack={() => navigation.goBack()} />
+        <ArtworkPending />
+      </>
     );
   }
 
   const approved = invitation.status === 'approved';
-  const openBlock =
-    sheet?.kind === 'personalize' ? invitation.blocks.find((b) => b.key === sheet.key) ?? null : null;
-  const shareBlockTitle =
-    sheet?.kind === 'share' && sheet.key
-      ? invitation.blocks.find((b) => b.key === sheet.key)?.title
-      : undefined;
-
-  /* Hidden sections are not part of the published invitation, so they are
-     neither read, approved nor counted here. */
-  const visibleBlocks = invitation.blocks.filter((b) => !b.hidden);
-  /*
-   * A server that predates per-section sign-off sends no `approved` at all,
-   * and an invitation approved before it existed has none stored. Approving
-   * the whole thing is approving every section of it, so the status decides
-   * when the field cannot — otherwise an approved invitation asks to be
-   * approved again, ten times.
-   */
-  const waiting = approved
-    ? 0
-    : visibleBlocks.filter((b) => b.approved !== true).length;
-
-  /* The section the header card stands for, so its Edit opens the right one. */
-  const headerBlock =
-    invitation.blocks.find((b) => b.key === 'header') ?? invitation.blocks[0];
-
-  const openShare = (key?: string) => {
-    setOutcomes(null);
-    setSheet({ kind: 'share', ...(key ? { key } : {}) });
-    guestList
-      .execute(bookingId)
-      .then(setGuests)
-      .catch(() => {
-        // error surfaces through guestList.error
-      });
-  };
+  const artwork = artworkOf(invitation);
 
   return (
     <>
-      {/*
-        Stationery, not a dashboard.
-
-        This screen is a card somebody is about to send to their family, so
-        its head is paper: a cream ground, the screen's name, and everything
-        else behind one menu. A workspace and an ideas feed are measured in
-        counts; an invitation is read, so there is no bar of figures on it.
-      */}
-      <View style={sh.paper}>
-        <View style={sh.bar}>
-          <TouchableOpacity
-            style={sh.back}
-            activeOpacity={0.7}
-            onPress={() => navigation.goBack()}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-          >
-            <EventlyIcon name="chevron-left" size={22} color={INV_NAVY_DEEP} />
-          </TouchableOpacity>
-          <View style={sh.barText}>
-            <EventlyText variant="subtitle" style={sh.barTitle} numberOfLines={1}>
-              {COPY.detailTitle}
-            </EventlyText>
-          </View>
-          {/*
-            The two things that are not a way of working on the invitation —
-            looking at it as a guest, and the list it would go to — behind one
-            control rather than as a third tab and a row of buttons.
-          */}
-          <TouchableOpacity
-            style={sh.menu}
-            activeOpacity={0.7}
-            onPress={() => setSheet({ kind: 'menu' })}
-            accessibilityRole="button"
-            accessibilityLabel={COPY.menuTitle}
-            testID="invitation-menu"
-          >
-            <EventlyIcon name="menu" size={22} color={INV_NAVY_DEEP} />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/*
-        Two ways of working on it: read what the organizer assembled, or sign
-        it off section by section. The guest's view is not a third — it is a
-        look at the finished thing, and it lives in the menu.
-      */}
-      <View style={sh.tabs}>
-        {INVITATION_TABS.map((item) => {
-          const on = item.key === tab;
-          return (
-            <TouchableOpacity
-              key={item.key}
-              style={[sh.tab, on && sh.tabOn]}
-              activeOpacity={0.85}
-              onPress={() => setTab(item.key)}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: on }}
-              accessibilityLabel={item.label}
-              testID={`invitation-tab-${item.key}`}
-            >
-              <EventlyText variant="caption" style={[sh.tabText, on && sh.tabTextOn]}>
-                {item.label}
-              </EventlyText>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
+      <InvitationBar
+        onBack={() => navigation.goBack()}
+        onGuests={
+          approved
+            ? () =>
+                navigation.navigate('GuestList', {
+                  bookingId,
+                  title: invitation.bookingTitle || invitation.occasion,
+                })
+            : undefined
+        }
+      />
 
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={loading} onRefresh={refetch} />}
       >
-        <>
-            <InvitationHeaderCard
-              invitation={invitation}
-              /* The header block is the customer's when they own it — and on
-                 an invitation where the organizer keeps it, there is nothing
-                 for this button to open. */
-              onEdit={
-                headerBlock && headerBlock.owner === 'customer'
-                  ? () => setSheet({ kind: 'personalize', key: headerBlock.key })
-                  : undefined
-              }
-            />
+        {/* The invitation, then where it stands, then the two decisions. */}
+        {artwork ? (
+          <InvitationArtwork artwork={artwork} onView={() => setViewing(true)} />
+        ) : (
+          <ArtworkPending />
+        )}
 
-            {tab === 'organizer' ? (
-              <>
-                {visibleBlocks.map((block) => (
-                  <BlockCanvas
-                    key={block.key}
-                    block={block}
-                    /* Whose section it is decides what the control does: the
-                       customer edits their own, and can only ask about the
-                       organizer's. That is the rule the API enforces, so the
-                       page never offers an edit that would 403. */
-                    onEdit={() => {
-                      if (block.owner === 'customer') {
-                        setSheet({ kind: 'personalize', key: block.key });
-                        return;
-                      }
-                      setRequestSent(false);
-                      setSheet({ kind: 'request', key: block.key });
-                    }}
-                  />
-                ))}
-                <HiddenNote count={invitation.blocks.length - visibleBlocks.length} />
-              </>
-            ) : (
-              visibleBlocks.map((block) => (
-                <ApproveRow
-                  key={block.key}
-                  block={block}
-                  isApproving={approvingKey === block.key}
-                  canShare={approved}
-                  onShare={() => openShare(block.key)}
-                  onAccept={() => {
-                    setApprovingKey(block.key);
-                    approveBlock
-                      .execute(bookingId, block.key)
+        {artwork ? (
+          <>
+            <View style={w.status}>
+              <View style={[w.statusDot, approved && w.statusDotDone]} />
+              <View style={w.statusText}>
+                <EventlyText
+                  variant="subtitle"
+                  style={[w.statusTitle, approved && w.statusTitleDone]}
+                >
+                  {approved ? COPY.artworkApproved : COPY.artworkWaiting}
+                </EventlyText>
+                <EventlyText variant="caption" style={w.statusNote}>
+                  {approved ? COPY.artworkApprovedNote : COPY.artworkWaitingNote}
+                </EventlyText>
+              </View>
+            </View>
+
+            <View style={w.actions}>
+              {/* Before approval the one thing to do is approve; after it, the
+                  one thing to do is send it. Never both at once. */}
+              {approved ? (
+                <TouchableOpacity
+                  style={[w.approve, w.share]}
+                  activeOpacity={0.9}
+                  onPress={openShare}
+                  accessibilityRole="button"
+                  accessibilityLabel={COPY.shareAll}
+                  testID="invitation-share"
+                >
+                  <EventlyIcon name="whatsapp" size={18} color={colors.onPrimary} />
+                  <EventlyText variant="subtitle" style={w.approveText}>
+                    {COPY.shareAll}
+                  </EventlyText>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={[w.approve, approve.loading && w.approveDisabled]}
+                  activeOpacity={0.9}
+                  disabled={approve.loading}
+                  onPress={() =>
+                    approve
+                      .execute(bookingId)
                       .then(setPatched)
                       .catch(() => {
-                        // error surfaces through approveBlock.error
+                        // error surfaces below
                       })
-                      .finally(() => setApprovingKey(null));
-                  }}
-                  onRequestChange={() => {
-                    setRequestSent(false);
-                    setSheet({ kind: 'request', key: block.key });
-                  }}
-                />
-              ))
-            )}
+                  }
+                  accessibilityRole="button"
+                  accessibilityLabel={COPY.artworkApprove}
+                  testID="invitation-approve"
+                >
+                  {approve.loading ? (
+                    <ActivityIndicator size="small" color={colors.onPrimary} />
+                  ) : (
+                    <EventlyIcon name="check" size={18} color={colors.onPrimary} />
+                  )}
+                  <EventlyText variant="subtitle" style={w.approveText}>
+                    {approve.loading ? COPY.artworkApproving : COPY.artworkApprove}
+                  </EventlyText>
+                </TouchableOpacity>
+              )}
 
-            {approve.error || approveBlock.error ? (
-              <EventlyText variant="caption" style={a.errorText}>
-                {(approve.error ?? approveBlock.error)?.message}
+              {/* Always available: approving ends this round, not the
+                  conversation with the organizer. */}
+              <TouchableOpacity
+                style={w.ask}
+                activeOpacity={0.85}
+                onPress={() => {
+                  setRequestSent(false);
+                  setSheet({ kind: 'request' });
+                }}
+                accessibilityRole="button"
+                accessibilityLabel={COPY.artworkAsk}
+                testID="invitation-ask"
+              >
+                <EventlyIcon
+                  name="message-question-outline"
+                  size={17}
+                  color={INV_NAVY_DEEP}
+                />
+                <EventlyText variant="subtitle" style={w.askText}>
+                  {COPY.artworkAsk}
+                </EventlyText>
+              </TouchableOpacity>
+
+              <EventlyText variant="caption" style={w.askNote}>
+                {COPY.artworkAskNote}
               </EventlyText>
-            ) : null}
-            {requestSent ? (
-              <EventlyText variant="caption" style={a.sentText}>
-                {COPY.requestSent}
-              </EventlyText>
-            ) : null}
-        </>
+
+              {approve.error ? (
+                <EventlyText variant="caption" style={w.errorText}>
+                  {approve.error.message}
+                </EventlyText>
+              ) : null}
+              {requestSent ? (
+                <EventlyText variant="caption" style={w.sentText}>
+                  {COPY.requestSent}
+                </EventlyText>
+              ) : null}
+            </View>
+          </>
+        ) : null}
+
+        {/*
+         * The countdown, below the invitation. Independent of everything else
+         * on the screen: it ticks whether or not the invitation is approved.
+         */}
+        {/*
+         * The live stream, above the countdown: it is the thing happening
+         * right now, and everything below it is what has not happened yet.
+         * It renders itself away when nothing is on air.
+         */}
+        <LiveBlock subEvents={invitation.subEvents ?? []} />
+
+        <CountdownBlock countdown={invitation.countdown ?? null} />
+
+        {/*
+         * Save the Date: one card per celebration. The list arrives already
+         * filtered by the server, so nothing here decides who sees what.
+         */}
+        <SaveTheDate
+          subEvents={invitation.subEvents ?? []}
+          palette={invitation.cardPalette}
+          defaultMinutes={invitation.defaultSubEventMinutes ?? 120}
+          invitationName={invitation.bookingTitle || invitation.occasion}
+        />
+
+        {/*
+         * The story, below the invitation and inside the same scroll — the
+         * customer approves what their guests will get, so they have to be
+         * able to see it. It renders itself away when there are no cards.
+         */}
+        <StoryBlock
+          cards={invitation.storyCards ?? []}
+          title={invitation.details.storyTitle ?? ''}
+          onOpen={(imageUrl) => {
+            setViewingPhoto({ kind: 'image', url: imageUrl, seconds: 0 });
+            setViewing(true);
+          }}
+        />
       </ScrollView>
 
-      {/*
-        One action, pinned. On the approve pass it is the whole invitation in
-        one tap; everywhere else it is sending it — disabled until it is
-        approved, because the API refuses to send an unapproved invitation and
-        a button that fails is worse than one that says why.
-      */}
-      <View style={[sh.foot, { paddingBottom: Math.max(insets.bottom, 12) }]}>
-        {tab === 'approve' && waiting > 0 ? (
-          <TouchableOpacity
-            style={[sh.footButton, sh.footButtonApprove, approve.loading && sh.footButtonDisabled]}
-            activeOpacity={0.9}
-            disabled={approve.loading}
-            onPress={() =>
-              approve
-                .execute(bookingId)
-                .then(setPatched)
-                .catch(() => {
-                  // error surfaces through approve.error
-                })
-            }
-            accessibilityRole="button"
-            accessibilityLabel={COPY.approveAll(waiting)}
-          >
-            {approve.loading ? (
-              <ActivityIndicator size="small" color={colors.onPrimary} />
-            ) : (
-              <EventlyIcon name="check" size={18} color={colors.onPrimary} />
-            )}
-            <EventlyText variant="subtitle" style={sh.footButtonText}>
-              {COPY.approveAll(waiting)}
-            </EventlyText>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={[sh.footButton, !approved && sh.footButtonDisabled]}
-            activeOpacity={0.9}
-            disabled={!approved}
-            onPress={() => openShare()}
-            accessibilityRole="button"
-            accessibilityLabel={COPY.shareAll}
-          >
-            <EventlyIcon name="whatsapp" size={18} color={colors.onPrimary} />
-            <EventlyText variant="subtitle" style={sh.footButtonText}>
-              {COPY.shareAll}
-            </EventlyText>
-          </TouchableOpacity>
-        )}
-        <EventlyText variant="caption" style={sh.footNote}>
-          {tab === 'approve' && waiting > 0
-            ? COPY.approveAllNote
-            : approved
-              ? COPY.shareNote
-              : COPY.shareLockedNote}
-        </EventlyText>
-      </View>
-
-      <MenuSheet
-        visible={sheet?.kind === 'menu'}
-        onPreview={() => setSheet({ kind: 'preview' })}
-        onGuestList={() => {
-          /* Closing first, so backing out of the guest list lands on the
-             invitation rather than on a sheet over it. */
-          setSheet(null);
-          navigation.navigate('GuestList', {
-            bookingId,
-            title: invitation.bookingTitle || invitation.occasion,
-          });
+      {/* What a guest gets, whole, with nothing over it — the invitation, or
+          whichever story photograph was tapped. */}
+      <ArtworkViewer
+        visible={viewing}
+        artwork={viewingPhoto ?? artwork}
+        onClose={() => {
+          setViewing(false);
+          setViewingPhoto(null);
         }}
-        onClose={() => setSheet(null)}
-      />
-
-      <PreviewSheet
-        visible={sheet?.kind === 'preview'}
-        invitation={invitation}
-        blockKey={sheet?.kind === 'preview' ? sheet.key : undefined}
-        canShare={approved}
-        // Straight from looking at it to sending it: the share sheet opens on
-        // whatever the preview was showing.
-        onShare={() => openShare(sheet?.kind === 'preview' ? sheet.key : undefined)}
-        onClose={() => setSheet(null)}
-      />
-
-      <PersonalizeSheet
-        key={openBlock?.key ?? 'none'}
-        block={openBlock}
-        isSaving={personalize.loading}
-        errorMessage={personalize.error?.message ?? null}
-        onSave={(patch) => {
-          if (!openBlock) return;
-          personalize
-            .execute(bookingId, openBlock.key, patch)
-            .then((updated) => {
-              setPatched(updated);
-              setSheet(null);
-            })
-            .catch(() => {
-              // error surfaces in the sheet
-            });
-        }}
-        onClose={() => setSheet(null)}
-      />
-
-      <RequestChangeSheet
-        visible={sheet?.kind === 'request'}
-        blockTitle={
-          sheet?.kind === 'request' && sheet.key
-            ? invitation.blocks.find((b) => b.key === sheet.key)?.title
-            : undefined
-        }
-        isSending={requestChange.loading}
-        errorMessage={requestChange.error?.message ?? null}
-        onSend={(note) => {
-          const key = sheet?.kind === 'request' ? sheet.key : undefined;
-          requestChange
-            .execute(bookingId, note, key)
-            .then(() => {
-              setRequestSent(true);
-              setSheet(null);
-              // The ask is now on the invitation; the rows count them.
-              refetch();
-            })
-            .catch(() => {
-              // error surfaces in the sheet
-            });
-        }}
-        onClose={() => setSheet(null)}
       />
 
       <ShareSheet
         visible={sheet?.kind === 'share'}
-        sectionKey={sheet?.kind === 'share' ? sheet.key : undefined}
-        sectionTitle={shareBlockTitle}
         guests={guests}
         isLoadingGuests={guestList.loading}
         isSending={share.loading}
         errorMessage={share.error?.message ?? guestList.error?.message ?? null}
         outcomes={outcomes}
         onSend={(guestIds, newGuest) => {
-          const section = sheet?.kind === 'share' ? sheet.key : undefined;
           share
-            .execute(bookingId, {
-              ...(section ? { section } : {}),
-              guestIds,
-              newGuests: newGuest ? [newGuest] : [],
-            })
+            .execute(bookingId, { guestIds, newGuests: newGuest ? [newGuest] : [] })
             .then((result) => setOutcomes(result.results))
             .catch(() => {
               // error surfaces in the sheet
@@ -643,6 +543,26 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
           setSheet(null);
           setOutcomes(null);
         }}
+      />
+
+      <RequestChangeSheet
+        visible={sheet?.kind === 'request'}
+        isSending={requestChange.loading}
+        errorMessage={requestChange.error?.message ?? null}
+        onSend={(note) => {
+          requestChange
+            .execute(bookingId, note, undefined)
+            .then(() => {
+              setRequestSent(true);
+              setSheet(null);
+              // The ask is on the invitation now; the organizer has been told.
+              refetch();
+            })
+            .catch(() => {
+              // error surfaces in the sheet
+            });
+        }}
+        onClose={() => setSheet(null)}
       />
     </>
   );

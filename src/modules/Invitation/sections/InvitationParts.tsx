@@ -3,6 +3,8 @@ import { EventlyIcon, EventlyText } from '../../../Components';
 import {
   BLOCK_ICON,
   BLOCK_ICON_FALLBACK,
+  BLOCK_RENDERER,
+  COVER_BLOCK_KEY,
   INVITATION_COPY as COPY,
   INV_ACCENT,
   INV_GREEN,
@@ -11,6 +13,22 @@ import {
 } from '../constants';
 import { bannerStyles, heroStyles, previewStyles } from '../styles';
 import type { InvitationBlockDTO, InvitationDTO } from '../types';
+import { CoverBlock } from './CoverBlock';
+
+/**
+ * Which renderer draws a block.
+ *
+ * The cover is a design and is drawn by the cover renderer; everything else is
+ * a heading and some words. A block whose type this build has never seen falls
+ * through to the generic renderer rather than vanishing, which is what makes
+ * it safe for the server to add one.
+ */
+export function rendererFor(block: InvitationBlockDTO): 'cover' | 'generic' {
+  /* A server that predates typed blocks sends no type at all; the cover's key
+     has been stable since the invitation existed, so it still identifies it. */
+  const type = block.type ?? (block.key === COVER_BLOCK_KEY ? 'cover' : 'generic');
+  return BLOCK_RENDERER[type] ?? 'generic';
+}
 
 export function blockIcon(icon: string): string {
   return BLOCK_ICON[icon] ?? BLOCK_ICON_FALLBACK;
@@ -107,17 +125,14 @@ interface GuestPreviewProps {
  * rendering something no guest will ever see.
  */
 export function GuestPreview({ invitation, blockKey }: GuestPreviewProps) {
-  const { details, blocks, subEvents } = invitation;
+  const { blocks, subEvents } = invitation;
   const one = blockKey ? blocks.find((b) => b.key === blockKey) : undefined;
   const visible = one ? (one.hidden ? [] : [one]) : blocks.filter((b) => !b.hidden);
   const hiddenCount = one ? 0 : blocks.length - visible.length;
   const showSchedule = !blockKey && subEvents.length > 0;
 
-  const hosts = [details.hostOne, details.hostTwo].filter(Boolean).join(` ${details.joiner || '&'} `);
-  const when = [dateLabel(details.eventDate) || dateLabel(invitation.eventDate), details.eventTime]
-    .filter(Boolean)
-    .join(' · ');
-  const venue = [details.venueName, details.venueAddress].filter(Boolean).join(', ');
+  /* The cover is drawn as the cover, not as another heading-and-words row. */
+  const rest = visible.filter((b) => rendererFor(b) !== 'cover');
 
   return (
     <View style={previewStyles.wrap}>
@@ -125,28 +140,11 @@ export function GuestPreview({ invitation, blockKey }: GuestPreviewProps) {
         {/* A phone's own furniture, so the frame reads as a device rather
             than as another card on the screen. */}
         <View style={previewStyles.notch} />
-        <View style={previewStyles.card}>
-          {details.eyebrow ? (
-            <EventlyText variant="caption" style={previewStyles.eyebrow}>
-              {details.eyebrow}
-            </EventlyText>
-          ) : null}
-          <EventlyText variant="h1" style={previewStyles.hosts}>
-            {hosts || invitation.bookingTitle}
-          </EventlyText>
-          {when ? (
-            <EventlyText variant="body" style={previewStyles.when}>
-              {when}
-            </EventlyText>
-          ) : null}
-          {venue || invitation.location ? (
-            <EventlyText variant="caption" style={previewStyles.venue}>
-              {venue || invitation.location}
-            </EventlyText>
-          ) : null}
-        </View>
+        {/* The cover, by the renderer that draws it everywhere else — so the
+            preview cannot drift from what the link actually opens. */}
+        <CoverBlock invitation={invitation} mode="guest" />
 
-        {visible.map((block) => (
+        {rest.map((block) => (
           <View key={block.key} style={previewStyles.block}>
             <View style={previewStyles.blockHead}>
               <EventlyIcon name={blockIcon(block.icon)} size={16} color={INV_ACCENT} />

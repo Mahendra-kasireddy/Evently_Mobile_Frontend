@@ -15,7 +15,18 @@ type Json = any;
 
 // Note: `lineHeight` is NOT here. React Native measures it in pixels, so
 // emitting it unitless would multiply it by the font size.
-const UNITLESS = new Set(['flex', 'flexGrow', 'flexShrink', 'opacity', 'zIndex', 'fontWeight']);
+/* aspectRatio is a ratio, not a length: emitted with px it is invalid CSS
+   and the box collapses to nothing, which reads in a preview as a missing
+   element rather than a broken declaration. */
+const UNITLESS = new Set([
+  'flex',
+  'flexGrow',
+  'flexShrink',
+  'opacity',
+  'zIndex',
+  'fontWeight',
+  'aspectRatio',
+]);
 
 /** React Native shorthands with no CSS equivalent. */
 const AXIS: Record<string, string[]> = {

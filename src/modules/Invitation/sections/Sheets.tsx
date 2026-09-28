@@ -4,12 +4,14 @@ import { EventlyIcon, EventlyText } from '../../../Components';
 import { colors } from '../../../theme';
 import { INVITATION_COPY as COPY, INV_ACCENT, INV_GREEN, INV_NAVY } from '../constants';
 import {
+  approveStyles as ap,
   previewSheetStyles as p,
   sheetStyles as s,
   shellStyles as sh,
 } from '../styles';
 import type { BlockPatch, GuestDTO, InvitationBlockDTO, InvitationDTO, ShareOutcomeDTO } from '../types';
 import { GuestPreview } from './InvitationParts';
+import { ApproveRow } from './ApproveRow';
 import { GroupFilter } from '../../GuestList/sections/GroupFilter';
 import { avatarColorFor, groupFilters, groupOf, initialsOf } from '../../GuestList/utils';
 import type { GuestGroup } from '../../GuestList/types';
@@ -26,6 +28,88 @@ function Sheet({ visible, onClose, children }: { visible: boolean; onClose: () =
         </Pressable>
       </Pressable>
     </Modal>
+  );
+}
+
+interface ApproveSheetProps {
+  visible: boolean;
+  blocks: InvitationBlockDTO[];
+  waiting: number;
+  canShare: boolean;
+  approvingKey: string | null;
+  isApprovingAll: boolean;
+  onAccept: (blockKey: string) => void;
+  onApproveAll: () => void;
+  onRequestChange: (blockKey: string) => void;
+  onShareBlock: (blockKey: string) => void;
+  onClose: () => void;
+}
+
+/**
+ * The approval pass, on its own.
+ *
+ * Approving is a sitting, not a mode: the customer works down the invitation
+ * once, accepting each section or asking for a change, and then they are
+ * done. As a tab it was a second permanent view of the same page and the
+ * screen had to explain which one you were in; as a sheet it opens from the
+ * one button that asks for it and closes when the work is finished.
+ */
+export function ApproveSheet({
+  visible,
+  blocks,
+  waiting,
+  canShare,
+  approvingKey,
+  isApprovingAll,
+  onAccept,
+  onApproveAll,
+  onRequestChange,
+  onShareBlock,
+  onClose,
+}: ApproveSheetProps) {
+  return (
+    <Sheet visible={visible} onClose={onClose}>
+      <EventlyText variant="h2" style={s.title}>
+        {COPY.approveSheetTitle}
+      </EventlyText>
+      <EventlyText variant="caption" style={s.subtitle}>
+        {COPY.approveAllNote}
+      </EventlyText>
+
+      {blocks.map((block) => (
+        <ApproveRow
+          key={block.key}
+          block={block}
+          isApproving={approvingKey === block.key}
+          canShare={canShare}
+          onAccept={() => onAccept(block.key)}
+          onRequestChange={() => onRequestChange(block.key)}
+          onShare={() => onShareBlock(block.key)}
+        />
+      ))}
+
+      {/* One tap for the lot, for a customer who has read it already. */}
+      {waiting > 0 ? (
+        <TouchableOpacity
+          style={[ap.all, isApprovingAll && ap.allBusy]}
+          activeOpacity={0.9}
+          disabled={isApprovingAll}
+          onPress={onApproveAll}
+          accessibilityRole="button"
+          accessibilityLabel={COPY.approveAll(waiting)}
+          testID="approve-all"
+        >
+          {isApprovingAll ? (
+            <ActivityIndicator size="small" color={colors.onPrimary} />
+          ) : (
+            <EventlyIcon name="check" size={17} color={colors.onPrimary} />
+          )}
+          <EventlyText variant="subtitle" style={ap.allText}>
+            {COPY.approveAll(waiting)}
+          </EventlyText>
+        </TouchableOpacity>
+      ) : null}
+    </Sheet>
   );
 }
 

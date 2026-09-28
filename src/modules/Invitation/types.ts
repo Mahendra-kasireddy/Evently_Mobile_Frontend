@@ -35,11 +35,38 @@ export interface InvitationListItem {
   needsYou: boolean;
 }
 
-/** Which of the three views of the invitation is on screen. */
-export type InvitationTab = 'organizer' | 'approve';
+/**
+ * Where an invitation is on its way to the guests.
+ *
+ * Every invitation goes the same way — somebody writes the parts that are
+ * theirs, the customer approves the lot, and then it is sent — so the screen
+ * shows one of three states rather than a set of independent flags.
+ */
+export type InvitationStage = 'write' | 'approve' | 'share';
+
+/**
+ * What kind of block this is, as the server names it.
+ *
+ * The key is an identity ('header', 'story'); the type is a *renderer*. A
+ * screen picks a component by type, so a block added later arrives with a type
+ * this app already knows how to draw — and one it does not falls through to
+ * the generic renderer rather than disappearing.
+ */
+export type InvitationBlockType =
+  | 'cover'
+  | 'story'
+  | 'countdown'
+  | 'memories'
+  | 'guestWall'
+  | 'liveStream'
+  | 'saveTheDate'
+  | 'ride'
+  | 'generic';
 
 export interface InvitationBlockDTO {
   key: string;
+  /** Absent on a server that predates typed blocks; treated as 'generic'. */
+  type?: InvitationBlockType;
   title: string;
   /** Backend icon name; mapped to a MaterialCommunityIcons glyph on this side. */
   icon: string;
@@ -63,11 +90,36 @@ export interface InvitationSubEventDTO {
   eventDate: string;
   eventTime: string;
   endTime: string;
+  /** The card's own zone; the event's date and time are read against it. */
+  timezone?: string;
   venueName: string;
   venueAddress: string;
   dressCode: string;
   note: string;
   colour: string;
+  /** Present for the customer, never for a guest. */
+  visibility?: 'all' | 'groups' | 'hidden';
+
+  /* ---- F5: this event's live stream ----
+   *
+   * All optional: a server that predates F5 simply sends none of them, and
+   * `liveOf` below then finds nothing live, which is the correct answer.
+   */
+  liveEnabled?: boolean;
+  liveTitle?: string;
+  liveUrl?: string;
+  live360Url?: string;
+  liveVrUrl?: string;
+  /** ISO instant the organizer switched it on. Server-owned. */
+  liveStartedAt?: string;
+}
+
+/** A colour a card may be given. Server-owned, like the templates. */
+export interface CardColourDTO {
+  id: string;
+  label: string;
+  wash: string;
+  ink: string;
 }
 
 /** An outstanding ask with the organizer. Resolved ones are not returned. */
@@ -79,6 +131,9 @@ export interface ChangeRequestDTO {
   at: string;
 }
 
+/** What the cover may sit behind. '' is "nothing uploaded". */
+export type HeroMediaType = '' | 'image' | 'video';
+
 export interface InvitationDetailsDTO {
   eyebrow: string;
   hostOne: string;
@@ -88,6 +143,74 @@ export interface InvitationDetailsDTO {
   eventTime: string;
   venueName: string;
   venueAddress: string;
+  /* ---- the cover block ---- */
+  /** A template id from the invitation's own `templates`. */
+  template?: string;
+  /** A font id from the invitation's own `fonts`. */
+  fontStyle?: string;
+  /** The welcome message. Capped by the server; see `limits`. */
+  message?: string;
+  heroMediaType?: HeroMediaType;
+  heroMediaUrl?: string;
+  heroMediaKey?: string;
+  heroMediaDurationSec?: number;
+  /** What the story section is called, e.g. "Our Journey". */
+  storyTitle?: string;
+}
+
+/**
+ * What the countdown counts down to, as the API resolves it.
+ *
+ * `startsAt` is one absolute instant, already resolved from the event's own
+ * wall-clock date, time and zone — the app subtracts and never interprets.
+ */
+export interface InvitationCountdownDTO {
+  subEventId: string;
+  name: string;
+  /** ISO instant, or null when the event has no date yet. */
+  startsAt: string | null;
+  timezone: string;
+  venueName: string;
+  venueAddress: string;
+  postEventMessage: string;
+}
+
+/** One photograph in the couple's story, and the line that goes under it. */
+export interface InvitationStoryCardDTO {
+  /** Server-assigned; stable across reorders, unlike an array index. */
+  id: string;
+  imageUrl: string;
+  caption: string;
+  /** The organizer's arrangement. The server sends them already sorted. */
+  order: number;
+}
+
+/**
+ * A theme, as the server defines it.
+ *
+ * Served rather than hard-coded here: the server refuses a template id it does
+ * not know, so the picker offers exactly the set that will save.
+ */
+export interface InvitationTemplateDTO {
+  id: string;
+  label: string;
+  /** The hero ramp as plain colours, painted top-left to bottom-right. */
+  heroStops: string[];
+  wash: string;
+  accent: string;
+}
+
+/** A typography style, by the name a customer would use for it. */
+export interface InvitationFontDTO {
+  id: string;
+  label: string;
+  note: string;
+}
+
+/** The server's own bounds, so the editor's counter cannot disagree with it. */
+export interface InvitationLimitsDTO {
+  welcomeMessage: number;
+  heroVideoSeconds: number;
 }
 
 /** GET /invitation/mine/:bookingId */
@@ -105,7 +228,20 @@ export interface InvitationDTO {
   details: InvitationDetailsDTO;
   blocks: InvitationBlockDTO[];
   subEvents: InvitationSubEventDTO[];
+  /** The story, in the organizer's order. Empty means there is no story. */
+  storyCards?: InvitationStoryCardDTO[];
+  /** What the countdown counts down to. Absent when no date is set anywhere. */
+  countdown?: InvitationCountdownDTO | null;
+  /** Colours a Save-the-Date card may be given. Server-owned. */
+  cardPalette?: CardColourDTO[];
+  /** Minutes a calendar entry runs for when a card has no end time. */
+  defaultSubEventMinutes?: number;
   changeRequests: ChangeRequestDTO[];
+  /* The catalogues and bounds the editor works within. Optional so a client
+     talking to a server that predates them still renders. */
+  templates?: InvitationTemplateDTO[];
+  fonts?: InvitationFontDTO[];
+  limits?: InvitationLimitsDTO;
 }
 
 /** GET /invitation/mine/:bookingId/guests */

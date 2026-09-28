@@ -1,5 +1,40 @@
-import { INVITATION_COPY, INVITATION_STATUS_LABEL } from './constants';
-import type { InvitationListItem, InvitationSummaryDTO } from './types';
+import {
+  BLOCK_RENDERER,
+  COVER_BLOCK_KEY,
+  INVITATION_COPY,
+  INVITATION_STATUS_LABEL,
+} from './constants';
+import type {
+  InvitationBlockDTO,
+  InvitationDTO,
+  InvitationListItem,
+  InvitationSummaryDTO,
+} from './types';
+
+/**
+ * Whether a section has anything in it yet.
+ *
+ * Most sections are a heading and some words, so "written" is a non-empty
+ * body. The cover is not: its content is the invitation's own name, date,
+ * venue, message and media, which live on the details rather than in a body —
+ * judging it by its body would leave it permanently unwritten and the
+ * invitation permanently unapprovable.
+ */
+export function blockIsWritten(invitation: InvitationDTO, block: InvitationBlockDTO): boolean {
+  const type = block.type ?? (block.key === COVER_BLOCK_KEY ? 'cover' : 'generic');
+  if ((BLOCK_RENDERER[type] ?? 'generic') === 'cover') {
+    const d = invitation.details;
+    return Boolean(
+      (d.hostOne ?? '').trim() ||
+        (d.hostTwo ?? '').trim() ||
+        (d.eventDate ?? '').trim() ||
+        (d.venueName ?? '').trim() ||
+        (d.message ?? '').trim() ||
+        (d.heroMediaUrl ?? '').trim(),
+    );
+  }
+  return block.body.trim().length > 0;
+}
 
 function dateLabel(value: string | null | undefined): string {
   if (!value) return '';

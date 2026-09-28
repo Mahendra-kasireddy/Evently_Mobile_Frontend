@@ -6,6 +6,21 @@ jest.mock('react-native-safe-area-context', () =>
   require('react-native-safe-area-context/jest/mock').default,
 );
 
+/*
+ * The web view's entry point resolves `lib/WebView` through Metro's platform
+ * extensions (`.ios.js` / `.android.js`), which plain Jest does not do — so
+ * importing it throws here even though it is installed and fine on a device.
+ * The stub is a plain View carrying the same props, which is enough for the
+ * live block to be rendered and read.
+ */
+jest.mock('react-native-webview', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    WebView: (props) => React.createElement(View, { ...props, testID: 'live-webview' }),
+  };
+});
+
 // Native modules with no JS-side fallback under Jest's fake native environment.
 jest.mock('react-native-permissions', () => require('react-native-permissions/mock'));
 

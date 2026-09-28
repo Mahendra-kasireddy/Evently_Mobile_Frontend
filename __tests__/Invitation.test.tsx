@@ -26,11 +26,23 @@ import {
   blockIcon,
 } from '../src/modules/Invitation/sections/InvitationParts';
 import {
-  BlockCanvas,
-  InvitationHeaderCard,
-} from '../src/modules/Invitation/sections/BlockCanvas';
+  InsideList,
+  PrimaryAction,
+} from '../src/modules/Invitation/sections/InvitationOverview';
+import { CoverBlock } from '../src/modules/Invitation/sections/CoverBlock';
+import {
+  ArtworkPending,
+  InvitationArtwork,
+  artworkOf,
+} from '../src/modules/Invitation/sections/InvitationArtwork';
+import { canPlayVideo } from '../src/modules/Invitation/sections/HeroVideo';
+import { StoryBlock } from '../src/modules/Invitation/sections/StoryBlock';
+import { CountdownBlock } from '../src/modules/Invitation/sections/CountdownBlock';
+import { SaveTheDate } from '../src/modules/Invitation/sections/SaveTheDate';
+import { LiveBlock, liveOf } from '../src/modules/Invitation/sections/LiveBlock';
+import { isPlayerUrl } from '../src/modules/Invitation/sections/LivePlayer';
 import { PreviewSheet, ShareSheet } from '../src/modules/Invitation/sections/Sheets';
-import { mapInvitationList } from '../src/modules/Invitation/utils';
+import { blockIsWritten, mapInvitationList } from '../src/modules/Invitation/utils';
 import type {
   GuestDTO,
   InvitationBlockDTO,
@@ -241,28 +253,22 @@ describe('InvitationHero', () => {
   });
 });
 
-describe('the invitation header', () => {
+describe('the invitation cover', () => {
+  const card = (over: Partial<InvitationDTO> = {}) =>
+    render(<CoverBlock invitation={invitation(over)} mode="guest" />);
+
   it('never heads the invitation with the booking list title', () => {
     /*
-     * "Corporate · 2026-09-29" is composed for a list of bookings. On an
-     * invitation it reads as a database row, so the occasion stands in until
-     * the customer writes their names.
+     * "Corporate · 2026-09-29" is composed for a list of bookings. On the
+     * card a guest will read, it is a database row.
      */
-    const tree = render(
-      <InvitationHeaderCard
-        invitation={invitation({
-          bookingTitle: 'Corporate · 2026-09-29',
-          occasion: 'corporate',
-          details: {
-            ...invitation().details,
-            hostOne: '',
-            hostTwo: '',
-          },
-        })}
-        onEdit={noop}
-      />,
+    const text = textOf(
+      card({
+        bookingTitle: 'Corporate · 2026-09-29',
+        occasion: 'corporate',
+        details: { ...invitation().details, hostOne: '', hostTwo: '' },
+      }),
     );
-    const text = textOf(tree);
     expect(text).toContain('Corporate');
     expect(text).not.toContain('2026-09-29');
   });
@@ -271,59 +277,519 @@ describe('the invitation header', () => {
     // Organizers routinely paste the full address into both fields.
     const full = 'Hi-tech city, Patrika Nagar, Hyderabad';
     const text = textOf(
-      render(
-        <InvitationHeaderCard
-          invitation={invitation({
-            details: {
-              ...invitation().details,
-              venueName: full,
-              venueAddress: full,
-            },
-          })}
-          onEdit={noop}
-        />,
-      ),
+      card({ details: { ...invitation().details, venueName: full, venueAddress: full } }),
     );
     expect(text.split('Patrika Nagar')).toHaveLength(2);
   });
+
+  it('invites the guest to read on rather than to operate anything', () => {
+    expect(textOf(card())).toContain('SCROLL FOR DETAILS');
+  });
 });
 
-describe('the invitation page', () => {
-  const page = (b: InvitationBlockDTO) =>
-    render(<BlockCanvas block={b} onEdit={noop} />);
+describe('the uploaded invitation', () => {
+  const withArtwork = (over: Record<string, unknown> = {}) =>
+    invitation({
+      details: {
+        ...invitation().details,
+        heroMediaType: 'image',
+        heroMediaUrl: '/api/upload/file/invites/meera-arjun.png',
+        ...over,
+      },
+    });
 
-  it('shows the section, not a description of it', () => {
+  it('finds the artwork the organizer uploaded', () => {
+    expect(artworkOf(withArtwork())).toEqual({
+      kind: 'image',
+      url: '/api/upload/file/invites/meera-arjun.png',
+      seconds: 0,
+    });
+  });
+
+  it('reports nothing before the organizer has uploaded one', () => {
     /*
-     * The list of cards this replaced named each section, badged it and hung
-     * two buttons off it — without ever showing the words being approved.
+     * A real state, not a failure: the organizer is still designing it. The
+     * screen says so rather than framing an empty box.
      */
-    const text = textOf(page(block({ body: 'Two families, one long evening.' })));
-    expect(text).toContain('Two families, one long evening.');
+    expect(artworkOf(invitation())).toBeNull();
   });
 
-  it('offers the customer an edit on their own section and an ask on the rest', () => {
-    // The API rejects personalizing a block the customer does not own, so the
-    // page must not offer an edit that would 403.
-    expect(textOf(page(block()))).toContain('Edit');
-    expect(textOf(page(block({ owner: 'organizer' })))).toContain('Ask');
+  it('ignores a url with no media type behind it', () => {
+    // Half a record is not an invitation; rendering it would be a broken image.
+    expect(
+      artworkOf(
+        invitation({
+          details: { ...invitation().details, heroMediaUrl: '/x.png', heroMediaType: '' },
+        }),
+      ),
+    ).toBeNull();
   });
 
-  it('leads with the heading the customer wrote, falling back to the name', () => {
-    expect(textOf(page(block({ heading: 'How we met' })))).toContain('HOW WE MET');
-    expect(textOf(page(block()))).toContain('OUR STORY');
+  it('offers one way in: the invitation, full screen, as a guest gets it', () => {
+    const tree = render(
+      <InvitationArtwork
+        artwork={{ kind: 'image', url: '/x.png', seconds: 0 }}
+        onView={noop}
+      />,
+    );
+    expect(textOf(tree)).toContain('View full screen');
+    // The artwork and the button, and nothing else to operate.
+    expect(labels(tree)).toEqual(['View full screen', 'View full screen']);
   });
 
-  it('addresses an empty section to whoever can fill it', () => {
+  it('says plainly when a video invitation cannot be played here', () => {
     /*
-     * It used to tell the customer their organizer had not written a section
-     * the customer owns — with an Edit button beside it proving otherwise.
+     * The organizer sent a video and this build ships no player. Saying so is
+     * better than a black rectangle the customer would report as a bug.
      */
-    expect(textOf(page(block({ body: '', owner: 'customer' })))).toContain(
-      'tap Edit to write it',
+    const text = textOf(
+      render(
+        <InvitationArtwork
+          artwork={{ kind: 'video', url: '/x.mp4', seconds: 22 }}
+          onView={noop}
+        />,
+      ),
     );
-    expect(textOf(page(block({ body: '', owner: 'organizer' })))).toContain(
-      'has not written this section yet',
+    expect(canPlayVideo ? 'skipped' : text).toContain(
+      canPlayVideo ? 'skipped' : 'can’t play video yet',
     );
+  });
+});
+
+describe('save the date', () => {
+  const sub = (over: Record<string, unknown> = {}) => ({
+    id: 'se1',
+    name: 'Haldi',
+    eventDate: '2026-10-09',
+    eventTime: '10:00',
+    endTime: '',
+    timezone: 'Asia/Kolkata',
+    venueName: 'Taj Krishna',
+    venueAddress: 'Banjara Hills, Hyderabad',
+    dressCode: 'Yellow & Floral',
+    note: 'Let the celebrations begin!',
+    colour: '',
+    ...over,
+  });
+
+  const block = (subEvents: ReturnType<typeof sub>[]) =>
+    render(
+      <SaveTheDate
+        subEvents={subEvents}
+        palette={[{ id: 'saffron', label: 'Saffron', wash: '#fdf6e3', ink: '#9a7b12' }]}
+        defaultMinutes={120}
+        invitationName="Meera & Arjun"
+      />,
+    );
+
+  it('is not there at all when the guest is invited to nothing listed', () => {
+    /*
+     * The whole block, not an empty frame: a guest invited to no listed
+     * celebration simply does not have this section.
+     */
+    expect(block([]).toJSON()).toBeNull();
+  });
+
+  it('gives each celebration its day, date, time, venue and dress code', () => {
+    const text = textOf(block([sub()]));
+    expect(text).toContain('Haldi');
+    expect(text).toContain('Friday · 9 October 2026');
+    expect(text).toContain('10:00 AM');
+    expect(text).toContain('Taj Krishna');
+    expect(text).toContain('Banjara Hills, Hyderabad');
+    expect(text).toContain('Yellow & Floral');
+    expect(text).toContain('Let the celebrations begin!');
+  });
+
+  it('keeps the organizer’s order rather than sorting by date', () => {
+    // A mehendi listed before a ceremony on the same day carries information
+    // a sort would throw away.
+    const text = textOf(
+      block([sub({ id: 'a', name: 'Sangeet' }), sub({ id: 'b', name: 'Reception' })]),
+    );
+    expect(text.indexOf('Sangeet')).toBeLessThan(text.indexOf('Reception'));
+  });
+
+  it('offers a calendar handoff per celebration', () => {
+    expect(labels(block([sub({ id: 'a', name: 'Haldi' }), sub({ id: 'b', name: 'Sangeet' })]))).toEqual([
+      'Add to Calendar — Haldi',
+      'Add to Calendar — Sangeet',
+    ]);
+  });
+
+  it('says so rather than offering a dead button when a card has no date', () => {
+    const text = textOf(block([sub({ eventDate: '' })]));
+    expect(text).toContain('This celebration has no date yet.');
+  });
+});
+
+describe('the live stream', () => {
+  const STREAM = 'https://www.youtube.com/embed/abc123';
+  const sub = (over: Record<string, unknown> = {}) => ({
+    id: 'se1',
+    name: 'The Wedding Ceremony',
+    eventDate: '2026-10-10',
+    eventTime: '18:00',
+    endTime: '',
+    timezone: 'Asia/Kolkata',
+    venueName: 'Taj Krishna',
+    venueAddress: 'Banjara Hills, Hyderabad',
+    dressCode: 'Traditional / Formal',
+    note: '',
+    colour: '',
+    liveEnabled: true,
+    liveUrl: STREAM,
+    ...over,
+  });
+
+  const block = (subEvents: ReturnType<typeof sub>[]) =>
+    render(<LiveBlock subEvents={subEvents} />);
+
+  it('is not there at all while nothing is on air', () => {
+    // The whole block, not an empty frame with a dead LIVE badge on it.
+    expect(block([]).toJSON()).toBeNull();
+    expect(block([sub({ liveEnabled: false })]).toJSON()).toBeNull();
+  });
+
+  it('is not there when the switch is on but no url was given', () => {
+    expect(liveOf([sub({ liveUrl: '' })])).toBeNull();
+    expect(block([sub({ liveUrl: '' })]).toJSON()).toBeNull();
+  });
+
+  it('names the event, badges it live, and carries its details', () => {
+    const text = textOf(block([sub()]));
+    expect(text).toContain('Live Stream');
+    expect(text).toContain('LIVE');
+    expect(text).toContain('The Wedding Ceremony');
+    expect(text).toContain('10 October 2026');
+    expect(text).toContain('6:00 PM');
+    expect(text).toContain('Taj Krishna');
+    expect(text).toContain('Traditional / Formal');
+  });
+
+  it('offers only the ways of watching there is a feed for', () => {
+    // One feed is not a choice, so no controls are drawn at all.
+    expect(textOf(block([sub()]))).not.toContain('360');
+
+    const all = textOf(block([sub({ live360Url: STREAM, liveVrUrl: STREAM })]));
+    expect(all).toContain('Standard');
+    expect(all).toContain('360');
+    expect(all).toContain('VR');
+  });
+
+  it('takes the first event that is on when several are', () => {
+    expect(liveOf([sub({ id: 'a', name: 'Mehendi' }), sub({ id: 'b', name: 'Ceremony' })])?.name).toBe(
+      'Mehendi',
+    );
+  });
+
+  it('draws every icon it names from the bundled set', () => {
+    /*
+     * A name the set does not carry renders as a blank square on the device
+     * and as nothing at all here — invisible in review, obvious to a guest.
+     * `monitor-play` shipped once and did exactly that.
+     */
+    const glyphs = require('react-native-vector-icons/glyphmaps/MaterialCommunityIcons.json');
+    /* The element tree, not `toJSON()`: the icon renders to a glyph, so the
+       name it was asked for only exists on the composite node. */
+    const named = (tree: ReactTestRenderer.ReactTestRenderer) =>
+      tree.root
+        .findAll((n: any) => typeof n.props?.name === 'string', { deep: true })
+        .map((n: any) => n.props.name as string);
+    const names = named(block([sub({ live360Url: STREAM, liveVrUrl: STREAM })]));
+    expect(names.length).toBeGreaterThan(0);
+    expect(names.filter((n) => !(n in glyphs))).toEqual([]);
+  });
+
+  it('plays the stream in place, rather than handing it off', () => {
+    /*
+     * The web view is a dependency now, so the card embeds the player and the
+     * hand-off line is gone. If this ever flips back it means the module
+     * stopped resolving, which is exactly the regression worth catching.
+     */
+    const tree = block([sub()]);
+    expect(tree.root.findAllByProps({ testID: 'live-player' }).length).toBeGreaterThan(0);
+    expect(textOf(tree)).not.toContain('Opens in your browser or the streaming app.');
+  });
+
+  describe('where the embedded player may navigate', () => {
+    /*
+     * The frame wears the invitation's chrome, so anywhere it can reach is
+     * somewhere a guest may believe is still the invitation. Only the player
+     * stays inside; everything else is handed to the real browser, where the
+     * address bar tells the truth.
+     */
+    it('stays inside for the player and the hosts it loads from', () => {
+      expect(isPlayerUrl('https://www.youtube.com/embed/abc')).toBe(true);
+      expect(isPlayerUrl('https://i.ytimg.com/vi/abc/hq.jpg')).toBe(true);
+      expect(isPlayerUrl('https://player.vimeo.com/video/76979871')).toBe(true);
+      expect(isPlayerUrl('about:blank')).toBe(true);
+    });
+
+    it('leaves for anywhere else', () => {
+      expect(isPlayerUrl('https://evil.example.com/login')).toBe(false);
+      expect(isPlayerUrl('https://accounts.example/pay')).toBe(false);
+    });
+
+    it('is not fooled by an allowed host appearing inside another', () => {
+      expect(isPlayerUrl('https://www.youtube.com.evil.example/embed')).toBe(false);
+      expect(isPlayerUrl('https://notyoutube.com/embed')).toBe(false);
+    });
+  });
+});
+
+describe('the countdown', () => {
+  /** Two days, three hours, four minutes and five seconds from a fixed now. */
+  const NOW = Date.UTC(2026, 9, 8, 12, 0, 0);
+  const target = (ms: number) => ({
+    subEventId: 'se1',
+    name: 'Wedding Ceremony',
+    startsAt: new Date(NOW + ms).toISOString(),
+    timezone: 'Asia/Kolkata',
+    venueName: 'Taj Krishna',
+    venueAddress: 'Banjara Hills',
+    postEventMessage: 'We are married!',
+  });
+
+  beforeEach(() => {
+    jest.useFakeTimers().setSystemTime(NOW);
+  });
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  const at = (ms: number) => render(<CountdownBlock countdown={target(ms)} />);
+
+  it('names the event the organizer chose, rather than a fixed title', () => {
+    expect(textOf(at(86_400_000))).toContain('Wedding Ceremony');
+  });
+
+  it('splits the gap into days, hours, minutes and seconds', () => {
+    const text = textOf(at(2 * 86_400_000 + 3 * 3_600_000 + 4 * 60_000 + 5_000));
+    expect(text).toContain('2');
+    expect(text).toContain('03');
+    expect(text).toContain('04');
+    expect(text).toContain('05');
+    expect(text).toContain('Days');
+    expect(text).toContain('Secs');
+  });
+
+  it('counts down without the screen being reloaded', () => {
+    const tree = at(10_000);
+    expect(textOf(tree)).toContain('10');
+    ReactTestRenderer.act(() => {
+      jest.advanceTimersByTime(3000);
+    });
+    expect(textOf(tree)).toContain('07');
+  });
+
+  it('never runs negative once the moment has passed', () => {
+    /*
+     * The organizer's message replaces the timer. A row of minus signs is the
+     * one thing this block must never show on somebody's invitation.
+     */
+    const text = textOf(at(-3_600_000));
+    expect(text).toContain('We are married!');
+    expect(text).not.toContain('-');
+  });
+
+  it('is not there at all when the event has no date', () => {
+    expect(render(<CountdownBlock countdown={null} />).toJSON()).toBeNull();
+    expect(
+      render(<CountdownBlock countdown={{ ...target(0), startsAt: null }} />).toJSON(),
+    ).toBeNull();
+  });
+});
+
+describe('the story', () => {
+  const story = (n: number) =>
+    Array.from({ length: n }, (_, i) => ({
+      id: `s${i}`,
+      imageUrl: `/api/upload/file/story/${i}.jpg`,
+      caption: `Moment ${i + 1}`,
+      order: i,
+    }));
+
+  const block = (cards: ReturnType<typeof story>, title = 'Our Journey') =>
+    render(<StoryBlock cards={cards} title={title} onOpen={noop} />);
+
+  it('is not there at all when the organizer has written no story', () => {
+    /*
+     * The whole block, not an empty frame and not a heading over nothing: an
+     * invitation with no story simply does not have this section.
+     */
+    expect(block([]).toJSON()).toBeNull();
+  });
+
+  it('appears as soon as there is one card', () => {
+    expect(textOf(block(story(1)))).toContain('Moment 1');
+  });
+
+  it('names the section the way the organizer named it', () => {
+    // Set in capitals by the stylesheet, so the text itself is as they typed it.
+    expect(textOf(block(story(2)))).toContain('Our Journey');
+  });
+
+  it('falls back to a name rather than heading the story with nothing', () => {
+    expect(textOf(block(story(2), ''))).toContain('Our story');
+  });
+
+  it('says the position in words, not only as a coloured dot', () => {
+    // Two shades of a dot is not something a tired eye can count.
+    expect(textOf(block(story(5)))).toContain('1 / 5');
+  });
+
+  it('keeps the organizer’s order', () => {
+    const text = textOf(block(story(3)));
+    expect(text.indexOf('Moment 1')).toBeLessThan(text.indexOf('Moment 2'));
+    expect(text.indexOf('Moment 2')).toBeLessThan(text.indexOf('Moment 3'));
+  });
+
+  it('offers every photograph as a way into the full-screen view', () => {
+    const opened = labels(block(story(3)));
+    expect(opened).toEqual([
+      'Open story photograph 1 full screen',
+      'Open story photograph 2 full screen',
+      'Open story photograph 3 full screen',
+    ]);
+  });
+});
+
+describe('the cover block', () => {
+  const templates = [
+    {
+      id: 'marigold',
+      label: 'Marigold',
+      heroStops: ['#5A2E0B', '#B4641A', '#3A1D06'],
+      wash: '#FFF7EA',
+      accent: '#F2A33C',
+    },
+    {
+      id: 'emerald',
+      label: 'Emerald',
+      heroStops: ['#07281F', '#145C46', '#04160F'],
+      wash: '#F1F8F4',
+      accent: '#4FC79B',
+    },
+  ];
+  const fonts = [
+    { id: 'elegant', label: 'Elegant', note: 'Serif, letter-spaced' },
+    { id: 'traditional', label: 'Traditional', note: 'Serif, set in capitals' },
+  ];
+
+  const cover = (over: Partial<InvitationDTO> = {}) =>
+    render(
+      <CoverBlock
+        invitation={invitation({ templates, fonts, ...over })}
+        mode="guest"
+      />,
+    );
+
+  it('shows the welcome message a guest reads first', () => {
+    const text = textOf(
+      cover({ details: { ...invitation().details, message: 'Come celebrate with us.' } }),
+    );
+    expect(text).toContain('Come celebrate with us.');
+  });
+
+  it('offers a guest nothing to operate', () => {
+    /*
+     * A guest opening the link gets the invitation, not the editor: no edit,
+     * no upload, no save, and no button of any kind on the cover itself.
+     */
+    expect(labels(cover())).toHaveLength(0);
+  });
+
+  it('sets the names in the chosen lettering', () => {
+    const text = textOf(
+      cover({ details: { ...invitation().details, fontStyle: 'traditional' } }),
+    );
+    expect(text).toContain('MEERA & ARJUN');
+  });
+
+  it('falls back to the theme rather than to somebody else\u2019s photograph', () => {
+    /*
+     * An invitation with no media uploaded has no photograph to show, and a
+     * stock one would be a picture of a wedding that is not this one. The
+     * cover paints the theme instead — so nothing on it is an <Image>.
+     */
+    const tree = cover().toJSON();
+    const images: string[] = [];
+    const walk = (n: any) => {
+      if (n == null || typeof n === 'string') return;
+      if (Array.isArray(n)) return n.forEach(walk);
+      if (n.type === 'Image') images.push(n.type);
+      walk(n.children);
+    };
+    walk(tree);
+    expect(images).toHaveLength(0);
+  });
+
+  it('renders a theme the deployed server sent without its colours', () => {
+    /*
+     * `heroStops` is newer than the running API: a template that arrives with
+     * only its CSS `hero` string carries nothing a native gradient can paint
+     * from. The cover falls back to a palette rather than failing to render.
+     */
+    const legacy = invitation({
+      templates: [{ id: 'garden', label: 'Garden' } as unknown as (typeof templates)[number]],
+      details: { ...invitation().details, template: 'garden' },
+    });
+    expect(textOf(render(<CoverBlock invitation={legacy} mode="guest" />))).toContain(
+      'Meera & Arjun',
+    );
+  });
+
+  it('judges the cover by its own content, not by an empty body', () => {
+    /*
+     * The cover's content is the names, date, venue, message and media, which
+     * live on the details — a cover judged by its body would be permanently
+     * unwritten, and the invitation permanently unapprovable.
+     */
+    const header = block({ key: 'header', title: 'Invitation header', type: 'cover', body: '' });
+    expect(blockIsWritten(invitation(), header)).toBe(true);
+    const blank = invitation({
+      details: {
+        ...invitation().details,
+        hostOne: '',
+        hostTwo: '',
+        eventDate: '',
+        venueName: '',
+      },
+    });
+    expect(blockIsWritten(blank, header)).toBe(false);
+  });
+});
+
+describe('the stage', () => {
+  const list = (blocks: InvitationBlockDTO[]) =>
+    render(<InsideList invitation={invitation()} blocks={blocks} onPressBlock={noop} />);
+
+  it('names a section the customer still has to write', () => {
+    /*
+     * Nobody can approve an invitation that is still missing the words only
+     * the customer can write, so their empty sections are called out as
+     * theirs rather than as "not written yet".
+     */
+    const text = textOf(list([block({ body: '', owner: 'customer' })]));
+    expect(text).toContain('Yours to write');
+  });
+
+  it('tells a written section from an approved one', () => {
+    expect(textOf(list([block({ body: 'Ten years.' })]))).toContain('Written');
+    expect(
+      textOf(list([block({ body: 'Ten years.', approved: true })])),
+    ).toContain('Approved');
+  });
+
+  it('says which of the three things happens next, and only that one', () => {
+    const { STAGE_CTA } = require('../src/modules/Invitation/constants');
+    expect(
+      textOf(render(<PrimaryAction stage="write" onPress={noop} />)),
+    ).toContain(STAGE_CTA.write);
+    expect(
+      textOf(render(<PrimaryAction stage="share" onPress={noop} />)),
+    ).toContain(STAGE_CTA.share);
   });
 });
 
@@ -349,7 +815,8 @@ describe('GuestPreview', () => {
     const text = textOf(render(<GuestPreview invitation={invitation()} />));
 
     expect(text).toContain('Meera & Arjun');
-    expect(text).toContain('Together with our families');
+    // The cover sets its eyebrow in capitals, as the design does.
+    expect(text).toContain('TOGETHER WITH OUR FAMILIES');
     expect(text).toContain('Countdown');
     // Hidden from guests, so hidden from a preview of what guests see.
     expect(text).not.toContain('Book a ride');
@@ -361,11 +828,18 @@ describe('GuestPreview', () => {
     );
   });
 
-  it('falls back to the booking title when no hosts are named', () => {
+  it('falls back to the occasion, not the booking row, when no hosts are named', () => {
     const bare = invitation({
       details: { ...invitation().details, hostOne: '', hostTwo: '' },
     });
-    expect(textOf(render(<GuestPreview invitation={bare} />))).toContain('Your Naming · 5 Sept 2026');
+    /*
+     * Never the booking list's own title — "Your Naming · 5 Sept 2026" is
+     * composed for a list of bookings and reads as a database row on an
+     * invitation. The occasion, set as a word, is what a guest gets.
+     */
+    const text = textOf(render(<GuestPreview invitation={bare} />));
+    expect(text).toContain('Naming');
+    expect(text).not.toContain('5 Sept 2026');
   });
 });
 
@@ -623,10 +1097,58 @@ describe('render dump', () => {
     if (!out) return;
 
     const full = invitation({
+      templates: [
+        {
+          id: 'marigold',
+          label: 'Marigold',
+          heroStops: ['#5A2E0B', '#B4641A', '#3A1D06'],
+          wash: '#FFF7EA',
+          accent: '#F2A33C',
+        },
+        {
+          id: 'emerald',
+          label: 'Emerald',
+          heroStops: ['#07281F', '#145C46', '#04160F'],
+          wash: '#F1F8F4',
+          accent: '#4FC79B',
+        },
+        {
+          id: 'roseGold',
+          label: 'Rose Gold',
+          heroStops: ['#4A2229', '#A35D5A', '#2C1317'],
+          wash: '#FFF3F0',
+          accent: '#E8A08C',
+        },
+        {
+          id: 'royalBlue',
+          label: 'Royal Blue',
+          heroStops: ['#0B1B45', '#23407F', '#050C21'],
+          wash: '#F1F4FD',
+          accent: '#7EA2F5',
+        },
+      ],
+      fonts: [
+        { id: 'elegant', label: 'Elegant', note: 'Serif, letter-spaced' },
+        { id: 'classic', label: 'Classic', note: 'The app\u2019s own face' },
+        { id: 'romantic', label: 'Romantic', note: 'Serif italic' },
+        { id: 'modern', label: 'Modern', note: 'Bold and tight' },
+        { id: 'traditional', label: 'Traditional', note: 'Serif, set in capitals' },
+      ],
+      limits: { welcomeMessage: 200, heroVideoSeconds: 30 },
+      details: {
+        ...invitation().details,
+        template: 'roseGold',
+        fontStyle: 'elegant',
+        message: 'Come early, stay late, and bring an appetite.',
+      },
       blocks: [
-        block({ key: 'header', title: 'Invitation header', icon: 'image', heading: 'Meera & Arjun', body: 'Together with our families, we invite you.' }),
-        block({ key: 'countdown', title: 'Countdown', icon: 'clock', owner: 'organizer' }),
+        block({ key: 'header', title: 'Cover', icon: 'image', type: 'cover' }),
         block({ key: 'story', title: 'Our story', icon: 'sparkles', body: 'Ten years, one courtyard.' }),
+        block({ key: 'countdown', title: 'Countdown', icon: 'clock', owner: 'organizer' }),
+        block({ key: 'save-the-date', title: 'Save the date', icon: 'calendar', owner: 'organizer' }),
+        block({ key: 'live-stream', title: 'Live stream', icon: 'play', owner: 'organizer' }),
+        block({ key: 'memories', title: 'Shared memories', icon: 'camera' }),
+        block({ key: 'wall', title: 'Share your wishes, messages, photos and blessings', icon: 'users', body: 'Leave a note for the family.' }),
         block({ key: 'ride', title: 'Book a ride', icon: 'car', owner: 'organizer', hidden: true }),
       ],
       changeRequests: [
@@ -650,10 +1172,8 @@ describe('render dump', () => {
 
     const review = (
       <>
-        <InvitationHeaderCard invitation={full} onEdit={noop} />
-        {full.blocks.map((b) => (
-          <BlockCanvas key={b.key} block={b} onEdit={noop} />
-        ))}
+        <PrimaryAction stage="write" onPress={noop} />
+        <InsideList invitation={full} blocks={full.blocks} onPressBlock={noop} />
       </>
     );
 
@@ -666,7 +1186,80 @@ describe('render dump', () => {
     ];
 
     const panels: Array<[string, string]> = [
+      [
+        'The invitation the organizer sent',
+        toHtml(
+          render(
+            <InvitationArtwork
+              artwork={{ kind: 'image', url: '/x.png', seconds: 0 }}
+              onView={noop}
+            />,
+          ).toJSON(),
+        ),
+      ],
+      ['Nothing uploaded yet', toHtml(render(<ArtworkPending />).toJSON())],
+      [
+        'The countdown',
+        toHtml(
+          render(
+            <CountdownBlock
+              countdown={{
+                subEventId: 'se1',
+                name: 'The Wedding Ceremony',
+                startsAt: new Date(Date.now() + 12 * 86_400_000).toISOString(),
+                timezone: 'Asia/Kolkata',
+                venueName: 'Taj Krishna',
+                venueAddress: 'Banjara Hills, Hyderabad',
+                postEventMessage: '',
+              }}
+            />,
+          ).toJSON(),
+        ),
+      ],
+      [
+        'The countdown, after the day',
+        toHtml(
+          render(
+            <CountdownBlock
+              countdown={{
+                subEventId: 'se1',
+                name: 'The Wedding Ceremony',
+                startsAt: new Date(Date.now() - 86_400_000).toISOString(),
+                timezone: 'Asia/Kolkata',
+                venueName: 'Taj Krishna',
+                venueAddress: 'Banjara Hills, Hyderabad',
+                postEventMessage: 'We\u2019re Married!\nThank you for celebrating with us.',
+              }}
+            />,
+          ).toJSON(),
+        ),
+      ],
+      [
+        'The story, under the invitation',
+        toHtml(
+          render(
+            <StoryBlock
+              title="Our Journey"
+              cards={[
+                {
+                  id: 's1',
+                  imageUrl: '/a.jpg',
+                  caption: 'Where our story began, on a wet Tuesday in Hyderabad.',
+                  order: 0,
+                },
+                { id: 's2', imageUrl: '/b.jpg', caption: 'Our first adventure together.', order: 1 },
+                { id: 's3', imageUrl: '/c.jpg', caption: 'And then came the proposal\u2026', order: 2 },
+              ]}
+              onOpen={noop}
+            />,
+          ).toJSON(),
+        ),
+      ],
       ['Review — before approval', toHtml(render(review).toJSON())],
+      [
+        'The cover, as a guest gets it',
+        toHtml(render(<CoverBlock invitation={full} mode="guest" />).toJSON()),
+      ],
       [
         'Share one section',
         toHtml(

@@ -1,6 +1,49 @@
-import type { BlockOwner, InvitationTab } from './types';
+import type { TextStyle } from 'react-native';
+import { fontFor } from '../../theme';
+import type {
+  BlockOwner,
+  InvitationBlockType,
+  InvitationStage,
+  InvitationTemplateDTO,
+} from './types';
 
 export const MY_INVITATIONS_ENDPOINT = '/invitation/mine';
+
+/** The cover is one block among the rest — this is the key it is stored under. */
+export const COVER_BLOCK_KEY = 'header';
+
+/**
+ * The theme used when the invitation names none, or names one this build has
+ * never heard of. Same shape as a served template, so the renderer never has
+ * to branch on "is there a theme".
+ */
+export const COVER_FALLBACK_TEMPLATE: InvitationTemplateDTO = {
+  id: 'midnight',
+  label: 'Midnight',
+  heroStops: ['#101B33', '#1A2E5A', '#2B1E32'],
+  wash: '#FBF7F1',
+  accent: '#FFB48A',
+};
+
+/**
+ * How each font id is actually drawn.
+ *
+ * The server owns the *set* — which styles exist, and which ids it will
+ * accept — and this owns the drawing, because only the app knows which faces
+ * it ships. Poppins is bundled; the serif looks are the platform's own serif,
+ * which every device has, so nothing here waits on a font file being added to
+ * the build.
+ */
+export const COVER_FONT_STYLE: Record<string, TextStyle> = {
+  elegant: { fontFamily: 'serif', fontWeight: '400', letterSpacing: 1.2 },
+  classic: { fontFamily: fontFor('700'), fontWeight: '700', letterSpacing: -0.4 },
+  romantic: { fontFamily: 'serif', fontStyle: 'italic', letterSpacing: 0.4 },
+  modern: { fontFamily: fontFor('800'), fontWeight: '800', letterSpacing: -0.8 },
+  traditional: { fontFamily: 'serif', fontWeight: '700', letterSpacing: 3 },
+};
+export const COVER_FONT_FALLBACK = 'elegant';
+/** Traditional is the one that is set in capitals. */
+export const COVER_FONT_UPPERCASE = 'traditional';
 
 // Web's tokens, scoped to this screen — matching the other ported surfaces.
 export const INV_ACCENT = '#e8633a';
@@ -15,6 +58,15 @@ export const INV_GREEN_SOFT = '#e8f6ef';
    apart from "done" green and "waiting on you" coral. */
 /** The screen's own ground: paper, not canvas. */
 export const INV_PAPER = '#fdf9f4';
+/** The gold the invitation is ruled with — the web app's own `--c-gold`. */
+export const INV_GOLD = '#b0852b';
+/** The blush a countdown figure sits on, and the cream behind the card. */
+export const INV_BLUSH = '#fbede7';
+export const INV_CREAM = '#fbf4ed';
+/** The petal in the corner blossom — blush, a shade up from INV_BLUSH. */
+export const INV_BLUSH_PETAL = '#f3cfc0';
+/** Legible ink on a blush tile — the mark inside an Event Details row. */
+export const INV_ACCENT_INK = '#9c6248';
 export const INV_VIOLET = '#5b46c9';
 export const INV_VIOLET_SOFT = '#eeeaff';
 
@@ -51,6 +103,25 @@ export const OCCASION_ICON: Record<string, string> = {
 export const OCCASION_ICON_FALLBACK = 'email-heart-outline';
 
 /**
+ * Which renderer draws a block, by its type.
+ *
+ * Only the cover is built; everything else is the generic renderer, and this
+ * map is where a new block is registered when its turn comes — one line,
+ * rather than a branch added to every screen that draws a block.
+ */
+export const BLOCK_RENDERER: Record<InvitationBlockType, 'cover' | 'generic'> = {
+  cover: 'cover',
+  story: 'generic',
+  countdown: 'generic',
+  memories: 'generic',
+  guestWall: 'generic',
+  liveStream: 'generic',
+  saveTheDate: 'generic',
+  ride: 'generic',
+  generic: 'generic',
+};
+
+/**
  * What each badge means. The organizer assembles most of the invitation; a few
  * sections are the customer's own words, and the difference decides which
  * action a row offers.
@@ -75,12 +146,53 @@ export const INVITATION_STATUS_LABEL: Record<string, string> = {
  * invitation, it is a look at the finished thing, so it lives in the menu
  * beside the guest list.
  */
-export const INVITATION_TABS: Array<{ key: InvitationTab; label: string }> = [
-  { key: 'organizer', label: 'Organizer' },
-  { key: 'approve', label: 'Approve' },
-];
+/**
+ * The words for each stage: where the invitation is, what the one button
+ * does, and what it promises. Said as the thing itself — "Share on WhatsApp",
+ * not "Proceed" — so nothing on the screen has to be decoded.
+ */
+export const STAGE_TITLE: Record<InvitationStage, string> = {
+  write: 'Still being written',
+  approve: 'Ready for your approval',
+  share: 'Ready to send',
+};
+
+export const STAGE_CTA: Record<InvitationStage, string> = {
+  write: 'Write your sections',
+  approve: 'Review & approve',
+  share: 'Share on WhatsApp',
+};
+
+export const STAGE_CTA_NOTE: Record<InvitationStage, string> = {
+  write: 'Only you can write the parts that are yours.',
+  approve: 'Nothing reaches a guest until you approve it.',
+  share: 'Nothing is shared until you send the link.',
+};
 
 export const INVITATION_COPY = {
+  /* Grouped so a screen can index them by stage rather than branching. */
+  stageTitle: STAGE_TITLE,
+  stageCta: STAGE_CTA,
+  stageCtaNote: STAGE_CTA_NOTE,
+  /* The contents page. */
+  insideTitle: "What's inside",
+  insideWritten: 'Written',
+  insideApproved: 'Approved',
+  /* Short on purpose: this is the commonest row by far, and five of them
+     reading "Not written yet" turns the contents page into a wall. */
+  insideEmpty: 'Not yet',
+  insideYours: 'Yours to write',
+  /** How much there is, said once above the list rather than counted by eye. */
+  insideCount: (total: number, yours: number) =>
+    yours > 0
+      ? `${total} sections · ${yours} ${yours === 1 ? 'needs' : 'need'} you`
+      : `${total} sections`,
+  /* How the stage line reads under its own title. */
+  stageWriteNote: (n: number) =>
+    n === 1 ? 'One section is still yours to write.' : `${n} sections are still yours to write.`,
+  stageApproveNote: (n: number) =>
+    n === 1 ? 'One section is waiting on you.' : `${n} sections are waiting on you.`,
+  stageShareNote: 'Every section is approved. Your guest link is live.',
   approveAll: (n: number) => (n === 1 ? 'Approve the last block' : `Approve all ${n} blocks`),
   approveAllNote: 'Approve each block, or ask your organizer for a change.',
   /* Said under the send button because it is the promise the button makes. */
@@ -91,6 +203,7 @@ export const INVITATION_COPY = {
   waitingOnYou: 'WAITING ON YOU',
   shareBlock: 'Share this block',
   /* Behind the menu: the guest's view, and the list it would go to. */
+  approveSheetTitle: 'Approve your invitation',
   menuTitle: 'Invitation',
   menuPreview: 'Preview as a guest',
   menuPreviewNote: 'Exactly what the link opens',
@@ -231,6 +344,99 @@ export const INVITATION_COPY = {
   preparingTitle: 'Being prepared',
   preparingBody:
     'Your organizer is still putting this invitation together. You’ll be able to review and approve it here as soon as they share it — nothing reaches your guests until you do.',
+  /* ---- the invitation itself ---- */
+  /** The screen's own name. It is the invitation, not a builder for one. */
+  artworkTitle: 'Invitation',
+  artworkView: 'View full screen',
+  artworkVideoNoPlayer:
+    'This build can\u2019t play video yet. Your organizer sent a video invitation \u2014 it is saved, and guests will see it once video playback is enabled.',
+  artworkPendingTitle: 'Being prepared',
+  artworkPendingBody:
+    'Your organizer is designing your invitation. It will appear here as soon as they send it \u2014 nothing reaches your guests until you approve it.',
+  /* Where it stands, and what the two buttons under it do. */
+  artworkWaiting: 'Waiting for your approval',
+  artworkWaitingNote: 'Nothing reaches a guest until you approve it.',
+  artworkApproved: 'Approved \u00b7 your guest link is live',
+  artworkApprovedNote: 'Your organizer has been told. You can still ask for a change.',
+  artworkApprove: 'Approve this invitation',
+  artworkApproving: 'Approving\u2026',
+  artworkAsk: 'Ask for a change',
+  artworkAskNote: 'Your organizer updates the design and sends it again.',
+  artworkGuests: 'Guest list',
+  /* ---- Save the Date ---- */
+  saveTheDateTitle: 'Save the Date',
+  saveTheDateLead: 'Celebrate every beautiful moment with us',
+  saveTheDateDress: 'Dress code',
+  saveTheDateAdd: 'Add to Calendar',
+  saveTheDateNoDate: 'This celebration has no date yet.',
+  /* ---- F5: the live stream ---- */
+  liveBadge: 'LIVE',
+  liveNow: 'LIVE NOW',
+  liveTitle: 'Live Stream',
+  liveHappening: (name: string) => `${name} is happening now!`,
+  liveLead: 'Join us and watch the celebration live from anywhere.',
+  liveWatch: 'Watch Live',
+  liveDetails: 'Event Details',
+  liveDress: 'Dress Code',
+  liveStandard: 'Standard',
+  live360: '360\u00b0',
+  liveVr: 'VR',
+  /* Said plainly, because this app opens the stream rather than playing it. */
+  liveOpens: 'Opens in your browser or the streaming app.',
+  /* ---- the countdown ---- */
+  countdownTo: 'Countdown to',
+  countdownRemaining: 'Time remaining',
+  countdownDays: 'Days',
+  countdownHours: 'Hours',
+  countdownMinutes: 'Mins',
+  countdownSeconds: 'Secs',
+  countdownStarted: 'The celebration has begun.',
+  /* ---- the story ---- */
+  storyTitle: 'Our story',
+  storyOpen: (n: number) => `Open story photograph ${n} full screen`,
+  storyPosition: (n: number, total: number) => `${n} / ${total}`,
+
+  /* ---- the cover ---- */
+  /** What the cover is called on the contents page. Not "Invitation header":
+      that is the builder's word for it, and nobody reading their own
+      invitation calls it a header. */
+  coverRow: 'Cover',
+  coverEdit: 'Edit the cover',
+  coverTitle: 'Your invitation cover',
+  coverSub: 'The first thing a guest sees when they open the link.',
+  coverScroll: 'Scroll for details',
+  coverPhoto: 'Add a photo',
+  coverVideo: 'Add a video',
+  coverReplace: 'Replace',
+  coverRemove: 'Remove',
+  coverMediaNone: 'No photo or video — guests see your theme.',
+  coverMediaImage: 'Photo behind the cover',
+  coverMediaVideo: 'Video behind the cover',
+  coverUploading: 'Uploading…',
+  coverVideoTooLong: (max: number) => `A cover video can be at most ${max} seconds.`,
+  coverVideoUnknownLength:
+    'We could not read that video\u2019s length, so it can\u2019t be used as a cover.',
+  coverVideoSilent: 'It plays on its own, without sound, and loops.',
+  /** Said only where the player is genuinely absent — never as a guess. */
+  coverVideoNoPlayer:
+    'This build can\u2019t play video yet, so the cover shows your theme here. The video is saved and stays on the invitation.',
+  coverNames: 'Whose celebration is it?',
+  coverHostOne: 'First name',
+  coverHostTwo: 'Second name (optional)',
+  coverJoiner: 'Joined by',
+  coverWhen: 'When',
+  coverDate: 'Date',
+  coverTime: 'Time (24h, e.g. 18:30)',
+  coverWhere: 'Where',
+  coverVenueName: 'Venue',
+  coverVenueAddress: 'Address',
+  coverMessage: 'Welcome message',
+  coverMessageHint: 'One or two lines your guests read first.',
+  coverTheme: 'Theme',
+  coverFont: 'Lettering',
+  coverSaved: 'Cover saved',
+  coverPickFailed: 'That file could not be opened.',
+
   loading: 'Opening your invitation…',
   errorTitle: 'We couldn’t load your invitation',
   retry: 'Try again',
