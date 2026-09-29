@@ -2,10 +2,15 @@ import { useState } from 'react';
 import { Linking, TouchableOpacity, View } from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
 import { colors } from '../../../theme';
-import { INVITATION_COPY as COPY, INV_ACCENT_INK } from '../constants';
+import {
+  INVITATION_COPY as COPY,
+  INV_ACCENT_INK,
+  INV_BLUSH_PETAL,
+  INV_GOLD,
+} from '../constants';
 import { cardDate, clockLabel, venueOf } from '../saveTheDate';
 import { liveStyles as s } from '../styles';
-import { CornerBloom } from './CornerBloom';
+import { CornerBloom } from '../../../Components';
 import { canEmbedStream, LivePlayer } from './LivePlayer';
 import type { InvitationSubEventDTO } from '../types';
 
@@ -100,10 +105,10 @@ export function LiveBlock({ subEvents }: LiveBlockProps) {
     <View style={s.block} testID="live-block">
       {/* Behind the words, at the two corners the reference decorates. */}
       <View style={s.bloomTop} pointerEvents="none">
-        <CornerBloom size={104} />
+        <CornerBloom size={104} petal={INV_BLUSH_PETAL} stem={INV_GOLD} />
       </View>
       <View style={s.bloomBottom} pointerEvents="none">
-        <CornerBloom size={88} flip />
+        <CornerBloom size={88} flip petal={INV_BLUSH_PETAL} stem={INV_GOLD} />
       </View>
 
       <View style={s.head}>
@@ -191,7 +196,7 @@ export function LiveBlock({ subEvents }: LiveBlockProps) {
       {when || where || sub.dressCode ? (
         <View style={s.details}>
           <View style={s.detailsBloom} pointerEvents="none">
-            <CornerBloom size={74} />
+            <CornerBloom size={74} petal={INV_BLUSH_PETAL} stem={INV_GOLD} />
           </View>
 
           <EventlyText variant="subtitle" style={s.detailsHead}>

@@ -1,12 +1,18 @@
 import { useCallback, useMemo } from 'react';
 import { useBookingDetail, useIdeaBoard, useInvitation } from './hooks';
 import { mapWorkspace } from './utils';
-import type { IdeaCounts, InvitationDTO, WorkspaceViewModel } from './types';
+import type { IdeaCounts, IdeaDTO, InvitationDTO, WorkspaceViewModel } from './types';
 
 export interface WorkspaceContainerResult {
   workspace: WorkspaceViewModel | null;
   /** Board counts, or null while they are still loading (or failed). */
   ideaCounts: IdeaCounts | null;
+  /**
+   * The newest thing the organizer put on the board, or null if they have not
+   * put anything there yet. The board's own feed is a screen away; this is the
+   * one post worth surfacing without going to it.
+   */
+  latestFromOrganizer: IdeaDTO | null;
   /** null while the invitation is still the organizer's draft. */
   invitation: InvitationDTO | null;
   isLoading: boolean;
@@ -29,6 +35,19 @@ export function useWorkspaceContainer(bookingId: string): WorkspaceContainerResu
 
   const workspace = useMemo<WorkspaceViewModel | null>(() => (data ? mapWorkspace(data) : null), [data]);
 
+  /*
+   * Newest first by date rather than trusting the feed's order, and the
+   * organizer's own posts only — the customer does not need their own idea
+   * read back to them on the card they would use to write another.
+   */
+  const latestFromOrganizer = useMemo<IdeaDTO | null>(() => {
+    const mine = (board.data?.items ?? []).filter(item => item.authorRole === 'organizer');
+    if (mine.length === 0) return null;
+    return mine.reduce((newest, item) =>
+      Date.parse(item.createdAt) > Date.parse(newest.createdAt) ? item : newest,
+    );
+  }, [board.data]);
+
   const refetchAll = useCallback(() => {
     refetch();
     board.refetch();
@@ -38,6 +57,7 @@ export function useWorkspaceContainer(bookingId: string): WorkspaceContainerResu
   return {
     workspace,
     ideaCounts: board.data?.counts ?? null,
+    latestFromOrganizer,
     invitation: invitation.data ?? null,
     isLoading: loading,
     isError: error !== null,

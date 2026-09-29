@@ -9,6 +9,16 @@ import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 import { View } from 'react-native';
 
+/*
+ * The banner sizes the artwork from the window's width, and jest's default
+ * window is not a phone — without this the preview would draw the picture at
+ * a height the panel never has.
+ */
+jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
+  __esModule: true,
+  default: () => ({ width: 390, height: 844, scale: 3, fontScale: 1 }),
+}));
+
 jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
   const { Text } = require('react-native');
   return function MockIcon({ name, size, color }: { name: string; size?: number; color?: string }) {
@@ -18,6 +28,7 @@ jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
 
 import { page, toHtml } from '../test-utils/rn-to-html';
 import { mapWorkspace, formatINR } from '../src/modules/Workspace/utils';
+import { WORKSPACE_TABS } from '../src/modules/Workspace/constants';
 import { WorkspaceOverview } from '../src/modules/Workspace/sections/WorkspaceOverview';
 import {
   Milestones,
@@ -68,6 +79,37 @@ const detail = (over: Partial<BookingDetailDTO> = {}): BookingDetailDTO =>
   }) as BookingDetailDTO;
 
 describe('mapWorkspace', () => {
+  /*
+   * The heading is the event's name and nothing else. The backend titles a
+   * booking by occasion and date — "Corporate 2026-09-29" — which is a
+   * sensible row in a list and a heading that repeats the date the screen
+   * already prints twice under it.
+   */
+  it('titles the workspace by the occasion alone', () => {
+    expect(mapWorkspace(detail({ occasion: 'corporate', title: 'Corporate 2026-09-29' })).title).toBe(
+      'Corporate',
+    );
+  });
+
+  it('takes the date off a stored title when the booking carries no occasion', () => {
+    const cases: Array<[string, string]> = [
+      ['Corporate 2026-09-29', 'Corporate'],
+      ['Your Naming \u00b7 5 Sept 2026', 'Your Naming'],
+      ['Sangeet, 29 September 2026', 'Sangeet'],
+      ['Reception 29/09/2026', 'Reception'],
+      ['Haldi', 'Haldi'],
+    ];
+    for (const [stored, want] of cases) {
+      expect(mapWorkspace(detail({ occasion: '', title: stored })).title).toBe(want);
+    }
+  });
+
+  // A title that was only ever a date keeps its own words rather than
+  // becoming the fallback — better a date than "Your event workspace".
+  it('never strips a title down to nothing', () => {
+    expect(mapWorkspace(detail({ occasion: '', title: '2026-09-29' })).title).toBe('2026-09-29');
+  });
+
   it('names the workspace after the occasion', () => {
     expect(mapWorkspace(detail()).workspaceName).toBe('Your naming workspace');
     // A booking with no occasion still needs a name for the header.
@@ -181,6 +223,20 @@ describe('render dump', () => {
       }),
     );
 
+    const latestIdea = {
+      id: 'i1',
+      authorRole: 'organizer',
+      authorName: 'MAHENDRA EVENTS',
+      type: 'idea',
+      text: 'Thinking a marigold and white palette for the stage, with brass lamps down the aisle.',
+      images: [],
+      confidential: false,
+      reply: null,
+      approval: 'pending',
+      approvalLabel: 'Waiting for your approval',
+      createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+    } as Parameters<typeof IdeasSummary>[0]['latest'];
+
     const Screen = ({
       data,
       counts,
@@ -195,15 +251,16 @@ describe('render dump', () => {
           data={data}
           onBack={() => {}}
           tab="details"
-          tabs={[
-            { key: 'details', label: 'Details' },
-            { key: 'plan', label: 'Plan' },
-            { key: 'payment', label: 'Payment' },
-          ]}
+          tabs={WORKSPACE_TABS}
           onSelectTab={() => {}}
         />
         <Milestones data={data} />
-        <IdeasSummary counts={counts} organizerName={data.organizerName} onPress={() => {}} />
+        <IdeasSummary
+          counts={counts}
+          organizerName={data.organizerName}
+          latest={counts && counts.shared > 0 ? latestIdea : null}
+          onPress={() => {}}
+        />
         <InvitationSummary invitation={invitation} organizerName={data.organizerName} onPress={() => {}} />
         <Payment data={data} />
         <Tasks data={data} />
@@ -233,6 +290,29 @@ describe('render dump', () => {
       [
         'Paid, nothing agreed or scheduled yet',
         render(<Screen data={sparse} counts={{ shared: 0, planned: 0, awaitingApproval: 0 }} invitation={null} />),
+      ],
+      /*
+       * A real Hyderabad address. Held here because a short venue proves
+       * nothing: the long one is what ran off the right of the screen with
+       * its tail cut off by the block, and the picture behind it is what
+       * stretched when the block grew to hold three lines.
+       */
+      [
+        'A long address',
+        render(
+          <Screen
+            data={mapWorkspace(
+              detail({
+                occasion: 'corporate',
+                title: 'Corporate 2026-09-29',
+                location:
+                  'Hi-tech city, patrika nagar, Road no 8, Hyderabad ,kukatapally village , near BJP office, Hyderabad, Telangana',
+              }),
+            )}
+            counts={{ shared: 0, planned: 0, awaitingApproval: 0 }}
+            invitation={null}
+          />,
+        ),
       ],
     ];
 

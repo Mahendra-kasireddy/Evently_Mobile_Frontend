@@ -3,21 +3,18 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { ActivityIndicator, RefreshControl, ScrollView, TouchableOpacity, View } from 'react-native';
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
 import { colors } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
-import { WORKSPACE_ACCENT, WORKSPACE_COPY } from './constants';
+import { WORKSPACE_ACCENT, WORKSPACE_COPY, WORKSPACE_TABS } from './constants';
 import { useWorkspaceContainer } from './container';
 import { WorkspaceOverview } from './sections/WorkspaceOverview';
 import { Milestones, Payment, Tasks, Timeline } from './sections/WorkspaceSections';
 import { IdeasSummary, InvitationSummary } from './sections/WorkspaceLinks';
 import { ReviewPrompt } from './sections/ReviewPrompt';
 import { LeaveReviewSheet, useCanReview } from '../Organizer';
-import { actionBarStyles as bar, styles } from './styles';
+import { styles } from './styles';
 import type { WorkspaceTab } from './types';
 
 type WorkspaceNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Workspace'>;
@@ -37,9 +34,16 @@ export function WorkspaceScreen() {
   const canReview = useCanReview(params.bookingId);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [tab, setTab] = useState<WorkspaceTab>('details');
-  const insets = useSafeAreaInsets();
-  const { workspace, ideaCounts, invitation, isLoading, isError, errorMessage, refetch } =
-    useWorkspaceContainer(params.bookingId);
+  const {
+    workspace,
+    ideaCounts,
+    latestFromOrganizer,
+    invitation,
+    isLoading,
+    isError,
+    errorMessage,
+    refetch,
+  } = useWorkspaceContainer(params.bookingId);
 
   /*
    * Back returns where the customer came from, and nothing else.
@@ -110,12 +114,6 @@ export function WorkspaceScreen() {
       organizerName: workspace.organizerName ?? undefined,
     });
 
-  const tabs: Array<{ key: WorkspaceTab; label: string }> = [
-    { key: 'details', label: WORKSPACE_COPY.tabDetails },
-    { key: 'plan', label: WORKSPACE_COPY.tabPlan },
-    { key: 'payment', label: WORKSPACE_COPY.tabPayment },
-  ];
-
   return (
     /*
      * No top safe-area edge: the banner runs under the status bar, and its own
@@ -133,7 +131,7 @@ export function WorkspaceScreen() {
           data={workspace}
           onBack={goBack}
           tab={tab}
-          tabs={tabs}
+          tabs={WORKSPACE_TABS}
           onSelectTab={setTab}
         />
 
@@ -156,16 +154,6 @@ export function WorkspaceScreen() {
                 onPress={() => setReviewOpen(true)}
               />
             ) : null}
-            <IdeasSummary
-              counts={ideaCounts}
-              organizerName={workspace.organizerName}
-              onPress={openIdeas}
-            />
-            <InvitationSummary
-              invitation={invitation}
-              organizerName={workspace.organizerName}
-              onPress={openInvitation}
-            />
             {/*
               No "Event details" card here.
 
@@ -175,52 +163,42 @@ export function WorkspaceScreen() {
               a card six rows down is the same booking described twice, and
               the second telling is the one that gets doubted.
             */}
-          </>
-        ) : null}
-
-        {tab === 'plan' ? (
-          <>
+            {/*
+              What is owed, then who is doing what, then what has happened.
+              These were two further tabs; they are one scroll now, in the
+              order the questions get asked — money before work, and the log
+              last, because a log is what you consult rather than read.
+            */}
+            <Payment data={workspace} />
             <Tasks data={workspace} />
             <Timeline data={workspace} />
           </>
         ) : null}
 
-        {tab === 'payment' ? <Payment data={workspace} /> : null}
-      </ScrollView>
-
-      {/* The two things worth doing from here, and the one worth doing most —
-          on a bar that does not scroll away. */}
-      <View style={[bar.bar, { paddingBottom: Math.max(insets.bottom, 12) }]}>
-        <TouchableOpacity
-          style={bar.ghost}
-          activeOpacity={0.85}
-          onPress={openInvitation}
-          accessibilityRole="button"
-          accessibilityLabel={WORKSPACE_COPY.inviteAction}
-        >
-          <EventlyIcon name="email-outline" size={17} color={WORKSPACE_ACCENT} />
-          <EventlyText variant="caption" style={bar.ghostText}>
-            {WORKSPACE_COPY.inviteAction}
-          </EventlyText>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={bar.primary}
-          activeOpacity={0.9}
-          onPress={openIdeas}
-          accessibilityRole="button"
-          accessibilityLabel={WORKSPACE_COPY.ideasAction}
-        >
-          <EventlyIcon
-            name="lightbulb-on-outline"
-            size={18}
-            color={colors.onPrimary}
+        {/*
+          Each on its own tab rather than stacked under Details. The board and
+          the invitation are the two places the customer goes to do something
+          rather than to read something, and they were the two hardest to
+          reach: below the milestones, below the review ask, behind a bar that
+          covered them.
+        */}
+        {tab === 'ideas' ? (
+          <IdeasSummary
+            counts={ideaCounts}
+            organizerName={workspace.organizerName}
+            latest={latestFromOrganizer}
+            onPress={openIdeas}
           />
-          <EventlyText variant="subtitle" style={bar.primaryText}>
-            {WORKSPACE_COPY.ideasAction}
-          </EventlyText>
-        </TouchableOpacity>
-      </View>
+        ) : null}
+
+        {tab === 'invitation' ? (
+          <InvitationSummary
+            invitation={invitation}
+            organizerName={workspace.organizerName}
+            onPress={openInvitation}
+          />
+        ) : null}
+      </ScrollView>
 
       <LeaveReviewSheet
         visible={reviewOpen}

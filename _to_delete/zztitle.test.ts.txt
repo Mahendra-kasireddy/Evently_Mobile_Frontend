@@ -1,0 +1,24 @@
+import { mapWorkspace } from '../src/modules/Workspace/utils';
+const base: any = {
+  id:'b', ref:'EVT-1', description:'', location:'X', eventDate:'2026-09-29T00:00:00.000Z',
+  daysToGo:0, amount:0, amountPaid:0, balanceAmount:0, paymentStatus:'unpaid', progress:0,
+  status:'confirmed', steps:[], vendors:[], tasks:[], timeline:[], organizer:null,
+};
+it('titles by the occasion alone', () => {
+  expect(mapWorkspace({ ...base, occasion:'corporate', title:'Corporate 2026-09-29' }).title).toBe('Corporate');
+});
+it('strips the date from a stored title when there is no occasion', () => {
+  const cases: Array<[string,string]> = [
+    ['Corporate 2026-09-29','Corporate'],
+    ['Your Naming · 5 Sept 2026','Your Naming'],
+    ['Sangeet, 29 September 2026','Sangeet'],
+    ['Reception 29/09/2026','Reception'],
+    ['Haldi','Haldi'],
+  ];
+  for (const [raw, want] of cases) {
+    expect(mapWorkspace({ ...base, occasion:'', title: raw }).title).toBe(want);
+  }
+});
+it('never returns an empty name', () => {
+  expect(mapWorkspace({ ...base, occasion:'', title:'2026-09-29' }).title).toBe('2026-09-29');
+});

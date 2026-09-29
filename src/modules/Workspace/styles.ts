@@ -171,6 +171,94 @@ export const timelineStyles = StyleSheet.create({
  * the guest invitation. Both summarise real state and lead to their own
  * screen, so they share one layout.
  */
+/* ---------------------------------------------------------------------------
+ * The ideas & planning card.
+ *
+ * One card rather than a titled section wrapping a row: the tab above it is
+ * already called Ideas & planning, and the row inside a captioned card meant
+ * the same three words appeared twice within an inch of each other.
+ * ------------------------------------------------------------------------- */
+export const ideasCardStyles = StyleSheet.create({
+  card: {
+    marginHorizontal: spacing.md,
+    marginTop: spacing.md,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: '#f7ddd0',
+    padding: 16,
+    overflow: 'hidden',
+  },
+  wash: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
+  /* Tucked into the right edge, part of it past the corner — a flourish the
+     eye reads as paper rather than as a picture to look at. */
+  bloom: { position: 'absolute', top: -14, right: -16, opacity: 0.55 },
+
+  row: { ...globalStyles.row, gap: 13 },
+  badge: {
+    width: 50,
+    height: 50,
+    borderRadius: 999,
+    backgroundColor: colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text: { flex: 1, minWidth: 0 },
+  title: {
+    color: WORKSPACE_NAVY_DEEP,
+    fontSize: 16.5,
+    lineHeight: 22,
+    fontWeight: '700',
+    letterSpacing: -0.3,
+  },
+  body: { color: colors.textMuted, fontSize: 12.5, lineHeight: 17, marginTop: 3 },
+
+  /* The organizer's newest post, set on paper inside the card so it reads as
+     something they wrote rather than as more of the card's own copy. */
+  latest: {
+    backgroundColor: 'rgba(255,255,255,0.72)',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#f7e3d8',
+    padding: 12,
+    marginTop: 14,
+  },
+  latestHead: { ...globalStyles.row, gap: 8 },
+  typeChip: {
+    ...globalStyles.row,
+    gap: 4,
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  typeChipText: { fontSize: 10.5, fontWeight: '700', letterSpacing: 0.2 },
+  latestWhen: { color: colors.textMuted, fontSize: 11, marginLeft: 'auto' },
+  latestText: {
+    color: WORKSPACE_NAVY_DEEP,
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: 8,
+  },
+  latestFoot: { ...globalStyles.row, gap: 5, marginTop: 8 },
+  latestFootText: { color: colors.textMuted, fontSize: 11.5, flexShrink: 1 },
+  latestFootDone: { color: WORKSPACE_GREEN, fontWeight: '700' },
+
+  cta: {
+    ...globalStyles.row,
+    alignSelf: 'flex-start',
+    gap: 4,
+    borderRadius: 999,
+    backgroundColor: WORKSPACE_ACCENT,
+    paddingLeft: 16,
+    paddingRight: 11,
+    paddingVertical: 10,
+    marginTop: 14,
+  },
+  /* Beside the words rather than under them, for the card that has nothing
+     else on it. */
+  ctaInline: { alignSelf: 'center', marginTop: 0, paddingLeft: 13, paddingRight: 9 },
+  ctaText: { color: colors.onPrimary, fontSize: 13.5, fontWeight: '700' },
+});
+
 export const summaryRowStyles = StyleSheet.create({
   /*
    * Tight gaps and a button that never grows. Poppins sets wider than the
@@ -513,46 +601,38 @@ export const boardStyles = StyleSheet.create({
 });
 
 /* ---------------------------------------------------------------------------
- * The overview: a banner, the event's identity on a sheet lifted over it, and
- * one row of tabs deciding what is under them.
+ * The overview: the event's identity written over a photograph, the three
+ * figures on a card over the foot of it, and one row of tabs deciding what is
+ * under them.
  *
  * The screen used to be a single scroll of eight stacked cards — every
  * section of the booking at once, in the same weight, so the thing the
- * customer opened it for was somewhere in the middle of it. The banner and
- * the identity block answer "which event is this and when", and the tabs put
- * the rest where it can be looked for rather than scrolled past.
+ * customer opened it for was somewhere in the middle of it. This block
+ * answers "which event is this, when, where and how far along", and the tabs
+ * put the rest where it can be looked for rather than scrolled past.
  * ------------------------------------------------------------------------- */
 
-const BANNER_HEIGHT = 210;
-/** How far the sheet is lifted over the banner's foot. */
-const SHEET_LIFT = 22;
-
 export const overviewStyles = StyleSheet.create({
-  banner: { height: BANNER_HEIGHT, overflow: 'hidden' },
-  bannerLayer: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
-  bannerArt: {
-    position: 'absolute',
-    right: -10,
-    bottom: 10,
-    width: 190,
-    height: 160,
-    opacity: 0.9,
-  },
   /*
-   * The way back and the screen's name, on one row over the picture.
-   *
-   * No bar above the banner — that would be a second header for one arrow —
-   * and no disc behind the chevron: it was a shape to notice for a control
-   * that sits in the same corner of every screen. The touch target is the
-   * box, which is unchanged.
+   * The picture, the wash over it and everything written on it are one block
+   * — not a banner with a sheet pulled over its foot. The identity used to
+   * sit on a card lifted over a gradient, and the seam between the two was a
+   * line across the screen exactly where the eye lands. The photograph runs
+   * the whole height instead and simply stops being a photograph by the
+   * bottom of it.
    */
-  topRow: {
-    ...globalStyles.row,
-    position: 'absolute',
-    left: spacing.md,
-    right: spacing.md,
-    gap: 6,
-  },
+  /* White, because the fade over the artwork reaches solid white exactly
+     where the artwork ends — anything else here would show as a band under
+     a booking whose lines run past the foot of the picture. */
+  top: { backgroundColor: colors.background, overflow: 'hidden' },
+  /* The picture's box, and the fade's: the same geometry given to both, so
+     they are laid out identically. Pinned to the top at the full width, its
+     height coming from the source's own ratio, so the artwork is scaled down
+     to fit rather than stretched to whatever height the block came to. */
+  art: { position: 'absolute', top: 0, left: 0, width: '100%' },
+  body: { paddingHorizontal: spacing.md, paddingBottom: 18 },
+
+  topRow: { ...globalStyles.row, gap: 6 },
   back: {
     width: 38,
     height: 38,
@@ -561,76 +641,33 @@ export const overviewStyles = StyleSheet.create({
     marginLeft: -9,
   },
   topTitle: {
-    color: colors.onPrimary,
+    color: WORKSPACE_NAVY_DEEP,
     fontSize: 16,
     lineHeight: 21,
     fontWeight: '700',
     letterSpacing: -0.2,
     flexShrink: 1,
   },
-  /* The countdown, centred on the banner. The reference counts hours and
-     seconds; a booking months away is counted in days, and a live clock on a
-     date six months out is a spinning number nobody reads. */
-  countdown: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  countdownValue: {
-    color: colors.onPrimary,
-    fontSize: 40,
-    lineHeight: 46,
-    fontWeight: '700',
-    letterSpacing: -1,
-  },
-  countdownLabel: {
-    color: 'rgba(255,255,255,0.78)',
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 2,
-    marginTop: 2,
-  },
-  statusPill: {
-    ...globalStyles.row,
-    alignSelf: 'center',
-    gap: 6,
-    borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    marginTop: 10,
-  },
-  statusDot: { width: 7, height: 7, borderRadius: 999 },
-  statusText: {
-    color: colors.onPrimary,
-    fontSize: 11.5,
-    fontWeight: '700',
-    letterSpacing: 0.6,
-  },
 
-  sheet: {
-    backgroundColor: colors.background,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    marginTop: -SHEET_LIFT,
-    paddingHorizontal: spacing.md,
-    paddingTop: 18,
-  },
-  titleRow: { ...globalStyles.row, alignItems: 'flex-start', gap: 10 },
+  titleRow: { ...globalStyles.row, alignItems: 'flex-start', gap: 10, marginTop: 14 },
   title: {
     flex: 1,
     color: WORKSPACE_NAVY_DEEP,
-    fontSize: 19,
-    lineHeight: 25,
+    fontSize: 20,
+    lineHeight: 26,
     fontWeight: '700',
-    letterSpacing: -0.4,
+    letterSpacing: -0.5,
   },
-  /* The two chips the reference puts beside its title: what it costs, and
-     when it is. Each is dropped rather than drawn empty. */
+  /* What it costs and the day it falls on, held together against the right
+     edge so the name has the whole left to itself. */
+  chips: { ...globalStyles.row, gap: 8, flexShrink: 0, marginTop: 3 },
   amountChip: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 12,
+    borderRadius: 10,
     backgroundColor: WORKSPACE_ACCENT_SOFT,
-    paddingHorizontal: 10,
+    paddingHorizontal: 11,
     paddingVertical: 7,
-    flexShrink: 0,
   },
   amountChipText: { color: WORKSPACE_ACCENT, fontSize: 13, fontWeight: '700' },
   dateChip: {
@@ -639,8 +676,7 @@ export const overviewStyles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: WORKSPACE_NAVY,
     paddingHorizontal: 10,
-    paddingVertical: 5,
-    flexShrink: 0,
+    paddingVertical: 6,
   },
   dateChipMonth: {
     color: 'rgba(255,255,255,0.8)',
@@ -656,79 +692,152 @@ export const overviewStyles = StyleSheet.create({
     lineHeight: 18,
   },
 
-  byRow: { ...globalStyles.row, gap: 8, marginTop: 12 },
+  factRow: { ...globalStyles.row, gap: 8, marginTop: 8 },
+  /* The address is the one fact that runs to three lines; its icon belongs
+     beside the first of them rather than in the middle of the block. */
+  factRowTall: { alignItems: 'flex-start' },
+  /* The box the row's leftover width goes to; the text inside it wraps
+     against this rather than against the screen. */
+  factText: { flex: 1, minWidth: 0 },
+  factValue: {
+    color: WORKSPACE_NAVY_DEEP,
+    fontSize: 12.5,
+    lineHeight: 17,
+    fontWeight: '500',
+  },
+  ref: {
+    color: colors.textMuted,
+    fontSize: 11,
+    lineHeight: 15,
+    letterSpacing: 0.3,
+    marginTop: 5,
+    marginLeft: 24,
+  },
+
+  byRow: { ...globalStyles.row, gap: 10, marginTop: 12 },
+  /* Takes the row's slack, so the pill lands at the far end when there is an
+     organizer and sits quietly at the left when there is not yet one. */
+  byWho: { ...globalStyles.row, gap: 8, flex: 1, minWidth: 0 },
   byAvatar: {
-    width: 24,
-    height: 24,
+    width: 22,
+    height: 22,
     borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  byAvatarText: { color: colors.onPrimary, fontSize: 10, fontWeight: '700' },
-  byText: { color: colors.textMuted, fontSize: 13, lineHeight: 18, flexShrink: 1 },
-
-  factRow: { ...globalStyles.row, alignItems: 'flex-start', gap: 10, marginTop: 14 },
-  factText: { flex: 1 },
-  factValue: {
+  byAvatarText: { color: colors.onPrimary, fontSize: 9.5, fontWeight: '700' },
+  byText: { color: colors.textMuted, fontSize: 12.5, lineHeight: 17, flexShrink: 1 },
+  /* Pushed to the row's far end, so the organizer's name and the booking's
+     standing read as two facts rather than one sentence. */
+  statusPill: {
+    ...globalStyles.row,
+    gap: 6,
+    flexShrink: 0,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.82)',
+    borderWidth: 1,
+    borderColor: 'rgba(14,26,51,0.08)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  statusDot: { width: 7, height: 7, borderRadius: 999 },
+  statusText: {
     color: WORKSPACE_NAVY_DEEP,
-    fontSize: 14,
-    lineHeight: 19,
-    fontWeight: '600',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
-  factNote: { color: colors.textMuted, fontSize: 12.5, lineHeight: 17, marginTop: 1 },
 
-  /* One row, three destinations. A segmented control rather than a scroll of
-     everything, so the sections below are chosen instead of passed. */
   /*
-   * Three figures, three colours, one row: how long is left, how much is
-   * ready, how much is paid. Each is real — the countdown, the milestone
-   * share, the share of the agreed amount settled — and each tile disappears
-   * when its figure does not exist yet.
+   * Three figures on one white card over the foot of the picture: how long is
+   * left, how much is ready, how much is paid. The card is what separates
+   * them from the photograph — as three loose tiles they read as part of the
+   * wash, and the numbers are the reason the customer opened the screen.
    */
-  stats: { ...globalStyles.row, gap: 8, marginTop: 16 },
-  stat: {
-    flex: 1,
+  stats: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    backgroundColor: colors.background,
     borderRadius: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+    marginTop: 14,
+    shadowColor: '#0e1a33',
+    shadowOpacity: 0.08,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 3,
   },
-  statTime: { backgroundColor: WORKSPACE_ACCENT_SOFT },
-  statReady: { backgroundColor: WORKSPACE_GREEN_SOFT },
-  statPaid: { backgroundColor: WORKSPACE_VIOLET_SOFT },
-  statValue: { fontSize: 19, lineHeight: 24, fontWeight: '700', letterSpacing: -0.4 },
-  statValueTime: { color: WORKSPACE_ACCENT },
-  statValueReady: { color: WORKSPACE_GREEN },
-  statValuePaid: { color: WORKSPACE_VIOLET },
+  stat: { ...globalStyles.row, flex: 1, gap: 8 },
+  statText: { flexShrink: 1, minWidth: 0 },
+  /* A tinted tile carrying the figure's own icon, so the three read as three
+     different measures before the words under them are read. */
+  statMark: {
+    width: 28,
+    height: 28,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  statMarkTime: { backgroundColor: WORKSPACE_ACCENT_SOFT },
+  statMarkReady: { backgroundColor: WORKSPACE_GREEN_SOFT },
+  statMarkPaid: { backgroundColor: WORKSPACE_VIOLET_SOFT },
+  statValue: {
+    color: WORKSPACE_NAVY_DEEP,
+    fontSize: 15,
+    lineHeight: 19,
+    fontWeight: '700',
+    letterSpacing: -0.3,
+  },
   statLabel: {
     color: colors.textMuted,
-    fontSize: 11.5,
-    lineHeight: 15,
-    fontWeight: '600',
-    marginTop: 2,
+    fontSize: 10,
+    lineHeight: 13,
+    fontWeight: '500',
   },
 
+  /* Edge to edge, so the rule under the tabs runs the width of the screen
+     and the three of them have every point of it to fit in. */
   tabs: {
-    ...globalStyles.row,
-    marginTop: 18,
     borderBottomWidth: 1,
     borderBottomColor: '#efe9e5',
   },
+  /* The rail the tabs sit on. They size to their own words rather than
+     splitting the width three ways, which would have given "Details" as much
+     room as "Guest invitation". It scrolls if a larger text size pushes them
+     past the edge; at the ordinary size all three are in view. */
+  /* 12, not the page's 16: the three labels are long, and the eight points
+     saved at each end are what keeps all of them on screen at this size. */
+  tabsRow: { ...globalStyles.row, paddingHorizontal: 12 },
   tab: {
-    flex: 1,
+    ...globalStyles.row,
+    /* Never squeezed. A tab on a sideways rail is as wide as its own word;
+       let it shrink and every label ends in an ellipsis, which is the one
+       thing a tab cannot afford — it is the word that says where it goes. */
+    flexShrink: 0,
+    gap: 6,
     alignItems: 'center',
-    paddingVertical: 11,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    /* 13 and 13: with the label's own line this comes to a 44pt row, which
+       is the smallest a thing worth tapping should be. */
+    paddingVertical: 13,
+    paddingHorizontal: 9,
   },
-  /* A wash behind the one you are on, so the row reads as a choice rather
-     than as three labels with a line under one of them. */
-  tabActive: { backgroundColor: WORKSPACE_ACCENT_SOFT },
-  tabLabel: { color: colors.textMuted, fontSize: 13.5, lineHeight: 18, fontWeight: '600' },
+  /* Nothing behind the one you are on. The word and its mark go to the
+     accent and the rule under it does the rest; a filled tab read as a
+     button, which is a thing you press once, not a place you are. */
+  tabActive: {},
+  tabLabel: {
+    color: colors.textMuted,
+    fontSize: 14.5,
+    lineHeight: 19,
+    fontWeight: '600',
+    flexShrink: 0,
+  },
   tabLabelActive: { color: WORKSPACE_ACCENT, fontWeight: '700' },
   tabUnderline: {
     position: 'absolute',
-    left: 18,
-    right: 18,
+    left: 8,
+    right: 8,
     bottom: -1,
     height: 2.5,
     borderRadius: 999,
@@ -736,36 +845,4 @@ export const overviewStyles = StyleSheet.create({
   },
 });
 
-/* The bar that never scrolls away: the two things worth doing from here, and
-   the one worth doing most. */
-export const actionBarStyles = StyleSheet.create({
-  bar: {
-    ...globalStyles.row,
-    gap: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#efe9e5',
-    backgroundColor: colors.background,
-    paddingHorizontal: spacing.md,
-    paddingTop: 10,
-  },
-  ghost: {
-    ...globalStyles.row,
-    gap: 6,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: '#e6dfda',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  ghostText: { color: WORKSPACE_NAVY_DEEP, fontSize: 13.5, fontWeight: '700' },
-  primary: {
-    flex: 1,
-    ...globalStyles.row,
-    justifyContent: 'center',
-    gap: 8,
-    borderRadius: 14,
-    backgroundColor: WORKSPACE_ACCENT,
-    paddingVertical: 13,
-  },
-  primaryText: { color: colors.onPrimary, fontSize: 14.5, fontWeight: '700' },
-});
+

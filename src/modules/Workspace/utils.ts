@@ -47,6 +47,28 @@ function titleize(value: string): string {
   return t ? t.charAt(0).toUpperCase() + t.slice(1) : '';
 }
 
+/*
+ * The date a booking's stored title carries, taken back off it.
+ *
+ * The backend names a booking by occasion and date — "Corporate 2026-09-29" —
+ * which is a sensible row in a list and the wrong heading here: the screen
+ * already prints the date twice under it, in full and on the chip. This is a
+ * fallback only; a booking that knows its occasion is titled by that.
+ */
+function nameOnly(value: string): string {
+  const trimmed = (value ?? '').trim();
+  const stripped = trimmed
+    // "… 2026-09-29"
+    .replace(/[\s·,–—-]*\d{4}-\d{2}-\d{2}$/, '')
+    // "… · 5 Sept 2026" / "… , 5 September 2026"
+    .replace(/[\s·,–—-]+\d{1,2}(st|nd|rd|th)?\s+[A-Za-z]{3,9}\.?\s+\d{4}$/, '')
+    // "… 29/09/2026"
+    .replace(/[\s·,–—-]*\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4}$/, '')
+    .trim();
+  // Never hand back nothing: a title that was only a date keeps its own words.
+  return stripped || trimmed;
+}
+
 const TASK_STATUSES: TaskStatus[] = ['pending', 'in_progress', 'done', 'blocked'];
 
 /**
@@ -128,7 +150,9 @@ export function mapWorkspace(dto: BookingDetailDTO): WorkspaceViewModel {
     id: dto.id,
     ref: dto.ref,
     workspaceName: occasion ? `Your ${occasion.toLowerCase()} workspace` : WORKSPACE_COPY.fallbackName,
-    title: dto.title || occasion || WORKSPACE_COPY.fallbackName,
+    // The occasion first: it is the name and nothing else. The stored title is
+    // the fallback, with the date it carries taken off.
+    title: occasion || nameOnly(dto.title) || WORKSPACE_COPY.fallbackName,
     status: dto.status,
     statusLabel: WORKSPACE_STATUS_LABEL[dto.status] ?? '',
     progress: Math.min(100, Math.max(0, Math.round(dto.progress ?? 0))),

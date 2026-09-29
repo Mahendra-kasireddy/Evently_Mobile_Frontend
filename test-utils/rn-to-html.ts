@@ -238,6 +238,10 @@ function svgNode(node: Json): string {
   }
 }
 
+/** Where the preview should look for bundled images, set by the render dump. */
+declare const process: { env: Record<string, string | undefined> };
+const assetBase = (): string => process.env.EVENTLY_RENDER_ASSET_BASE ?? '';
+
 export function toHtml(node: Json): string {
   if (node == null || node === false) {
     return '';
@@ -283,6 +287,33 @@ export function toHtml(node: Json): string {
     return `<div style="${css(style)};${muted ? `color:${node.props?.placeholderTextColor ?? '#6B7280'}` : ''}">${toHtml(
       String(shown),
     )}</div>`;
+  }
+
+  /*
+   * A photograph is a real part of a layout — a block that reserves no space
+   * renders the screen above it, not the screen. `testUri` is what the RN jest
+   * asset transform leaves behind for a bundled `require`; a remote source
+   * carries `uri`. Either way the preview needs a src it can load relative to
+   * the html file, so EVENTLY_RENDER_ASSET_BASE says where the assets are.
+   */
+  if (node.type === 'Image') {
+    const src: string =
+      node.props?.source?.uri ??
+      node.props?.source?.testUri ??
+      '';
+    const base = assetBase();
+    const href = /^(https?:|data:|file:)/.test(src)
+      ? src
+      : base + src.replace(/^(\.\.\/)+/, '');
+    const fit = node.props?.resizeMode === 'contain' ? 'contain' : 'cover';
+    /*
+     * A div holding the picture, not a bare <img>. An image is a replaced
+     * element: given `left` and `right` with no width it keeps its intrinsic
+     * size and ignores the constraint, so a 1536px source rendered 1536px
+     * wide inside a 390px phone and the preview showed its blank corner.
+     * Yoga sizes an absolute box from its insets; a div does too.
+     */
+    return `<div style="${css(style)};overflow:hidden"><img src="${href}" style="display:block;width:100%;height:100%;object-fit:${fit}" /></div>`;
   }
 
   const isText = node.type === 'Text';

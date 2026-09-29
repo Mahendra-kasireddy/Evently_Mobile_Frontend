@@ -106,7 +106,14 @@ export interface WorkspaceTimelineEntry {
  * Three, not eight cards in a column: what the event is (details), what is
  * being done about it (plan), and what it costs (payment).
  */
-export type WorkspaceTab = 'details' | 'plan' | 'payment';
+export type WorkspaceTab = 'details' | 'ideas' | 'invitation';
+
+/** One destination on the workspace's tab row: its key, its word, its mark. */
+export interface WorkspaceTabItem {
+  key: WorkspaceTab;
+  label: string;
+  icon: string;
+}
 
 export interface WorkspaceViewModel {
   id: string;

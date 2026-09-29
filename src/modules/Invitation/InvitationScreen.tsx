@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { RouteProp } from '@react-navigation/native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   ActivityIndicator,
+  InteractionManager,
   FlatList,
   Linking,
   RefreshControl,
@@ -44,6 +45,14 @@ import {
 } from './sections/InvitationArtwork';
 import { CountdownBlock } from './sections/CountdownBlock';
 import { LiveBlock } from './sections/LiveBlock';
+import { MemoriesBlock, MemoriesOffCard } from './sections/MemoriesBlock';
+import {
+  AddMemorySheet,
+  ConfirmMemorySheet,
+  MemoryViewer,
+} from './sections/MemorySheets';
+import { useMemories, useMemoryUpload } from './memories.hooks';
+import { absoluteFileUrl } from '../../services/urls';
 import { SaveTheDate } from './sections/SaveTheDate';
 import { StoryBlock } from './sections/StoryBlock';
 import type { Artwork } from './sections/InvitationArtwork';
@@ -266,6 +275,53 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
    */
   const [viewingPhoto, setViewingPhoto] = useState<Artwork | null>(null);
   const [guests, setGuests] = useState<GuestDTO[]>([]);
+  /* Shared Memories: the sheet that is open, the item being viewed, and the
+     one line about the last upload. */
+  const [adding, setAdding] = useState(false);
+  /*
+   * Which picker to open once the sheet has actually gone.
+   *
+   * iOS will not present a view controller while another is still being
+   * dismissed: launching the camera in the same tick as closing this sheet
+   * silently does nothing at all, which is exactly how it behaved. So the
+   * choice is remembered, the sheet closes, and the picker opens after the
+   * dismissal has finished.
+   */
+  const [pendingPick, setPendingPick] = useState<'photo' | 'library' | 'reel' | null>(null);
+  const [viewingMemory, setViewingMemory] = useState(-1);
+  const [say, setSay] = useState('');
+  const [sayWarn, setSayWarn] = useState(false);
+
+  /*
+   * The gallery and the uploader. Both are scoped to this booking, and both
+   * ask the server what is allowed rather than deciding here — the section
+   * simply does not exist when it answers no.
+   */
+  const memories = useMemories(bookingId);
+  const upload = useMemoryUpload(bookingId);
+
+  /*
+   * Open the chosen picker once the sheet's dismissal animation has finished.
+   *
+   * `runAfterInteractions` rather than a timeout, and rather than the Modal's
+   * `onDismiss`, which iOS fires but Android never does — one path that
+   * behaves the same on both.
+   */
+  useEffect(() => {
+    if (adding || !pendingPick) return;
+    const action = pendingPick;
+    setPendingPick(null);
+    const task = InteractionManager.runAfterInteractions(() => {
+      const open =
+        action === 'photo'
+          ? upload.takePhoto
+          : action === 'library'
+            ? upload.pickFromLibrary
+            : upload.recordReel;
+      open().catch(() => undefined);
+    });
+    return () => task.cancel();
+  }, [adding, pendingPick, upload]);
   const [outcomes, setOutcomes] = useState<ShareOutcomeDTO[] | null>(null);
 
   const invitation = patched ?? data;
@@ -489,6 +545,36 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
          * customer approves what their guests will get, so they have to be
          * able to see it. It renders itself away when there are no cards.
          */}
+        {/*
+         * Shared Memories, last: the invitation is what the hosts made, and
+         * this is what everyone brought to it. The whole section is absent
+         * unless the server says it exists for this person.
+         */}
+        {/* Known and off: offer the switch rather than showing nothing. */}
+        {memories.known && !memories.enabled ? (
+          <MemoriesOffCard
+            busy={memories.loading}
+            onEnable={() => memories.enable().catch(() => undefined)}
+          />
+        ) : null}
+
+        {memories.canView ? (
+          <MemoriesBlock
+            gallery={memories.gallery}
+            items={memories.items}
+            kind={memories.kind}
+            subEvent={memories.subEvent}
+            paging={memories.paging}
+            canUpload={memories.canUpload}
+            say={say}
+            sayWarn={sayWarn}
+            onFilter={memories.changeFilter}
+            onMore={() => memories.loadMore().catch(() => undefined)}
+            onOpen={setViewingMemory}
+            onAdd={() => setAdding(true)}
+          />
+        ) : null}
+
         <StoryBlock
           cards={invitation.storyCards ?? []}
           title={invitation.details.storyTitle ?? ''}
@@ -498,6 +584,65 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
           }}
         />
       </ScrollView>
+
+      <AddMemorySheet
+        visible={adding}
+        onClose={() => {
+          setPendingPick(null);
+          setAdding(false);
+        }}
+        onTakePhoto={() => {
+          setPendingPick('photo');
+          setAdding(false);
+        }}
+        onPickMedia={() => {
+          setPendingPick('library');
+          setAdding(false);
+        }}
+        onRecordReel={() => {
+          setPendingPick('reel');
+          setAdding(false);
+        }}
+      />
+
+      <ConfirmMemorySheet
+        picked={upload.picked}
+        subEvents={memories.gallery?.subEvents ?? []}
+        busy={upload.busy}
+        progress={upload.progress}
+        error={upload.error}
+        onRetake={() => {
+          upload.clear();
+          setAdding(true);
+        }}
+        onCancel={upload.clear}
+        onSend={(subEventId, caption) => {
+          upload
+            .send(subEventId, caption)
+            .then((outcome) => {
+            if (!outcome) return;
+            /* The server's own sentence, shown as it arrives — duplicate,
+               quality warning or waiting for approval are all its words. */
+            setSay(outcome.message);
+            setSayWarn(outcome.status === 'duplicate' || outcome.status === 'flagged');
+            if (outcome.status !== 'duplicate') memories.load().catch(() => undefined);
+            })
+            .catch(() => undefined);
+        }}
+      />
+
+      <MemoryViewer
+        items={memories.items}
+        index={viewingMemory}
+        canDownload={memories.canDownload}
+        onIndex={setViewingMemory}
+        onClose={() => setViewingMemory(-1)}
+        onDownload={(item) => {
+          /* The original, and only because the server said downloads are on —
+             the same permission it enforces on the guest route. */
+          Linking.openURL(absoluteFileUrl(item.url)).catch(() => undefined);
+        }}
+      />
 
       {/* What a guest gets, whole, with nothing over it — the invitation, or
           whichever story photograph was tapped. */}

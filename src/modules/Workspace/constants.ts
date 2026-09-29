@@ -8,6 +8,7 @@ import type {
   TaskStatus,
   WorkspaceStatus,
 } from './types';
+import type { WorkspaceTabItem } from './types';
 
 export const BOOKING_DETAIL_ENDPOINT = '/booking';
 export const IDEA_BOARD_ENDPOINT = '/idea/mine';
@@ -67,6 +68,10 @@ export const WORKSPACE_ACCENT = '#e8633a';
 export const WORKSPACE_NAVY = '#1a2e5a';
 export const WORKSPACE_NAVY_DEEP = '#0e1a33';
 export const WORKSPACE_ACCENT_SOFT = '#fdeee7';
+/* The cream the workspace artwork is painted on, sampled from it. The block
+   carries this behind the picture so a booking whose lines run past the foot
+   of the artwork does not show a band of white under it. */
+export const WORKSPACE_CREAM = '#fdf6f1';
 /*
  * Three tints, one per figure on the strip under the title, and reused by the
  * cards that belong to each: coral for time (how long is left), green for
@@ -95,23 +100,49 @@ export const WORKSPACE_COPY = {
   /** On the banner, beside the way back. */
   screenTitle: 'Workspace',
   milestones: 'Milestones',
-  /* The three tabs, and the two actions on the bar under them. */
+  /*
+   * Three tabs.
+   *
+   * Ideas and the invitation used to be two buttons on a bar pinned to the
+   * foot of the screen — a bar that covered the last of whatever tab was
+   * open. They are tabs now, and the bar is gone.
+   *
+   * Plan and Payment are not tabs. Everything a booking says about itself —
+   * where it has got to, what is owed, who is doing what, what has happened
+   * — is one account of one booking, and splitting it three ways meant the
+   * customer had to guess which third held the thing they came for. It is
+   * all under Details, in one scroll. What is left beside it are the two
+   * places you go to do something rather than to read something.
+   */
   tabDetails: 'Details',
-  tabPlan: 'Plan',
-  tabPayment: 'Payment',
-  inviteAction: 'Invitation',
-  ideasAction: 'Ideas & planning',
+  tabIdeas: 'Ideas & planning',
+  tabInvitation: 'Guest invitation',
   details: 'Event details',
   payment: 'Payment',
   vendors: 'Vendors & tasks',
   timeline: 'Activity',
   noTasks: 'Your organizer has not added any vendor tasks yet.',
-  ideas: 'Ideas & planning board',
+  ideas: 'Ideas & Planning',
+  ideasBlurb: 'Explore ideas, themes and tips to make your event even more special.',
+  ideasOpen: 'Explore',
+  ideasStart: 'Start',
   invitation: 'Guest invitation',
   noTimeline: 'Nothing has happened on this booking yet.',
   loading: 'Opening your workspace…',
   retry: 'Try again',
 };
+
+/**
+ * The workspace's destinations, in the order they are offered.
+ *
+ * Declared once here rather than built in the screen, so the preview and the
+ * screen cannot end up offering different rows.
+ */
+export const WORKSPACE_TABS: WorkspaceTabItem[] = [
+  { key: 'details', label: WORKSPACE_COPY.tabDetails, icon: 'information-outline' },
+  { key: 'ideas', label: WORKSPACE_COPY.tabIdeas, icon: 'lightbulb-on-outline' },
+  { key: 'invitation', label: WORKSPACE_COPY.tabInvitation, icon: 'email-outline' },
+];
 
 // ---------------------------------------------------------------------------
 // Ideas & planning board.

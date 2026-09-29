@@ -40,6 +40,13 @@ import { StoryBlock } from '../src/modules/Invitation/sections/StoryBlock';
 import { CountdownBlock } from '../src/modules/Invitation/sections/CountdownBlock';
 import { SaveTheDate } from '../src/modules/Invitation/sections/SaveTheDate';
 import { LiveBlock, liveOf } from '../src/modules/Invitation/sections/LiveBlock';
+import {
+  MemoriesBlock,
+  MemoriesOffCard,
+} from '../src/modules/Invitation/sections/MemoriesBlock';
+import { AddMemorySheet } from '../src/modules/Invitation/sections/MemorySheets';
+import * as memoriesService from '../src/modules/Invitation/memories.service';
+import { useMemories } from '../src/modules/Invitation/memories.hooks';
 import { isPlayerUrl } from '../src/modules/Invitation/sections/LivePlayer';
 import { PreviewSheet, ShareSheet } from '../src/modules/Invitation/sections/Sheets';
 import { blockIsWritten, mapInvitationList } from '../src/modules/Invitation/utils';
@@ -420,6 +427,233 @@ describe('save the date', () => {
   it('says so rather than offering a dead button when a card has no date', () => {
     const text = textOf(block([sub({ eventDate: '' })]));
     expect(text).toContain('This celebration has no date yet.');
+  });
+});
+
+describe('shared memories', () => {
+  const memory = (over: Record<string, unknown> = {}) => ({
+    id: 'm1',
+    kind: 'photo' as const,
+    subEvent: 'se1',
+    url: 'https://cdn.example/original.jpg',
+    thumbnailUrl: 'https://cdn.example/original.thumb.webp',
+    displayUrl: 'https://cdn.example/original.display.webp',
+    caption: '',
+    durationSec: 0,
+    likes: 3,
+    uploader: 'Priya',
+    status: 'published',
+    moderationStatus: 'notRequired',
+    visibility: 'gallery',
+    flags: [] as string[],
+    createdAt: '2026-10-09T12:00:00.000Z',
+    ...over,
+  });
+
+  const gallery = (over: Record<string, unknown> = {}) => ({
+    items: [],
+    nextCursor: '',
+    counts: { all: 1, photo: 1, video: 0, reel: 0 },
+    awaiting: 0,
+    subEvents: [{ id: 'se1', name: 'Haldi' }],
+    ...over,
+  });
+
+  const block = (items: ReturnType<typeof memory>[], props: Record<string, unknown> = {}) =>
+    render(
+      <MemoriesBlock
+        gallery={gallery() as never}
+        items={items as never}
+        kind="all"
+        subEvent="all"
+        paging={false}
+        canUpload
+        say=""
+        sayWarn={false}
+        onFilter={() => undefined}
+        onMore={() => undefined}
+        onOpen={() => undefined}
+        onAdd={() => undefined}
+        {...props}
+      />,
+    );
+
+  it('fetches on mount, or the section can never appear', async () => {
+    /*
+     * The regression this exists for: the hook defined `load` and nothing
+     * called it, so settings stayed null, `canView` stayed false, and Shared
+     * Memories was simply absent from the screen with no error anywhere.
+     */
+    const settings = jest
+      .spyOn(memoriesService, 'fetchMemorySettings')
+      .mockResolvedValue({
+        enabled: true,
+        guestUpload: true,
+        guestView: true,
+        guestDownload: false,
+        moderation: false,
+        uploadFrom: '',
+        uploadWindowDays: 7,
+        window: { open: true, reason: '', opensAt: '', closesAt: '' },
+      });
+    const list = jest.spyOn(memoriesService, 'fetchMemories').mockResolvedValue({
+      items: [],
+      nextCursor: '',
+      counts: { all: 0, photo: 0, video: 0, reel: 0 },
+      awaiting: 0,
+      subEvents: [],
+    });
+
+    let seen: ReturnType<typeof useMemories> | undefined;
+    function Probe() {
+      seen = useMemories('bk1');
+      return null;
+    }
+    await ReactTestRenderer.act(async () => {
+      ReactTestRenderer.create(<Probe />);
+    });
+
+    expect(settings).toHaveBeenCalledWith('bk1');
+    expect(list).toHaveBeenCalled();
+    // And the section is therefore able to appear.
+    expect(seen?.canView).toBe(true);
+
+    settings.mockRestore();
+    list.mockRestore();
+  });
+
+  it('offers the switch when the gallery is off, instead of showing nothing', () => {
+    /*
+     * What shipped first was nothing at all: no gallery, no explanation, and
+     * no way to tell an invitation without one from a screen that failed to
+     * load. The setting belongs to the customer and this is their app.
+     */
+    const text = textOf(render(<MemoriesOffCard busy={false} onEnable={() => undefined} />));
+    expect(text).toContain('Shared Memories');
+    expect(text).toContain('Switch it on');
+  });
+
+  it('names camera, library and reel actions the picker can act on', () => {
+    /*
+     * The sheet's three options. They were doing nothing because the picker
+     * was launched in the same tick as the sheet's dismissal — iOS refuses to
+     * present a controller while another is dismissing — so the screen now
+     * remembers the choice and opens it after the dismissal finishes.
+     */
+    const taps: string[] = [];
+    const tree = render(
+      <AddMemorySheet
+        visible
+        onClose={() => taps.push('close')}
+        onTakePhoto={() => taps.push('photo')}
+        onPickMedia={() => taps.push('library')}
+        onRecordReel={() => taps.push('reel')}
+      />,
+    );
+    const text = textOf(tree);
+    expect(text).toContain('Take a photo');
+    expect(text).toContain('Upload a photo or video');
+    expect(text).toContain('Record a reel');
+
+    // Each option is wired to its own handler.
+    /* `findAll` returns the composite and its host node for each control, so
+       the same testID appears twice; one press each is what is being tested. */
+    const seen = new Set<string>();
+    const buttons = tree.root
+      .findAll(
+        (n: any) =>
+          typeof n.props?.testID === 'string' &&
+          n.props.testID.startsWith('memory-option-') &&
+          typeof n.props?.onPress === 'function',
+        { deep: true },
+      )
+      .filter((n: any) => {
+        if (seen.has(n.props.testID)) return false;
+        seen.add(n.props.testID);
+        return true;
+      });
+    expect(buttons).toHaveLength(3);
+    ReactTestRenderer.act(() => {
+      buttons.forEach((b: any) => b.props.onPress());
+    });
+    expect(taps).toEqual(['photo', 'library', 'reel']);
+  });
+
+  it('makes a relative stored url absolute, or nothing loads on a device', () => {
+    /*
+     * The local storage driver returns "/api/upload/file/<key>" when
+     * UPLOAD_PUBLIC_BASE_URL is unset, which is the development default. A
+     * browser resolves that against the page it is on; React Native has no
+     * such context and shows a broken-image glyph — which is exactly what it
+     * did until the grid used the app's existing `absoluteFileUrl`.
+     */
+    const relative = memory({
+      thumbnailUrl: '/api/upload/file/memoryPhoto/2026/09/abc.thumb.webp',
+    });
+    const uris = block([relative])
+      .root.findAll((n: any) => typeof n.props?.source?.uri === 'string', { deep: true })
+      .map((n: any) => n.props.source.uri as string);
+    expect(uris.some((u: string) => u.startsWith('/'))).toBe(false);
+    expect(uris.some((u: string) => /^https?:\/\/.+\.thumb\.webp$/.test(u))).toBe(true);
+  });
+
+  it('draws the grid from thumbnails, never the original', () => {
+    /*
+     * The performance failure this guards against is invisible in review:
+     * everything works, and a phone quietly pulls megabytes to draw tiles a
+     * couple of hundred pixels wide.
+     */
+    const sources = block([memory()])
+      .root.findAll((n: any) => typeof n.props?.source?.uri === 'string', { deep: true })
+      .map((n: any) => n.props.source.uri as string);
+    expect(sources).toContain('https://cdn.example/original.thumb.webp');
+    expect(sources).not.toContain('https://cdn.example/original.jpg');
+    expect(sources).not.toContain('https://cdn.example/original.display.webp');
+  });
+
+  it('offers no way to add one when the server says uploads are shut', () => {
+    // The window and the permission are both the server's answers; hiding the
+    // button is the courtesy, and the route refuses regardless.
+    expect(textOf(block([memory()], { canUpload: false }))).not.toContain('Add a memory');
+    expect(textOf(block([memory()]))).toContain('Add a memory');
+  });
+
+  it('invites the first memory rather than showing an empty frame', () => {
+    expect(textOf(block([]))).toContain('Be the first to share a moment.');
+    expect(textOf(block([], { canUpload: false }))).toContain('No photos have been shared yet.');
+  });
+
+  it('names the celebrations from the invitation, never a fixed list', () => {
+    const text = textOf(block([memory()]));
+    expect(text).toContain('Haldi');
+    expect(text).toContain('All Events');
+    expect(text).not.toContain('Sangeet');
+  });
+
+  it('tells the uploader what became of their own, on the tile', () => {
+    expect(textOf(block([memory({ moderationStatus: 'awaiting' })]))).toContain(
+      'Waiting for approval',
+    );
+    expect(textOf(block([memory({ visibility: 'uploader' })]))).toContain(
+      'Only you can see this',
+    );
+    // Nothing on a memory that is simply in the gallery.
+    expect(textOf(block([memory()]))).not.toContain('Waiting for approval');
+  });
+
+  it('marks a reel and shows a clip’s length', () => {
+    const text = textOf(block([memory({ kind: 'reel', durationSec: 42 })]));
+    expect(text).toContain('REEL');
+    expect(text).toContain('0:42');
+  });
+
+  it('draws every icon it names from the bundled set', () => {
+    const glyphs = require('react-native-vector-icons/glyphmaps/MaterialCommunityIcons.json');
+    const names = block([memory({ kind: 'video', durationSec: 30 })])
+      .root.findAll((n: any) => typeof n.props?.name === 'string', { deep: true })
+      .map((n: any) => n.props.name as string);
+    expect(names.length).toBeGreaterThan(0);
+    expect(names.filter((n: string) => !(n in glyphs))).toEqual([]);
   });
 });
 

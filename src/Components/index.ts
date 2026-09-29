@@ -8,6 +8,7 @@ export { CalendarSheet, todayIso, toIsoDate } from './CalendarSheet';
 export { EventlyImage } from './EventlyImage';
 export { OccasionArt } from './OccasionArt';
 export { Confetti } from './Confetti';
+export { CornerBloom } from './CornerBloom';
 export type { EventlyTextVariant } from './EventlyText';
 export type { EventlyButtonVariant } from './EventlyButton';
 export type { OccasionArtKey } from './OccasionArt';

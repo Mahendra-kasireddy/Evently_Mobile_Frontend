@@ -114,6 +114,72 @@ export interface InvitationSubEventDTO {
   liveStartedAt?: string;
 }
 
+/* ---- F6: Shared Memories -------------------------------------------------
+ *
+ * The same shapes the web reads. Nothing is modelled twice: these are the
+ * server's answers, named.
+ */
+
+/** Whether the gallery exists, and who may do what. Server-owned. */
+export interface MemorySettingsDTO {
+  enabled: boolean;
+  guestUpload: boolean;
+  guestView: boolean;
+  guestDownload: boolean;
+  moderation: boolean;
+  uploadFrom: string;
+  uploadWindowDays: number;
+  /** Whether uploads are open right now, and why not when they are shut. */
+  window: { open: boolean; reason: string; opensAt: string; closesAt: string };
+}
+
+/** One item, as the customer who owns the celebration reads it. */
+export interface MemoryDTO {
+  id: string;
+  kind: 'photo' | 'video' | 'reel';
+  subEvent: string;
+  /** The original. For the download flow only — never rendered in a grid. */
+  url: string;
+  thumbnailUrl: string;
+  displayUrl: string;
+  caption: string;
+  durationSec: number;
+  likes: number;
+  uploader: string;
+  status: string;
+  moderationStatus: string;
+  visibility: string;
+  flags: string[];
+  createdAt: string;
+}
+
+export interface MemoryGalleryDTO {
+  items: MemoryDTO[];
+  /** Empty when there is no further page. */
+  nextCursor: string;
+  counts: { all: number; photo: number; video: number; reel: number };
+  awaiting: number;
+  subEvents: Array<{ id: string; name: string }>;
+}
+
+export interface MemoryUploadOutcomeDTO {
+  status: 'added' | 'pending' | 'duplicate' | 'flagged';
+  /** Already worded for a person; shown as it arrives. */
+  message: string;
+  media?: MemoryDTO;
+}
+
+/** One file on its way up, as the picker handed it over. */
+export interface UploadMemoryInput {
+  uri: string;
+  fileName: string;
+  mimeType: string;
+  subEventId?: string;
+  caption?: string;
+  durationSec?: number;
+  reel?: boolean;
+}
+
 /** A colour a card may be given. Server-owned, like the templates. */
 export interface CardColourDTO {
   id: string;

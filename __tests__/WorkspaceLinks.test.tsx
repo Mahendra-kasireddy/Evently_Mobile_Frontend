@@ -18,7 +18,7 @@ jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
 });
 
 import { IdeasSummary, InvitationSummary } from '../src/modules/Workspace/sections/WorkspaceLinks';
-import type { InvitationDTO } from '../src/modules/Workspace/types';
+import type { IdeaDTO, InvitationDTO } from '../src/modules/Workspace/types';
 
 function render(node: React.ReactElement) {
   let tree!: ReactTestRenderer.ReactTestRenderer;
@@ -52,19 +52,37 @@ function textOf(tree: ReactTestRenderer.ReactTestRenderer): string {
 
 const noop = () => {};
 
+const idea = (over: Partial<IdeaDTO> = {}): IdeaDTO =>
+  ({
+    id: 'i1',
+    authorRole: 'organizer',
+    authorName: 'MAHENDRA EVENTS',
+    type: 'idea',
+    text: 'Thinking a marigold and white palette for the stage.',
+    images: [],
+    confidential: false,
+    reply: null,
+    approval: 'none',
+    approvalLabel: '',
+    createdAt: new Date().toISOString(),
+    ...over,
+  }) as IdeaDTO;
+
 describe('IdeasSummary', () => {
-  it('invites a first post rather than reporting three zeros', () => {
+  it('says what the board is for rather than reporting three zeros', () => {
     const text = textOf(
       render(
         <IdeasSummary
           counts={{ shared: 0, planned: 0, awaitingApproval: 0 }}
           organizerName="MAHENDRA EVENTS"
+          latest={null}
           onPress={noop}
         />,
       ),
     );
 
-    expect(text).toContain('Share your ideas with MAHENDRA EVENTS');
+    expect(text).toContain('Ideas & Planning');
+    expect(text).toContain('Explore ideas, themes and tips');
     expect(text).not.toContain('0 ideas shared');
     expect(text).toContain('Start');
   });
@@ -75,30 +93,88 @@ describe('IdeasSummary', () => {
         <IdeasSummary
           counts={{ shared: 3, planned: 2, awaitingApproval: 1 }}
           organizerName="MAHENDRA EVENTS"
+          latest={null}
           onPress={noop}
         />,
       ),
     );
 
-    expect(text).toContain('Your ideas with MAHENDRA EVENTS');
     expect(text).toContain('3 ideas shared · 2 planned · 1 awaiting your approval');
-    expect(text).toContain('Open');
+    expect(text).toContain('Explore');
   });
 
   it('says "1 idea", not "1 ideas"', () => {
     const text = textOf(
-      render(<IdeasSummary counts={{ shared: 1, planned: 0, awaitingApproval: 0 }} organizerName={null} onPress={noop} />),
+      render(
+        <IdeasSummary
+          counts={{ shared: 1, planned: 0, awaitingApproval: 0 }}
+          organizerName={null}
+          latest={null}
+          onPress={noop}
+        />,
+      ),
     );
     expect(text).toContain('1 idea shared');
-    // No organizer on the booking yet — the copy still has to read.
-    expect(text).toContain('your organizer');
   });
 
   it('still renders while the counts are loading', () => {
-    // The board loads alongside the booking, so the section must not vanish
+    // The board loads alongside the booking, so the card must not vanish
     // (or crash) in the gap.
-    const text = textOf(render(<IdeasSummary counts={null} organizerName="ME" onPress={noop} />));
-    expect(text).toContain('Share your ideas with ME');
+    const text = textOf(
+      render(<IdeasSummary counts={null} organizerName="ME" latest={null} onPress={noop} />),
+    );
+    expect(text).toContain('Ideas & Planning');
+  });
+
+  /*
+   * The organizer's newest post, on the card. The customer should not have to
+   * open the board to find out that something is waiting there.
+   */
+  it('shows the organizer\'s newest post and who it came from', () => {
+    const text = textOf(
+      render(
+        <IdeasSummary
+          counts={{ shared: 2, planned: 0, awaitingApproval: 0 }}
+          organizerName="MAHENDRA EVENTS"
+          latest={idea()}
+          onPress={noop}
+        />,
+      ),
+    );
+
+    expect(text).toContain('marigold and white palette');
+    expect(text).toContain('From MAHENDRA EVENTS');
+  });
+
+  it('shows the board\'s own word for a post that has been signed off', () => {
+    const text = textOf(
+      render(
+        <IdeasSummary
+          counts={{ shared: 2, planned: 1, awaitingApproval: 0 }}
+          organizerName="MAHENDRA EVENTS"
+          latest={idea({ approval: 'approved', approvalLabel: 'You approved this' })}
+          onPress={noop}
+        />,
+      ),
+    );
+
+    // The board's label, not a sentence this card made up about it.
+    expect(text).toContain('You approved this');
+    expect(text).not.toContain('From MAHENDRA EVENTS');
+  });
+
+  it('draws no post block at all when the organizer has written nothing', () => {
+    const text = textOf(
+      render(
+        <IdeasSummary
+          counts={{ shared: 1, planned: 0, awaitingApproval: 0 }}
+          organizerName="MAHENDRA EVENTS"
+          latest={null}
+          onPress={noop}
+        />,
+      ),
+    );
+    expect(text).not.toContain('From MAHENDRA EVENTS');
   });
 });
 

@@ -9,6 +9,11 @@ import type {
 
 export const MY_INVITATIONS_ENDPOINT = '/invitation/mine';
 
+/** The platform recorder stops itself here; the server decides the rest. */
+export const REEL_MAX_SECONDS = 60;
+/** Matches the server's bound, so the counter and the limit agree. */
+export const MEMORY_CAPTION_MAX = 120;
+
 /** The cover is one block among the rest — this is the key it is stored under. */
 export const COVER_BLOCK_KEY = 'header';
 
@@ -369,6 +374,56 @@ export const INVITATION_COPY = {
   saveTheDateDress: 'Dress code',
   saveTheDateAdd: 'Add to Calendar',
   saveTheDateNoDate: 'This celebration has no date yet.',
+  /* ---- F6: shared memories ---- */
+  memoriesTitle: 'Shared Memories',
+  memoriesLead: 'Everything your guests photographed, in one place.',
+  memoriesOffLead:
+    'Let your guests add their photos and videos to one shared gallery. It is off until you switch it on.',
+  memoriesTurnOn: 'Switch it on',
+  memoriesOffNote:
+    'You can change who may view, upload and download it from your event page at any time.',
+  memoryTally: (n: number) => `${n} shared`,
+  memoryAll: 'All',
+  memoryPhotos: 'Photos',
+  memoryVideos: 'Videos',
+  memoryReels: 'Reels',
+  memoryAllEvents: 'All Events',
+  memoryTheCelebration: 'The celebration',
+  memoryReel: 'REEL',
+  memoryMore: 'Show more',
+  memoryLoading: 'Loading\u2026',
+  memoryEmpty: 'No photos have been shared yet.',
+  memoryEmptyCanAdd: 'Be the first to share a moment.',
+  memoryOpen: (n: number, total: number) => `Open item ${n} of ${total}`,
+  memoryPosition: (n: number, total: number) => `${n} of ${total}`,
+  /* On your own tile, and only there. */
+  memoryPending: 'Waiting for approval',
+  memoryRejected: 'Not shared',
+  memoryHidden: 'Hidden from guests',
+  memoryOnlyYou: 'Only you can see this',
+  /* Adding one. */
+  memoryAdd: 'Add a memory',
+  memoryAddTitle: 'Add to your memories',
+  memoryAddLead: 'It goes into the same gallery your guests are filling.',
+  memoryTakePhoto: 'Take a photo',
+  memoryTakePhotoNote: 'Opens your camera.',
+  memoryPick: 'Upload a photo or video',
+  memoryPickNote: 'Choose from your phone.',
+  memoryRecord: 'Record a reel',
+  memoryRecordNote: 'Up to a minute, straight from your camera.',
+  memoryConfirmTitle: 'Share this memory?',
+  memoryConfirmLead: 'Nothing is uploaded until you say so.',
+  memoryWhichEvent: 'Which event is this from?',
+  memoryCaption: 'Caption (optional)',
+  memoryCaptionHint: 'A line about this moment\u2026',
+  memoryAdding: 'Adding your memory\u2026',
+  memoryShare: 'Share it',
+  memoryRetake: 'Choose another',
+  memoryCancel: 'Cancel',
+  memoryClose: 'Close',
+  memoryPrevious: 'Previous',
+  memoryNext: 'Next',
+  memorySave: 'Save',
   /* ---- F5: the live stream ---- */
   liveBadge: 'LIVE',
   liveNow: 'LIVE NOW',

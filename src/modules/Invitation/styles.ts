@@ -1601,3 +1601,257 @@ export const liveStyles = StyleSheet.create({
   },
   factText: { color: colors.text, fontSize: 13, lineHeight: 19 },
 });
+
+/* ---------- F6: Shared Memories ---------- */
+
+/*
+ * The same cream card, gold hairlines and coral accent as the rest of the
+ * invitation. A gallery is the section most likely to drift into looking like
+ * a social app, so it is deliberately held to the invitation's own voice.
+ */
+export const memoriesStyles = StyleSheet.create({
+  block: {
+    position: 'relative',
+    overflow: 'hidden',
+    marginTop: 28,
+    marginHorizontal: spacing.md,
+    paddingHorizontal: 16,
+    paddingTop: 18,
+    paddingBottom: 16,
+    borderRadius: 20,
+    backgroundColor: INV_CREAM,
+  },
+  bloom: { position: 'absolute', top: -14, right: -12 },
+
+  head: { ...globalStyles.row, alignItems: 'baseline', justifyContent: 'space-between' },
+  heading: { color: INV_NAVY_DEEP, fontFamily: 'serif', fontSize: 19, fontWeight: '600' },
+  tally: { color: colors.textMuted, fontSize: 11.5 },
+  lead: { color: colors.textMuted, fontSize: 12.5, lineHeight: 18, marginTop: 4 },
+
+  /* Both filter rows scroll rather than wrap: a wedding has four or five
+     celebrations and a phone is 360px wide. */
+  tabs: { marginTop: 14 },
+  tabsRow: { ...globalStyles.row, gap: 8, paddingRight: 16 },
+  tab: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 13,
+    paddingVertical: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(176,133,43,0.22)',
+    backgroundColor: '#fff',
+  },
+  tabOn: { borderColor: 'transparent', backgroundColor: INV_ACCENT },
+  tabText: { color: colors.text, fontSize: 12.5, lineHeight: 17, fontWeight: '700' },
+  tabTextOn: { color: colors.onPrimary },
+  filters: { marginTop: 8 },
+  filter: {
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'transparent',
+    backgroundColor: '#fff',
+  },
+  filterOn: { borderColor: 'rgba(176,133,43,0.35)' },
+  filterText: { color: colors.textMuted, fontSize: 11.5, fontWeight: '700' },
+  filterTextOn: { color: INV_NAVY_DEEP },
+
+  /* Two columns, square cells — the grid is a grid before a single image has
+     loaded, so nothing reflows under the reader as they arrive. */
+  grid: { ...globalStyles.row, flexWrap: 'wrap', gap: 8, marginTop: 14 },
+  cell: {
+    width: '48%',
+    aspectRatio: 1,
+    borderRadius: 14,
+    overflow: 'hidden',
+    backgroundColor: INV_BLUSH,
+  },
+  cellImage: { width: '100%', height: '100%' },
+  play: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  reelMark: {
+    position: 'absolute',
+    left: 7,
+    top: 7,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 999,
+    backgroundColor: 'rgba(15,17,22,0.6)',
+  },
+  reelText: { color: '#fff', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
+  length: {
+    position: 'absolute',
+    right: 7,
+    bottom: 7,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 6,
+    backgroundColor: 'rgba(15,17,22,0.66)',
+  },
+  lengthText: { color: '#fff', fontSize: 10.5 },
+  cellNote: {
+    position: 'absolute',
+    left: 6,
+    right: 6,
+    bottom: 6,
+    paddingHorizontal: 7,
+    paddingVertical: 5,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255,253,250,0.94)',
+  },
+  cellNoteText: { color: colors.text, fontSize: 10.5, lineHeight: 14 },
+
+  empty: { color: colors.textMuted, fontSize: 13, lineHeight: 19, textAlign: 'center', marginTop: 18 },
+  more: {
+    marginTop: 12,
+    paddingVertical: 11,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(176,133,43,0.25)',
+    backgroundColor: '#fff',
+    alignItems: 'center',
+  },
+  moreText: { color: INV_NAVY_DEEP, fontSize: 12.5, fontWeight: '700' },
+
+  /* The floating action, inside the card rather than over the whole screen —
+     the invitation is one long scroll and a screen-level button would sit on
+     top of the countdown and the story too. */
+  add: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 14,
+    paddingVertical: 13,
+    borderRadius: 14,
+    backgroundColor: INV_ACCENT,
+  },
+  addText: { color: colors.onPrimary, fontSize: 14, fontWeight: '700' },
+  say: {
+    marginTop: 10,
+    paddingHorizontal: 11,
+    paddingVertical: 9,
+    borderRadius: 10,
+    backgroundColor: '#fff',
+  },
+  sayWarn: { backgroundColor: '#fff7f3' },
+  sayText: { color: colors.text, fontSize: 12.5, lineHeight: 18 },
+  sayTextWarn: { color: INV_ACCENT },
+
+  /* ---- the sheets ---- */
+  sheetTitle: { color: INV_NAVY_DEEP, fontSize: 17, fontWeight: '700', marginBottom: 4 },
+  sheetLead: { color: colors.textMuted, fontSize: 12.5, lineHeight: 18, marginBottom: 14 },
+  option: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: INV_HAIRLINE,
+    marginBottom: 8,
+  },
+  optionMark: {
+    width: 38,
+    height: 38,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: INV_BLUSH,
+  },
+  optionText: { flex: 1 },
+  optionName: { color: INV_NAVY_DEEP, fontSize: 14, fontWeight: '700' },
+  optionNote: { color: colors.textMuted, fontSize: 11.5, lineHeight: 16, marginTop: 1 },
+
+  preview: {
+    width: '100%',
+    aspectRatio: 1,
+    borderRadius: 14,
+    backgroundColor: '#0f1116',
+    marginBottom: 12,
+  },
+  fieldLabel: {
+    color: colors.textMuted,
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    marginBottom: 6,
+  },
+  eventRow: { ...globalStyles.row, gap: 8, flexWrap: 'wrap', marginBottom: 14 },
+  captionInput: {
+    borderWidth: 1,
+    borderColor: INV_HAIRLINE,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    minHeight: 64,
+    color: colors.text,
+    fontSize: 13.5,
+    textAlignVertical: 'top',
+  },
+  counter: { color: colors.textMuted, fontSize: 11, textAlign: 'right', marginTop: 4 },
+  counterOver: { color: INV_ACCENT },
+
+  /* A bar rather than a spinner: an upload has a length, and saying so is the
+     difference between waiting and wondering. */
+  progressTrack: {
+    height: 5,
+    borderRadius: 999,
+    backgroundColor: INV_HAIRLINE,
+    overflow: 'hidden',
+    marginTop: 12,
+  },
+  progressFill: { height: 5, borderRadius: 999, backgroundColor: INV_ACCENT },
+
+  sheetActions: { ...globalStyles.row, gap: 8, marginTop: 14 },
+  sheetGhost: {
+    flex: 1,
+    paddingVertical: 13,
+    borderRadius: 13,
+    borderWidth: 1,
+    borderColor: INV_HAIRLINE,
+    alignItems: 'center',
+  },
+  sheetGhostText: { color: INV_NAVY_DEEP, fontSize: 13.5, fontWeight: '700' },
+  sheetPrimary: {
+    flex: 2,
+    paddingVertical: 13,
+    borderRadius: 13,
+    backgroundColor: INV_ACCENT,
+    alignItems: 'center',
+  },
+  sheetPrimaryText: { color: colors.onPrimary, fontSize: 13.5, fontWeight: '700' },
+
+  /* ---- the viewer ---- */
+  viewerBar: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+  },
+  viewerCaption: { flex: 1, color: '#fff', fontSize: 13, lineHeight: 18, textAlign: 'center' },
+  viewerPill: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 11,
+    paddingVertical: 8,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+  },
+  viewerPillText: { color: '#fff', fontSize: 12.5, fontWeight: '700' },
+});
