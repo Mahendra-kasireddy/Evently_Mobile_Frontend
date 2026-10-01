@@ -10,7 +10,11 @@ export const SEARCH_NAVY = '#1a2e5a';
 export const SEARCH_NAVY_DEEP = '#0e1a33';
 export const SEARCH_CANVAS = '#faf8f7';
 
-export const NO_FILTERS: SearchFilters = { occasion: '', city: '', maxBudget: '' };
+export const NO_FILTERS: SearchFilters = {
+  occasion: '',
+  city: '',
+  maxBudget: '',
+};
 
 /**
  * The ceilings a customer can pick, in rupees.
@@ -19,7 +23,11 @@ export const NO_FILTERS: SearchFilters = { occasion: '', city: '', maxBudget: ''
  * platform knows the distribution of prices well enough to place a handle
  * meaningfully, and these are the bands the plan wizard already asks in.
  */
-export const BUDGET_CEILINGS: Array<{ key: string; label: string; value: number }> = [
+export const BUDGET_CEILINGS: Array<{
+  key: string;
+  label: string;
+  value: number;
+}> = [
   { key: '1l', label: 'Under ₹1L', value: 100000 },
   { key: '3l', label: 'Under ₹3L', value: 300000 },
   { key: '5l', label: 'Under ₹5L', value: 500000 },
@@ -41,7 +49,8 @@ export const SEARCH_COPY = {
   resultCount: (n: number) => (n === 1 ? '1 result' : `${n} results`),
 
   idleTitle: 'What are you planning?',
-  idleBody: 'Search by occasion, an organizer’s name, or what you need — decor, catering, photography.',
+  idleBody:
+    'Search by occasion, an organizer’s name, or what you need — decor, catering, photography.',
   emptyTitle: 'Nothing matched',
   emptyBody: 'Try a shorter search, or clear a filter.',
   errorTitle: "We couldn't run that search",

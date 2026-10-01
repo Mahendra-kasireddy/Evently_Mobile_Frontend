@@ -1,4 +1,10 @@
-import { Modal, Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { EventlyText } from '../../../Components';
 import { BUDGET_CEILINGS, SEARCH_COPY as COPY } from '../constants';
 import { filterSheetStyles as s } from '../styles';
@@ -35,7 +41,7 @@ function ChipGroup({
         {title}
       </EventlyText>
       <View style={s.chips}>
-        {options.map((option) => {
+        {options.map(option => {
           const on = selected === option.key;
           return (
             <TouchableOpacity
@@ -47,7 +53,10 @@ function ChipGroup({
               accessibilityState={{ selected: on }}
               accessibilityLabel={`${title}: ${option.label}`}
             >
-              <EventlyText variant="caption" style={[s.chipText, on && s.chipTextOn]}>
+              <EventlyText
+                variant="caption"
+                style={[s.chipText, on && s.chipTextOn]}
+              >
                 {option.label}
               </EventlyText>
             </TouchableOpacity>
@@ -77,9 +86,14 @@ export function FilterSheet({
   onClose,
 }: FilterSheetProps) {
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+    >
       <Pressable style={s.backdrop} onPress={onClose}>
-        <Pressable style={s.sheet} onPress={(e) => e.stopPropagation()}>
+        <Pressable style={s.sheet} onPress={e => e.stopPropagation()}>
           <View style={s.grabber} />
           <View style={s.head}>
             <EventlyText variant="h2" style={s.title}>
@@ -95,21 +109,24 @@ export function FilterSheet({
           <ScrollView showsVerticalScrollIndicator={false}>
             <ChipGroup
               title={COPY.occasion}
-              options={occasions.map((o) => ({ key: o.id, label: o.label }))}
+              options={occasions.map(o => ({ key: o.id, label: o.label }))}
               selected={filters.occasion}
-              onSelect={(value) => onSelect('occasion', value)}
+              onSelect={value => onSelect('occasion', value)}
             />
             <ChipGroup
               title={COPY.city}
-              options={cities.map((city) => ({ key: city, label: city }))}
+              options={cities.map(city => ({ key: city, label: city }))}
               selected={filters.city}
-              onSelect={(value) => onSelect('city', value)}
+              onSelect={value => onSelect('city', value)}
             />
             <ChipGroup
               title={COPY.budget}
-              options={BUDGET_CEILINGS.map((b) => ({ key: b.key, label: b.label }))}
+              options={BUDGET_CEILINGS.map(b => ({
+                key: b.key,
+                label: b.label,
+              }))}
               selected={filters.maxBudget}
-              onSelect={(value) => onSelect('maxBudget', value)}
+              onSelect={value => onSelect('maxBudget', value)}
             />
 
             <TouchableOpacity

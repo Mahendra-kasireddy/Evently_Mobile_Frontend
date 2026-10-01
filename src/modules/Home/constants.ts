@@ -373,6 +373,8 @@ export const BOOKED_CTA = 'Open workspace';
 export const BOOKED_STEP_DONE_COLOR = '#1d9e75';
 export const BOOKED_STEP_PENDING_COLOR = '#e6e9f0';
 export const BOOKED_RING_TRACK_COLOR = '#eef0f4';
+/** The warm cream the booked card's photo fades into on the left. */
+export const BOOKED_CARD_PHOTO_BG = '#fbf3ee';
 
 /**
  * Ring geometry, matching the reference design's phone breakpoint: a 76px ring

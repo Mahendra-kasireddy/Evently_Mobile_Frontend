@@ -162,7 +162,7 @@ function pressables(tree: ReactTestRenderer.ReactTestRenderer) {
 const noop = () => {};
 
 describe('BookedEventCard', () => {
-  it('states the booking, the event and the countdown', () => {
+  it('states the booking and each fact on its own line', () => {
     const text = textOf(
       render(<BookedEventCard data={booked} onPress={noop} />),
     );
@@ -170,93 +170,65 @@ describe('BookedEventCard', () => {
     expect(text).toContain('BOOKED');
     expect(text).toContain('EVT-2026-1977');
     expect(text).toContain('Naming ceremony');
-    expect(text).toContain('5 Sep 2026 · Kukatpally · 150 guests');
-    expect(text).toContain('3');
-    expect(text).toContain('days to go');
-    expect(text).toContain('Open workspace');
+    expect(text).toContain('5 Sep 2026');
+    expect(text).toContain('Kukatpally');
+    expect(text).toContain('150 guests');
+    expect(text).toContain('Event planning progress');
+    expect(text).toContain('1 of 4 steps done');
   });
 
-  it('names the organizer and what they are doing', () => {
-    const text = textOf(
-      render(<BookedEventCard data={booked} onPress={noop} />),
-    );
-    expect(text).toContain('Mahendra Events');
-    expect(text).toContain('ME');
-    expect(text).toContain('Managing 6 vendors for you');
-  });
-
-  it('draws the bar at exactly the progress the milestones report', () => {
+  it('marks done, next and not-yet milestones apart', () => {
+    // The whole point of the row is showing what happens next.
     const tree = render(<BookedEventCard data={booked} onPress={noop} />);
-    const fill = stylesOf(tree).find(
-      s =>
-        s.backgroundColor === bookedEventStyles.fill.backgroundColor &&
-        s.width !== undefined,
+    const nodes = stylesOf(tree).filter(s => s.width === 28 && s.height === 28);
+    expect(nodes).toHaveLength(4);
+    expect(nodes[0].backgroundColor).toBe(
+      bookedEventStyles.nodeDone.backgroundColor,
     );
-    expect(fill.width).toBe('25%');
-
-    // …and the count beside it agrees, from the same milestones.
-    expect(textOf(tree)).toContain('1 of 4 steps done');
-    const done = booked.steps.filter(s => s.done).length;
-    expect(Math.round((done / booked.steps.length) * 100)).toBe(
-      booked.progress,
+    expect(nodes[1].backgroundColor).toBe(
+      bookedEventStyles.nodeNext.backgroundColor,
     );
-  });
-
-  it('marks the next milestone, not just the finished ones', () => {
-    // Done / next / not yet, told apart by the dot and the label together —
-    // the whole point of the row is showing what happens next.
-    const tree = render(<BookedEventCard data={booked} onPress={noop} />);
-    const dots = stylesOf(tree).filter(
-      s => s.borderRadius === 999 && s.width === 8,
-    );
-    expect(dots).toHaveLength(4);
-    expect(dots[0].backgroundColor).toBe(
-      bookedEventStyles.stepDotDone.backgroundColor,
-    );
-    expect(dots[1].backgroundColor).toBe(
-      bookedEventStyles.stepDotNext.backgroundColor,
-    );
-    expect(dots[2].backgroundColor).toBe(
-      bookedEventStyles.stepDot.backgroundColor,
+    expect(nodes[2].backgroundColor).toBe(
+      bookedEventStyles.node.backgroundColor,
     );
   });
 
   it('marks nothing as next once everything is done', () => {
     const tree = render(<BookedEventCard data={underway} onPress={noop} />);
-    const dots = stylesOf(tree).filter(
-      s => s.borderRadius === 999 && s.width === 8,
-    );
+    const nodes = stylesOf(tree).filter(s => s.width === 28 && s.height === 28);
     expect(
-      dots.every(
-        d =>
-          d.backgroundColor === bookedEventStyles.stepDotDone.backgroundColor,
+      nodes.every(
+        n => n.backgroundColor === bookedEventStyles.nodeDone.backgroundColor,
       ),
     ).toBe(true);
+    expect(textOf(tree)).toContain('All set!');
   });
 
-  it('still reads BOOKED before the organizer has confirmed', () => {
-    // The customer has chosen an organizer and paid; what is outstanding is the
-    // organizer's acceptance, which the organizer line states outright.
+  it('says it is on track, with the countdown, while steps remain', () => {
+    const text = textOf(
+      render(<BookedEventCard data={booked} onPress={noop} />),
+    );
+    expect(text).toContain('Everything is on track!');
+    expect(text).toContain('3 days to go');
+  });
+
+  it('still reads BOOKED before the organizer has confirmed, and says so', () => {
     const text = textOf(
       render(<BookedEventCard data={awaiting} onPress={noop} />),
     );
     expect(text).toContain('BOOKED');
-    expect(text).toContain('Confirming your booking');
-    expect(text).toContain('day to go');
-    expect(text).not.toContain('days to go');
+    expect(text).toContain('Waiting for your organizer');
+    expect(text).not.toContain('Everything is on track!');
   });
 
-  it('switches the badge once the event is underway, and drops the units on the day', () => {
+  it('switches the badge once the event is underway', () => {
     const text = textOf(
       render(<BookedEventCard data={underway} onPress={noop} />),
     );
     expect(text).toContain('IN PROGRESS');
-    expect(text).toContain('Today');
-    // A countdown of nothing does not need the units it is not counting.
-    expect(text).not.toContain('days to go');
   });
 
-  it('opens the workspace, and the organizer thread separately', () => {
+  it('opens the workspace from the card, and the organizer from its menu', () => {
     const onPress = jest.fn();
     const onMessage = jest.fn();
     const tree = render(
@@ -267,27 +239,41 @@ describe('BookedEventCard', () => {
       />,
     );
 
-    const drawn = pressables(tree);
-    expect(drawn).toHaveLength(2);
-
-    const message = drawn.find(n =>
-      n.props.accessibilityLabel.startsWith('Message'),
-    )!;
-    const workspace = drawn.find(n =>
+    const card = pressables(tree).find(n =>
       n.props.accessibilityLabel.startsWith('Open workspace'),
     )!;
-    expect(message.props.accessibilityLabel).toBe('Message Mahendra Events');
-
-    ReactTestRenderer.act(() => message.props.onPress());
-    ReactTestRenderer.act(() => workspace.props.onPress());
-    expect(onMessage).toHaveBeenCalledTimes(1);
+    ReactTestRenderer.act(() => card.props.onPress());
     expect(onPress).toHaveBeenCalledTimes(1);
+
+    const more = pressables(tree).find(n =>
+      n.props.accessibilityLabel.startsWith('More'),
+    )!;
+    ReactTestRenderer.act(() => more.props.onPress());
+    expect(textOf(tree)).toContain('Message Mahendra Events');
+
+    // The innermost button holding the label — the card itself wraps the
+    // menu too, so the first match would be the card.
+    const menuMessage = tree.root
+      .findAllByProps({ accessibilityRole: 'button' })
+      .filter(
+        n =>
+          typeof n.props.onPress === 'function' &&
+          n.findAll(c => c.props.children === 'Message Mahendra Events')
+            .length > 0,
+      )
+      .pop()!;
+    ReactTestRenderer.act(() => menuMessage.props.onPress());
+    expect(onMessage).toHaveBeenCalledTimes(1);
   });
 
-  it('offers no message button when there is no organizer to message', () => {
+  it('offers no message option when there is no organizer to message', () => {
     // A button that fails on tap is worse than no button.
     const tree = render(<BookedEventCard data={booked} onPress={noop} />);
-    expect(pressables(tree)).toHaveLength(1);
+    const more = pressables(tree).find(n =>
+      n.props.accessibilityLabel.startsWith('More'),
+    )!;
+    ReactTestRenderer.act(() => more.props.onPress());
+    expect(textOf(tree)).not.toContain('Message');
   });
 });
 

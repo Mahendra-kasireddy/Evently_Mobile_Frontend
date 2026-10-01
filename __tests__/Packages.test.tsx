@@ -169,18 +169,16 @@ describe('Packages — saving', () => {
 });
 
 describe('Packages', () => {
-  it('shows the badge, title, organizer, rating and price', () => {
+  it('shows the badge, title, what it is, the price and what it includes', () => {
     const text = textOf(render(<Packages {...base} data={section()} />)).join('|');
 
-    expect(text).toContain('BUDGET PICK');
+    // The badge as written, in its own colour, rather than shouted.
+    expect(text).toContain('Budget pick');
+    expect(text).toContain('Terrace setup · 80 guests');
+    expect(text).toContain('Decor');
+    expect(text).toContain('50–100 guests');
     expect(text).toContain('Birthday Bash');
-    expect(text).toContain('Sruthi Celebrations');
-    expect(text).toContain('4.8');
-    expect(text).toContain('(51)');
     expect(text).toContain('₹95,000');
-    // The organizer's own recent bookings, said under their name — nothing
-    // links a booking back to the package that inspired it.
-    expect(text).toContain('18 booked this month');
   });
 
   it('drops the strapline: the cards say what they are', () => {

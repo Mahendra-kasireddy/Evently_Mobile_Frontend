@@ -1,15 +1,15 @@
-import { useState } from 'react';
-import { View } from 'react-native';
+import { useRef, useState } from 'react';
+import type { ReactNode } from 'react';
+import { Pressable, TextInput, View } from 'react-native';
 import {
   EventlyIcon,
   EventlyText,
   EventlyTextInput,
 } from '../../../Components';
-import { PLAN_ACCENT, PLAN_TEXT_MUTED } from '../constants';
+import { PLAN_TEXT_MUTED } from '../constants';
 import { eventDetailsStyles } from '../styles';
 import { formatEventDate, todayIsoDate } from '../utils';
 import { DatePickerModal } from './DatePickerModal';
-import { SelectField } from './SelectField';
 import { SelectListModal } from './SelectListModal';
 import type { PlanDraft } from '../types';
 
@@ -25,6 +25,79 @@ interface EventDetailsFormProps {
 
 type OpenModal = 'date' | 'city' | 'guests' | 'budget' | null;
 
+/** Each row's icon wears its own tint, so the list scans by colour. */
+const ROW_TINT = {
+  date: { bg: '#fde8e6', fg: '#e5534b' },
+  city: { bg: '#e3f4ec', fg: '#1d9e75' },
+  area: { bg: '#ece9fb', fg: '#6c5ce7' },
+  guests: { bg: '#fff1e0', fg: '#f08c2e' },
+  budget: { bg: '#e6effb', fg: '#3b6fd8' },
+} as const;
+
+interface DetailRowProps {
+  caption: string;
+  icon: string;
+  tint: { bg: string; fg: string };
+  value?: string;
+  placeholder?: string;
+  onPress: () => void;
+  isLast?: boolean;
+  /** Replaces the value text — the Area row puts its input here. */
+  children?: ReactNode;
+}
+
+/** One row of the details card: tinted icon, caption over value, chevron. */
+function DetailRow({
+  caption,
+  icon,
+  tint,
+  value,
+  placeholder,
+  onPress,
+  isLast = false,
+  children,
+}: DetailRowProps) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        eventDetailsStyles.row,
+        !isLast && eventDetailsStyles.rowDivider,
+        pressed && eventDetailsStyles.rowPressed,
+      ]}
+      accessibilityRole="button"
+      accessibilityLabel={`${caption}. ${value || placeholder || ''}`}
+    >
+      <View style={[eventDetailsStyles.rowIcon, { backgroundColor: tint.bg }]}>
+        <EventlyIcon name={icon} size={20} color={tint.fg} />
+      </View>
+      <View style={eventDetailsStyles.rowBody}>
+        <EventlyText
+          variant="caption"
+          style={eventDetailsStyles.rowCaption}
+          numberOfLines={1}
+        >
+          {caption}
+        </EventlyText>
+        {children ?? (
+          <EventlyText
+            variant="body"
+            style={
+              value
+                ? eventDetailsStyles.rowValue
+                : eventDetailsStyles.rowPlaceholder
+            }
+            numberOfLines={1}
+          >
+            {value || placeholder}
+          </EventlyText>
+        )}
+      </View>
+      <EventlyIcon name="chevron-right" size={22} color={PLAN_TEXT_MUTED} />
+    </Pressable>
+  );
+}
+
 export function EventDetailsForm({
   draft,
   cityOptions,
@@ -35,87 +108,67 @@ export function EventDetailsForm({
   onSelectBudget,
 }: EventDetailsFormProps) {
   const [openModal, setOpenModal] = useState<OpenModal>(null);
-  const [areaFocused, setAreaFocused] = useState(false);
+
+  const areaInputRef = useRef<TextInput>(null);
+  const hasBudget = budgetOptions.length > 0;
 
   return (
     <View style={eventDetailsStyles.section}>
-      <EventlyText variant="subtitle" style={eventDetailsStyles.sectionTitle}>
-        The basics
-      </EventlyText>
-
-      {/* Date and guest count are both short answers, so they share a row. */}
-      <View style={eventDetailsStyles.pair}>
-        <View style={eventDetailsStyles.pairItem}>
-          <SelectField
-            caption="Event date"
-            icon="calendar-blank-outline"
-            value={draft.eventDate ? formatEventDate(draft.eventDate) : ''}
-            placeholder="Choose"
-            showChevron={false}
-            onPress={() => setOpenModal('date')}
-          />
-        </View>
-        <View style={eventDetailsStyles.pairItem}>
-          <SelectField
-            caption="Guests"
-            icon="account-group-outline"
-            value={draft.guests}
-            placeholder="Choose"
-            showChevron={false}
-            onPress={() => setOpenModal('guests')}
-          />
-        </View>
-      </View>
-
-      <SelectField
-        caption="City"
-        icon="map-marker-outline"
-        value={draft.city}
-        placeholder="Choose your city"
-        onPress={() => setOpenModal('city')}
-      />
-
-      {/*
-        Free text, so it is an input rather than a picker — but it wears the
-        same caption-inside-the-control shape as its neighbours, or it would
-        read as a different kind of thing sitting between two that are not.
-      */}
-      <View
-        style={[
-          eventDetailsStyles.control,
-          areaFocused && eventDetailsStyles.controlRowFocused,
-        ]}
-      >
-        <EventlyText variant="caption" style={eventDetailsStyles.caption}>
-          Area / neighbourhood
-        </EventlyText>
-        <View style={eventDetailsStyles.controlValueRow}>
-          <EventlyIcon
-            name="map-marker-radius-outline"
-            size={14}
-            color={draft.area ? PLAN_ACCENT : PLAN_TEXT_MUTED}
-          />
+      <View style={eventDetailsStyles.card}>
+        <DetailRow
+          caption="Event date"
+          icon="calendar-month-outline"
+          tint={ROW_TINT.date}
+          value={draft.eventDate ? formatEventDate(draft.eventDate) : ''}
+          placeholder="Choose a date"
+          onPress={() => setOpenModal('date')}
+        />
+        <DetailRow
+          caption="City"
+          icon="map-marker"
+          tint={ROW_TINT.city}
+          value={draft.city}
+          placeholder="Choose your city"
+          onPress={() => setOpenModal('city')}
+        />
+        {/* Free text, so the row holds an input; tapping anywhere on the row
+            focuses it, the same as tapping a picker row opens its picker. */}
+        <DetailRow
+          caption="Area / Neighbourhood"
+          icon="map-outline"
+          tint={ROW_TINT.area}
+          onPress={() => areaInputRef.current?.focus()}
+        >
           <EventlyTextInput
-            style={eventDetailsStyles.controlInput}
+            ref={areaInputRef}
+            style={eventDetailsStyles.rowInput}
             value={draft.area}
             placeholder="e.g. Banjara Hills"
+            placeholderTextColor={PLAN_TEXT_MUTED}
             onChangeText={text => onSetField('area', text)}
-            onFocus={() => setAreaFocused(true)}
-            onBlur={() => setAreaFocused(false)}
           />
-        </View>
-      </View>
-
-      {budgetOptions.length > 0 ? (
-        <SelectField
-          caption="Budget — optional"
-          icon="wallet-outline"
-          value={draft.budget}
-          placeholder="Add a range to sharpen matches"
-          optional
-          onPress={() => setOpenModal('budget')}
+        </DetailRow>
+        <DetailRow
+          caption="Guests"
+          icon="account-group-outline"
+          tint={ROW_TINT.guests}
+          value={draft.guests}
+          placeholder="How many guests?"
+          onPress={() => setOpenModal('guests')}
+          isLast={!hasBudget}
         />
-      ) : null}
+        {hasBudget ? (
+          <DetailRow
+            caption="Budget — optional"
+            icon="wallet-outline"
+            tint={ROW_TINT.budget}
+            value={draft.budget}
+            placeholder="Add a range to sharpen matches"
+            onPress={() => setOpenModal('budget')}
+            isLast
+          />
+        ) : null}
+      </View>
 
       <DatePickerModal
         visible={openModal === 'date'}

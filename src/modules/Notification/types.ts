@@ -1,4 +1,9 @@
-export type NotificationType = 'booking' | 'quote' | 'payment' | 'message' | 'system';
+export type NotificationType =
+  | 'booking'
+  | 'quote'
+  | 'payment'
+  | 'message'
+  | 'system';
 
 export interface NotificationDTO {
   id: string;
@@ -31,4 +36,7 @@ export interface NotificationGroup {
 }
 
 /** Where a notification leads, when the app has somewhere to send it. */
-export type NotificationRoute = { screen: 'Conversation'; conversationId: string } | null;
+export type NotificationRoute = {
+  screen: 'Conversation';
+  conversationId: string;
+} | null;

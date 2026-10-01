@@ -1,5 +1,6 @@
-import { useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
+import { useEffect } from 'react';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
@@ -11,6 +12,7 @@ import {
   KeyboardAvoider,
 } from '../../Components';
 import type { MainTabParamList } from '../../navigation/types';
+import { colors } from '../../theme';
 import { PLAN_ACCENT, PLAN_BG, PLAN_GREEN, PLAN_TEXT_MUTED } from './constants';
 import { usePlanContainer } from './container';
 import { CategoriesStep } from './sections/CategoriesStep';
@@ -20,7 +22,7 @@ import { IdeasRequests } from './sections/IdeasRequests';
 import { OccasionPicker } from './sections/OccasionPicker';
 import { PlanHero } from './sections/PlanHero';
 import { ReviewStep } from './sections/ReviewStep';
-import { Stepper } from './sections/Stepper';
+import { StepPills } from './sections/StepPills';
 import { eventDetailsStyles, styles } from './styles';
 import { splitBannerSentence } from './utils';
 
@@ -56,12 +58,36 @@ function HeaderFade() {
 
 export function PlanScreen() {
   const route = useRoute<RouteProp<MainTabParamList, 'Plan'>>();
+  const navigation = useNavigation();
   const container = usePlanContainer(
     route.params?.occasionId,
     route.params?.organizerId,
     route.params?.eventDate,
     route.params?.requestId,
   );
+
+  /*
+   * Every navigation into Plan, not just the first.
+   *
+   * A tab stays mounted, so tapping "Birthday" on Home after the wizard had
+   * already opened on "Wedding" used to leave Wedding selected. Each navigate()
+   * hands over a fresh params object; apply it, then clear it so a plain tap
+   * on the Plan tab later does not re-apply a stale choice.
+   */
+  const { applyEntry } = container;
+  const entryParams = route.params;
+  useEffect(() => {
+    const occasionId = entryParams?.occasionId;
+    const organizerId = entryParams?.organizerId;
+    const eventDate = entryParams?.eventDate;
+    if (!occasionId && !organizerId && !eventDate) return;
+    applyEntry({ occasionId, organizerId, eventDate });
+    navigation.setParams({
+      occasionId: undefined,
+      organizerId: undefined,
+      eventDate: undefined,
+    } as never);
+  }, [entryParams, applyEntry, navigation]);
 
   if (container.isLoadingScreen) {
     return (
@@ -128,29 +154,43 @@ export function PlanScreen() {
   const isOrganizersStep = stepIndex === stepIndices.organizersIndex;
   const isReviewStep = stepIndex === stepIndices.reviewIndex;
   const stepInfo = container.steps[stepIndex];
+  const selectedOrganizerCount = container.draft.selectedOrganizerIds.length;
   const occasionLabel = container.currentOccasion.label;
 
   const banner = splitBannerSentence(data.budgetBanner ?? '');
 
+  // A short tagline under the header title, one per step.
+  const headerSubtitle = isDetailsStep
+    ? 'Create your dream celebration'
+    : isCategoriesStep
+    ? 'Bring your vision to life'
+    : isOrganizersStep
+    ? 'Find the best organizers'
+    : isReviewStep
+    ? 'One last look before you send'
+    : undefined;
+
+  // Back walks the plan's own steps first; on the first step it leaves the
+  // tab (the tab navigator returns to Home) rather than doing nothing.
+  const handleBack = () => {
+    if (stepIndex > 0) {
+      container.goBack();
+    } else if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate('Home' as never);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.fixedHeader}>
-        {/*
-          No back arrow: Plan is a bottom-tab root, so there is nothing behind it
-          to go back to. Moving between steps is the Stepper right below.
-        */}
-        <AppHeader
-          title={`Plan your ${occasionLabel}`}
-          showBackButton={false}
-          compact
-        />
-        <Stepper
-          steps={container.steps}
-          current={stepIndex}
-          onSelect={container.goToStep}
-        />
-      </View>
-
+      {/* The standard app header, unwrapped: it carries its own 16pt gutters,
+          so it lines up with every other screen's header. */}
+      <AppHeader
+        title={`Plan your ${occasionLabel}`}
+        subtitle={headerSubtitle}
+        onBackPress={handleBack}
+      />
       <KeyboardAvoider style={styles.body}>
         <HeaderFade />
         <ScrollView
@@ -158,13 +198,30 @@ export function PlanScreen() {
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
         >
-          <PlanHero
-            occasionLabel={occasionLabel}
-            isDetailsStep={isDetailsStep}
-            heading={stepInfo?.heading ?? ''}
-            subtitle={stepInfo?.subtitle ?? ''}
-            trust={data.trust ?? []}
-          />
+          {/* Position is a "Step N of 4" pill rather than a progress bar. The
+              Details hero draws its own, inside the floral header. */}
+          {isDetailsStep ? null : (
+            <View style={styles.stepPillsGap}>
+              <StepPills
+                stepNumber={stepIndex + 1}
+                stepCount={container.steps.length}
+                stepLabel={stepInfo?.label ?? ''}
+              />
+            </View>
+          )}
+
+          {isCategoriesStep || isOrganizersStep ? null : (
+            <PlanHero
+              occasionLabel={occasionLabel}
+              isDetailsStep={isDetailsStep}
+              heading={stepInfo?.heading ?? ''}
+              subtitle={stepInfo?.subtitle ?? ''}
+              trust={data.trust ?? []}
+              stepNumber={stepIndex + 1}
+              stepCount={container.steps.length}
+              stepLabel={stepInfo?.label ?? ''}
+            />
+          )}
 
           {isOrganizersStep ? (
             <FindOrganizers
@@ -174,7 +231,6 @@ export function PlanScreen() {
               selectedOrganizerIds={container.draft.selectedOrganizerIds}
               onToggleOrganizer={container.toggleOrganizer}
               canAddOrganizer={container.canAddOrganizer}
-              onReviewShortlist={container.reviewShortlist}
             />
           ) : isReviewStep ? (
             <ReviewStep
@@ -202,6 +258,8 @@ export function PlanScreen() {
             />
           ) : isDetailsStep ? (
             <>
+              {/* The occasion comes first: it names the step's heading and
+                  frames every answer below it. */}
               <OccasionPicker
                 occasions={container.occasions}
                 selectedId={container.draft.occasionId}
@@ -224,11 +282,13 @@ export function PlanScreen() {
               />
               {data.budgetBanner ? (
                 <View style={eventDetailsStyles.banner}>
-                  <EventlyIcon
-                    name="information-outline"
-                    size={17}
-                    color={PLAN_GREEN}
-                  />
+                  <View style={eventDetailsStyles.bannerIcon}>
+                    <EventlyIcon
+                      name="lightbulb-on-outline"
+                      size={19}
+                      color={colors.onPrimary}
+                    />
+                  </View>
                   <EventlyText
                     variant="body"
                     style={eventDetailsStyles.bannerText}
@@ -243,6 +303,13 @@ export function PlanScreen() {
                     ) : null}
                     {banner.rest}
                   </EventlyText>
+                  {/* A small green sprout, as in the design: budget as
+                      something that grows into a plan, not a gate. */}
+                  <EventlyIcon
+                    name="sprout-outline"
+                    size={30}
+                    color={PLAN_GREEN}
+                  />
                 </View>
               ) : null}
             </>
@@ -287,6 +354,36 @@ export function PlanScreen() {
                 styles.floatingButton,
                 !container.canContinue && styles.continueDisabled,
               ]}
+            />
+          </View>
+        ) : null}
+
+        {/* One request, several organizers: the shortlist travels with the
+            customer down the list, and sends to everyone ticked at once. */}
+        {isOrganizersStep && selectedOrganizerCount > 0 ? (
+          <View style={[styles.footerBar, styles.shortlistFooter]}>
+            <View style={styles.shortlistFooterText}>
+              <EventlyText
+                variant="subtitle"
+                style={styles.shortlistFooterCount}
+              >
+                {selectedOrganizerCount === 1
+                  ? '1 organizer selected'
+                  : `${selectedOrganizerCount} organizers selected`}
+              </EventlyText>
+              <EventlyText variant="caption" style={styles.shortlistFooterHint}>
+                Each sends their own quote to compare
+              </EventlyText>
+            </View>
+            <EventlyButton
+              title={
+                selectedOrganizerCount === 1
+                  ? 'Request quote'
+                  : `Request ${selectedOrganizerCount} quotes`
+              }
+              onPress={container.reviewShortlist}
+              accentColor={PLAN_ACCENT}
+              style={styles.shortlistFooterButton}
             />
           </View>
         ) : null}

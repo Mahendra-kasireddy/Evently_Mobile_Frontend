@@ -1,8 +1,9 @@
-import { Dimensions, StyleSheet } from 'react-native';
+import { Dimensions, Platform, StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
 import { brand } from '../../theme';
 import { colors, spacing } from '../../theme';
 import {
+  BOOKED_CARD_PHOTO_BG,
   BOOKED_STEP_DONE_COLOR,
   BOOKED_STEP_PENDING_COLOR,
   CATEGORY_ICON_BADGE_COLOR,
@@ -32,6 +33,8 @@ import {
 export const HERO_PHOTO_OVERLAP = 34;
 
 export const styles = StyleSheet.create({
+  /** Holds whichever state Home is in, plus the one name prompt. */
+  root: { flex: 1, backgroundColor: HOME_CANVAS },
   container: { flex: 1, backgroundColor: HOME_CANVAS },
   scroll: { flex: 1 },
   content: { paddingBottom: spacing.xl },
@@ -151,7 +154,6 @@ export const homeHeaderStyles = StyleSheet.create({
     fontWeight: '700',
     lineHeight: 13,
   },
-
 });
 
 /**
@@ -660,169 +662,171 @@ export const heroTrustStyles = StyleSheet.create({
 export const BOOKED_CARD_WIDTH =
   Dimensions.get('window').width - spacing.md * 2 - 28;
 
+const BOOKED_NODE = 28;
+
 export const bookedEventStyles = StyleSheet.create({
   section: { marginTop: spacing.lg, paddingHorizontal: spacing.md },
   row: { marginTop: spacing.lg },
   rowContent: { paddingHorizontal: spacing.md, gap: 12 },
   card: {
-    ...globalStyles.card,
-    borderRadius: 20,
+    borderRadius: 22,
+    overflow: 'hidden',
+    backgroundColor: BOOKED_CARD_PHOTO_BG,
     borderWidth: 1,
     borderColor: HOME_HAIRLINE,
-    /* The head is painted to the card's edge, so the padding moved onto the
-       two halves rather than sitting on the card. */
-    padding: 0,
-    overflow: 'hidden',
+    ...Platform.select({
+      ios: {
+        shadowColor: HOME_NAVY,
+        shadowOpacity: 0.08,
+        shadowRadius: 14,
+        shadowOffset: { width: 0, height: 6 },
+      },
+      android: { elevation: 3 },
+    }),
   },
   cardInRow: { width: BOOKED_CARD_WIDTH },
 
-  /*
-   * The head carries the warm sweep — the same one the Get quotes button runs,
-   * so the two warmest things on Home are the action and the live booking.
-   * Everything on it is reversed out; everything below it is on white.
-   */
-  head: { paddingHorizontal: spacing.md, paddingTop: 14, paddingBottom: 16 },
-  headGradient: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
-
-  /* Status, reference and countdown on one line: three facts about the same
-     booking, none of them worth a row of its own. */
-  topRow: { ...globalStyles.row, alignItems: 'center', gap: 10 },
+  /* The photo fills the head and dissolves into cream on the left, where the
+     title and facts sit. */
+  head: { padding: spacing.md, paddingBottom: spacing.lg, minHeight: 200 },
+  photo: { position: 'absolute', top: 0, right: 0, bottom: 0, width: '72%' },
+  photoImage: { width: '100%', height: '100%' },
+  photoFade: { position: 'absolute', top: 0, left: 0 },
+  topRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   statusPill: {
-    ...globalStyles.row,
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 4,
+    backgroundColor: HOME_ACCENT_SOFT,
     borderRadius: 999,
-    /* Glass on the gradient rather than the mint pill it was: a pale green
-       chip on coral is two unrelated colours arguing in one corner. */
-    backgroundColor: 'rgba(255,255,255,0.22)',
     paddingHorizontal: 10,
     paddingVertical: 5,
   },
   statusText: {
-    color: colors.onPrimary,
-    fontSize: 11.5,
-    fontWeight: '700',
-    letterSpacing: 0.8,
+    color: HERO_ACCENT_COLOR,
+    fontWeight: '800',
+    fontSize: 11,
+    letterSpacing: 0.6,
   },
-  ref: {
-    color: 'rgba(255,255,255,0.78)',
-    fontSize: 13,
-    letterSpacing: 0.4,
-    flexShrink: 1,
-  },
-  /* Pushed right on its own, so the reference can be any length without the
-     countdown drifting off the edge. */
-  days: {
-    ...globalStyles.row,
-    alignItems: 'baseline',
-    gap: 5,
-    marginLeft: 'auto',
-    flexShrink: 0,
-  },
-  daysCount: { color: colors.onPrimary, fontSize: 19, fontWeight: '700' },
-  daysLabel: { color: 'rgba(255,255,255,0.82)', fontSize: 13 },
-
-  title: {
-    color: colors.onPrimary,
-    fontSize: 23,
-    fontWeight: '700',
-    letterSpacing: -0.4,
-    marginTop: 12,
-  },
-  facts: {
-    color: 'rgba(255,255,255,0.88)',
-    fontSize: 14,
-    marginTop: 5,
-    lineHeight: 20,
-  },
-
-  /* Everything the customer acts on, on white, under the head. */
-  body: { padding: spacing.md },
-
-  /* The organizer sits in their own panel: they are a party to the event, not
-     another fact about it. */
-  organizer: {
-    ...globalStyles.row,
-    alignItems: 'center',
-    gap: 12,
-    borderRadius: 16,
-    backgroundColor: HOME_CANVAS,
-    padding: 12,
-  },
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+  ref: { color: colors.textMuted, fontSize: 11, flexShrink: 1 },
+  topSpacer: { flex: 1 },
+  more: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: 'rgba(255,255,255,0.92)',
     alignItems: 'center',
     justifyContent: 'center',
-    flexShrink: 0,
   },
-  avatarText: { color: colors.onPrimary, fontSize: 14, fontWeight: '700' },
-  organizerText: { flex: 1 },
-  organizerName: { color: HOME_NAVY_DEEP, fontSize: 15.5, fontWeight: '700' },
-  organizerNote: { color: colors.textMuted, fontSize: 13.5, marginTop: 1 },
-  chat: {
-    width: 42,
-    height: 42,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: HOME_HAIRLINE,
+  title: {
+    color: HOME_NAVY,
+    fontSize: 28,
+    lineHeight: 34,
+    fontWeight: '800',
+    marginTop: spacing.s12,
+    maxWidth: '62%',
+  },
+  facts: { gap: 8, marginTop: spacing.sm, maxWidth: '56%' },
+  fact: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
+  factText: { color: HOME_NAVY, fontSize: 12.5, lineHeight: 17, flex: 1 },
+
+  /* The white panel over the photo's bottom edge. */
+  body: {
+    marginTop: -spacing.md,
+    backgroundColor: colors.background,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: spacing.md,
+    gap: spacing.md,
+  },
+  progressHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  progressTitle: { color: HOME_NAVY, fontWeight: '800' },
+  progressCountRow: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+  progressCount: { color: HOME_NAVY },
+  steps: { flexDirection: 'row' },
+  step: { flex: 1, alignItems: 'center', gap: 4 },
+  connector: {
+    position: 'absolute',
+    top: BOOKED_NODE / 2 - 0.75,
+    left: '50%',
+    right: '-50%',
+    height: 1.5,
+    backgroundColor: BOOKED_STEP_PENDING_COLOR,
+  },
+  connectorDone: { backgroundColor: BOOKED_STEP_DONE_COLOR },
+  node: {
+    width: BOOKED_NODE,
+    height: BOOKED_NODE,
+    borderRadius: BOOKED_NODE / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#eef0f6',
+  },
+  nodeDone: { backgroundColor: BOOKED_STEP_DONE_COLOR },
+  /* The step in progress wears a soft halo, so it reads as "now". */
+  nodeNext: {
+    backgroundColor: HERO_ACCENT_COLOR,
+    borderWidth: 3,
+    borderColor: HOME_ACCENT_SOFT,
+  },
+  stepLabel: {
+    color: HOME_NAVY,
+    fontSize: 10,
+    lineHeight: 13,
+    textAlign: 'center',
+  },
+  stepLabelDone: { color: HOME_NAVY },
+  stepLabelNext: { color: HERO_ACCENT_COLOR, fontWeight: '700' },
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.s12,
+    backgroundColor: '#fdf0ea',
+    borderRadius: 14,
+    padding: spacing.s12,
+  },
+  statusIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
-    flexShrink: 0,
   },
+  statusTextCol: { flex: 1 },
+  statusTitle: { color: HOME_NAVY, fontWeight: '700' },
+  statusBody: { color: colors.textMuted, marginTop: 1 },
 
-  progressHead: { ...globalStyles.row, alignItems: 'center', marginTop: 18 },
-  progressTitle: { color: HOME_NAVY_DEEP, fontSize: 15.5, fontWeight: '700' },
-  progressCount: {
-    color: colors.textMuted,
-    fontSize: 13.5,
-    marginLeft: 'auto',
+  menuOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(14,26,51,0.45)',
+    justifyContent: 'flex-end',
+    padding: spacing.md,
   },
-  track: {
-    height: 6,
-    borderRadius: 999,
-    backgroundColor: HOME_TRACK,
-    marginTop: 10,
+  menu: {
+    backgroundColor: colors.background,
+    borderRadius: 18,
     overflow: 'hidden',
+    marginBottom: spacing.lg,
   },
-  fill: { height: 6, borderRadius: 999, backgroundColor: HERO_ACCENT_COLOR },
-
-  /* One column per milestone, equal width, so the dots line up with the bar
-     above them rather than bunching under the longest label. */
-  steps: { flexDirection: 'row', marginTop: 12 },
-  step: { flex: 1, paddingRight: 8 },
-  stepDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 999,
-    backgroundColor: BOOKED_STEP_PENDING_COLOR,
-  },
-  stepDotDone: { backgroundColor: BOOKED_STEP_DONE_COLOR },
-  stepDotNext: { backgroundColor: HERO_ACCENT_COLOR },
-  stepLabel: {
-    color: colors.textMuted,
-    fontSize: 12.5,
-    marginTop: 7,
-    lineHeight: 16,
-  },
-  stepLabelDone: { color: HOME_NAVY_DEEP },
-  /* The one still to do is the only thing on this card worth acting on, so it
-     is the only label in the accent colour. */
-  stepLabelNext: { color: HERO_ACCENT_COLOR, fontWeight: '600' },
-
-  /* Navy, not coral. The head is already the warm colour, and a coral button
-     under a coral gradient is one card wearing the same note twice. */
-  cta: {
+  menuItem: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: HOME_NAVY_DEEP,
-    borderRadius: 14,
-    paddingVertical: 16,
-    marginTop: 18,
+    gap: spacing.sm,
+    height: 54,
+    paddingHorizontal: spacing.md,
   },
-  ctaText: { color: colors.onPrimary, fontSize: 16, fontWeight: '700' },
+  menuItemDivider: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: HOME_HAIRLINE,
+  },
+  menuText: { color: HOME_NAVY, fontWeight: '600' },
+  menuCancel: { color: colors.textMuted, fontWeight: '600' },
 });
 
 export const currentEventStyles = StyleSheet.create({
@@ -877,7 +881,6 @@ export const currentEventStyles = StyleSheet.create({
   },
   progressLabel: { color: colors.textMuted },
 });
-
 
 // ---------------------------------------------------------------------------
 // "Curated packages by budget". One full-width card per package: a gradient
@@ -1969,115 +1972,93 @@ export const occasionGridStyles = StyleSheet.create({
  */
 export const packageCardStyles = StyleSheet.create({
   card: {
-    width: 268,
-    borderRadius: 22,
-    backgroundColor: HOME_NAVY_DEEP,
+    width: 236,
+    borderRadius: 20,
+    backgroundColor: colors.background,
+    borderWidth: 1,
+    borderColor: HOME_HAIRLINE,
     overflow: 'hidden',
+    ...Platform.select({
+      ios: {
+        shadowColor: HOME_NAVY,
+        shadowOpacity: 0.07,
+        shadowRadius: 12,
+        shadowOffset: { width: 0, height: 5 },
+      },
+      android: { elevation: 2 },
+    }),
   },
-  /* Tall, because it is now the card rather than its header. */
-  banner: { height: 196, justifyContent: 'flex-end' },
+  banner: { height: 138 },
   bannerLayer: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
   bannerArt: {
     position: 'absolute',
-    top: 18,
+    top: 14,
     right: 8,
-    width: 118,
-    height: 100,
+    width: 110,
+    height: 96,
     opacity: 0.85,
-  },
-  bannerNote: {
-    color: 'rgba(255,255,255,0.88)',
-    fontSize: 12.5,
-    fontWeight: '500',
-    padding: 12,
   },
   badge: {
     position: 'absolute',
     top: 10,
     left: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
     borderRadius: 999,
-    backgroundColor: colors.background,
-    paddingHorizontal: 11,
-    paddingVertical: 5,
+    backgroundColor: 'rgba(255,255,255,0.96)',
+    paddingLeft: 4,
+    paddingRight: 10,
+    paddingVertical: 4,
+    maxWidth: 170,
   },
-  badgeText: {
-    color: HERO_ACCENT_COLOR,
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 0.6,
+  badgeIcon: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  /* On the photograph, opposite the badge: a rating is about the organizer,
-     not the package, so it does not belong in the panel with the price. */
-  ratingChip: {
-    ...globalStyles.row,
+  badgeText: { fontWeight: '700', fontSize: 11.5, flexShrink: 1 },
+  heart: {
     position: 'absolute',
     top: 10,
     right: 10,
-    gap: 4,
-    borderRadius: 999,
-    backgroundColor: 'rgba(12,18,32,0.62)',
-    paddingHorizontal: 9,
-    paddingVertical: 5,
-  },
-  rating: { color: colors.onPrimary, fontSize: 12.5, fontWeight: '700' },
-  reviews: { color: 'rgba(255,255,255,0.72)', fontSize: 12 },
-
-  /* The panel. Solid, not a scrim: white type over a photograph is legible
-     only for as long as nobody uploads a pale one. */
-  body: { backgroundColor: HOME_NAVY_DEEP, padding: 14, paddingTop: 13 },
-  title: {
-    color: colors.onPrimary,
-    fontSize: 16.5,
-    fontWeight: '700',
-    lineHeight: 21,
-    /* Clear of the heart, which floats over this row. */
-    paddingRight: 44,
-  },
-  metaRow: { ...globalStyles.row, gap: 5, marginTop: 5 },
-  meta: { color: 'rgba(255,255,255,0.76)', fontSize: 13, flexShrink: 1 },
-
-  priceRow: { ...globalStyles.row, gap: 10, marginTop: 12 },
-  priceText: { flex: 1 },
-  priceCaption: { color: 'rgba(255,255,255,0.6)', fontSize: 11.5 },
-  price: {
-    color: colors.onPrimary,
-    fontSize: 19,
-    fontWeight: '700',
-    letterSpacing: -0.3,
-  },
-  listPrice: {
-    color: 'rgba(255,255,255,0.55)',
-    fontSize: 12.5,
-    textDecorationLine: 'line-through',
-  },
-  /* The action the card is for, in the brand accent — the one warm thing on
-     the panel, so there is no question what to press. */
-  cta: {
-    borderRadius: 999,
-    backgroundColor: HERO_ACCENT_COLOR,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    flexShrink: 0,
-  },
-  ctaText: { color: colors.onPrimary, fontSize: 13.5, fontWeight: '700' },
-
-  /*
-   * Over the seam, top-right, as in the reference.
-   *
-   * Measured from the top rather than the bottom: the banner is a fixed 196
-   * and the panel is not — a two-line title makes it taller — so anchoring to
-   * the bottom would slide the heart up and down with the wording.
-   */
-  heart: {
-    position: 'absolute',
-    top: 178,
-    right: 12,
-    width: 36,
-    height: 36,
-    borderRadius: 999,
-    backgroundColor: colors.background,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(14,26,51,0.28)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  body: { padding: spacing.s12, gap: spacing.sm },
+  titleRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  titleCol: { flex: 1 },
+  title: { color: HOME_NAVY, fontWeight: '700', fontSize: 14, lineHeight: 19 },
+  subtitle: { color: colors.textMuted, marginTop: 1 },
+  arrow: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm },
+  price: { color: HOME_NAVY, fontWeight: '700', fontSize: 16, lineHeight: 21 },
+  listPrice: { color: colors.textMuted, textDecorationLine: 'line-through' },
+  features: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingTop: spacing.sm,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: HOME_HAIRLINE,
+  },
+  feature: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 5 },
+  featureText: {
+    color: HOME_NAVY,
+    fontSize: 10.5,
+    lineHeight: 13,
+    flexShrink: 1,
   },
 });
 
@@ -2090,69 +2071,127 @@ export const packageCardStyles = StyleSheet.create({
  * the reply time on one card in five sizes, and the name — the thing a
  * customer is actually reading — was set at the same weight as the rest of it.
  */
+const ORGANIZER_CARD_WIDTH = 176;
+const ORGANIZER_LOGO = 36;
+
 export const organizerRowStyles = StyleSheet.create({
+  rowContent: {
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.s12,
+    paddingBottom: spacing.xs,
+    gap: spacing.s12,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: spacing.s12,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.s12,
+  },
   card: {
-    ...globalStyles.row,
-    alignItems: 'flex-start',
-    gap: 12,
+    width: ORGANIZER_CARD_WIDTH,
+    borderRadius: 18,
     backgroundColor: colors.background,
-    borderRadius: 16,
     borderWidth: 1,
     borderColor: HOME_HAIRLINE,
-    padding: 10,
-    marginHorizontal: spacing.md,
-    marginTop: 10,
+    overflow: 'hidden',
+    ...Platform.select({
+      ios: {
+        shadowColor: HOME_NAVY,
+        shadowOpacity: 0.06,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 4 },
+      },
+      android: { elevation: 2 },
+    }),
   },
-  /*
-   * The reference has a photograph here. An organizer has no cover image in
-   * the feed, so the tile is their own monogram on their own colour — which
-   * is what every other surface in the app identifies them by.
-   */
-  avatar: {
-    width: 92,
-    height: 84,
-    borderRadius: 12,
+  cardInGrid: { width: '48.5%' },
+  cover: { height: 112 },
+  coverImage: {
+    width: '100%',
+    height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    flexShrink: 0,
   },
-  avatarText: {
-    color: colors.onPrimary,
-    fontSize: 22,
-    fontWeight: '700',
-    letterSpacing: 0.5,
-  },
-
-  text: { flex: 1, minHeight: 84 },
-  /* The quiet line above the name, where the reference puts its date. */
-  metaRow: { ...globalStyles.row, gap: 4 },
-  rating: { color: HOME_NAVY, fontSize: 13, fontWeight: '700' },
-  reviews: { color: colors.textMuted, fontSize: 12.5 },
-  dot: { color: colors.textMuted, fontSize: 12.5 },
-  tier: { fontSize: 12.5, fontWeight: '700' },
-  name: {
-    color: HOME_NAVY,
-    fontSize: 16,
-    fontWeight: '700',
-    lineHeight: 21,
-    letterSpacing: -0.2,
-    marginTop: 3,
-  },
-
-  /* The foot of the card: what they have done lately on the left, what they
-     start at on the right — the reference's "200+ registered" and "Public". */
-  factRow: {
-    ...globalStyles.row,
+  verified: {
+    position: 'absolute',
+    top: spacing.sm,
+    left: spacing.sm,
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginTop: 'auto',
-    paddingTop: 8,
+    gap: 3,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
   },
-  booked: { color: colors.textMuted, fontSize: 12.5, flexShrink: 1 },
-  right: { ...globalStyles.row, alignItems: 'baseline', gap: 4, marginLeft: 'auto', flexShrink: 0 },
-  fromLabel: { color: colors.textMuted, fontSize: 11.5 },
-  fromValue: { color: HOME_NAVY, fontSize: 14.5, fontWeight: '700' },
-  replies: { color: HOME_GREEN, fontSize: 12.5 },
+  verifiedText: { color: HOME_GREEN, fontWeight: '700', fontSize: 11 },
+  heart: {
+    position: 'absolute',
+    top: spacing.sm,
+    right: spacing.sm,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  /* The logo straddles the photo's bottom edge. */
+  logo: {
+    position: 'absolute',
+    left: spacing.s12,
+    bottom: -ORGANIZER_LOGO / 2,
+    width: ORGANIZER_LOGO,
+    height: ORGANIZER_LOGO,
+    borderRadius: ORGANIZER_LOGO / 2,
+    borderWidth: 2,
+    borderColor: colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  logoImage: { width: '100%', height: '100%' },
+  logoText: { color: colors.onPrimary, fontWeight: '800', fontSize: 12 },
+  body: {
+    paddingHorizontal: spacing.s12,
+    paddingTop: ORGANIZER_LOGO / 2 + 6,
+    paddingBottom: spacing.s12,
+    gap: 6,
+  },
+  name: { color: HOME_NAVY, fontWeight: '800' },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.xs,
+  },
+  ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
+  rating: { color: HOME_NAVY, fontWeight: '700' },
+  reviews: { color: colors.textMuted },
+  location: { color: colors.textMuted, flexShrink: 1, textAlign: 'right' },
+  tagRow: { flexDirection: 'row', gap: 5, overflow: 'hidden' },
+  tag: {
+    backgroundColor: '#f3f4f7',
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    flexShrink: 1,
+  },
+  tagText: { color: HOME_NAVY, fontSize: 10.5 },
+  cta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: HOME_ACCENT_SOFT,
+    borderRadius: 10,
+    paddingLeft: spacing.s12,
+    paddingRight: spacing.sm,
+    height: 36,
+    marginTop: 4,
+  },
+  ctaText: { color: HERO_ACCENT_COLOR, fontWeight: '700', fontSize: 12.5 },
   emptyText: {
     color: colors.textMuted,
     paddingHorizontal: spacing.md,
@@ -2177,4 +2216,112 @@ export const trustStripStyles = StyleSheet.create({
     padding: 12,
   },
   label: { color: '#414b5c', fontSize: 12.5, marginTop: 10, lineHeight: 17 },
+});
+
+/** The warm cream the "other events" banner's photo fades into. */
+export const OTHER_EVENT_CARD_BG = '#fbf1ea';
+/** Side margin of the banner, matching every Home section's heading. */
+export const OTHER_EVENT_GUTTER = spacing.md;
+
+/*
+ * "Your other events" — a banner per event: pill, title, date / city / guests,
+ * a "View plan" button on the left, the occasion's photo on the right.
+ */
+export const otherEventCardStyles = StyleSheet.create({
+  listContent: {
+    paddingHorizontal: OTHER_EVENT_GUTTER,
+    paddingTop: spacing.s12,
+  },
+  separator: { width: OTHER_EVENT_GUTTER / 2 },
+  card: {
+    height: 176,
+    borderRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: OTHER_EVENT_CARD_BG,
+    borderWidth: 1,
+    borderColor: 'rgba(232,99,58,0.12)',
+  },
+  photo: { position: 'absolute', top: 0, right: 0, bottom: 0, width: '62%' },
+  photoImage: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
+  /* The bouquet sits on the right of a 3:2 image; pin its right edge. */
+  photoImageFloral: {
+    position: 'absolute',
+    top: -10,
+    right: -30,
+    bottom: -10,
+    width: 320,
+  },
+  artLayer: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
+  photoFade: { position: 'absolute', top: 0, left: 0 },
+  content: { flex: 1, padding: spacing.md, justifyContent: 'space-between' },
+  pill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 5,
+    backgroundColor: colors.background,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  pillText: { color: HERO_ACCENT_COLOR, fontWeight: '700', fontSize: 11 },
+  title: {
+    color: HOME_NAVY,
+    fontSize: 20,
+    lineHeight: 26,
+    fontWeight: '800',
+    maxWidth: '70%',
+  },
+  metaRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    columnGap: spacing.s12,
+    rowGap: 4,
+  },
+  metaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  metaText: { color: HOME_NAVY, fontWeight: '500' },
+  cta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 6,
+    backgroundColor: colors.background,
+    borderRadius: 999,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    ...Platform.select({
+      ios: {
+        shadowColor: HOME_NAVY,
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 2 },
+      },
+      android: { elevation: 2 },
+    }),
+  },
+  ctaText: { color: HOME_NAVY, fontWeight: '700', fontSize: 13 },
+  edit: {
+    position: 'absolute',
+    top: spacing.s12,
+    right: spacing.s12,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: spacing.s12,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(26,46,90,0.18)',
+  },
+  dotActive: { width: 18, backgroundColor: HOME_NAVY },
 });

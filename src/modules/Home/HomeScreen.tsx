@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import type { ReactNode } from 'react';
 import type { CompositeNavigationProp } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -32,7 +33,7 @@ import { GuestsSheet, RangeSheet } from '../Pickers';
 import { usePlanScreenData } from '../Plan/hooks';
 import { Banner } from './sections/Banner';
 import { BookedEventCard } from './sections/BookedEventCard';
-import { EventRow } from './sections/EventRow';
+import { OtherEventsCarousel } from './sections/OtherEventsCarousel';
 import { EventHero } from './sections/EventHero';
 import { HomeHeroPhoto } from './sections/HomeHeroPhoto';
 import { HomeHeader } from './sections/HomeHeader';
@@ -183,6 +184,13 @@ export function HomeScreen() {
       key={booking.id}
       data={booking}
       inRow={inRow}
+      photoUrl={
+        occasions?.items.find(
+          tile =>
+            tile.label.toLowerCase() === booking.title.toLowerCase() ||
+            tile.id.toLowerCase() === booking.title.toLowerCase(),
+        )?.photoUrl ?? ''
+      }
       onPress={() =>
         navigation.navigate('Workspace', {
           bookingId: booking.id,
@@ -246,8 +254,26 @@ export function HomeScreen() {
     />
   );
 
+  /*
+   * The name prompt, mounted once for all three states below.
+   *
+   * It used to be rendered inside each of them, so a reload went: the
+   * loading state's copy opened the sheet, the feed arrived, that copy was
+   * torn down mid-slide, and a second one mounted in the loaded state. On
+   * iOS, removing a Modal while it is still presenting leaves its invisible
+   * layer over the screen — the sheet "closed by itself" and Home stopped
+   * scrolling. As a keyed sibling inside one wrapper it survives every change
+   * of state beside it.
+   */
+  const withNameGate = (screen: ReactNode) => (
+    <View style={styles.root}>
+      {screen}
+      <NameGateSheet key="name-gate" onNameSaved={refetch} />
+    </View>
+  );
+
   if (isLoading && !hasAnyContent) {
-    return (
+    return withNameGate(
       <SafeAreaView style={styles.container} edges={['top']}>
         <HomeHeader {...headerProps} />
         <View style={styles.centered}>
@@ -256,13 +282,12 @@ export function HomeScreen() {
             Loading your home…
           </EventlyText>
         </View>
-        <NameGateSheet onNameSaved={refetch} />
-      </SafeAreaView>
+      </SafeAreaView>,
     );
   }
 
   if (isError && !hasAnyContent) {
-    return (
+    return withNameGate(
       <SafeAreaView style={styles.container} edges={['top']}>
         <HomeHeader {...headerProps} />
         <View style={styles.centered}>
@@ -270,12 +295,11 @@ export function HomeScreen() {
             {errorMessage ?? 'Something went wrong.'}
           </EventlyText>
         </View>
-        <NameGateSheet onNameSaved={refetch} />
-      </SafeAreaView>
+      </SafeAreaView>,
     );
   }
 
-  return (
+  return withNameGate(
     /*
      * No top safe-area edge here, deliberately: the hero photograph runs under
      * the status bar, and insetting the screen would draw a canvas-coloured
@@ -384,17 +408,14 @@ export function HomeScreen() {
           ) : null}
 
           {/*
-          Every other live event, one row each.
+          Every other live event, as a swipeable banner carousel.
 
-          These used to be full heroes, and ten events meant ten screens of
-          navy card before anything else on Home. Only the leading event needs
-          that weight; the rest need telling apart, which a row does. Three of
-          them, then a link — Home stays the same length whether the customer
-          has four events or forty, and the Events tab is already the full list.
+          One card tall however many there are, with dots for the rest. Three
+          of them, then "See all" — the Events list is the full set.
         */}
           {visibleOtherEvents.length ? (
-          <View style={sectionStyles.block}>
-            {/*
+            <View style={sectionStyles.block}>
+              {/*
               "See all", always — the same head every other section on Home
               uses.
 
@@ -405,35 +426,33 @@ export function HomeScreen() {
               events list now rather than the Events tab, which is the
               screen this section is a preview of.
             */}
-            <SectionHead
-              title="Your other events"
-              actionLabel="See all"
-              testID="see-all-events"
-              onPressAction={() =>
-                navigation.navigate('SeeAll', { kind: 'events' })
-              }
-            />
+              <SectionHead
+                title="Your other events"
+                actionLabel="See all"
+                testID="see-all-events"
+                onPressAction={() =>
+                  navigation.navigate('SeeAll', { kind: 'events' })
+                }
+              />
 
-            {visibleOtherEvents.map(event => (
-              <EventRow
-                key={`${event.source}:${event.refId}`}
-                event={event}
-                onPress={() => openEvent(event)}
-                /* Only a brief nobody has been hired off yet: past
-                   acceptance there is a booking, and changing the terms is a
-                   conversation with the organizer rather than a form. */
-                onEdit={
+              <OtherEventsCarousel
+                events={visibleOtherEvents}
+                occasionTiles={occasions?.items ?? []}
+                onOpen={openEvent}
+                /* Only a brief nobody has been hired off yet: past acceptance
+                 there is a booking, and changing the terms is a conversation
+                 with the organizer rather than a form. */
+                editFor={event =>
                   isBriefEditable(event)
                     ? () =>
                         navigation.navigate('Plan', { requestId: event.refId })
                     : undefined
                 }
               />
-            ))}
-          </View>
-        ) : null}
+            </View>
+          ) : null}
 
-        {offers && (
+          {offers && (
             <View style={sectionStyles.block}>
               <Offers
                 data={offers}
@@ -528,9 +547,8 @@ export function HomeScreen() {
         onClose={() => setOpenSheet(null)}
       />
 
-      <NameGateSheet onNameSaved={refetch} />
       <CouponSheet coupon={openCoupon} onClose={() => setOpenCoupon(null)} />
-    </View>
+    </View>,
   );
 }
 

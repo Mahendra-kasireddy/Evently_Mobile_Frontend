@@ -1,5 +1,9 @@
 import { apiClient } from '../../services/apiClient';
-import { CITIES_ENDPOINT, OCCASIONS_ENDPOINT, SEARCH_ENDPOINT } from './constants';
+import {
+  CITIES_ENDPOINT,
+  OCCASIONS_ENDPOINT,
+  SEARCH_ENDPOINT,
+} from './constants';
 import type { SearchKind, SearchResultsDTO } from './types';
 
 export interface SearchParams {
@@ -25,13 +29,19 @@ export async function search(params: SearchParams): Promise<SearchResultsDTO> {
   if (params.maxBudget != null) query.maxBudget = params.maxBudget;
   if (params.kind !== 'all') query.kind = params.kind;
 
-  const { data } = await apiClient.get<SearchResultsDTO>(SEARCH_ENDPOINT, { params: query });
+  const { data } = await apiClient.get<SearchResultsDTO>(SEARCH_ENDPOINT, {
+    params: query,
+  });
   return data;
 }
 
 /** The filter sheet's own options — the same lists the plan wizard offers. */
-export async function fetchOccasions(): Promise<Array<{ id: string; label: string }>> {
-  const { data } = await apiClient.get<Array<{ id: string; label: string }>>(OCCASIONS_ENDPOINT);
+export async function fetchOccasions(): Promise<
+  Array<{ id: string; label: string }>
+> {
+  const { data } = await apiClient.get<Array<{ id: string; label: string }>>(
+    OCCASIONS_ENDPOINT,
+  );
   return Array.isArray(data) ? data : [];
 }
 

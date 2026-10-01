@@ -40,6 +40,10 @@ const newcomer: OrganizerItem = {
   fromLabel: '₹7L',
   repliesLabel: 'Replies in 1h',
   bookedLabel: '19 booked this month',
+  coverUrl: '',
+  logoUrl: '',
+  verified: false,
+  locationLabel: 'Hyderabad',
 };
 
 const established: OrganizerItem = {
@@ -55,6 +59,10 @@ const established: OrganizerItem = {
   fromLabel: '₹7L',
   repliesLabel: 'Replies in 1h',
   bookedLabel: '19 booked this month',
+  coverUrl: '',
+  logoUrl: '',
+  verified: false,
+  locationLabel: 'Hyderabad',
 };
 
 const section = (over: Partial<TopOrganizersViewModel> = {}): TopOrganizersViewModel => ({

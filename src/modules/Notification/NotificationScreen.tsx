@@ -1,10 +1,16 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ActivityIndicator, RefreshControl, ScrollView, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText } from '../../Components';
+import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
-import { NOTIFICATION_COPY as COPY, NOTIF_ACCENT, NOTIF_NAVY } from './constants';
+import { NOTIFICATION_COPY as COPY, NOTIF_ACCENT } from './constants';
 import { useNotificationContainer } from './container';
 import { NotificationRow } from './sections/NotificationRow';
 import { styles as s } from './styles';
@@ -27,7 +33,6 @@ type NotificationNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 export function NotificationScreen() {
   const navigation = useNavigation<NotificationNavigationProp>();
   const {
-    groups,
     items,
     hasUnread,
     isLoading,
@@ -43,43 +48,37 @@ export function NotificationScreen() {
     if (!item.read) markRead(item.id);
     const route = routeFor(item.link);
     if (route?.screen === 'Conversation') {
-      navigation.navigate('Conversation', { conversationId: route.conversationId });
+      navigation.navigate('Conversation', {
+        conversationId: route.conversationId,
+      });
     }
   };
 
+  /* The app's standard header, so this screen matches every other one; the
+     one action rides in its trailing slot, offered only when there is
+     something to clear. */
   const header = (
-    <View style={s.header}>
-      <View style={s.headerLeft}>
-        <TouchableOpacity
-          style={s.back}
-          onPress={() => navigation.goBack()}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-        >
-          <EventlyIcon name="chevron-left" size={24} color={NOTIF_NAVY} />
-        </TouchableOpacity>
-        <EventlyText variant="h1" style={s.title} numberOfLines={1}>
-          {COPY.title}
-        </EventlyText>
-      </View>
-
-      {/* Offered only when there is something to clear. */}
-      {hasUnread ? (
-        <TouchableOpacity
-          onPress={markAllRead}
-          disabled={isMarkingAllRead}
-          accessibilityRole="button"
-          accessibilityLabel={COPY.markAllRead}
-        >
-          <EventlyText
-            variant="body"
-            style={[s.markAllRead, isMarkingAllRead && s.markAllReadDisabled]}
+    <AppHeader
+      title={COPY.title}
+      rightElement={
+        hasUnread ? (
+          <TouchableOpacity
+            onPress={markAllRead}
+            disabled={isMarkingAllRead}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={COPY.markAllRead}
           >
-            {COPY.markAllRead}
-          </EventlyText>
-        </TouchableOpacity>
-      ) : null}
-    </View>
+            <EventlyText
+              variant="caption"
+              style={[s.markAllRead, isMarkingAllRead && s.markAllReadDisabled]}
+            >
+              {COPY.markAllRead}
+            </EventlyText>
+          </TouchableOpacity>
+        ) : undefined
+      }
+    />
   );
 
   if (isLoading && items.length === 0) {
@@ -149,17 +148,13 @@ export function NotificationScreen() {
       <ScrollView
         contentContainerStyle={s.list}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
+        refreshControl={
+          <RefreshControl refreshing={isLoading} onRefresh={refetch} />
+        }
       >
-        {groups.map((group) => (
-          <View key={group.key}>
-            <EventlyText variant="caption" style={s.groupLabel}>
-              {group.label}
-            </EventlyText>
-            {group.items.map((item) => (
-              <NotificationRow key={item.id} item={item} onPress={open} />
-            ))}
-          </View>
+        {/* One continuous list, newest first — no day headings. */}
+        {items.map(item => (
+          <NotificationRow key={item.id} item={item} onPress={open} />
         ))}
       </ScrollView>
     </SafeAreaView>

@@ -52,7 +52,10 @@ export function SearchScreen() {
 
   // The mappers read a home payload; only these fields are consulted, and
   // giving them the search response keeps one set of card-building rules.
-  const asFeed = { packages: results.packages, topOrganizers: results.organizers } as HomeFeedDTO;
+  const asFeed = {
+    packages: results.packages,
+    topOrganizers: results.organizers,
+  } as HomeFeedDTO;
   const packages = mapPackages(asFeed);
   const organizers = mapTopOrganizers(asFeed);
 
@@ -68,7 +71,7 @@ export function SearchScreen() {
       </TouchableOpacity>
 
       <View style={s.field}>
-        <EventlyIcon name="magnify" size={20} color={colors.textMuted} />
+        <EventlyIcon name="magnify" size={17} color={colors.textMuted} />
         <TextInput
           style={s.input}
           value={container.query}
@@ -93,7 +96,7 @@ export function SearchScreen() {
             : COPY.filters
         }
       >
-        <EventlyIcon name="tune-variant" size={20} color={colors.onPrimary} />
+        <EventlyIcon name="tune-variant" size={18} color={colors.onPrimary} />
         {container.activeFilterCount > 0 ? (
           <View style={s.filterBadge}>
             <EventlyText variant="caption" style={s.filterBadgeText}>
@@ -107,7 +110,7 @@ export function SearchScreen() {
 
   const tabs = (
     <View style={s.tabs} accessibilityRole="tablist">
-      {TABS.map((tab) => {
+      {TABS.map(tab => {
         const on = container.kind === tab.key;
         return (
           <TouchableOpacity
@@ -118,7 +121,10 @@ export function SearchScreen() {
             accessibilityRole="tab"
             accessibilityState={{ selected: on }}
           >
-            <EventlyText variant="caption" style={[s.tabText, on && s.tabTextOn]}>
+            <EventlyText
+              variant="caption"
+              style={[s.tabText, on && s.tabTextOn]}
+            >
               {tab.label}
             </EventlyText>
           </TouchableOpacity>
@@ -128,7 +134,9 @@ export function SearchScreen() {
   );
 
   const body = () => {
-    if (isLoading) {
+    // Keep the last results on screen while the next keystroke's search runs;
+    // blanking them to a spinner on every letter reads as flicker.
+    if (isLoading && (isIdle || results.total === 0)) {
       return (
         <View style={s.centered}>
           <ActivityIndicator size="large" color={SEARCH_ACCENT} />
@@ -192,30 +200,39 @@ export function SearchScreen() {
     }
 
     return (
-      <ScrollView contentContainerStyle={s.list} showsVerticalScrollIndicator={false}>
-        <EventlyText variant="caption" style={s.countLine}>
-          {COPY.resultCount(results.total)}
-        </EventlyText>
-
+      <ScrollView
+        contentContainerStyle={s.list}
+        showsVerticalScrollIndicator={false}
+      >
         {packages ? (
-          <Packages
-            data={packages}
-            onPressPackage={(item) =>
-              navigation.navigate('Main', { screen: 'Plan', params: { occasionId: item.art } })
-            }
-            onPressSeeAll={() => container.setKind('packages')}
-            savedIds={[]}
-            onToggleSaved={() => {}}
-          />
+          <View style={s.section}>
+            <Packages
+              data={packages}
+              onPressPackage={item =>
+                navigation.navigate('Main', {
+                  screen: 'Plan',
+                  params: { occasionId: item.art },
+                })
+              }
+              onPressSeeAll={() => container.setKind('packages')}
+              savedIds={[]}
+              onToggleSaved={() => {}}
+            />
+          </View>
         ) : null}
 
         {organizers ? (
-          <TopOrganizers
-            data={organizers}
-            onPressOrganizer={(organizerId) => navigation.navigate('Organizer', { organizerId })}
-            onPressSeeAll={() => container.setKind('organizers')}
-            onPressChangeCity={() => navigation.navigate('Location')}
-          />
+          <View style={s.section}>
+            <TopOrganizers
+              data={organizers}
+              onPressOrganizer={organizerId =>
+                navigation.navigate('Organizer', { organizerId })
+              }
+              onPressSeeAll={() => container.setKind('organizers')}
+              onPressChangeCity={() => navigation.navigate('Location')}
+              layout="grid"
+            />
+          </View>
         ) : null}
       </ScrollView>
     );

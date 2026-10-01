@@ -101,8 +101,8 @@ export function mapBookedEvents(feed: HomeFeedDTO): BookedEventViewModel[] {
   const rows = isNonEmptyArray(feed.bookings)
     ? feed.bookings
     : feed.booking
-      ? [feed.booking]
-      : [];
+    ? [feed.booking]
+    : [];
   return rows
     .map(mapBooking)
     .filter((row): row is BookedEventViewModel => row !== null);
@@ -155,6 +155,13 @@ function mapBooking(b: BookedEventDTO | null): BookedEventViewModel | null {
       .map(part => (part ?? '').trim())
       .filter(Boolean)
       .join(' · '),
+    dateLabel: (b.dateLabel ?? '').trim(),
+    location: (b.location ?? '').trim(),
+    guestsLabel: b.guests?.trim()
+      ? /guest/i.test(b.guests)
+        ? b.guests.trim()
+        : `${b.guests.trim()} guests`
+      : '',
     daysToGoValue: daysToGo === 0 ? 'Today' : String(daysToGo),
     daysToGoLabel:
       daysToGo === 0 ? '' : daysToGo === 1 ? 'day to go' : 'days to go',
@@ -832,6 +839,10 @@ export function mapTopOrganizers(
         (o.bookedThisMonth ?? 0) > 0
           ? `${o.bookedThisMonth} booked this month`
           : '',
+      coverUrl: absoluteFileUrl(o.coverPhoto?.url || o.gallery?.[0]?.url || ''),
+      logoUrl: absoluteFileUrl(o.profilePhoto?.url || ''),
+      verified: o.verified === true,
+      locationLabel: (o.city || o.location || '').trim(),
     })),
   };
 }

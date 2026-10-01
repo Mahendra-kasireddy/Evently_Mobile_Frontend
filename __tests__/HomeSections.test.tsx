@@ -1228,6 +1228,10 @@ describe('render dump', () => {
                     fromLabel: '₹7L',
                     repliesLabel: 'Replies in 1h',
                     bookedLabel: '19 booked this month',
+                    coverUrl: '',
+                    logoUrl: '',
+                    verified: true,
+                    locationLabel: 'Hyderabad',
                   },
                   {
                     id: 'o2',
@@ -1242,6 +1246,10 @@ describe('render dump', () => {
                     fromLabel: '',
                     repliesLabel: 'Replies in 3h',
                     bookedLabel: '',
+                    coverUrl: '',
+                    logoUrl: '',
+                    verified: false,
+                    locationLabel: 'Hyderabad',
                   },
                 ],
               }}

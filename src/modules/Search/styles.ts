@@ -1,7 +1,12 @@
 import { StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
 import { colors, fontFor, spacing } from '../../theme';
-import { SEARCH_ACCENT, SEARCH_CANVAS, SEARCH_NAVY, SEARCH_NAVY_DEEP } from './constants';
+import {
+  SEARCH_ACCENT,
+  SEARCH_CANVAS,
+  SEARCH_NAVY,
+  SEARCH_NAVY_DEEP,
+} from './constants';
 
 const HAIRLINE = '#efe9e5';
 const TRACK = '#f0ecea';
@@ -9,7 +14,12 @@ const TRACK = '#f0ecea';
 export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: SEARCH_CANVAS },
   list: { paddingBottom: spacing.xl },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.lg,
+  },
   centeredIcon: {
     width: 64,
     height: 64,
@@ -18,9 +28,22 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  emptyTitle: { color: SEARCH_NAVY, marginTop: spacing.md, textAlign: 'center' },
-  emptyBody: { color: colors.textMuted, marginTop: spacing.sm, textAlign: 'center', lineHeight: 20 },
-  errorText: { color: colors.danger, textAlign: 'center', marginTop: spacing.sm },
+  emptyTitle: {
+    color: SEARCH_NAVY,
+    marginTop: spacing.md,
+    textAlign: 'center',
+  },
+  emptyBody: {
+    color: colors.textMuted,
+    marginTop: spacing.sm,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  errorText: {
+    color: colors.danger,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+  },
   retryButton: {
     ...globalStyles.row,
     gap: spacing.xs,
@@ -33,23 +56,34 @@ export const styles = StyleSheet.create({
   },
   retryText: { color: SEARCH_ACCENT, fontWeight: '700' },
 
-  bar: { ...globalStyles.row, gap: 10, paddingHorizontal: spacing.md, paddingBottom: spacing.sm },
+  bar: {
+    ...globalStyles.row,
+    gap: 10,
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.sm,
+  },
   back: { padding: 4, marginLeft: -4 },
   field: {
     ...globalStyles.row,
     flex: 1,
-    gap: 10,
-    minHeight: 48,
+    gap: 8,
+    minHeight: 44,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: HAIRLINE,
     backgroundColor: colors.background,
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
   },
-  input: { flex: 1, color: colors.text, fontSize: 15, fontFamily: fontFor('400'), padding: 0 },
+  input: {
+    flex: 1,
+    color: colors.text,
+    fontSize: 13.5,
+    fontFamily: fontFor('400'),
+    padding: 0,
+  },
   filterButton: {
-    width: 48,
-    height: 48,
+    width: 44,
+    height: 44,
     borderRadius: 14,
     backgroundColor: SEARCH_NAVY_DEEP,
     alignItems: 'center',
@@ -66,28 +100,39 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  filterBadgeText: { color: colors.onPrimary, fontSize: 10, fontWeight: '700', lineHeight: 13 },
+  filterBadgeText: {
+    color: colors.onPrimary,
+    fontSize: 10,
+    fontWeight: '700',
+    lineHeight: 13,
+  },
 
-  tabs: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.md, paddingBottom: spacing.sm },
-  tab: { borderRadius: 999, backgroundColor: TRACK, paddingHorizontal: 18, paddingVertical: 8 },
+  tabs: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.sm,
+  },
+  tab: {
+    borderRadius: 999,
+    backgroundColor: TRACK,
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+  },
   tabOn: { backgroundColor: SEARCH_NAVY },
   tabText: { color: '#6f6a66', fontSize: 13.5, fontWeight: '600' },
   tabTextOn: { color: colors.onPrimary },
 
-  countLine: {
-    color: colors.textMuted,
-    fontSize: 12.5,
-    fontWeight: '700',
-    letterSpacing: 0.9,
-    textTransform: 'uppercase',
-    paddingHorizontal: spacing.md,
-    marginTop: spacing.md,
-    marginBottom: 4,
-  },
+  /* Clear air between the packages and the organizers. */
+  section: { marginTop: spacing.lg },
 });
 
 export const filterSheetStyles = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: 'rgba(14,26,51,0.45)', justifyContent: 'flex-end' },
+  backdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(14,26,51,0.45)',
+    justifyContent: 'flex-end',
+  },
   sheet: {
     backgroundColor: SEARCH_CANVAS,
     borderTopLeftRadius: 24,

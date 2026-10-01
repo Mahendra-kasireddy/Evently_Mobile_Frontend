@@ -1,12 +1,23 @@
 import { StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
 import { colors, spacing } from '../../theme';
-import { NOTIF_ACCENT, NOTIF_CANVAS, NOTIF_HAIRLINE, NOTIF_NAVY } from './constants';
+import {
+  NOTIF_ACCENT,
+  NOTIF_CANVAS,
+  NOTIF_DIVIDER,
+  NOTIF_HAIRLINE,
+  NOTIF_NAVY,
+} from './constants';
 
 export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: NOTIF_CANVAS },
-  list: { paddingHorizontal: spacing.md, paddingBottom: spacing.xl },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
+  list: { paddingBottom: spacing.xl },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.lg,
+  },
   centeredIcon: {
     width: 64,
     height: 64,
@@ -17,8 +28,17 @@ export const styles = StyleSheet.create({
   },
   loadingText: { color: colors.textMuted, marginTop: spacing.md },
   emptyTitle: { color: NOTIF_NAVY, marginTop: spacing.md, textAlign: 'center' },
-  emptyBody: { color: colors.textMuted, marginTop: spacing.sm, textAlign: 'center', lineHeight: 20 },
-  errorText: { color: colors.danger, textAlign: 'center', marginTop: spacing.sm },
+  emptyBody: {
+    color: colors.textMuted,
+    marginTop: spacing.sm,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  errorText: {
+    color: colors.danger,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+  },
   retryButton: {
     ...globalStyles.row,
     gap: spacing.xs,
@@ -31,80 +51,46 @@ export const styles = StyleSheet.create({
   },
   retryText: { color: NOTIF_ACCENT, fontWeight: '700' },
 
-  /** Back, title and the one action — the screen's own bar. */
-  header: {
-    ...globalStyles.row,
-    justifyContent: 'space-between',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.md,
-  },
-  headerLeft: { ...globalStyles.row, gap: 12, flexShrink: 1 },
-  /* Just the chevron. The disc behind it was a second shape to notice for a
-     control every screen has in the same corner, and the touch target is the
-     box, not the paint. */
-  back: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: -10,
-  },
-  title: { color: NOTIF_NAVY, fontSize: 25, fontWeight: '700', letterSpacing: -0.4 },
-  markAllRead: { color: NOTIF_ACCENT, fontSize: 14.5, fontWeight: '600', flexShrink: 0 },
+  markAllRead: { color: NOTIF_ACCENT, fontSize: 13, fontWeight: '600' },
   markAllReadDisabled: { opacity: 0.5 },
-
-  /*
-   * A section label, not a title — small, muted, letterspaced caps, the same
-   * treatment every other grouped list in the app uses, so a day heading can
-   * never be mistaken for one of the notifications under it.
-   */
-  groupLabel: {
-    color: '#7b8595',
-    fontSize: 12.5,
-    fontWeight: '700',
-    letterSpacing: 0.9,
-    textTransform: 'uppercase',
-    marginTop: spacing.md,
-    marginBottom: 10,
-  },
 });
 
+/*
+ * A flat list row rather than a card: full width, a hairline between rows.
+ * Unread rows carry a faint warm wash, read rows sit on the page.
+ */
 export const notificationRowStyles = StyleSheet.create({
   row: {
     ...globalStyles.row,
     alignItems: 'flex-start',
-    gap: 14,
-    backgroundColor: colors.background,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: NOTIF_HAIRLINE,
-    padding: 14,
-    marginBottom: 12,
+    gap: 12,
+    backgroundColor: '#fdf4ef',
+    paddingHorizontal: spacing.md,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: NOTIF_DIVIDER,
   },
-  /** Unread sits on white; read fades back into the page. */
-  rowRead: { backgroundColor: 'transparent', borderColor: '#f4efec' },
+  rowRead: { backgroundColor: 'transparent' },
   iconBadge: {
-    width: 42,
-    height: 42,
-    borderRadius: 13,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
   },
   content: { flex: 1 },
-  title: { color: NOTIF_NAVY, fontSize: 16, fontWeight: '700', lineHeight: 22 },
-  titleRead: { fontWeight: '600' },
-  body: { color: '#414b5c', fontSize: 14, marginTop: 3, lineHeight: 20 },
-  time: { color: colors.textMuted, fontSize: 13, marginTop: 8 },
+  title: { color: NOTIF_NAVY, fontSize: 14, fontWeight: '700', lineHeight: 19 },
+  titleRead: { fontWeight: '500' },
+  body: { color: '#525c6c', fontSize: 12.5, marginTop: 2, lineHeight: 17 },
+  time: { color: colors.textMuted, fontSize: 11, marginTop: 4 },
   /** Top-aligned with the title, so it reads as a state and not a bullet. */
   unreadDot: {
-    width: 9,
-    height: 9,
+    width: 8,
+    height: 8,
     borderRadius: 999,
     backgroundColor: NOTIF_ACCENT,
-    marginTop: 7,
+    marginTop: 6,
     flexShrink: 0,
   },
 });

@@ -56,14 +56,25 @@ export const PLAN_QUOTE_BG = '#eef1f7';
 // MaterialCommunityIcons glyph names, keyed by occasion id — same mapping
 // Home/constants.ts already ported from the web's OccasionPicker icon set.
 export const OCCASION_ICON_NAME: Record<string, string> = {
-  wedding: 'heart',
-  birthday: 'gift',
-  housewarming: 'home',
+  wedding: 'ring',
+  birthday: 'gift-outline',
+  housewarming: 'home-outline',
   naming: 'creation',
-  anniversary: 'star',
-  corporate: 'briefcase',
+  anniversary: 'star-outline',
+  corporate: 'briefcase-outline',
 };
-export const DEFAULT_OCCASION_ICON = 'heart';
+export const DEFAULT_OCCASION_ICON = 'heart-outline';
+
+/** Soft circle behind each occasion's icon in the picker, and its glyph colour. */
+export const OCCASION_TINT: Record<string, { bg: string; fg: string }> = {
+  wedding: { bg: '#fde6de', fg: '#e8633a' },
+  birthday: { bg: '#ece9fb', fg: '#6c5ce7' },
+  housewarming: { bg: '#e3f4ec', fg: '#1d9e75' },
+  naming: { bg: '#efe7fb', fg: '#8b5cf6' },
+  anniversary: { bg: '#fff1e0', fg: '#e8a33a' },
+  corporate: { bg: '#e6effb', fg: '#3b6fd8' },
+};
+export const DEFAULT_OCCASION_TINT = { bg: '#fde6de', fg: '#e8633a' };
 
 // Ported verbatim from web's plan/constants.ts ART_GRADIENT (165deg linear
 // gradients) — scoped to this module only, matches Home's CATEGORY_GRADIENT.
@@ -87,20 +98,21 @@ export const CATEGORY_ICON_NAME: Record<CategoryIcon, string> = {
   transport: 'truck',
 };
 
-// A distinct icon color per category — reuses existing theme/brand tokens (no
-// new hex values) so the checklist reads as a set of varied services instead
-// of one color repeated 8 times, which flattens the screen once several rows
-// are selected.
+// A distinct icon color per category, so the grid reads as a set of varied
+// services instead of one color repeated eight times.
 export const CATEGORY_ICON_COLOR: Record<CategoryIcon, string> = {
-  food: PLAN_ACCENT,
-  water: colors.tierPlatinum,
-  decor: PLAN_GREEN,
-  photo: PLAN_NAVY,
-  music: PLAN_ACCENT_WARM,
-  priest: colors.tierGold,
-  mehendi: colors.tierSilver,
-  transport: PLAN_ACCENT,
+  food: '#f07a4a',
+  water: '#3b82f6',
+  decor: '#22a06b',
+  photo: '#7c5cdb',
+  music: '#ec5a8c',
+  priest: '#e8a33a',
+  mehendi: '#b4643c',
+  transport: '#14a3a3',
 };
+
+// The soft blush behind the Categories step's checklist banner.
+export const PLAN_CHECKLIST_BG = '#fdf0ea';
 
 export const TRUST_ICON_NAME: Record<TrustIcon, string> = {
   zap: 'lightning-bolt-outline',

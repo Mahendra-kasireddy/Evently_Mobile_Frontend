@@ -1,7 +1,7 @@
-import { TouchableOpacity, View } from 'react-native';
+import { useState } from 'react';
+import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
-import { colors } from '../../../theme';
-import { HOME_GREEN, TIER_COLOR } from '../constants';
+import { HERO_ACCENT_COLOR, HOME_GREEN, HOME_NAVY } from '../constants';
 import { organizerRowStyles as s } from '../styles';
 import { SectionHead } from './SectionHead';
 import type { OrganizerItem, TopOrganizersViewModel } from '../types';
@@ -12,48 +12,110 @@ interface TopOrganizersProps {
   onPressSeeAll: () => void;
   /** Offered when the list had to widen past the customer's city. */
   onPressChangeCity: () => void;
+  /**
+   * 'carousel' is Home's swipeable row; 'grid' lays the same cards two to a
+   * row, for a results list like Search.
+   */
+  layout?: 'carousel' | 'grid';
 }
 
-function OrganizerRow({
+function OrganizerCard({
   item,
   onPress,
+  isSaved,
+  onToggleSaved,
+  inGrid,
 }: {
   item: OrganizerItem;
   onPress: () => void;
+  isSaved: boolean;
+  onToggleSaved: () => void;
+  inGrid: boolean;
 }) {
   const spoken = [
     item.name,
+    item.verified ? 'Verified' : '',
     item.reviews > 0
       ? `${item.rating.toFixed(1)} from ${item.reviews} reviews`
       : 'No reviews yet',
-    item.tier,
-    item.bookedLabel,
-    item.fromLabel ? `from ${item.fromLabel}` : '',
-    item.repliesLabel,
+    item.locationLabel,
   ]
     .filter(Boolean)
     .join('. ');
 
   return (
     <TouchableOpacity
-      style={s.card}
+      style={[s.card, inGrid && s.cardInGrid]}
       activeOpacity={0.9}
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`${spoken}. View profile.`}
     >
-      <View style={[s.avatar, { backgroundColor: item.avatarColor }]}>
-        <EventlyText variant="subtitle" style={s.avatarText}>
-          {item.initials}
-        </EventlyText>
+      <View style={s.cover}>
+        {item.coverUrl ? (
+          <Image
+            source={{ uri: item.coverUrl }}
+            style={s.coverImage}
+            resizeMode="cover"
+          />
+        ) : (
+          /* No photo yet: their own colour, never somebody else's picture. */
+          <View style={[s.coverImage, { backgroundColor: item.avatarColor }]}>
+            <EventlyIcon
+              name="party-popper"
+              size={34}
+              color="rgba(255,255,255,0.35)"
+            />
+          </View>
+        )}
+
+        {item.verified ? (
+          <View style={s.verified}>
+            <EventlyIcon name="check-decagram" size={12} color={HOME_GREEN} />
+            <EventlyText variant="caption" style={s.verifiedText}>
+              Verified
+            </EventlyText>
+          </View>
+        ) : null}
+
+        {/* Session-only for now: there is no saved-organizers API yet. */}
+        <TouchableOpacity
+          style={s.heart}
+          onPress={onToggleSaved}
+          hitSlop={6}
+          accessibilityRole="button"
+          accessibilityLabel={
+            isSaved ? `Remove ${item.name} from saved` : `Save ${item.name}`
+          }
+        >
+          <EventlyIcon
+            name={isSaved ? 'heart' : 'heart-outline'}
+            size={17}
+            color={isSaved ? HERO_ACCENT_COLOR : HOME_NAVY}
+          />
+        </TouchableOpacity>
+
+        <View style={[s.logo, { backgroundColor: item.avatarColor }]}>
+          {item.logoUrl ? (
+            <Image source={{ uri: item.logoUrl }} style={s.logoImage} />
+          ) : (
+            <EventlyText variant="caption" style={s.logoText}>
+              {item.initials}
+            </EventlyText>
+          )}
+        </View>
       </View>
 
-      <View style={s.text}>
+      <View style={s.body}>
+        {/* Their own name, as they wrote it. */}
+        <EventlyText variant="body" style={s.name} numberOfLines={1}>
+          {item.name}
+        </EventlyText>
+
         <View style={s.metaRow}>
-          {/* A score with no reviews behind it is not a rating — the old card
-              drew five filled stars for an organizer nobody had reviewed. */}
+          {/* A score with no reviews behind it is not a rating. */}
           {item.reviews > 0 ? (
-            <>
+            <View style={s.ratingRow}>
               <EventlyIcon name="star" size={13} color="#e8a33a" />
               <EventlyText variant="caption" style={s.rating}>
                 {item.rating.toFixed(1)}
@@ -61,61 +123,45 @@ function OrganizerRow({
               <EventlyText variant="caption" style={s.reviews}>
                 {`(${item.reviews})`}
               </EventlyText>
-            </>
+            </View>
           ) : (
             <EventlyText variant="caption" style={s.reviews}>
               No reviews yet
             </EventlyText>
           )}
-          <EventlyText variant="caption" style={s.dot}>
-            ·
-          </EventlyText>
-          <EventlyText
-            variant="caption"
-            style={[s.tier, { color: TIER_COLOR[item.tier] }]}
-          >
-            {item.tier}
-          </EventlyText>
+          {item.locationLabel ? (
+            <EventlyText variant="caption" style={s.location} numberOfLines={1}>
+              {item.locationLabel}
+            </EventlyText>
+          ) : null}
         </View>
 
-        {/* Their own name, as they wrote it. It used to be set in capitals,
-            which is a shout rather than a name. */}
-        <EventlyText variant="body" style={s.name} numberOfLines={2}>
-          {item.name}
-        </EventlyText>
+        {item.tags.length > 0 ? (
+          <View style={s.tagRow}>
+            {item.tags.slice(0, 2).map(tag => (
+              <View key={tag} style={s.tag}>
+                <EventlyText
+                  variant="caption"
+                  style={s.tagText}
+                  numberOfLines={1}
+                >
+                  {tag}
+                </EventlyText>
+              </View>
+            ))}
+          </View>
+        ) : null}
 
-        <View style={s.factRow}>
-          {/* What they have done lately, or how fast they answer — whichever
-              they have. Both drop rather than reading "0 booked". */}
-          {item.bookedLabel || item.repliesLabel ? (
-            <>
-              <EventlyIcon
-                name={item.bookedLabel ? 'calendar-check' : 'clock-outline'}
-                size={14}
-                color={item.bookedLabel ? colors.textMuted : HOME_GREEN}
-              />
-              <EventlyText
-                variant="caption"
-                style={item.bookedLabel ? s.booked : s.replies}
-                numberOfLines={1}
-              >
-                {item.bookedLabel || item.repliesLabel}
-              </EventlyText>
-            </>
-          ) : null}
-
-          {/* Dropped when the organizer has published no figure — "From ₹0"
-              is worse than saying nothing. */}
-          {item.fromLabel ? (
-            <View style={s.right}>
-              <EventlyText variant="caption" style={s.fromLabel}>
-                From
-              </EventlyText>
-              <EventlyText variant="subtitle" style={s.fromValue}>
-                {item.fromLabel}
-              </EventlyText>
-            </View>
-          ) : null}
+        {/* Drawn as a button, pressed as part of the card. */}
+        <View style={s.cta}>
+          <EventlyText variant="caption" style={s.ctaText}>
+            View profile
+          </EventlyText>
+          <EventlyIcon
+            name="chevron-right"
+            size={16}
+            color={HERO_ACCENT_COLOR}
+          />
         </View>
       </View>
     </TouchableOpacity>
@@ -135,7 +181,25 @@ export function TopOrganizers({
   onPressOrganizer,
   onPressSeeAll,
   onPressChangeCity,
+  layout = 'carousel',
 }: TopOrganizersProps) {
+  const [saved, setSaved] = useState<string[]>([]);
+  const toggleSaved = (id: string) =>
+    setSaved(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id],
+    );
+
+  const cards = data.items.map(item => (
+    <OrganizerCard
+      key={item.id}
+      item={item}
+      inGrid={layout === 'grid'}
+      isSaved={saved.includes(item.id)}
+      onToggleSaved={() => toggleSaved(item.id)}
+      onPress={() => onPressOrganizer(item.id)}
+    />
+  ));
+
   return (
     <View>
       <SectionHead
@@ -169,14 +233,16 @@ export function TopOrganizers({
               : 'Set your city and we will show the organizers who serve it.'}
           </EventlyText>
         </TouchableOpacity>
+      ) : layout === 'grid' ? (
+        <View style={s.grid}>{cards}</View>
       ) : (
-        data.items.map(item => (
-          <OrganizerRow
-            key={item.id}
-            item={item}
-            onPress={() => onPressOrganizer(item.id)}
-          />
-        ))
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={s.rowContent}
+        >
+          {cards}
+        </ScrollView>
       )}
     </View>
   );

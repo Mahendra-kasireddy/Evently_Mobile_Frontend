@@ -12,7 +12,7 @@ interface NotificationRowProps {
 /**
  * One notification.
  *
- * Read and unread are told apart three ways — the card's fill, the title's
+ * Read and unread are told apart three ways — the row's fill, the title's
  * weight, and the dot — because any one of them alone is missed: the dot is
  * small, the weight is subtle, and the fill is invisible to anyone who cannot
  * distinguish white from off-white.
@@ -22,7 +22,12 @@ interface NotificationRowProps {
  */
 export function NotificationRow({ item, onPress }: NotificationRowProps) {
   const look = NOTIFICATION_LOOK[item.type];
-  const spoken = [item.read ? '' : 'Unread', item.title, item.body, item.relativeTime]
+  const spoken = [
+    item.read ? '' : 'Unread',
+    item.title,
+    item.body,
+    item.relativeTime,
+  ]
     .filter(Boolean)
     .join('. ');
 
@@ -35,7 +40,7 @@ export function NotificationRow({ item, onPress }: NotificationRowProps) {
       accessibilityLabel={spoken}
     >
       <View style={[s.iconBadge, { backgroundColor: look.bg }]}>
-        <EventlyIcon name={look.icon} size={21} color={look.fg} />
+        <EventlyIcon name={look.icon} size={18} color={look.fg} />
       </View>
 
       <View style={s.content}>
@@ -49,7 +54,7 @@ export function NotificationRow({ item, onPress }: NotificationRowProps) {
         {/* Dropped rather than left as an empty line — some notices are a
             headline and nothing more. */}
         {item.body ? (
-          <EventlyText variant="body" style={s.body} numberOfLines={3}>
+          <EventlyText variant="body" style={s.body} numberOfLines={2}>
             {item.body}
           </EventlyText>
         ) : null}

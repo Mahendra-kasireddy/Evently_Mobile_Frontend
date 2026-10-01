@@ -22,7 +22,10 @@ export function useNotificationContainer(): NotificationContainerResult {
   const markReadCall = useMarkRead();
   const markAllReadCall = useMarkAllRead();
 
-  const items = useMemo<NotificationItem[]>(() => (data ? mapNotifications(data) : []), [data]);
+  const items = useMemo<NotificationItem[]>(
+    () => (data ? mapNotifications(data) : []),
+    [data],
+  );
   const groups = useMemo(() => groupByDay(items), [items]);
 
   const markRead = useCallback(
@@ -49,7 +52,7 @@ export function useNotificationContainer(): NotificationContainerResult {
   return {
     items,
     groups,
-    hasUnread: items.some((item) => !item.read),
+    hasUnread: items.some(item => !item.read),
     isLoading: loading,
     isError: error !== null,
     errorMessage: error?.message ?? null,

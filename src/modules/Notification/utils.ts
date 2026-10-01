@@ -7,13 +7,23 @@ import type {
   NotificationType,
 } from './types';
 
-const TYPES: NotificationType[] = ['booking', 'quote', 'payment', 'message', 'system'];
+const TYPES: NotificationType[] = [
+  'booking',
+  'quote',
+  'payment',
+  'message',
+  'system',
+];
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 
 function startOfDay(date: Date): number {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+  ).getTime();
 }
 
 /**
@@ -23,7 +33,10 @@ function startOfDay(date: Date): number {
  * beyond that. "2h ago" on something from last month would be wrong, and
  * "34 days ago" is arithmetic the reader should not have to do.
  */
-export function relativeTime(iso: string | null | undefined, now = new Date()): string {
+export function relativeTime(
+  iso: string | null | undefined,
+  now = new Date(),
+): string {
   if (!iso) return '';
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return '';
@@ -40,8 +53,11 @@ export function relativeTime(iso: string | null | undefined, now = new Date()): 
   return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
-export function mapNotifications(dtos: NotificationDTO[], now = new Date()): NotificationItem[] {
-  return (dtos ?? []).map((dto) => ({
+export function mapNotifications(
+  dtos: NotificationDTO[],
+  now = new Date(),
+): NotificationItem[] {
+  return (dtos ?? []).map(dto => ({
     id: dto.id,
     // An unknown type from a newer backend renders as a plain notice rather
     // than indexing the look-up map to undefined and crashing the row.
@@ -72,14 +88,15 @@ export function groupByDay(items: NotificationItem[]): NotificationGroup[] {
   for (const item of items) {
     // Read off the label the mapper already produced, so the grouping and the
     // wording can never disagree about what "today" means.
-    if (item.relativeTime.endsWith('ago') || item.relativeTime === 'Just now') today.push(item);
+    if (item.relativeTime.endsWith('ago') || item.relativeTime === 'Just now')
+      today.push(item);
     else earlier.push(item);
   }
 
   return [
     { key: 'today' as const, label: COPY.today, items: today },
     { key: 'earlier' as const, label: COPY.earlier, items: earlier },
-  ].filter((group) => group.items.length > 0);
+  ].filter(group => group.items.length > 0);
 }
 
 /**

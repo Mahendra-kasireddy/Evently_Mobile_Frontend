@@ -6,13 +6,8 @@ import {
   EventlyText,
   OccasionArt,
 } from '../../../Components';
-import {
-  CATEGORY_GRADIENT,
-  HERO_ACCENT_COLOR,
-  HOME_NAVY,
-  PACKAGE_CTA,
-  PACKAGE_PRICE_CAPTION,
-} from '../constants';
+import { CATEGORY_GRADIENT, HERO_ACCENT_COLOR, HOME_NAVY } from '../constants';
+import { colors } from '../../../theme';
 import { packageCardStyles as s } from '../styles';
 import { SectionHead } from './SectionHead';
 import type { PackageItem, PackagesViewModel } from '../types';
@@ -35,6 +30,40 @@ interface PackageCardProps {
   onToggleSaved: () => void;
 }
 
+/** Colours per badge, read off its words: the pill and the arrow share them. */
+function badgeTint(badge: string): { bg: string; fg: string; icon: string } {
+  const b = badge.toLowerCase();
+  if (/budget|save|afford/.test(b)) {
+    return { bg: '#e8633a', fg: '#ffffff', icon: 'crown-outline' };
+  }
+  if (/book|popular|trend|loved/.test(b)) {
+    return { bg: '#8b5cf6', fg: '#ffffff', icon: 'fire' };
+  }
+  if (/value|best|deal/.test(b)) {
+    return { bg: '#1d9e75', fg: '#ffffff', icon: 'check-decagram' };
+  }
+  return { bg: HOME_NAVY, fg: '#ffffff', icon: 'star-outline' };
+}
+
+/** A glyph for what a package includes, read off the tag's words. */
+function featureIcon(tag: string): string {
+  const t = tag.toLowerCase();
+  if (/food|cater|dine|menu|buffet/.test(t)) return 'silverware-fork-knife';
+  if (/decor|flower|stage|floral/.test(t)) return 'palette-outline';
+  if (/photo|video|camera/.test(t)) return 'camera-outline';
+  if (/music|dj|band|sound|entertain/.test(t)) return 'music-note-outline';
+  if (/venue|hall|resort/.test(t)) return 'home-city-outline';
+  if (/invit|card/.test(t)) return 'email-outline';
+  return 'check-circle-outline';
+}
+
+/** "150" -> "150+ guests"; "100+ guests" left as written. */
+function guestsFeature(guests: string): string {
+  const g = guests.trim();
+  if (!g) return '';
+  return /guest/i.test(g) ? g : `${g}+ guests`;
+}
+
 function PackageCard({
   item,
   onPress,
@@ -47,24 +76,23 @@ function PackageCard({
    * on the screen paint whichever gradient rendered last. Scoped per package.
    */
   const gradientId = `packageBanner-${item.id}`;
-  const rating =
-    item.organizer && item.organizer.reviews > 0 ? item.organizer : null;
-  /*
-   * Who runs it, and how busy they have been — one line, because the panel
-   * has one line to give. The bookings are the organizer's own (nothing links
-   * a booking back to the package that inspired it), which is why they sit
-   * against their name rather than under the price.
-   */
-  const metaLabel = item.organizer
-    ? [item.organizer.name, item.organizer.bookedLabel]
-        .filter(Boolean)
-        .join(' · ')
-    : item.bannerNote;
+  const tint = badgeTint(item.badge);
+  /* The line under the title: what the package is like, or failing that who
+     runs it. */
+  const subtitle = item.bannerNote || item.organizer?.name || '';
+  const features = [
+    ...item.tags
+      .slice(0, 2)
+      .map(tag => ({ icon: featureIcon(tag), label: tag })),
+    ...(item.guests
+      ? [{ icon: 'account-group-outline', label: guestsFeature(item.guests) }]
+      : []),
+  ];
 
   return (
     <View style={s.card}>
       {/*
-        The whole card is one control — banner and body together — so there is
+        The whole card is one control — photo and body together — so there is
         one tap target and one accessible name. The heart is its sibling rather
         than a child: nesting it would make keeping a package and opening it
         the same gesture, which is how people lose the thing they meant to save.
@@ -75,7 +103,7 @@ function PackageCard({
         accessibilityRole="button"
         accessibilityLabel={[
           item.title,
-          item.organizer?.name,
+          subtitle,
           item.priceLabel || item.budget,
           item.guests,
         ]
@@ -129,82 +157,75 @@ function PackageCard({
 
           {item.badge ? (
             <View style={s.badge}>
+              <View style={[s.badgeIcon, { backgroundColor: tint.bg }]}>
+                <EventlyIcon name={tint.icon} size={10} color={tint.fg} />
+              </View>
               <EventlyText
                 variant="caption"
-                style={s.badgeText}
+                style={[s.badgeText, { color: tint.bg }]}
                 numberOfLines={1}
               >
-                {item.badge.toUpperCase()}
-              </EventlyText>
-            </View>
-          ) : null}
-
-          {/* A score with no reviews behind it is not a rating. */}
-          {rating ? (
-            <View style={s.ratingChip}>
-              <EventlyIcon name="star" size={13} color="#f2c14e" />
-              <EventlyText variant="caption" style={s.rating}>
-                {rating.rating.toFixed(1)}
-              </EventlyText>
-              <EventlyText variant="caption" style={s.reviews}>
-                {`(${rating.reviews})`}
+                {item.badge}
               </EventlyText>
             </View>
           ) : null}
         </View>
 
         <View style={s.body}>
-          <EventlyText variant="subtitle" style={s.title} numberOfLines={2}>
-            {item.title}
-          </EventlyText>
-
-          {/* Who runs it, or — for a package with no organizer on it yet —
-              what the picture is of. Never a location: a package is not held
-              anywhere until somebody books it. */}
-          {metaLabel ? (
-            <View style={s.metaRow}>
-              <EventlyIcon
-                name={item.organizer ? 'storefront-outline' : 'party-popper'}
-                size={14}
-                color="rgba(255,255,255,0.76)"
-              />
-              <EventlyText variant="caption" style={s.meta} numberOfLines={1}>
-                {metaLabel}
+          <View style={s.titleRow}>
+            <View style={s.titleCol}>
+              <EventlyText variant="subtitle" style={s.title} numberOfLines={1}>
+                {item.title}
               </EventlyText>
-            </View>
-          ) : null}
-
-          <View style={s.priceRow}>
-            <View style={s.priceText}>
-              <EventlyText variant="caption" style={s.priceCaption}>
-                {PACKAGE_PRICE_CAPTION}
-              </EventlyText>
-              <View style={s.metaRow}>
-                <EventlyText variant="h2" style={s.price}>
-                  {item.priceLabel || item.budget}
+              {subtitle ? (
+                <EventlyText
+                  variant="caption"
+                  style={s.subtitle}
+                  numberOfLines={1}
+                >
+                  {subtitle}
                 </EventlyText>
-                {/* Only a genuine reduction; the server refuses a "was" figure
-                    that is not above the current price. */}
-                {item.listPriceLabel ? (
-                  <EventlyText variant="caption" style={s.listPrice}>
-                    {item.listPriceLabel}
-                  </EventlyText>
-                ) : null}
-              </View>
+              ) : null}
             </View>
-
-            {/*
-              Not a button of its own: the whole card already opens the
-              planner, and two controls doing the same thing is two ways to
-              be told the same news. It is drawn as one because the reference
-              is, and because a card with nothing to press reads as a poster.
-            */}
-            <View style={s.cta}>
-              <EventlyText variant="caption" style={s.ctaText}>
-                {PACKAGE_CTA}
-              </EventlyText>
+            {/* Drawn as a button, pressed as part of the card. */}
+            <View style={[s.arrow, { backgroundColor: tint.bg }]}>
+              <EventlyIcon name="chevron-right" size={20} color={tint.fg} />
             </View>
           </View>
+
+          <View style={s.priceRow}>
+            <EventlyText variant="h2" style={s.price} numberOfLines={1}>
+              {item.priceLabel || item.budget}
+            </EventlyText>
+            {/* Only a genuine reduction; the server refuses a "was" figure
+                that is not above the current price. */}
+            {item.listPriceLabel ? (
+              <EventlyText variant="caption" style={s.listPrice}>
+                {item.listPriceLabel}
+              </EventlyText>
+            ) : null}
+          </View>
+
+          {features.length > 0 ? (
+            <View style={s.features}>
+              {features.map(feature => (
+                <View key={feature.label} style={s.feature}>
+                  <EventlyIcon
+                    name={feature.icon}
+                    size={16}
+                    color={HOME_NAVY}
+                  />
+                  <EventlyText
+                    variant="caption"
+                    style={s.featureText}
+                    numberOfLines={2}
+                  >
+                    {feature.label}
+                  </EventlyText>
+                </View>
+              ))}
+            </View>
+          ) : null}
         </View>
       </TouchableOpacity>
 
@@ -221,7 +242,7 @@ function PackageCard({
         <EventlyIcon
           name={saved ? 'heart' : 'heart-outline'}
           size={18}
-          color={saved ? HERO_ACCENT_COLOR : HOME_NAVY}
+          color={saved ? HERO_ACCENT_COLOR : colors.onPrimary}
         />
       </TouchableOpacity>
     </View>

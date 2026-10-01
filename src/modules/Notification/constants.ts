@@ -9,6 +9,8 @@ export const NOTIF_ACCENT = '#e8633a';
 export const NOTIF_NAVY = '#1a2e5a';
 export const NOTIF_CANVAS = '#faf8f7';
 export const NOTIF_HAIRLINE = '#efe9e5';
+/** The light line between two notifications. */
+export const NOTIF_DIVIDER = '#e6e1dd';
 
 /**
  * The icon and its wash, per kind of notification.

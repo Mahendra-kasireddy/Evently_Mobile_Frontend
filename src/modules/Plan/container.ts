@@ -64,7 +64,9 @@ function buildInitialDraft(
   return {
     ...DEFAULT_DRAFT,
     ...(initialOccasionId ? { occasionId: initialOccasionId } : {}),
-    ...(initialOrganizerId ? { selectedOrganizerIds: [initialOrganizerId] } : {}),
+    ...(initialOrganizerId
+      ? { selectedOrganizerIds: [initialOrganizerId] }
+      : {}),
     // "Hold date" on an organizer's profile arrives here: the date they are
     // free, already in the brief, so the customer is not asked to re-enter
     // the one thing they just tapped.
@@ -109,6 +111,12 @@ export interface PlanContainerResult {
   toggleCategory: (id: string) => void;
   goToStep: (index: number) => void;
   goBack: () => void;
+  /** Apply an occasion / organizer / date the customer navigated in with. */
+  applyEntry: (entry: {
+    occasionId?: string;
+    organizerId?: string;
+    eventDate?: string;
+  }) => void;
   continueStep: () => void;
   canContinue: boolean;
   blockReason: string | undefined;
@@ -176,6 +184,41 @@ export function usePlanContainer(
     buildInitialDraft(initialOccasionId, initialOrganizerId, initialEventDate),
   );
   const hydratedRef = useRef(false);
+  // Set once the customer arrived with an occasion chosen (a Home tile, a
+  // package). The saved draft must not overwrite that choice when it lands.
+  const entryOccasionRef = useRef(Boolean(initialOccasionId));
+
+  /**
+   * Apply what the customer tapped to get here.
+   *
+   * Plan is a tab, so it stays mounted: the `useState` seed above runs once,
+   * and every later tap on a Home tile arrived with its occasion ignored. The
+   * screen calls this whenever new route params come in.
+   */
+  const applyEntry = useCallback(
+    (entry: {
+      occasionId?: string;
+      organizerId?: string;
+      eventDate?: string;
+    }) => {
+      if (entry.occasionId) entryOccasionRef.current = true;
+      setDraft(prev => ({
+        ...prev,
+        ...(entry.occasionId ? { occasionId: entry.occasionId, step: 0 } : {}),
+        ...(entry.eventDate ? { eventDate: entry.eventDate } : {}),
+        ...(entry.organizerId &&
+        !prev.selectedOrganizerIds.includes(entry.organizerId)
+          ? {
+              selectedOrganizerIds: [
+                ...prev.selectedOrganizerIds,
+                entry.organizerId,
+              ],
+            }
+          : {}),
+      }));
+    },
+    [],
+  );
 
   // Resume a previously saved draft once it arrives — only patch fields the
   // server actually has a value for (mirrors web's usePlan.ts hydration).
@@ -183,7 +226,8 @@ export function usePlanContainer(
     if (hydratedRef.current || !myDraft) return;
     hydratedRef.current = true;
     const patch: Partial<PlanDraft> = {};
-    if (myDraft.occasion) patch.occasionId = myDraft.occasion;
+    if (myDraft.occasion && !entryOccasionRef.current)
+      patch.occasionId = myDraft.occasion;
     if (myDraft.eventDate) patch.eventDate = myDraft.eventDate.slice(0, 10);
     if (myDraft.city) patch.city = myDraft.city;
     if (myDraft.area) patch.area = myDraft.area;
@@ -559,6 +603,7 @@ export function usePlanContainer(
     toggleCategory,
     goToStep,
     goBack,
+    applyEntry,
     continueStep,
     canContinue,
     blockReason,

@@ -46,6 +46,10 @@ export interface PlanOrganizerDTO {
   responseHours?: number;
   score?: number;
   concierge?: boolean;
+  /** Cover / gallery / profile photo; '' when the organizer has none. */
+  imageUrl?: string;
+  /** Passed admin verification. */
+  verified?: boolean;
 }
 
 export type RecommendationSort =

@@ -1,8 +1,12 @@
-import { ScrollView, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
-import { PLAN_ACCENT_WARM, TRUST_ICON_NAME } from '../constants';
+import { Image, View } from 'react-native';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
+import { EventlyText } from '../../../Components';
+import { PLAN_BG } from '../constants';
 import { heroStyles } from '../styles';
 import type { PlanTrustDTO } from '../types';
+import { StepPills } from './StepPills';
+
+const HERO_FLOWERS = require('../../../assets/images/flowers_workspace.png');
 
 interface PlanHeroProps {
   occasionLabel: string;
@@ -10,11 +14,23 @@ interface PlanHeroProps {
   heading: string;
   subtitle: string;
   trust: PlanTrustDTO[];
+  /** 1-based position of the current step, for the "Step 1 of 4" pill. */
+  stepNumber: number;
+  stepCount: number;
+  stepLabel: string;
 }
 
-/** Only the Details step gets the illustrated navy/orange hero treatment — every
- * other step gets a plain page heading, matching web's Component.tsx exactly. */
-export function PlanHero({ occasionLabel, isDetailsStep, heading, subtitle, trust }: PlanHeroProps) {
+/** Only the Details step gets the illustrated floral hero — every other step
+ * gets a plain page heading, matching web's Component.tsx exactly. */
+export function PlanHero({
+  occasionLabel,
+  isDetailsStep,
+  heading,
+  subtitle,
+  stepNumber,
+  stepCount,
+  stepLabel,
+}: PlanHeroProps) {
   if (!isDetailsStep) {
     return (
       <View style={heroStyles.plainSection}>
@@ -34,29 +50,62 @@ export function PlanHero({ occasionLabel, isDetailsStep, heading, subtitle, trus
 
   return (
     <View style={heroStyles.section}>
-      <EventlyText variant="h2" style={heroStyles.heading}>
-        Let&rsquo;s bring your <EventlyText variant="h2" style={heroStyles.headingAccent}>{occasionLabel}</EventlyText> to
-        life
+      {/* Flowers in the top-right corner, dissolving into the page on the
+          left and bottom so the heading reads over a flat background. */}
+      <View style={heroStyles.art} pointerEvents="none">
+        <Image
+          source={HERO_FLOWERS}
+          style={heroStyles.artImage}
+          resizeMode="cover"
+        />
+        <Svg style={heroStyles.artFade} width="100%" height="100%">
+          <Defs>
+            <LinearGradient id="planHeroFadeX" x1="0" y1="0" x2="1" y2="0">
+              <Stop offset="0" stopColor={PLAN_BG} stopOpacity={1} />
+              <Stop offset="0.45" stopColor={PLAN_BG} stopOpacity={0} />
+            </LinearGradient>
+            <LinearGradient id="planHeroFadeY" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0.6" stopColor={PLAN_BG} stopOpacity={0} />
+              <Stop offset="1" stopColor={PLAN_BG} stopOpacity={1} />
+            </LinearGradient>
+          </Defs>
+          <Rect
+            x={0}
+            y={0}
+            width="100%"
+            height="100%"
+            fill="url(#planHeroFadeX)"
+          />
+          <Rect
+            x={0}
+            y={0}
+            width="100%"
+            height="100%"
+            fill="url(#planHeroFadeY)"
+          />
+        </Svg>
+      </View>
+
+      <StepPills
+        stepNumber={stepNumber}
+        stepCount={stepCount}
+        stepLabel={stepLabel}
+      />
+
+      <EventlyText variant="h1" style={heroStyles.heading}>
+        {/* Names the chosen occasion, so picking Birthday below retitles
+            the step instead of leaving a generic "event". */}
+        {'Let\u2019s start with\nyour '}
+        <EventlyText variant="h1" style={heroStyles.headingAccent}>
+          {occasionLabel.toLowerCase()}
+        </EventlyText>
+        {' details'}
       </EventlyText>
 
-      {subtitle ? (
-        <EventlyText variant="caption" style={heroStyles.subtitle} numberOfLines={2}>
-          {subtitle}
-        </EventlyText>
-      ) : null}
-
-      {trust.length > 0 ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={heroStyles.trustRow}>
-          {trust.map((item) => (
-            <View key={item.label} style={heroStyles.trustChip}>
-              <EventlyIcon name={TRUST_ICON_NAME[item.icon] ?? 'check-circle-outline'} size={13} color={PLAN_ACCENT_WARM} />
-              <EventlyText variant="caption" style={heroStyles.trustLabel}>
-                {item.label}
-              </EventlyText>
-            </View>
-          ))}
-        </ScrollView>
-      ) : null}
+      <EventlyText variant="body" style={heroStyles.subtitle}>
+        Tell us a little about your event so we can create the perfect plan for
+        you.
+      </EventlyText>
     </View>
   );
 }

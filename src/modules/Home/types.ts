@@ -176,6 +176,13 @@ export interface OrganizerDTO {
   events: number;
   tags: string[];
   location: string;
+  /** Uploaded files, absent on older payloads. */
+  profilePhoto?: { url: string } | null;
+  coverPhoto?: { url: string } | null;
+  gallery?: Array<{ url: string }>;
+  /** Passed admin verification. */
+  verified?: boolean;
+  city?: string;
 }
 
 /**
@@ -494,6 +501,11 @@ export interface BookedEventViewModel {
   description: string;
   /** "5 Sep 2026 · Kukatpally · 150 guests" — only the facts we hold. */
   factsLine: string;
+  /** The same facts one by one, each '' when the booking lacks it. */
+  dateLabel: string;
+  location: string;
+  /** "150 guests". */
+  guestsLabel: string;
   /** "3 days to go" / "Today" — the number is emphasised by the card. */
   daysToGoValue: string;
   daysToGoLabel: string;
@@ -660,6 +672,13 @@ export interface OrganizerItem {
   repliesLabel: string;
   /** "19 booked this month" — '' when they have taken none. */
   bookedLabel: string;
+  /** Card photo — cover, else first gallery shot; '' when there is none. */
+  coverUrl: string;
+  /** Their logo / profile photo; '' to show initials. */
+  logoUrl: string;
+  verified: boolean;
+  /** Where they are based, "Hyderabad"; '' when unknown. */
+  locationLabel: string;
 }
 
 export interface TopOrganizersViewModel {

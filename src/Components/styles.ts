@@ -24,7 +24,9 @@ export const appHeaderStyles = StyleSheet.create({
     marginRight: layout.headerGap - (layout.backTouch - layout.backIcon) / 2,
   },
   backButtonPressed: { opacity: 0.6 },
+  titleCol: { flexShrink: 1 },
   title: { color: colors.text, flexShrink: 1 },
+  subtitle: { color: colors.textMuted, marginTop: 1 },
   rightElement: { marginLeft: spacing.md },
 });
 

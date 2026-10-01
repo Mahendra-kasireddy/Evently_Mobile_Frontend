@@ -8,6 +8,8 @@ import { appHeaderStyles } from './styles';
 
 interface AppHeaderProps {
   title: string;
+  /** Optional one-line tagline under the title. */
+  subtitle?: string;
   showBackButton?: boolean;
   onBackPress?: () => void;
   rightElement?: ReactNode;
@@ -43,6 +45,7 @@ interface AppHeaderProps {
  */
 export function AppHeader({
   title,
+  subtitle,
   showBackButton = true,
   onBackPress,
   rightElement,
@@ -78,13 +81,24 @@ export function AppHeader({
             />
           </Pressable>
         )}
-        <EventlyText
-          variant="screenTitle"
-          style={appHeaderStyles.title}
-          numberOfLines={1}
-        >
-          {title}
-        </EventlyText>
+        <View style={appHeaderStyles.titleCol}>
+          <EventlyText
+            variant="screenTitle"
+            style={appHeaderStyles.title}
+            numberOfLines={1}
+          >
+            {title}
+          </EventlyText>
+          {subtitle ? (
+            <EventlyText
+              variant="caption"
+              style={appHeaderStyles.subtitle}
+              numberOfLines={1}
+            >
+              {subtitle}
+            </EventlyText>
+          ) : null}
+        </View>
       </View>
 
       {rightElement && (
