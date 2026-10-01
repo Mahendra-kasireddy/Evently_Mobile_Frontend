@@ -24,7 +24,18 @@ import { SavedPackagesScreen } from '../modules/SavedPackages';
 import { SearchScreen } from '../modules/Search';
 import { SettingsScreen } from '../modules/Settings';
 import { SplashScreen } from '../modules/Splash';
+import { BookingScreen } from '../modules/Booking';
 import { IdeaBoardScreen, WorkspaceScreen } from '../modules/Workspace';
+import {
+  DigitalTicketScreen,
+  EventBookingSuccessScreen,
+  EventCheckoutScreen,
+  EventMemoriesScreen,
+  EventTicketSelectionScreen,
+  MyTicketsScreen,
+  PublicEventDetailScreen,
+  PublicEventLiveScreen,
+} from '../modules/PublicEvents';
 import { selectAuthToken, selectIsAuthHydrated } from '../store/authSlice';
 import {
   selectHasSeenOnboarding,
@@ -53,7 +64,29 @@ export function RootNavigator() {
           <Stack.Screen name="Main" component={MainTabNavigator} />
           <Stack.Screen name="Location" component={LocationScreen} />
           <Stack.Screen name="Notification" component={NotificationScreen} />
+          <Stack.Screen name="Bookings" component={BookingScreen} />
           <Stack.Screen name="Workspace" component={WorkspaceScreen} />
+          <Stack.Screen
+            name="PublicEventDetail"
+            component={PublicEventDetailScreen}
+          />
+          <Stack.Screen
+            name="EventTicketSelection"
+            component={EventTicketSelectionScreen}
+          />
+          <Stack.Screen name="EventCheckout" component={EventCheckoutScreen} />
+          <Stack.Screen
+            name="EventBookingSuccess"
+            component={EventBookingSuccessScreen}
+            options={{ gestureEnabled: false }}
+          />
+          <Stack.Screen name="EventMemories" component={EventMemoriesScreen} />
+          <Stack.Screen name="MyTickets" component={MyTicketsScreen} />
+          <Stack.Screen name="DigitalTicket" component={DigitalTicketScreen} />
+          <Stack.Screen
+            name="PublicEventLive"
+            component={PublicEventLiveScreen}
+          />
           <Stack.Screen name="IdeaBoard" component={IdeaBoardScreen} />
           <Stack.Screen name="Invitations" component={InvitationScreen} />
           <Stack.Screen name="GuestList" component={GuestListScreen} />

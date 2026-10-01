@@ -22,7 +22,6 @@ jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
 import { page, toHtml } from '../test-utils/rn-to-html';
 import { EventCard } from '../src/modules/Booking/sections/EventCard';
 import { EventTabs } from '../src/modules/Booking/sections/EventTabs';
-import { EventsHeader } from '../src/modules/Booking/sections/EventsHeader';
 import { JumpToGrid } from '../src/modules/Booking/sections/JumpToGrid';
 import {
   compactDays,
@@ -484,7 +483,6 @@ describe('render dump', () => {
         toHtml(
           render(
             <>
-              <EventsHeader />
               <EventTabs value="active" onChange={noop} counts={{ active: 2, past: 1 }} />
               {list(activeList, 'bk1')}
               <JumpToGrid
@@ -503,7 +501,6 @@ describe('render dump', () => {
         toHtml(
           render(
             <>
-              <EventsHeader />
               <EventTabs value="past" onChange={noop} counts={{ active: 2, past: 2 }} />
               {list(
                 [

@@ -1,12 +1,12 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EventlyIcon } from '../Components';
-import { BookingScreen } from '../modules/Booking';
 import { BOOKING_ACCENT } from '../modules/Booking/constants';
 import { ChatScreen } from '../modules/Chat';
 import { HomeScreen } from '../modules/Home';
 import { OrganizerHomeScreen } from '../modules/OrganizerHome';
 import { PlanScreen } from '../modules/Plan';
+import { PublicEventsScreen } from '../modules/PublicEvents';
 import { selectIsOrganizerView } from '../store/authSlice';
 import { useAppSelector } from '../store/hooks';
 import { colors } from '../theme';
@@ -15,7 +15,7 @@ import type { MainTabParamList } from './types';
 const TAB_ICON_NAME: Record<keyof MainTabParamList, string> = {
   Home: 'home',
   Plan: 'clipboard-text',
-  Events: 'calendar-month',
+  Events: 'ticket-confirmation-outline',
   Chat: 'chat',
 };
 
@@ -82,9 +82,10 @@ export function MainTabNavigator() {
         component={isOrganizer ? OrganizerHomeScreen : HomeScreen}
       />
       <Tab.Screen name="Plan" component={PlanScreen} />
-      {/* The customer's events, alongside Plan and Chat — shared for now, in
-          the same way those are, rather than hidden behind the view switch. */}
-      <Tab.Screen name="Events" component={BookingScreen} />
+      {/* Public events — shows, workshops and nights out with tickets. The
+          customer's own bookings, and the tickets bought here, are on the
+          Bookings screen, reached from the menu. */}
+      <Tab.Screen name="Events" component={PublicEventsScreen} />
       <Tab.Screen name="Chat" component={ChatScreen} />
       {/* Profile is not a tab. It is one destination reached from one place —
           the avatar at the top of Home — and a tab for it spent a fifth of the

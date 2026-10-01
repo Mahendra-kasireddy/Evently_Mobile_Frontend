@@ -16,7 +16,13 @@ const TRACK = '#f0ecea';
 export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: BOOKING_CANVAS },
   list: { paddingHorizontal: spacing.md, paddingBottom: spacing.xl },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
+  listBleed: { marginHorizontal: -spacing.md },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.lg,
+  },
   centeredIcon: {
     width: 64,
     height: 64,
@@ -26,8 +32,16 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   loadingText: { color: colors.textMuted, marginTop: spacing.md },
-  errorText: { color: colors.danger, textAlign: 'center', marginTop: spacing.sm },
-  emptyTitle: { color: BOOKING_NAVY, marginTop: spacing.md, textAlign: 'center' },
+  errorText: {
+    color: colors.danger,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+  },
+  emptyTitle: {
+    color: BOOKING_NAVY,
+    marginTop: spacing.md,
+    textAlign: 'center',
+  },
   emptySubtitle: {
     color: colors.textMuted,
     marginTop: spacing.sm,
@@ -83,7 +97,12 @@ export const styles = StyleSheet.create({
 });
 
 export const eventTabsStyles = StyleSheet.create({
-  row: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.md, paddingBottom: spacing.md },
+  row: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.md,
+  },
   tab: {
     borderRadius: 999,
     backgroundColor: TRACK,
@@ -123,10 +142,26 @@ export const eventCardStyles = StyleSheet.create({
   },
   headText: { flex: 1 },
   titleRow: { ...globalStyles.row, gap: spacing.sm },
-  title: { color: BOOKING_NAVY, fontSize: 17, fontWeight: '700', lineHeight: 23, flex: 1 },
-  subtitle: { color: colors.textMuted, fontSize: 12.5, marginTop: 2, lineHeight: 18 },
+  title: {
+    color: BOOKING_NAVY,
+    fontSize: 17,
+    fontWeight: '700',
+    lineHeight: 23,
+    flex: 1,
+  },
+  subtitle: {
+    color: colors.textMuted,
+    fontSize: 12.5,
+    marginTop: 2,
+    lineHeight: 18,
+  },
 
-  statusChip: { borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4, flexShrink: 0 },
+  statusChip: {
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    flexShrink: 0,
+  },
   /*
    * The longest label this can hold is "EXPIRED — NO RESPONSE". Poppins sets
    * wide, and at 10/ExtraBold with half a point of tracking that pill crowds
@@ -135,8 +170,18 @@ export const eventCardStyles = StyleSheet.create({
   statusText: { fontSize: 9.5, fontWeight: '700', letterSpacing: 0.4 },
 
   progressRow: { ...globalStyles.row, gap: 12, marginTop: 14 },
-  progressTrack: { flex: 1, height: 6, borderRadius: 3, backgroundColor: TRACK, overflow: 'hidden' },
-  progressFill: { height: '100%', borderRadius: 3, backgroundColor: BOOKING_ACCENT },
+  progressTrack: {
+    flex: 1,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: TRACK,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 3,
+    backgroundColor: BOOKING_ACCENT,
+  },
   daysLabel: { color: '#5b6470', fontSize: 13, fontWeight: '600' },
 
   /** Edge to edge, so the footer reads as its own band rather than a stray rule. */
@@ -194,6 +239,199 @@ export const jumpToStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  tileTitle: { color: BOOKING_NAVY, fontSize: 14.5, fontWeight: '600', lineHeight: 20, marginTop: 12 },
-  tileSubtitle: { color: colors.textMuted, fontSize: 12.5, marginTop: 3, lineHeight: 17 },
+  tileTitle: {
+    color: BOOKING_NAVY,
+    fontSize: 14.5,
+    fontWeight: '600',
+    lineHeight: 20,
+    marginTop: 12,
+  },
+  tileSubtitle: {
+    color: colors.textMuted,
+    fontSize: 12.5,
+    marginTop: 3,
+    lineHeight: 17,
+  },
+});
+
+/* Bookings: the event tickets section and the planned-events states. */
+export const ticketSectionStyles = StyleSheet.create({
+  section: { paddingHorizontal: spacing.md, marginBottom: spacing.lg },
+  head: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.s12,
+  },
+  headTitle: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  title: {
+    color: BOOKING_NAVY,
+    fontWeight: '800',
+    fontSize: 16,
+    lineHeight: 22,
+  },
+  count: {
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
+    paddingHorizontal: 6,
+    backgroundColor: BOOKING_ACCENT_SOFT,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  countText: {
+    color: BOOKING_ACCENT,
+    fontWeight: '800',
+    fontSize: 11.5,
+    lineHeight: 15,
+  },
+  seeAll: { flexDirection: 'row', alignItems: 'center' },
+  seeAllText: {
+    color: BOOKING_ACCENT,
+    fontWeight: '700',
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  card: {
+    backgroundColor: colors.background,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: HAIRLINE,
+    paddingHorizontal: spacing.md,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.s12,
+    paddingVertical: spacing.md,
+  },
+  rowDivider: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#e6e1dd',
+  },
+  thumb: {
+    width: 72,
+    height: 72,
+    borderRadius: 14,
+    backgroundColor: '#e9edf5',
+  },
+  body: { flex: 1, gap: 4 },
+  rowTitle: {
+    color: BOOKING_NAVY,
+    fontWeight: '800',
+    fontSize: 14,
+    lineHeight: 19,
+  },
+  line: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  lineText: { color: '#6b7385', fontSize: 12, lineHeight: 17, flexShrink: 1 },
+  pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 2 },
+  pill: { borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
+  pillText: { fontWeight: '700', fontSize: 10.5, lineHeight: 15 },
+  typePill: { backgroundColor: BOOKING_ACCENT_SOFT },
+  typePillText: { color: BOOKING_ACCENT },
+  qr: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: '#f3f4f7',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
+
+export const bookingStateStyles = StyleSheet.create({
+  sectionTitle: {
+    color: BOOKING_NAVY,
+    fontWeight: '800',
+    fontSize: 16,
+    lineHeight: 22,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.s12,
+  },
+  /* No planned events, but tickets above: a small card, not a whole screen. */
+  inline: {
+    marginHorizontal: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.s12,
+    backgroundColor: colors.background,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: HAIRLINE,
+    padding: spacing.md,
+  },
+  inlineIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: BOOKING_ACCENT_SOFT,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inlineText: { flex: 1, gap: 2 },
+  inlineTitle: {
+    color: BOOKING_NAVY,
+    fontWeight: '700',
+    fontSize: 14,
+    lineHeight: 19,
+  },
+  inlineBody: { color: colors.textMuted, fontSize: 12.5, lineHeight: 18 },
+  inlineCta: {
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: BOOKING_ACCENT,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  inlineCtaText: {
+    color: BOOKING_ACCENT,
+    fontWeight: '700',
+    fontSize: 12.5,
+    lineHeight: 17,
+  },
+  /* Nothing booked at all. */
+  empty: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.lg,
+  },
+  emptyActions: {
+    alignSelf: 'stretch',
+    gap: spacing.s12,
+    marginTop: spacing.lg,
+  },
+  primary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    height: 50,
+    borderRadius: 14,
+    backgroundColor: BOOKING_ACCENT,
+  },
+  primaryText: {
+    color: colors.onPrimary,
+    fontWeight: '700',
+    fontSize: 15,
+    lineHeight: 20,
+  },
+  secondary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    height: 50,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: BOOKING_ACCENT,
+    backgroundColor: colors.background,
+  },
+  secondaryText: {
+    color: BOOKING_ACCENT,
+    fontWeight: '700',
+    fontSize: 15,
+    lineHeight: 20,
+  },
+  scroll: { paddingTop: spacing.sm, paddingBottom: spacing.xl },
 });

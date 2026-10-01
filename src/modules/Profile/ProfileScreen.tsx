@@ -32,7 +32,7 @@ export function ProfileScreen() {
   const go = (action: ProfileAction) => {
     switch (action) {
       case 'bookings':
-        return navigation.navigate('Main', { screen: 'Events' });
+        return navigation.navigate('Bookings');
       case 'savedPackages':
         return navigation.navigate('SavedPackages');
       case 'invitations':

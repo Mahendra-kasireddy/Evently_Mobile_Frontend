@@ -12,7 +12,6 @@
  */
 
 import React from 'react';
-import ReactTestRenderer from 'react-test-renderer';
 
 jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
   const { Text } = require('react-native');
@@ -20,8 +19,6 @@ jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
     return <Text>{` icon:${name}`}</Text>;
   };
 });
-
-import { EventsHeader } from '../src/modules/Booking/sections/EventsHeader';
 
 /* Minimal shapes rather than @types/node, which this app does not carry —
    the same pattern the other suites use for their render dumps. */
@@ -51,19 +48,23 @@ const routeNamesIn = (source: string): string[] =>
 
 describe('one screen, one route', () => {
   /*
-   * BookingScreen was registered twice: as the Events tab, and as a pushed
-   * `Bookings` route. Two routes rendering the same screen is what made the
-   * loop possible — the customer could not tell which copy they were on.
+   * BookingScreen was once registered twice: as the Events tab, and as a
+   * pushed `Bookings` route. Two routes rendering the same screen is what made
+   * the loop possible. It is now the pushed route only — the Events tab is the
+   * public events catalogue.
    */
-  it('registers the events list once, as a tab', () => {
-    expect(routeNamesIn(read('navigation', 'MainTabNavigator.tsx'))).toContain(
-      'Events',
+  it('registers the bookings list once, as a pushed route', () => {
+    expect(routeNamesIn(read('navigation', 'RootNavigator.tsx'))).toContain(
+      'Bookings',
+    );
+    expect(read('navigation', 'MainTabNavigator.tsx')).not.toMatch(
+      /component=\{BookingScreen\}/,
     );
   });
 
-  it('has no pushed duplicate of the events list', () => {
-    expect(routeNamesIn(read('navigation', 'RootNavigator.tsx'))).not.toContain(
-      'Bookings',
+  it('reaches Bookings from the menu', () => {
+    expect(read('modules/Profile', 'ProfileScreen.tsx')).toMatch(
+      /navigate\('Bookings'\)/,
     );
   });
 
@@ -86,9 +87,37 @@ describe('one screen, one route', () => {
     expect(tabs.filter(c => stack.includes(c))).toEqual([]);
   });
 
-  it('does not keep a Bookings route in the param list', () => {
-    // A route name that no navigator registers is a crash waiting to be typed.
-    expect(read('navigation', 'types.ts')).not.toMatch(/^\s*Bookings:/m);
+  /*
+   * The catalogue has to be reachable.
+   *
+   * It was registered on the root stack with nothing linking to it, which is a
+   * screen that exists and cannot be opened — every route in the app resolved,
+   * every test passed, and a customer had no way in. A tab is the way in, and
+   * this is what notices if it disappears.
+   */
+  it('puts public events on the bottom bar, where a customer can find them', () => {
+    const tabs = read('navigation', 'MainTabNavigator.tsx');
+    expect(tabs).toMatch(/name="Events"[\s\S]*?component=\{PublicEventsScreen\}/);
+    // One tab for it — the old Discover tab is gone.
+    expect(routeNamesIn(tabs)).not.toContain('Discover');
+    expect(read('navigation', 'types.ts')).not.toMatch(/^\s*Discover:/m);
+  });
+
+  /* The ticket a customer already bought needs a door too — it opens from the
+     catalogue's header rather than spending a sixth tab on it. */
+  it('offers a way into My Tickets from the catalogue', () => {
+    const screen = read('modules/PublicEvents', 'PublicEventsScreen.tsx');
+    expect(screen).toMatch(/navigate\('MyTickets'\)/);
+  });
+
+  it('declares the Bookings route it registers', () => {
+    // A route the navigator registers but the param list does not know is a
+    // navigate() call that will not type-check — and the reverse is a crash.
+    expect(read('navigation', 'types.ts')).toMatch(/^\s*Bookings:/m);
+  });
+
+  it('shows public-event tickets on the Bookings screen', () => {
+    expect(read('modules/Booking', 'BookingScreen.tsx')).toMatch(/EventTicketsSection/);
   });
 });
 
@@ -196,26 +225,11 @@ describe('where an event opens', () => {
   });
 });
 
-describe('the events header', () => {
-  it('shows no back arrow, because a tab has nothing behind it', () => {
-    let tree!: ReactTestRenderer.ReactTestRenderer;
-    ReactTestRenderer.act(() => {
-      tree = ReactTestRenderer.create(<EventsHeader />);
-    });
-
-    const icons: string[] = [];
-    const walk = (n: unknown): void => {
-      if (n == null) return;
-      if (typeof n === 'string') {
-        if (n.startsWith(' icon:')) icons.push(n);
-        return;
-      }
-      if (Array.isArray(n)) return n.forEach(walk);
-      walk((n as { children?: unknown }).children);
-    };
-    walk(tree.toJSON());
-
-    expect(icons.join(' ')).not.toContain('chevron-left');
+describe('the bookings header', () => {
+  it('has a back arrow, because Bookings is opened from the menu', () => {
+    // A pushed screen with no way back strands the customer on it.
+    const source = read('modules', 'Booking', 'BookingScreen.tsx');
+    expect(source).toMatch(/<AppHeader[\s\S]{0,80}onBackPress=\{navigation\.goBack\}/);
   });
 });
 

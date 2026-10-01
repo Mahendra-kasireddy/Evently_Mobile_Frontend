@@ -22,10 +22,8 @@ export type MainTabParamList = {
       }
     | undefined;
   /**
-   * The customer's events. The same screen is also registered on the root
-   * stack as `Bookings`, which is where Home's booked card and the workspace's
-   * back button land; as a tab it is the customer's own way in, with no back
-   * arrow because there is nothing to go back to.
+   * Public events — tickets to somebody else's show. The customer's own
+   * bookings live on the root stack as `Bookings`, reached from the menu.
    */
   Events: undefined;
   Chat: undefined;
@@ -47,6 +45,35 @@ export type RootStackParamList = {
   Main: NavigatorScreenParams<MainTabParamList> | undefined;
   Location: undefined;
   Notification: undefined;
+  /*
+   * Public events — tickets to somebody else's show, as opposed to the private
+   * bookings the rest of this app is about. A separate business flow, so
+   * separate screens rather than a mode on the existing ones.
+   *
+   * The catalogue itself is not here: it is the Events tab, and registering
+   * it in both navigators would be one screen with two routes.
+   */
+  /** The customer's own bookings, and the event tickets they hold. */
+  Bookings: undefined;
+  PublicEventDetail: { eventId: string };
+  /** Choosing a ticket type and how many, before the checkout. */
+  EventTicketSelection: { eventId: string; ticketTypeId?: string };
+  /** The order summary and the one button that opens the payment. */
+  EventCheckout: { eventId: string; ticketTypeId: string; quantity: number };
+  /** Shown once the payment is verified and the tickets exist. */
+  EventBookingSuccess: {
+    eventId: string;
+    reference: string;
+    ticketIds: string[];
+    quantity: number;
+    amount: number;
+    ticketTypeName: string;
+  };
+  /** The event's shared gallery: attendees' photos and clips. */
+  EventMemories: { eventId: string };
+  PublicEventLive: { eventId: string };
+  MyTickets: undefined;
+  DigitalTicket: { ticketId: string };
   /**
    * One booking's workspace. `workspaceName` is optional and purely cosmetic:
    * it lets the header show the right name during the first load, before the
@@ -139,7 +166,11 @@ export type RootStackParamList = {
    * booking is booked with the advance still owed, and telling that customer
    * "Advance paid" would report money as having moved when it has not.
    */
-  PaymentSuccess: { bookingId: string; organizerName?: string; inCash?: boolean };
+  PaymentSuccess: {
+    bookingId: string;
+    organizerName?: string;
+    inCash?: boolean;
+  };
   /** One organizer's full profile. `name` is only for the first render. */
   Organizer: { organizerId: string; name?: string };
   /** Everything people have said about that organizer. */
