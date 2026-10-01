@@ -23,6 +23,7 @@ import {
   SORT_OPTIONS,
   formatEventWhen,
   formatPrice,
+  saleNote,
 } from './constants';
 import { usePublicEvents } from './hooks';
 import { CategoryPill, InfoLine, LivePill } from './sections/ui';
@@ -54,6 +55,14 @@ function EventListCard({
 }) {
   const live = event.liveEnabled && event.liveState === 'live';
   const where = [event.venueName, event.city].filter(Boolean).join(', ');
+  /* Sold out, sales not open yet, sales closed — or '' when it is on sale
+     and the price is the thing to show. */
+  const note = saleNote(
+    event.saleState,
+    event.soldOut,
+    event.salesOpenAt,
+    event.timezone,
+  );
   return (
     <TouchableOpacity
       style={s.card}
@@ -91,9 +100,12 @@ function EventListCard({
           text={formatEventWhen(event.startDateTime, event.timezone)}
         />
         <InfoLine icon="map-marker-outline" text={where} />
-        {event.soldOut ? (
-          <EventlyText variant="caption" style={s.soldOut}>
-            {PUBLIC_EVENTS_COPY.soldOut}
+        {note ? (
+          <EventlyText
+            variant="caption"
+            style={event.soldOut ? s.soldOut : s.saleNote}
+          >
+            {note}
           </EventlyText>
         ) : (
           <EventlyText variant="caption" style={s.price}>

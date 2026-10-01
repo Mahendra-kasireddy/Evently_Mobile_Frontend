@@ -27,6 +27,7 @@ import {
   formatEventWhen,
   formatPrice,
   initialsOf,
+  saleNote,
   ticketAvailability,
 } from './constants';
 import { useEventDetail } from './hooks';
@@ -98,7 +99,7 @@ export function PublicEventDetailScreen() {
   const sellable = data.canBook && !data.soldOut;
   const holder = data.you.hasTicket;
   /* Why "Book Ticket" may have nothing behind it — told apart, because
-     "you've hit the per-person limit" and "nothing is on sale right now"
+     "you've hit the per-person limit", "sales open Friday" and "sold out"
      are different news. The limit only counts when a ticket is on sale with
      seats left, and the one thing stopping this customer is the cap. */
   const onSaleWithSeats = data.ticketTypes.filter(
@@ -108,8 +109,13 @@ export function PublicEventDetailScreen() {
     sellable &&
     onSaleWithSeats.length > 0 &&
     onSaleWithSeats.every(t => t.maxForYou <= 0);
-  const nothingOnSale =
-    sellable && data.ticketTypes.length > 0 && onSaleWithSeats.length === 0;
+  const note = saleNote(
+    data.saleState,
+    data.soldOut,
+    data.salesOpenAt,
+    data.timezone,
+  );
+  const nothingOnSale = sellable && onSaleWithSeats.length === 0;
   const canBookMore = sellable && !limitReached && !nothingOnSale;
   const featured = data.ticketTypes[0] ?? null;
   const venueLine = [data.venue?.name, data.venue?.city]
@@ -486,7 +492,7 @@ export function PublicEventDetailScreen() {
               : limitReached
               ? 'Booking Limit Reached'
               : nothingOnSale
-              ? 'Tickets Not On Sale'
+              ? note || 'Tickets Not On Sale'
               : holder
               ? 'Book More Tickets'
               : PUBLIC_EVENTS_COPY.bookCta}

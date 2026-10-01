@@ -14,6 +14,13 @@ export type PublicEventStatus =
   | 'sold_out'
   | 'completed'
   | 'cancelled';
+/** Where ticket sales stand — decided by the server from stock and windows. */
+export type SaleState =
+  | 'on_sale'
+  | 'sold_out'
+  | 'upcoming'
+  | 'closed'
+  | 'unavailable';
 export type LiveState = 'upcoming' | 'live' | 'ended';
 export type TicketState = 'upcoming' | 'checked_in' | 'completed' | 'cancelled';
 
@@ -30,6 +37,10 @@ export interface EventCard {
   city: string;
   startingPrice: number;
   soldOut: boolean;
+  /** Absent on older servers; read `soldOut` then. */
+  saleState?: SaleState;
+  /** When sales open, for an `upcoming` event. */
+  salesOpenAt?: string | null;
   status: PublicEventStatus;
   liveEnabled: boolean;
   liveState: LiveState;
@@ -78,6 +89,8 @@ export interface EventDetail {
   contactEmail: string;
   status: PublicEventStatus;
   soldOut: boolean;
+  saleState?: SaleState;
+  salesOpenAt?: string | null;
   canBook: boolean;
   ticketTypes: TicketOption[];
   memories: {

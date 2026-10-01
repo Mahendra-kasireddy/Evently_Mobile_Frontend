@@ -1,4 +1,4 @@
-import type { LiveState, TicketOption, TicketState } from './types';
+import type { LiveState, SaleState, TicketOption, TicketState } from './types';
 
 /** Where the customer-facing public event routes live. */
 export const BROWSE_ENDPOINT = '/public-event/browse';
@@ -177,4 +177,32 @@ export function ticketAvailability(
   if (option.maxForYou <= 0)
     return 'Per-person limit reached — you’ve already booked the maximum';
   return `${option.available} left · up to ${option.maxForYou} for you`;
+}
+
+/**
+ * What to say instead of a price when tickets cannot be bought, or '' when
+ * they can. "Sold out" only when the seats are gone — a window that has not
+ * opened, or has closed, is a different thing to be told.
+ */
+export function saleNote(
+  state: SaleState | undefined,
+  soldOut: boolean,
+  opensAt: string | null | undefined,
+  timezone: string,
+): string {
+  const s = state ?? (soldOut ? 'sold_out' : 'on_sale');
+  switch (s) {
+    case 'sold_out':
+      return 'Sold out';
+    case 'upcoming':
+      return opensAt
+        ? `Sales open ${formatEventWhen(opensAt, timezone)}`
+        : 'Sales open soon';
+    case 'closed':
+      return 'Sales closed';
+    case 'unavailable':
+      return 'Tickets coming soon';
+    default:
+      return '';
+  }
 }

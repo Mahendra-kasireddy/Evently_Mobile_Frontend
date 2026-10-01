@@ -346,6 +346,13 @@ export const listUi = StyleSheet.create({
     marginTop: 4,
   },
   soldOut: { color: PE_LIVE, fontWeight: '700', fontSize: 13, marginTop: 2 },
+  saleNote: {
+    color: PE_NAVY,
+    fontWeight: '700',
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: 4,
+  },
   empty: {
     alignItems: 'center',
     paddingVertical: spacing.xl,
