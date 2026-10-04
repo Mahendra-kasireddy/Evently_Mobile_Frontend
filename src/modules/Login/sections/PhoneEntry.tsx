@@ -6,7 +6,7 @@ import {
   EventlyTextInput,
 } from '../../../Components';
 import { brand } from '../../../theme';
-import { MOBILE_LENGTH, PHONE_COPY } from '../constants';
+import { DIAL_CODES, MOBILE_LENGTH, PHONE_COPY } from '../constants';
 import { fieldStyles } from '../styles';
 import { formatMobile, sanitizeDigits } from '../utils';
 import { DialCodeSheet } from './DialCodeSheet';
@@ -49,8 +49,11 @@ export function PhoneEntry({
           accessibilityLabel={`Country code ${dialCode}. Change`}
           testID="dial-code-button"
         >
-          <EventlyText style={fieldStyles.dialCode}>{dialCode}</EventlyText>
+          <EventlyText style={fieldStyles.flag}>
+            {DIAL_CODES.find(d => d.code === dialCode)?.flag ?? '🌐'}
+          </EventlyText>
           <EventlyIcon name="chevron-down" size={16} color={brand.navy} />
+          <EventlyText style={fieldStyles.dialCode}>{dialCode}</EventlyText>
         </Pressable>
 
         <View style={fieldStyles.divider} />

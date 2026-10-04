@@ -1,48 +1,29 @@
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
-import { brand, spacing } from '../../../theme';
-import { LOGIN_TAGLINE, LOGIN_TRUST_CHIPS } from '../constants';
-import { heroStyles } from '../styles';
-
-interface AuthHeroProps {
-  /** The status bar's height. Padding rather than a spacer above, so the navy
-   * runs behind the clock and battery instead of starting below them. */
-  topInset: number;
-}
+import { LOGIN_COPY } from '../constants';
+import { AUTH_ACCENT, heroStyles } from '../styles';
 
 /**
- * The navy block the sign-in screen opens with: wordmark, one line of promise,
- * three chips. No illustration and no carousel — this screen is on the critical
- * path to using the app, and anything that has to load first delays it.
+ * The sign-in step's heading: the mark, the wordmark, and one line saying what
+ * this screen is for. Drawn with icons and type alone — nothing to download
+ * before somebody can type their number.
+ *
+ * The serif lines use the platform's `Text` directly: the app's text component
+ * always swaps in a Poppins face, and these two are meant to be the serif.
  */
-export function AuthHero({ topInset }: AuthHeroProps) {
+export function AuthHero() {
   return (
-    <View style={[heroStyles.hero, { paddingTop: topInset + spacing.md }]}>
-      <View style={heroStyles.glow} pointerEvents="none" />
-
-      <View style={heroStyles.brandRow}>
-        <View style={heroStyles.logoTile}>
-          <EventlyIcon
-            name="star-four-points"
-            size={18}
-            color={brand.onAccent}
-          />
-        </View>
-        <EventlyText style={heroStyles.wordmark}>Evently</EventlyText>
-      </View>
-
-      <EventlyText variant="body" style={heroStyles.tagline}>
-        {LOGIN_TAGLINE}
+    <View style={heroStyles.brand}>
+      <EventlyIcon name="spa" size={34} color={AUTH_ACCENT} />
+      <Text style={heroStyles.wordmark} accessibilityRole="header">
+        {LOGIN_COPY.wordmark}
+      </Text>
+      <Text style={[heroStyles.title, heroStyles.titleGap]}>
+        {LOGIN_COPY.title}
+      </Text>
+      <EventlyText variant="body" style={heroStyles.subtitle}>
+        {LOGIN_COPY.subtitle}
       </EventlyText>
-
-      <View style={heroStyles.chipRow}>
-        {LOGIN_TRUST_CHIPS.map(chip => (
-          <View key={chip} style={heroStyles.chip}>
-            <View style={heroStyles.chipDot} />
-            <EventlyText style={heroStyles.chipText}>{chip}</EventlyText>
-          </View>
-        ))}
-      </View>
     </View>
   );
 }

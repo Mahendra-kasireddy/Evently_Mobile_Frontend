@@ -1,5 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Modal, View } from 'react-native';
+import {
+  Animated,
+  Modal,
+  ScrollView,
+  StatusBar,
+  Text,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   EventlyButton,
   EventlyIcon,
@@ -17,11 +25,10 @@ interface NameGateSheetProps {
 }
 
 /**
- * Mandatory, non-dismissible "what should we call you" prompt shown until the
- * real backend record has a name. No backdrop tap, no swipe, no skip button —
- * the only way out is a valid submit. The avatar circle live-previews the
- * first letter as the user types, so the sheet feels responsive rather than
- * like a static form.
+ * Mandatory "what's your name" page, shown until the real backend record has a
+ * name. A full page rather than a sheet over Home, and with no back or skip:
+ * the only way on is a valid name. The avatar previews the first letter as
+ * the person types, so the page answers them rather than sitting still.
  */
 export function NameGateSheet({ onNameSaved }: NameGateSheetProps) {
   const {
@@ -33,18 +40,19 @@ export function NameGateSheet({ onNameSaved }: NameGateSheetProps) {
     errorMessage,
     submit,
   } = useNameCaptureContainer(onNameSaved);
+  const insets = useSafeAreaInsets();
   const [isFocused, setIsFocused] = useState(false);
 
-  const avatarScale = useRef(new Animated.Value(0.6)).current;
+  const avatarScale = useRef(new Animated.Value(0.85)).current;
   const initialOpacity = useRef(new Animated.Value(0)).current;
   const hasInitial = name.trim().length > 0;
 
   useEffect(() => {
     if (!isVisible) return;
-    avatarScale.setValue(0.6);
+    avatarScale.setValue(0.85);
     Animated.spring(avatarScale, {
       toValue: 1,
-      friction: 5,
+      friction: 6,
       tension: 60,
       useNativeDriver: true,
     }).start();
@@ -61,15 +69,30 @@ export function NameGateSheet({ onNameSaved }: NameGateSheetProps) {
   return (
     <Modal
       visible={isVisible}
-      transparent
       animationType="slide"
+      presentationStyle="fullScreen"
       onRequestClose={() => {}}
       statusBarTranslucent
     >
-      <View style={styles.overlay}>
-        <KeyboardAvoider>
-          <View style={styles.sheet}>
-            <View style={styles.handle} />
+      <StatusBar barStyle="dark-content" />
+      <View style={[styles.page, { paddingTop: insets.top }]}>
+        <KeyboardAvoider style={styles.flex}>
+          <ScrollView
+            contentContainerStyle={[
+              styles.content,
+              { paddingBottom: insets.bottom + 24 },
+            ]}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            {/* The serif heading uses the platform Text: the app's text
+                component always swaps in a Poppins face. */}
+            <Text style={styles.heading} accessibilityRole="header">
+              {NAME_GATE_COPY.heading}
+            </Text>
+            <EventlyText variant="body" style={styles.subtitle}>
+              {NAME_GATE_COPY.subtitle}
+            </EventlyText>
 
             <View style={styles.avatarWrap}>
               <Animated.View
@@ -81,9 +104,9 @@ export function NameGateSheet({ onNameSaved }: NameGateSheetProps) {
                 <Animated.View
                   style={[styles.avatarLayer, { opacity: initialOpacity }]}
                 >
-                  <EventlyText style={styles.avatarInitial}>
+                  <Text style={styles.avatarInitial}>
                     {name.trim().charAt(0).toUpperCase()}
-                  </EventlyText>
+                  </Text>
                 </Animated.View>
                 <Animated.View
                   style={{
@@ -93,21 +116,10 @@ export function NameGateSheet({ onNameSaved }: NameGateSheetProps) {
                     }),
                   }}
                 >
-                  <EventlyIcon
-                    name="account-outline"
-                    size={40}
-                    color="#ffffff"
-                  />
+                  <EventlyIcon name="account" size={64} color="#f2b8a0" />
                 </Animated.View>
               </Animated.View>
             </View>
-
-            <EventlyText variant="h1" style={styles.heading}>
-              {NAME_GATE_COPY.heading}
-            </EventlyText>
-            <EventlyText variant="body" style={styles.subtitle}>
-              {NAME_GATE_COPY.subtitle}
-            </EventlyText>
 
             <EventlyTextInput
               value={name}
@@ -117,10 +129,13 @@ export function NameGateSheet({ onNameSaved }: NameGateSheetProps) {
               placeholder={NAME_GATE_COPY.placeholder}
               autoFocus
               autoCapitalize="words"
+              autoComplete="name"
+              textContentType="name"
               returnKeyType="done"
               maxLength={NAME_MAX_LENGTH}
               onSubmitEditing={submit}
               style={[styles.input, isFocused && styles.inputFocused]}
+              accessibilityLabel="Your name"
             />
 
             {errorMessage ? (
@@ -137,11 +152,7 @@ export function NameGateSheet({ onNameSaved }: NameGateSheetProps) {
               accentColor={NAME_GATE_ACCENT}
               style={styles.button}
             />
-
-            <EventlyText variant="caption" style={styles.reassurance}>
-              {NAME_GATE_COPY.reassurance}
-            </EventlyText>
-          </View>
+          </ScrollView>
         </KeyboardAvoider>
       </View>
     </Modal>

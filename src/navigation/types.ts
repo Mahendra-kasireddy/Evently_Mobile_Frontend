@@ -33,6 +33,8 @@ export type JoinRole = 'organizer' | 'subvendor';
 
 export type RootStackParamList = {
   Onboarding: undefined;
+  /** First-run fork: planning an event (sign in) or organizing them (register). */
+  UseChoice: undefined;
   Login: undefined;
   Join: undefined;
   ComingSoon: { role: JoinRole };

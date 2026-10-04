@@ -1,12 +1,7 @@
 import { useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
-import {
-  EventlyIcon,
-  EventlyText,
-  EventlyTextInput,
-} from '../../../Components';
+import { EventlyText, EventlyTextInput } from '../../../Components';
 import type { TextInput } from 'react-native';
-import { brand } from '../../../theme';
 import { OTP_COPY, OTP_LENGTH } from '../constants';
 import { otpStyles } from '../styles';
 import {
@@ -53,10 +48,6 @@ export function OtpEntry({
 
   return (
     <View>
-      <EventlyText variant="subtitle" style={otpStyles.label}>
-        {OTP_COPY.label}
-      </EventlyText>
-
       <Pressable
         style={otpStyles.boxRow}
         onPress={() => inputRef.current?.focus()}
@@ -102,39 +93,33 @@ export function OtpEntry({
         />
       </Pressable>
 
-      <EventlyText variant="caption" style={otpStyles.retryLead}>
-        {OTP_COPY.retryLead}
-      </EventlyText>
-
-      <View style={otpStyles.retryRow}>
+      {/* "Resend OTP in 0:28" while the cooldown runs, then the link. */}
+      <View style={otpStyles.resendRow}>
+        {canResend ? (
+          <EventlyText variant="caption" style={otpStyles.resendLead}>
+            {OTP_COPY.retryLead}
+          </EventlyText>
+        ) : null}
         <Pressable
-          style={[
-            otpStyles.retryPill,
-            !canResend && otpStyles.retryPillWaiting,
-          ]}
           onPress={onResend}
           disabled={!canResend}
+          hitSlop={8}
           accessibilityRole="button"
           accessibilityState={{ disabled: !canResend }}
           accessibilityLabel={
             canResend
-              ? 'Resend code by S M S'
+              ? 'Resend the code by S M S'
               : `Resend available in ${resendSeconds} seconds`
           }
           testID="otp-resend-sms"
         >
-          <EventlyIcon
-            name="message-text-outline"
-            size={14}
-            color={canResend ? brand.accentDeep : brand.textMuted}
-          />
           <EventlyText
-            style={[
-              otpStyles.retryText,
-              !canResend && otpStyles.retryTextWaiting,
-            ]}
+            variant="caption"
+            style={canResend ? otpStyles.resendLink : otpStyles.resendWait}
           >
-            {canResend ? OTP_COPY.retryChannel : formatCooldown(resendSeconds)}
+            {canResend
+              ? OTP_COPY.retryChannel
+              : `${OTP_COPY.retryWait} ${formatCooldown(resendSeconds)}`}
           </EventlyText>
         </Pressable>
       </View>

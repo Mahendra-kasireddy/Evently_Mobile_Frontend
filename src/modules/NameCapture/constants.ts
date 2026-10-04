@@ -16,10 +16,9 @@ export const NAME_GATE_TEXT_MUTED = '#5b6675'; // --color-text-muted
 export const NAME_GATE_BORDER = '#ebebeb'; // --color-border
 
 export const NAME_GATE_COPY = {
-  heading: 'What should we call you?',
-  subtitle: "So your organizer and guests know it's you.",
-  placeholder: 'e.g. Aditi Sharma',
+  heading: 'What’s your name?',
+  subtitle: 'We’d love to know your name to personalize your experience.',
+  placeholder: 'Your name',
   cta: 'Continue',
-  reassurance: 'This is how organizers & guests will see you.',
   errorTooShort: 'Please enter at least 2 characters.',
 } as const;

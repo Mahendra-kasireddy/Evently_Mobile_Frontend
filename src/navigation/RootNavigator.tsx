@@ -25,6 +25,7 @@ import { SearchScreen } from '../modules/Search';
 import { SettingsScreen } from '../modules/Settings';
 import { SplashScreen } from '../modules/Splash';
 import { BookingScreen } from '../modules/Booking';
+import { UseChoiceScreen } from '../modules/UseChoice';
 import { IdeaBoardScreen, WorkspaceScreen } from '../modules/Workspace';
 import {
   DigitalTicketScreen,
@@ -128,6 +129,9 @@ export function RootNavigator() {
             <Stack.Screen name="Onboarding" component={OnboardingScreen} />
           )}
           <Stack.Screen name="Login" component={LoginScreen} />
+          {/* After Login in the list, so a returning signed-out customer still
+              opens on sign-in; first run reaches it from Onboarding. */}
+          <Stack.Screen name="UseChoice" component={UseChoiceScreen} />
           <Stack.Screen name="Join" component={JoinScreen} />
           <Stack.Screen name="ComingSoon" component={ComingSoonScreen} />
           {/* Organizer onboarding is OTP-first and starts unauthenticated; the same

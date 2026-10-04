@@ -64,7 +64,7 @@ export function OnboardingScreen() {
 
   const finish = () => {
     dispatch(setHasSeenOnboarding());
-    navigation.replace('Login');
+    navigation.replace('UseChoice');
   };
 
   const goNext = () => {

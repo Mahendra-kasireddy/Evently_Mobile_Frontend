@@ -17,12 +17,12 @@ import { useLoginContainer } from './container';
 import { AuthCta } from './sections/AuthCta';
 import { AuthHero } from './sections/AuthHero';
 import { BusinessEntryCard } from './sections/BusinessEntryCard';
+import { OtpArt } from './sections/OtpArt';
 import { OtpEntry } from './sections/OtpEntry';
-import { OtpHeader } from './sections/OtpHeader';
 import { OtpSafetyNote } from './sections/OtpSafetyNote';
 import { PhoneEntry } from './sections/PhoneEntry';
 import { TermsNote } from './sections/TermsNote';
-import { styles } from './styles';
+import { AUTH_NAVY, styles } from './styles';
 import { formatSentTo } from './utils';
 
 type LoginNavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -30,8 +30,8 @@ type LoginNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 /**
  * Sign in: a number, then the code that was texted to it.
  *
- * Both steps share one layout — navy block, the field and its CTA, then a
- * footer — so moving between them does not reflow the screen.
+ * Both steps share one layout — back arrow, a heading block, the field and
+ * its CTA, then a footer — so moving between them does not reflow the screen.
  *
  * The footer is pushed to the bottom by a flexible spacer rather than sitting
  * wherever the content happens to end: with the keyboard down that fills what
@@ -90,23 +90,35 @@ export function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Light glyphs, drawing under the bar: the navy header runs to the top
-          edge, so the clock and battery sit on it. */}
+      {/* Dark glyphs on the light page. */}
       <StatusBar
-        barStyle="light-content"
+        barStyle="dark-content"
         backgroundColor="transparent"
         translucent
       />
 
-      {isPhoneStep ? (
-        <AuthHero topInset={insets.top} />
-      ) : (
-        <OtpHeader
-          sentTo={formatSentTo(sentTo, phone)}
-          onBack={changeNumber}
-          topInset={insets.top}
-        />
-      )}
+      {/* Back: on the code step it returns to the number; on the number step
+          it goes wherever the person came from, when there is somewhere. */}
+      <View style={[styles.topBar, { marginTop: insets.top }]}>
+        {!isPhoneStep || navigation.canGoBack() ? (
+          <Pressable
+            style={styles.back}
+            onPress={isPhoneStep ? navigation.goBack : changeNumber}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={
+              isPhoneStep ? 'Go back' : 'Go back and change number'
+            }
+            testID={isPhoneStep ? 'login-back' : 'otp-back'}
+          >
+            <EventlyIcon
+              name={isPhoneStep ? 'arrow-left' : 'chevron-left'}
+              size={24}
+              color={AUTH_NAVY}
+            />
+          </Pressable>
+        ) : null}
+      </View>
 
       <KeyboardAvoider style={styles.flex}>
         <ScrollView
@@ -127,6 +139,7 @@ export function LoginScreen() {
           >
             {isPhoneStep ? (
               <>
+                <AuthHero />
                 <PhoneEntry
                   phone={phone}
                   dialCode={dialCode}
@@ -144,6 +157,7 @@ export function LoginScreen() {
               </>
             ) : (
               <>
+                <OtpArt sentTo={formatSentTo(sentTo, phone)} />
                 <OtpEntry
                   code={code}
                   onChangeCode={setCode}
@@ -188,10 +202,10 @@ export function LoginScreen() {
           <View style={styles.footer}>
             {isPhoneStep ? (
               <>
+                <TermsNote />
                 <BusinessEntryCard
                   onPress={() => navigation.navigate('Join')}
                 />
-                <TermsNote />
               </>
             ) : (
               <OtpSafetyNote />

@@ -20,14 +20,11 @@ export const DIAL_CODES = [
   { code: '+91', country: 'India', flag: '🇮🇳' },
 ] as const;
 
-export const LOGIN_TAGLINE = 'Effortless celebrations, planned beautifully.';
-
-/** The three promises the hero makes. Each is checkable, so none of them is marketing. */
-export const LOGIN_TRUST_CHIPS = [
-  'Verified organizers',
-  'Itemised quotes',
-  'Free to compare',
-] as const;
+export const LOGIN_COPY = {
+  wordmark: 'Evently',
+  title: 'Welcome back',
+  subtitle: 'Sign in to continue your celebration journey',
+} as const;
 
 /**
  * A customer has no separate sign-up: verifying a number both signs them in
@@ -37,7 +34,7 @@ export const LOGIN_TRUST_CHIPS = [
 export const PHONE_COPY = {
   placeholder: 'Mobile number',
   ctaIdle: `Enter ${MOBILE_LENGTH} digits`,
-  ctaReady: 'Continue',
+  ctaReady: 'Send OTP',
   a11yField: 'Mobile number',
 } as const;
 
@@ -47,24 +44,26 @@ export const PHONE_COPY = {
  * signs in with the field above, which is the mistake this card used to cause.
  */
 export const BUSINESS_ENTRY_COPY = {
-  title: 'Organizer or sub-vendor?',
-  body: 'Register a business profile · already registered? Just sign in above',
+  lead: 'Organizer or sub-vendor?',
+  action: 'Register your business',
+  /* Said to a screen reader, where "already registered" matters most. */
+  a11y: 'Organizer or sub-vendor? Register your business. Already registered? Sign in with your number above.',
 } as const;
 
 export const TERMS_COPY = {
-  lead: "By continuing you agree to Evently's",
-  terms: 'Terms',
-  conjunction: '&',
+  lead: 'By continuing, you agree to our',
+  terms: 'Terms & Conditions',
+  conjunction: 'and',
   privacy: 'Privacy Policy',
 } as const;
 
 export const OTP_COPY = {
-  title: 'Verify number',
-  sentToPrefix: 'OTP sent to',
-  edit: 'Edit',
-  label: 'Enter OTP',
-  retryLead: "Didn't receive OTP? Retry via",
-  retryChannel: 'SMS',
+  title: 'Enter OTP',
+  sentToPrefix: `We've sent a ${OTP_LENGTH}-digit code to`,
+  retryLead: "Didn't receive the code?",
+  retryChannel: 'Resend OTP',
+  /** Before the cooldown ends: "Resend OTP in 0:28". */
+  retryWait: 'Resend OTP in',
   ctaIdle: `Enter ${OTP_LENGTH} digits`,
   ctaReady: 'Verify',
   /** Deliberately blunt. OTP phishing scripts ask people to read the code aloud. */

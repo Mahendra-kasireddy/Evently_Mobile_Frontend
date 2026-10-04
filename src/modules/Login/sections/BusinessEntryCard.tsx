@@ -1,44 +1,32 @@
-import { Pressable, View } from 'react-native';
+import { Pressable } from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
-import { brand } from '../../../theme';
 import { BUSINESS_ENTRY_COPY } from '../constants';
-import { businessEntryStyles } from '../styles';
+import { AUTH_ACCENT, businessEntryStyles as s } from '../styles';
 
 interface BusinessEntryCardProps {
   onPress: () => void;
 }
 
-/** The single door to the organizer / sub-vendor side. Customers never need it. */
+/**
+ * The single door to the organizer / sub-vendor side, as one quiet line.
+ * Customers never need it, so it does not compete with "Send OTP".
+ */
 export function BusinessEntryCard({ onPress }: BusinessEntryCardProps) {
   return (
     <Pressable
-      style={({ pressed }) => [
-        businessEntryStyles.card,
-        pressed && businessEntryStyles.cardPressed,
-      ]}
+      style={({ pressed }) => [s.link, pressed && { opacity: 0.6 }]}
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`${BUSINESS_ENTRY_COPY.title}. ${BUSINESS_ENTRY_COPY.body}`}
+      accessibilityLabel={BUSINESS_ENTRY_COPY.a11y}
       testID="business-entry-card"
     >
-      <View style={businessEntryStyles.iconTile}>
-        <EventlyIcon
-          name="briefcase-outline"
-          size={19}
-          color={brand.accentDeep}
-        />
-      </View>
-
-      <View style={businessEntryStyles.textBlock}>
-        <EventlyText variant="subtitle" style={businessEntryStyles.title}>
-          {BUSINESS_ENTRY_COPY.title}
-        </EventlyText>
-        <EventlyText variant="caption" style={businessEntryStyles.body}>
-          {BUSINESS_ENTRY_COPY.body}
-        </EventlyText>
-      </View>
-
-      <EventlyIcon name="chevron-right" size={20} color={brand.accent} />
+      <EventlyText variant="caption" style={s.lead}>
+        {BUSINESS_ENTRY_COPY.lead}
+      </EventlyText>
+      <EventlyText variant="caption" style={s.action}>
+        {BUSINESS_ENTRY_COPY.action}
+      </EventlyText>
+      <EventlyIcon name="chevron-right" size={16} color={AUTH_ACCENT} />
     </Pressable>
   );
 }
