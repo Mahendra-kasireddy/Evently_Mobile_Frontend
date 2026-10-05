@@ -1,11 +1,13 @@
 import { Pressable, ScrollView, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { artFor, EventlyIcon, EventlyText, GradientFill } from '../../../Components';
 import { colors } from '../../../theme';
 import {
+  CHIP_SELECTED_GRADIENT,
+  HERO_FIELD_GRADIENT,
   HERO_FIELD_ICON_NAME,
   HERO_FIELD_LABEL,
   HERO_FIELD_ORDER,
-  HOME_NAVY,
+  OCCASION_TINT,
   QUICK_DATES,
   QUICK_DATES_LABEL,
 } from '../constants';
@@ -17,6 +19,21 @@ interface BasicsCardProps {
   draft: HeroDraft;
   onEditField: (field: keyof HeroDraft) => void;
   onPickDate: (iso: string) => void;
+}
+
+/**
+ * The gradient a row's icon tile wears.
+ *
+ * Every row has its own, except the occasion row once it has been answered —
+ * that one borrows the chosen occasion's colour, which is the same colour that
+ * occasion wears on the grid below and on every card about it afterwards.
+ */
+function fieldGradient(field: keyof HeroDraft, value: string): [string, string] {
+  if (field === 'occasion' && value) {
+    const tint = OCCASION_TINT[artFor(value)];
+    if (tint) return [tint.ink, tint.ink];
+  }
+  return HERO_FIELD_GRADIENT[field];
 }
 
 /** What each row shows when the customer has not answered it yet. */
@@ -62,11 +79,23 @@ export function BasicsCard({
             accessibilityHint="Opens the picker"
             testID={`basics-${field}`}
           >
-            <EventlyIcon
-              name={HERO_FIELD_ICON_NAME[field]}
-              size={22}
-              color={HOME_NAVY}
-            />
+            {/*
+              The question's own colour, on a tile rather than a bare glyph.
+              Four identical navy marks made the brief a list to read; four
+              colours make it a form you can find your place in.
+
+              The occasion row is the exception that proves it: once an
+              occasion is chosen the tile takes *that* occasion's colour, so
+              the brief starts wearing the thing it is about.
+            */}
+            <View style={s.rowIcon}>
+              <GradientFill colors={fieldGradient(field, value)} />
+              <EventlyIcon
+                name={HERO_FIELD_ICON_NAME[field]}
+                size={19}
+                color={colors.onPrimary}
+              />
+            </View>
             <View style={s.rowText}>
               <EventlyText variant="caption" style={s.rowLabel}>
                 {HERO_FIELD_LABEL[field]}
@@ -114,6 +143,9 @@ export function BasicsCard({
                 accessibilityLabel={`${quick.label}, ${formatWhen(iso)}`}
                 testID={`quick-date-${quick.label}`}
               >
+                {/* Filled, not outlined. A pale wash behind a coral word was
+                    hard to tell from an unchosen chip at arm's length. */}
+                {active ? <GradientFill colors={CHIP_SELECTED_GRADIENT} direction="across" /> : null}
                 <EventlyText style={[s.chipText, active && s.chipTextActive]}>
                   {quick.label}
                 </EventlyText>

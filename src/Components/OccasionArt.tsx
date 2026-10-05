@@ -22,6 +22,53 @@ export type OccasionArtKey =
   | 'anniversary'
   | 'corporate';
 
+/** Every art key, in one place, so `artFor` cannot fall behind the type. */
+export const OCCASION_ART_KEYS: OccasionArtKey[] = [
+  'wedding',
+  'birthday',
+  'housewarming',
+  'naming',
+  'anniversary',
+  'corporate',
+];
+
+/**
+ * The drawing for an occasion named in words.
+ *
+ * Lives here rather than in a screen's utils because more than one screen asks
+ * the question now — the workspace, to pick a banner, and the brief, to colour
+ * the row once an occasion is chosen. Unknown words fall back to the wedding
+ * rather than to nothing, because every occasion has to draw as something.
+ */
+export function artFor(occasion: string): OccasionArtKey {
+  const text = (occasion ?? '').trim().toLowerCase();
+  if (!text) return 'wedding';
+
+  /* An exact word first — that is what most callers pass. */
+  if ((OCCASION_ART_KEYS as string[]).includes(text)) return text as OccasionArtKey;
+
+  /*
+   * Then by the word inside the phrase.
+   *
+   * Occasions reach this as the customer wrote them — "Naming ceremony",
+   * "Birthday party", "Corporate offsite" — and an exact-match-only lookup
+   * sent every one of those to the wedding. A naming ceremony was drawn with
+   * wedding artwork and coloured in wedding blush, which is a visible lie
+   * about somebody's event.
+   */
+  const found = OCCASION_ART_KEYS.find((key) => text.includes(key));
+  if (found) return found;
+
+  /* A few words customers use that are not the key itself. */
+  if (/marriage|nikah|reception|engagement/.test(text)) return 'wedding';
+  if (/birth\s*day|bday/.test(text)) return 'birthday';
+  if (/griha|house\s*warming|new home/.test(text)) return 'housewarming';
+  if (/naamkaran|cradle|christening/.test(text)) return 'naming';
+  if (/office|company|conference|team/.test(text)) return 'corporate';
+
+  return 'wedding';
+}
+
 const FLOWER_PETALS: Array<[number, number]> = [
   [0, -3.3],
   [3.1, -1],

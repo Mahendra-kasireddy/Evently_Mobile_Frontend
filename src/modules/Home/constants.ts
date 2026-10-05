@@ -106,7 +106,7 @@ export const SEE_ALL_COPY: Record<
       'Plans you start and requests you send will appear here until they are booked or closed.',
   },
   offers: {
-    title: 'Offers for you',
+    title: 'Coupons for you',
     countOne: '1 offer',
     countMany: 'offers',
     emptyTitle: 'No offers right now',
@@ -146,6 +146,8 @@ export const HOME_GREEN = '#1d9e75';
 /** The wash behind a green pill — web's --color-green-soft. */
 export const HOME_GREEN_SOFT = '#e8f6ef';
 export const HOME_CANVAS = '#faf8f7';
+/** Down the Home page: warm peach at the top, soft lavender by the bottom. */
+export const HOME_PAGE_GRADIENT: [string, string] = ['#fff1e8', '#f3eefe'];
 export const HOME_HAIRLINE = '#efe9e5';
 export const HOME_TRACK = '#f0ecea';
 export const HERO_ACCENT_COLOR = '#e8633a'; // --color-primary
@@ -183,6 +185,117 @@ export const CATEGORY_GRADIENT: Record<OccasionArtKey, [string, string]> = {
   anniversary: ['#5a3c1c', '#2e2010'],
   corporate: ['#243a6b', '#0e1a33'],
 };
+
+/**
+ * The light companion to CATEGORY_GRADIENT — one colour per occasion.
+ *
+ * The gradients above are deep, for white type on a dark card. These are the
+ * same six occasions in their daylight form: a wash to sit a tile on, and an
+ * ink dark enough to read on it.
+ *
+ * Colour here is doing a job rather than decorating. An occasion grid where
+ * every tile is the same cream asks the customer to read six labels to find
+ * one; give each its own hue and the grid is scanned instead of read, and the
+ * same hue then follows that occasion onto every card about it.
+ *
+ * The hues are the ones the rest of the app already uses — the brand coral,
+ * the violet the public-events module draws with, the green the workspace
+ * marks progress in — so this is six familiar colours arranged, not a new
+ * palette invented for one screen.
+ */
+export const OCCASION_TINT: Record<
+  OccasionArtKey,
+  { bg: string; ink: string; edge: string }
+> = {
+  /* Blush and rose. */
+  wedding: { bg: '#fdeef3', ink: '#c2416b', edge: '#f7d8e3' },
+  /* The brand's own coral — a birthday is the warmest thing on the grid. */
+  birthday: { bg: '#fff0e7', ink: '#e8633a', edge: '#fadbc9' },
+  /* Green, for a new house. */
+  housewarming: { bg: '#e7f6f1', ink: '#12866e', edge: '#cfeae1' },
+  /* The violet public events are drawn in. */
+  naming: { bg: '#f0ecfe', ink: '#6d4df2', edge: '#ddd4fb' },
+  /* Gold. */
+  anniversary: { bg: '#fdf4e3', ink: '#a8780f', edge: '#f4e3c0' },
+  /* Blue, which is the one occasion on this grid nobody is celebrating. */
+  corporate: { bg: '#e9f0fd', ink: '#2b5aa8', edge: '#d4e2f8' },
+};
+
+/**
+ * The occasion tiles' backgrounds: each occasion's tint deepening to its
+ * edge colour, so the grid reads as six bright squares rather than six flat
+ * washes.
+ */
+export const OCCASION_TILE_GRADIENT: Record<OccasionArtKey, [string, string]> =
+  {
+    wedding: ['#ffeaf1', '#fbc6d8'],
+    birthday: ['#fff0e6', '#ffc6a3'],
+    housewarming: ['#e6f7f0', '#b3e6d3'],
+    naming: ['#f1ecff', '#d1c4fd'],
+    anniversary: ['#fff5df', '#f6d894'],
+    corporate: ['#e9f1ff', '#c2d7fb'],
+  };
+
+/**
+ * A colour per section heading, so Home scans as a page rather than as one
+ * long column of identical navy titles.
+ *
+ * Keyed by the section, not by position: moving a section up the page should
+ * not change its colour, because the colour is part of how it is recognised.
+ */
+export const SECTION_TONE = {
+  occasions: '#e8633a',
+  events: '#6d4df2',
+  packages: '#12866e',
+  offers: '#a8780f',
+  organizers: '#2b5aa8',
+} as const;
+
+export type SectionTone = keyof typeof SECTION_TONE;
+
+/**
+ * A gradient per heading, so the mark before a section title is a sweep rather
+ * than a flat stripe. Same hue as SECTION_TONE above, lifted at one end.
+ */
+/** Each section's icon, drawn white on its gradient badge. */
+export const SECTION_TONE_ICON: Record<SectionTone, string> = {
+  occasions: 'party-popper',
+  events: 'calendar-star',
+  packages: 'gift-outline',
+  offers: 'tag-heart-outline',
+  organizers: 'account-star-outline',
+};
+
+export const SECTION_TONE_GRADIENT: Record<SectionTone, [string, string]> = {
+  occasions: ['#f0913f', '#e8633a'],
+  events: ['#8d72f6', '#5a35e0'],
+  packages: ['#2fb894', '#0e7358'],
+  offers: ['#d9a62a', '#92650b'],
+  organizers: ['#4d86e0', '#1f4a94'],
+};
+
+/**
+ * The four questions on the brief, each with its own gradient tile.
+ *
+ * A row of four identical navy glyphs is a list to read; four colours is a
+ * form you can find your place in. Occasion deliberately leads with the brand
+ * coral — it is the first question and the one the whole brief hangs off.
+ */
+export const HERO_FIELD_GRADIENT: Record<keyof HeroDraft, [string, string]> = {
+  occasion: ['#f0913f', '#e8633a'],
+  when: ['#8d72f6', '#5a35e0'],
+  where: ['#2fb894', '#0e7358'],
+  guests: ['#4d86e0', '#1f4a94'],
+};
+
+/**
+ * The warm sweep behind a chosen quick date.
+ *
+ * Selected used to be an outline and a pale wash, which at a glance was hard
+ * to tell from unselected. A filled sweep with white type is unmistakable,
+ * and it is the same coral the button below it is.
+ */
+export const CHIP_SELECTED_GRADIENT: [string, string] = ['#f0913f', '#e8633a'];
 
 // Web's --color-navy, used for the icon badge glyph — scoped to this card only.
 export const CATEGORY_ICON_BADGE_COLOR = '#1a2e5a';

@@ -215,7 +215,7 @@ describe('the offers section', () => {
   it('counts them, and titles itself for the section it was opened for', () => {
     withOffers(3);
     const text = textOf(render());
-    expect(text).toContain('Offers for you');
+    expect(text).toContain('Coupons for you');
     expect(text).toContain('3 offers');
   });
 

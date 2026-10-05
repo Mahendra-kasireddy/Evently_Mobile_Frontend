@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react';
-import { Image, TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
+import { EventlyIcon, EventlyText, GradientFill } from '../../../Components';
 import { absoluteFileUrl } from '../../../services/urls';
 import {
   DISTANCE_OPTIONS,
@@ -14,7 +14,13 @@ import {
   type WhenKey,
 } from '../constants';
 import { usePublicEvents } from '../hooks';
-import { homeUi as s, PE_MUTED, ui } from '../ui.styles';
+import {
+  HOME_EVENT_CARD_WIDTH,
+  HOME_EVENT_GAP,
+  homeUi as s,
+  PE_MUTED,
+  ui,
+} from '../ui.styles';
 import { PE_ACCENT, PE_NAVY } from '../styles';
 import type { EventCard } from '../types';
 
@@ -33,6 +39,25 @@ interface EventsNearYouProps {
   coordinates: { latitude: number; longitude: number } | null;
   onOpenEvent: (eventId: string) => void;
 }
+
+/**
+ * The colours a card can wear, in order along the row: a gradient for its
+ * button, and tints for its price and the date and venue icons.
+ */
+const CARD_ACCENTS: Array<{
+  gradient: [string, string];
+  ink: string;
+  soft: string;
+  altInk: string;
+  altSoft: string;
+}> = [
+  { gradient: ['#ff8a5c', '#e8433a'], ink: '#e2552f', soft: '#fff0e8', altInk: '#7c5cdb', altSoft: '#f1ecff' },
+  { gradient: ['#9b7dff', '#5a35e0'], ink: '#6d4df2', soft: '#f1ecff', altInk: '#e2552f', altSoft: '#fff0e8' },
+  { gradient: ['#3cc9a1', '#0e8a68'], ink: '#0f8a68', soft: '#e6f7f1', altInk: '#3b6fd8', altSoft: '#e9f0fd' },
+  { gradient: ['#ffb547', '#e8791a'], ink: '#d36b0c', soft: '#fff4e2', altInk: '#c2416b', altSoft: '#fdeef3' },
+  { gradient: ['#ff6f9f', '#c2416b'], ink: '#c2416b', soft: '#fdeef3', altInk: '#0f8a68', altSoft: '#e6f7f1' },
+  { gradient: ['#5b9bff', '#2554b8'], ink: '#2b5aa8', soft: '#e9f0fd', altInk: '#d36b0c', altSoft: '#fff4e2' },
+];
 
 /** "Oct 18" — the short date on the picture. */
 function shortDate(iso: string | null, timezone: string): string {
@@ -87,7 +112,8 @@ function FilterChip({
 /**
  * Events near you, on Home.
  *
- * A teaser rather than a second catalogue: four events, under the occasions,
+ * A teaser rather than a second catalogue: a swipeable row of up to eight
+ * events, under the occasions,
  * for the customer who opened the app with nothing of their own to plan.
  * "See all" and the Discover tab are where the full list lives, and this does
  * not try to be it.
@@ -105,7 +131,7 @@ export function EventsNearYou({ header, coordinates, onOpenEvent }: EventsNearYo
 
   const query = useMemo(
     () => ({
-      limit: 4,
+      limit: 8,
       sort,
       ...(when !== 'any' ? { when } : {}),
       ...(coordinates && distance > 0
@@ -188,9 +214,21 @@ export function EventsNearYou({ header, coordinates, onOpenEvent }: EventsNearYo
                 : 'No public events are on sale near you yet.'}
         </EventlyText>
       ) : (
-        <View style={s.grid}>
-          {events.map((event: EventCard) => {
+        /* One row that swipes, with wide cards: a 2-up grid made each card
+           half a phone and its words too small to read at a glance. */
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={s.row}
+          decelerationRate="fast"
+          snapToInterval={HOME_EVENT_CARD_WIDTH + HOME_EVENT_GAP}
+          snapToAlignment="start"
+        >
+          {events.map((event: EventCard, index: number) => {
             const tint = categoryTint(event.category);
+            /* Each card its own colour, so the row reads as a set of
+               different nights out rather than one card repeated. */
+            const accent = CARD_ACCENTS[index % CARD_ACCENTS.length];
             return (
               <TouchableOpacity
                 key={event.id}
@@ -225,7 +263,7 @@ export function EventsNearYou({ header, coordinates, onOpenEvent }: EventsNearYo
                       <View />
                     )}
                     <View style={s.dateChip}>
-                      <EventlyIcon name="calendar-blank-outline" size={9} color={PE_NAVY} />
+                      <EventlyIcon name="calendar-blank-outline" size={11} color={PE_NAVY} />
                       <EventlyText variant="caption" style={s.dateChipText}>
                         {shortDate(event.startDateTime, event.timezone)}
                       </EventlyText>
@@ -243,15 +281,19 @@ export function EventsNearYou({ header, coordinates, onOpenEvent }: EventsNearYo
                     {[event.category, event.city].filter(Boolean).join(' · ')}
                   </EventlyText>
 
-                  <View style={ui.line}>
-                    <EventlyIcon name="calendar-blank-outline" size={11} color={PE_MUTED} />
+                  <View style={s.metaLine}>
+                    <View style={[s.metaIcon, { backgroundColor: accent.soft }]}>
+                      <EventlyIcon name="calendar-month-outline" size={12} color={accent.ink} />
+                    </View>
                     <EventlyText variant="caption" style={s.kind} numberOfLines={1}>
                       {formatEventWhen(event.startDateTime, event.timezone)}
                     </EventlyText>
                   </View>
                   {event.venueName ? (
-                    <View style={ui.line}>
-                      <EventlyIcon name="map-marker-outline" size={11} color={PE_MUTED} />
+                    <View style={s.metaLine}>
+                      <View style={[s.metaIcon, { backgroundColor: accent.altSoft }]}>
+                        <EventlyIcon name="map-marker" size={12} color={accent.altInk} />
+                      </View>
                       <EventlyText variant="caption" style={s.kind} numberOfLines={1}>
                         {event.venueName}
                       </EventlyText>
@@ -259,25 +301,42 @@ export function EventsNearYou({ header, coordinates, onOpenEvent }: EventsNearYo
                   ) : null}
 
                   <View style={s.foot}>
-                    <EventlyText variant="caption" style={s.price} numberOfLines={1}>
-                      {event.soldOut
-                        ? PUBLIC_EVENTS_COPY.soldOut
-                        : event.startingPrice > 0
-                          ? `${PUBLIC_EVENTS_COPY.from} ${formatPrice(event.startingPrice)}`
-                          : 'Free'}
-                    </EventlyText>
+                    {/* The price on its own tinted pill, in the card's colour. */}
+                    <View style={[s.pricePill, { backgroundColor: accent.soft }]}>
+                      {event.soldOut || event.startingPrice <= 0 ? (
+                        <EventlyText
+                          variant="caption"
+                          style={[s.priceAmount, { color: accent.ink }]}
+                          numberOfLines={1}
+                        >
+                          {event.soldOut ? PUBLIC_EVENTS_COPY.soldOut : 'Free'}
+                        </EventlyText>
+                      ) : (
+                        <EventlyText variant="caption" style={s.priceFrom} numberOfLines={1}>
+                          {`${PUBLIC_EVENTS_COPY.from} `}
+                          <EventlyText
+                            variant="caption"
+                            style={[s.priceAmount, { color: accent.ink }]}
+                          >
+                            {formatPrice(event.startingPrice)}
+                          </EventlyText>
+                        </EventlyText>
+                      )}
+                    </View>
+                    {/* Drawn as a button, pressed as part of the card. */}
                     <View style={s.view}>
-                      <EventlyText variant="caption" style={s.viewText}>
+                      <GradientFill colors={accent.gradient} direction="across" />
+                      <EventlyText variant="caption" style={s.viewText} numberOfLines={1}>
                         {PUBLIC_EVENTS_COPY.viewEvent}
                       </EventlyText>
-                      <EventlyIcon name="chevron-right" size={11} color={PE_ACCENT} />
+                      <EventlyIcon name="chevron-right" size={12} color="#ffffff" />
                     </View>
                   </View>
                 </View>
               </TouchableOpacity>
             );
           })}
-        </View>
+        </ScrollView>
       )}
     </View>
   );

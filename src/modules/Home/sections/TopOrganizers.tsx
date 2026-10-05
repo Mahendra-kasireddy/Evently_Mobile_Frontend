@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
-import { HERO_ACCENT_COLOR, HOME_GREEN, HOME_NAVY } from '../constants';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
+import { EventlyIcon, EventlyText, GradientFill } from '../../../Components';
+import { SECTION_TONE_GRADIENT } from '../constants';
 import { organizerRowStyles as s } from '../styles';
 import { SectionHead } from './SectionHead';
 import type { OrganizerItem, TopOrganizersViewModel } from '../types';
@@ -19,19 +20,35 @@ interface TopOrganizersProps {
   layout?: 'carousel' | 'grid';
 }
 
+/**
+ * The colours an organizer card can wear, in turn along the row: a gradient
+ * for the logo ring and the button, and tints for the tags.
+ */
+const ORGANIZER_ACCENTS: Array<{ gradient: [string, string]; tags: string[][] }> = [
+  { gradient: ['#5b9bff', '#2554b8'], tags: [['#e9f0fd', '#2b5aa8'], ['#f1ecff', '#6d4df2']] },
+  { gradient: ['#ff8a5c', '#e8433a'], tags: [['#fff0e8', '#d24a24'], ['#fdeef3', '#c2416b']] },
+  { gradient: ['#a084ff', '#5a35e0'], tags: [['#f1ecff', '#6d4df2'], ['#e6f7f1', '#0f8a68']] },
+  { gradient: ['#3cc9a1', '#0e8a68'], tags: [['#e6f7f1', '#0f8a68'], ['#fff4e2', '#b8650b']] },
+];
+
 function OrganizerCard({
   item,
+  index,
   onPress,
   isSaved,
   onToggleSaved,
   inGrid,
 }: {
   item: OrganizerItem;
+  /** Its place in the row, which picks its colours. */
+  index: number;
   onPress: () => void;
   isSaved: boolean;
   onToggleSaved: () => void;
   inGrid: boolean;
 }) {
+  const accent = ORGANIZER_ACCENTS[index % ORGANIZER_ACCENTS.length];
+  const shadeId = `organizerShade-${item.id}`;
   const spoken = [
     item.name,
     item.verified ? 'Verified' : '',
@@ -68,15 +85,18 @@ function OrganizerCard({
             />
           </View>
         )}
-
-        {item.verified ? (
-          <View style={s.verified}>
-            <EventlyIcon name="check-decagram" size={12} color={HOME_GREEN} />
-            <EventlyText variant="caption" style={s.verifiedText}>
-              Verified
-            </EventlyText>
-          </View>
-        ) : null}
+        {/* A soft fade at the foot of the photo, under the logo. */}
+        <View style={s.coverShade} pointerEvents="none">
+          <Svg width="100%" height="100%">
+            <Defs>
+              <LinearGradient id={shadeId} x1="0" y1="0" x2="0" y2="1">
+                <Stop offset="0.45" stopColor="#0b0f24" stopOpacity={0} />
+                <Stop offset="1" stopColor="#0b0f24" stopOpacity={0.45} />
+              </LinearGradient>
+            </Defs>
+            <Rect x={0} y={0} width="100%" height="100%" fill={`url(#${shadeId})`} />
+          </Svg>
+        </View>
 
         {/* Session-only for now: there is no saved-organizers API yet. */}
         <TouchableOpacity
@@ -91,78 +111,86 @@ function OrganizerCard({
           <EventlyIcon
             name={isSaved ? 'heart' : 'heart-outline'}
             size={17}
-            color={isSaved ? HERO_ACCENT_COLOR : HOME_NAVY}
+            color={isSaved ? '#ff5a7a' : '#ffffff'}
           />
         </TouchableOpacity>
 
-        <View style={[s.logo, { backgroundColor: item.avatarColor }]}>
-          {item.logoUrl ? (
-            <Image source={{ uri: item.logoUrl }} style={s.logoImage} />
-          ) : (
-            <EventlyText variant="caption" style={s.logoText}>
-              {item.initials}
-            </EventlyText>
-          )}
+        {/* The logo in a ring of the card's own gradient. */}
+        <View style={s.logoRing}>
+          <GradientFill colors={accent.gradient} direction="diagonal" />
+          <View style={[s.logo, { backgroundColor: item.avatarColor }]}>
+            {item.logoUrl ? (
+              <Image source={{ uri: item.logoUrl }} style={s.logoImage} />
+            ) : (
+              <EventlyText variant="caption" style={s.logoText}>
+                {item.initials}
+              </EventlyText>
+            )}
+          </View>
         </View>
       </View>
 
       <View style={s.body}>
-        {/* Their own name, as they wrote it. */}
-        <EventlyText variant="body" style={s.name} numberOfLines={1}>
-          {item.name}
-        </EventlyText>
-
-        <View style={s.metaRow}>
-          {/* A score with no reviews behind it is not a rating. */}
-          {item.reviews > 0 ? (
-            <View style={s.ratingRow}>
-              <EventlyIcon name="star" size={13} color="#e8a33a" />
-              <EventlyText variant="caption" style={s.rating}>
-                {item.rating.toFixed(1)}
-              </EventlyText>
-              <EventlyText variant="caption" style={s.reviews}>
-                {`(${item.reviews})`}
-              </EventlyText>
-            </View>
-          ) : (
-            <EventlyText variant="caption" style={s.reviews}>
-              No reviews yet
-            </EventlyText>
-          )}
-          {item.locationLabel ? (
-            <EventlyText variant="caption" style={s.location} numberOfLines={1}>
-              {item.locationLabel}
-            </EventlyText>
+        <View style={s.nameRow}>
+          {/* Their own name, as they wrote it. */}
+          <EventlyText variant="body" style={s.name} numberOfLines={1}>
+            {item.name}
+          </EventlyText>
+          {item.verified ? (
+            <EventlyIcon name="check-decagram" size={15} color="#3b82f6" />
           ) : null}
         </View>
 
-        {item.tags.length > 0 ? (
-          <View style={s.tagRow}>
-            {item.tags.slice(0, 2).map(tag => (
-              <View key={tag} style={s.tag}>
-                <EventlyText
-                  variant="caption"
-                  style={s.tagText}
-                  numberOfLines={1}
-                >
-                  {tag}
-                </EventlyText>
-              </View>
-            ))}
+        {/* Where they are, then how they are rated — one line each. The
+            tick beside the name is the "verified" mark, so the photo does not
+            repeat it. */}
+        {item.locationLabel ? (
+          <View style={s.locationRow}>
+            <EventlyIcon name="map-marker" size={13} color={accent.gradient[1]} />
+            <EventlyText variant="caption" style={s.location} numberOfLines={1}>
+              {item.locationLabel}
+            </EventlyText>
           </View>
         ) : null}
 
-        {/* Drawn as a button, pressed as part of the card. */}
-        <View style={s.cta}>
-          <EventlyText variant="caption" style={s.ctaText}>
-            View profile
+        {/* A score with no reviews behind it is not a rating. */}
+        {item.reviews > 0 ? (
+          <View style={s.ratingLine}>
+            <View style={s.ratingPill}>
+              <EventlyIcon name="star" size={12} color="#e8a33a" />
+              <EventlyText variant="caption" style={s.rating}>
+                {item.rating.toFixed(1)}
+              </EventlyText>
+            </View>
+            <EventlyText variant="caption" style={s.reviews}>
+              {`(${item.reviews})`}
+            </EventlyText>
+          </View>
+        ) : (
+          <EventlyText variant="caption" style={s.reviews}>
+            No reviews yet
           </EventlyText>
-          <EventlyIcon
-            name="chevron-right"
-            size={16}
-            color={HERO_ACCENT_COLOR}
-          />
-        </View>
+        )}
+
+        {item.tags.length > 0 ? (
+          <View style={s.tagRow}>
+            {item.tags.slice(0, 2).map((tag, t) => {
+              const [bg, fg] = accent.tags[t % accent.tags.length];
+              return (
+                <View key={tag} style={[s.tag, { backgroundColor: bg }]}>
+                  <EventlyText
+                    variant="caption"
+                    style={[s.tagText, { color: fg }]}
+                    numberOfLines={1}
+                  >
+                    {tag}
+                  </EventlyText>
+                </View>
+              );
+            })}
+          </View>
+        ) : null}
+
       </View>
     </TouchableOpacity>
   );
@@ -189,10 +217,11 @@ export function TopOrganizers({
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id],
     );
 
-  const cards = data.items.map(item => (
+  const cards = data.items.map((item, index) => (
     <OrganizerCard
       key={item.id}
       item={item}
+      index={index}
       inGrid={layout === 'grid'}
       isSaved={saved.includes(item.id)}
       onToggleSaved={() => toggleSaved(item.id)}
@@ -203,6 +232,7 @@ export function TopOrganizers({
   return (
     <View>
       <SectionHead
+        tone={SECTION_TONE_GRADIENT.organizers}
         title={data.title}
         actionLabel="See all"
         onPressAction={onPressSeeAll}

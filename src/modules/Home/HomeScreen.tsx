@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EventlyText } from '../../Components';
+import { EventlyText, GradientFill } from '../../Components';
 import type {
   MainTabParamList,
   RootStackParamList,
@@ -24,7 +24,12 @@ import type {
   HeroDraft,
 } from './types';
 import { NameGateSheet } from '../NameCapture';
-import { HERO_ACCENT_COLOR, OTHER_EVENTS_ON_HOME } from './constants';
+import {
+  HERO_ACCENT_COLOR,
+  OTHER_EVENTS_ON_HOME,
+  HOME_PAGE_GRADIENT,
+  SECTION_TONE_GRADIENT,
+} from './constants';
 import { useOpenWithOrganizer } from '../Chat';
 import { useHomeContainer } from './container';
 import { useOpenEvent } from './useOpenEvent';
@@ -333,6 +338,9 @@ export function HomeScreen() {
           "the picture is at the top" true rather than nearly true.
         */}
         <View style={styles.sheet}>
+          {/* A soft peach-to-lavender wash down the whole page, behind every
+              section — the colour a celebration app should carry. */}
+          <GradientFill colors={HOME_PAGE_GRADIENT} direction="down" />
           {/*
           "Tell us the basics" — the four fields a brief needs, and the button
           that sends it.
@@ -401,6 +409,7 @@ export function HomeScreen() {
               header={
                 <SectionHead
                   title={PUBLIC_EVENTS_COPY.sectionTitle}
+                  tone={SECTION_TONE_GRADIENT.events}
                   actionLabel={PUBLIC_EVENTS_COPY.seeAll}
                   /* The Events tab, which is where the catalogue lives. */
                   onPressAction={() => navigation.navigate('Events')}
@@ -466,6 +475,8 @@ export function HomeScreen() {
             */}
               <SectionHead
                 title="Your other events"
+                tone={SECTION_TONE_GRADIENT.events}
+                icon="calendar-heart"
                 actionLabel="See all"
                 testID="see-all-events"
                 onPressAction={() =>
@@ -490,6 +501,26 @@ export function HomeScreen() {
             </View>
           ) : null}
 
+          {packages && (
+            <View style={sectionStyles.block}>
+              <Packages
+                data={packages}
+                // A package's art key is its occasion id, so opening one lands
+                // the planner on that occasion rather than a blank first step.
+                onPressPackage={item =>
+                  navigation.navigate('Plan', { occasionId: item.art })
+                }
+                onPressSeeAll={() =>
+                  navigation.navigate('Search', { kind: 'packages' })
+                }
+                savedIds={savedPackageIds}
+                onToggleSaved={toggleSavedPackage}
+              />
+            </View>
+          )}
+
+          {/* Coupons straight after the packages: a customer comparing
+              prices is the one a discount code is for. */}
           {offers && (
             <View style={sectionStyles.block}>
               <Offers
@@ -505,24 +536,6 @@ export function HomeScreen() {
                 onPressSeeAll={() =>
                   navigation.navigate('SeeAll', { kind: 'offers' })
                 }
-              />
-            </View>
-          )}
-
-          {packages && (
-            <View style={sectionStyles.block}>
-              <Packages
-                data={packages}
-                // A package's art key is its occasion id, so opening one lands
-                // the planner on that occasion rather than a blank first step.
-                onPressPackage={item =>
-                  navigation.navigate('Plan', { occasionId: item.art })
-                }
-                onPressSeeAll={() =>
-                  navigation.navigate('Search', { kind: 'packages' })
-                }
-                savedIds={savedPackageIds}
-                onToggleSaved={toggleSavedPackage}
               />
             </View>
           )}

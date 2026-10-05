@@ -50,6 +50,8 @@ export const styles = StyleSheet.create({
     backgroundColor: HOME_CANVAS,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
+    /* Clips the page gradient to the sheet's rounded top. */
+    overflow: 'hidden',
   },
   centered: {
     flex: 1,
@@ -134,7 +136,9 @@ export const homeHeaderStyles = StyleSheet.create({
     padding: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(16,26,49,0.42)',
+    /* White discs with coloured glyphs: brighter than a dark smoke over a
+       wedding photo, and each control has its own colour. */
+    backgroundColor: 'rgba(255,255,255,0.94)',
   },
   badge: {
     position: 'absolute',
@@ -206,6 +210,16 @@ export const basicsStyles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: 12,
   },
+  /* The question's colour, on a tile. `overflow: hidden` is what lets the
+     gradient inside take the tile's own corner radius. */
+  rowIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
   rowDivided: { borderTopWidth: 1, borderTopColor: HOME_HAIRLINE },
   rowPressed: { backgroundColor: HOME_ACCENT_SOFT },
   rowText: { flex: 1 },
@@ -239,8 +253,9 @@ export const basicsStyles = StyleSheet.create({
     paddingVertical: 8,
   },
   chipActive: {
-    borderColor: HERO_ACCENT_COLOR,
-    backgroundColor: HOME_ACCENT_SOFT,
+    borderColor: 'transparent',
+    /* The sweep is drawn inside; the radius has to clip it. */
+    overflow: 'hidden',
   },
   chipText: {
     color: HOME_NAVY,
@@ -248,7 +263,7 @@ export const basicsStyles = StyleSheet.create({
     lineHeight: 17,
     fontWeight: '600',
   },
-  chipTextActive: { color: HERO_ACCENT_COLOR },
+  chipTextActive: { color: colors.onPrimary, fontWeight: '700' },
 
   /*
    * One card, not two.
@@ -317,7 +332,9 @@ export const basicsStyles = StyleSheet.create({
    * four taps. Half opacity says "not yet" just as plainly and keeps the
    * colour on the page.
    */
-  ctaIdle: { opacity: 0.45 },
+  /* Still plainly not-yet-ready, but no longer washed out to near-cream: at
+     0.45 a fresh Home's main button read as broken rather than as waiting. */
+  ctaIdle: { opacity: 0.72 },
   ctaText: {
     color: colors.onPrimary,
     fontSize: 16,
@@ -1353,6 +1370,8 @@ export const sectionStyles = StyleSheet.create({
     gap: spacing.sm,
     paddingHorizontal: spacing.md,
   },
+  /* The badge and the title, kept together on the left. */
+  headLeft: { flexDirection: 'row', alignItems: 'center', flexShrink: 1 },
   /*
    * One size for every heading on Home, a step under the design system's
    * `sectionTitle`.
@@ -1369,6 +1388,17 @@ export const sectionStyles = StyleSheet.create({
     lineHeight: 21,
     letterSpacing: -0.3,
     flexShrink: 1,
+  },
+  /* The section's colour and icon, as a small badge in front of its name.
+     A mark to find the section by, not a banner. */
+  toneBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: 9,
+    marginRight: 10,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   /** The trailing "See all" — the design system's button token. */
   action: { color: HERO_ACCENT_COLOR },
@@ -1970,95 +2000,111 @@ export const occasionGridStyles = StyleSheet.create({
  * and the one thing they can do about it, and lets the photograph have the
  * rest of the card.
  */
+/*
+ * Curated packages: tall photo cards. The picture fills the card, a dark wash
+ * rises from the foot, and everything written sits on it in white.
+ */
+/*
+ * The front card's share of the screen in the stacked packages carousel. The
+ * rest is where the neighbours peek out on either side.
+ */
+export const PACKAGE_STACK_RATIO = 0.66;
+
+/*
+ * Curated packages: poster cards in a stacked carousel. The picture fills the
+ * card, a dark wash rises from the foot, and everything written sits on it.
+ */
 export const packageCardStyles = StyleSheet.create({
+  stackList: { paddingTop: 14, paddingBottom: 8 },
   card: {
-    width: 236,
-    borderRadius: 20,
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: HOME_HAIRLINE,
-    overflow: 'hidden',
+    borderRadius: 22,
+    backgroundColor: HOME_NAVY_DEEP,
     ...Platform.select({
       ios: {
-        shadowColor: HOME_NAVY,
-        shadowOpacity: 0.07,
-        shadowRadius: 12,
+        shadowColor: '#0b0f24',
+        shadowOpacity: 0.12,
+        shadowRadius: 10,
         shadowOffset: { width: 0, height: 5 },
       },
-      android: { elevation: 2 },
+      android: { elevation: 3 },
     }),
   },
-  banner: { height: 138 },
-  bannerLayer: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
-  bannerArt: {
+  press: { flex: 1, borderRadius: 22, overflow: 'hidden' },
+  fill: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
+  art: {
     position: 'absolute',
-    top: 14,
-    right: 8,
-    width: 110,
-    height: 96,
-    opacity: 0.85,
+    top: 32,
+    alignSelf: 'center',
+    width: 136,
+    height: 112,
+    opacity: 0.95,
   },
+  /* Frosted, the way a pill on a poster is. */
   badge: {
     position: 'absolute',
-    top: 10,
-    left: 10,
+    top: 14,
+    left: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
-    borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.96)',
-    paddingLeft: 4,
-    paddingRight: 10,
-    paddingVertical: 4,
-    maxWidth: 170,
+    gap: 7,
+    borderRadius: 12,
+    backgroundColor: 'rgba(20,22,40,0.45)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.22)',
+    paddingLeft: 5,
+    paddingRight: 11,
+    paddingVertical: 5,
+    maxWidth: '80%',
   },
   badgeIcon: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    width: 20,
+    height: 20,
+    borderRadius: 7,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  badgeText: { fontWeight: '700', fontSize: 11.5, flexShrink: 1 },
+  badgeText: { color: '#ffffff', fontWeight: '700', fontSize: 11, lineHeight: 15 },
+  content: { flex: 1, justifyContent: 'flex-end', padding: 12, gap: 4 },
+  title: { color: '#ffffff', fontSize: 15, lineHeight: 20, fontWeight: '700' },
+  subtitle: { color: 'rgba(255,255,255,0.75)', fontSize: 11, lineHeight: 15 },
+  meta: { color: 'rgba(255,255,255,0.7)', fontSize: 10.5, lineHeight: 15, marginTop: 1 },
+  priceLine: { flexDirection: 'row', alignItems: 'baseline', gap: 5, marginTop: 2 },
+  priceCaption: { color: 'rgba(255,255,255,0.7)', fontSize: 10.5, lineHeight: 14 },
+  price: { color: '#ffffff', fontSize: 15, lineHeight: 20, fontWeight: '700', flexShrink: 1 },
+  listPrice: {
+    color: 'rgba(255,255,255,0.55)',
+    fontSize: 11,
+    textDecorationLine: 'line-through',
+  },
+  /* "View Package": a wide frosted button, leaving room on its right for the
+     square heart that sits beside it. */
+  cta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    height: 38,
+    marginTop: 8,
+    marginRight: 48,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+  ctaText: { color: '#ffffff', fontWeight: '600', fontSize: 12.5, lineHeight: 17 },
   heart: {
     position: 'absolute',
-    top: 10,
-    right: 10,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(14,26,51,0.28)',
+    right: 12,
+    bottom: 12,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  body: { padding: spacing.s12, gap: spacing.sm },
-  titleRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  titleCol: { flex: 1 },
-  title: { color: HOME_NAVY, fontWeight: '700', fontSize: 14, lineHeight: 19 },
-  subtitle: { color: colors.textMuted, marginTop: 1 },
-  arrow: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  priceRow: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm },
-  price: { color: HOME_NAVY, fontWeight: '700', fontSize: 16, lineHeight: 21 },
-  listPrice: { color: colors.textMuted, textDecorationLine: 'line-through' },
-  features: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    paddingTop: spacing.sm,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: HOME_HAIRLINE,
-  },
-  feature: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 5 },
-  featureText: {
-    color: HOME_NAVY,
-    fontSize: 10.5,
-    lineHeight: 13,
-    flexShrink: 1,
   },
 });
 
@@ -2071,14 +2117,16 @@ export const packageCardStyles = StyleSheet.create({
  * the reply time on one card in five sizes, and the name — the thing a
  * customer is actually reading — was set at the same weight as the rest of it.
  */
-const ORGANIZER_CARD_WIDTH = 176;
-const ORGANIZER_LOGO = 36;
+const ORGANIZER_CARD_WIDTH = 200;
+const ORGANIZER_LOGO = 42;
+/** The gradient ring around the logo, and the gap it leaves inside. */
+const ORGANIZER_RING = ORGANIZER_LOGO + 6;
 
 export const organizerRowStyles = StyleSheet.create({
   rowContent: {
     paddingHorizontal: spacing.md,
     paddingTop: spacing.s12,
-    paddingBottom: spacing.xs,
+    paddingBottom: spacing.sm,
     gap: spacing.s12,
   },
   grid: {
@@ -2091,58 +2139,55 @@ export const organizerRowStyles = StyleSheet.create({
   },
   card: {
     width: ORGANIZER_CARD_WIDTH,
-    borderRadius: 18,
+    borderRadius: 20,
     backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: HOME_HAIRLINE,
     overflow: 'hidden',
     ...Platform.select({
       ios: {
         shadowColor: HOME_NAVY,
-        shadowOpacity: 0.06,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+        shadowOffset: { width: 0, height: 5 },
       },
-      android: { elevation: 2 },
+      android: { elevation: 3 },
     }),
   },
   cardInGrid: { width: '48.5%' },
-  cover: { height: 112 },
+  cover: { height: 124 },
   coverImage: {
     width: '100%',
     height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  verified: {
-    position: 'absolute',
-    top: spacing.sm,
-    left: spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 3,
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
-  verifiedText: { color: HOME_GREEN, fontWeight: '700', fontSize: 11 },
+  coverShade: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
+  /* Frosted, so it reads on a light photo and a dark one. */
   heart: {
     position: 'absolute',
-    top: spacing.sm,
-    right: spacing.sm,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: 'rgba(255,255,255,0.95)',
+    top: 8,
+    right: 8,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(11,15,36,0.32)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.35)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  /* The logo straddles the photo's bottom edge. */
-  logo: {
+  /* The ring straddles the photo's bottom edge. */
+  logoRing: {
     position: 'absolute',
     left: spacing.s12,
-    bottom: -ORGANIZER_LOGO / 2,
+    bottom: -ORGANIZER_RING / 2,
+    width: ORGANIZER_RING,
+    height: ORGANIZER_RING,
+    borderRadius: ORGANIZER_RING / 2,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logo: {
     width: ORGANIZER_LOGO,
     height: ORGANIZER_LOGO,
     borderRadius: ORGANIZER_LOGO / 2,
@@ -2153,45 +2198,37 @@ export const organizerRowStyles = StyleSheet.create({
     overflow: 'hidden',
   },
   logoImage: { width: '100%', height: '100%' },
-  logoText: { color: colors.onPrimary, fontWeight: '800', fontSize: 12 },
+  logoText: { color: colors.onPrimary, fontWeight: '800', fontSize: 13 },
   body: {
     paddingHorizontal: spacing.s12,
-    paddingTop: ORGANIZER_LOGO / 2 + 6,
+    paddingTop: ORGANIZER_RING / 2 + 8,
     paddingBottom: spacing.s12,
-    gap: 6,
+    gap: 7,
   },
-  name: { color: HOME_NAVY, fontWeight: '800' },
-  metaRow: {
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  name: { color: HOME_NAVY, fontWeight: '800', fontSize: 14, lineHeight: 19, flexShrink: 1 },
+  ratingPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.xs,
+    gap: 3,
+    backgroundColor: '#fff6e0',
+    borderRadius: 999,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
   },
-  ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  rating: { color: HOME_NAVY, fontWeight: '700' },
-  reviews: { color: colors.textMuted },
-  location: { color: colors.textMuted, flexShrink: 1, textAlign: 'right' },
+  rating: { color: '#9a6a08', fontWeight: '800', fontSize: 11.5, lineHeight: 15 },
+  reviews: { color: colors.textMuted, fontSize: 11, lineHeight: 15 },
+  locationRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
+  location: { color: colors.textMuted, fontSize: 12, lineHeight: 16, flexShrink: 1 },
+  ratingLine: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   tagRow: { flexDirection: 'row', gap: 5, overflow: 'hidden' },
   tag: {
-    backgroundColor: '#f3f4f7',
     borderRadius: 999,
     paddingHorizontal: 8,
     paddingVertical: 3,
     flexShrink: 1,
   },
-  tagText: { color: HOME_NAVY, fontSize: 10.5 },
-  cta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: HOME_ACCENT_SOFT,
-    borderRadius: 10,
-    paddingLeft: spacing.s12,
-    paddingRight: spacing.sm,
-    height: 36,
-    marginTop: 4,
-  },
-  ctaText: { color: HERO_ACCENT_COLOR, fontWeight: '700', fontSize: 12.5 },
+  tagText: { fontSize: 10.5, lineHeight: 14, fontWeight: '600' },
   emptyText: {
     color: colors.textMuted,
     paddingHorizontal: spacing.md,

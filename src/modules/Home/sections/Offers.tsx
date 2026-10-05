@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FlatList, TouchableOpacity, View } from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
-import { HERO_ACCENT_COLOR } from '../constants';
+import { HERO_ACCENT_COLOR, SECTION_TONE_GRADIENT } from '../constants';
 import { offersStyles as s } from '../styles';
 import { SectionHead } from './SectionHead';
 import type { CouponOffer, CouponsViewModel } from '../types';
@@ -124,6 +124,7 @@ export function Offers({ data, onPressOffer, onPressSeeAll }: OffersProps) {
   return (
     <View>
       <SectionHead
+        tone={SECTION_TONE_GRADIENT.offers}
         title={data.title}
         actionLabel="See all"
         onPressAction={onPressSeeAll}

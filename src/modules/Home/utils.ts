@@ -691,7 +691,7 @@ export function mapCoupons(feed: HomeFeedDTO): CouponsViewModel | null {
   if (!isNonEmptyArray(feed.coupons)) return null;
 
   return {
-    title: 'Offers for you',
+    title: 'Coupons for you',
     countLabel: `${feed.coupons.length} live`,
     items: feed.coupons.map((coupon, index) => ({
       id: coupon.id,

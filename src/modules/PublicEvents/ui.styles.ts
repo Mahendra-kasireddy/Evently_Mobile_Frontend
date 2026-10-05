@@ -1004,6 +1004,10 @@ export const filterUi = StyleSheet.create({
  * a glance on the way past, not a screen somebody came to read, and four
  * events in two rows cost Home half of what four stacked ones would.
  * ------------------------------------------------------------------------- */
+/** The Home "Events near you" row: a wide card, and the gap after it. */
+export const HOME_EVENT_CARD_WIDTH = 260;
+export const HOME_EVENT_GAP = 12;
+
 export const homeUi = StyleSheet.create({
   chipRow: {
     flexDirection: 'row',
@@ -1033,21 +1037,17 @@ export const homeUi = StyleSheet.create({
   },
   chipTextOn: { color: PE_ACCENT },
 
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    /* Every card on a row takes that row's height, so a title that wraps to
-       two lines makes its neighbour taller rather than taller than it. */
-    alignItems: 'stretch',
+  /* The swipeable row. Vertical padding leaves room for the cards' shadow,
+     which a horizontal ScrollView would otherwise clip. */
+  row: {
     paddingHorizontal: spacing.md,
-    marginTop: spacing.sm,
-    gap: spacing.sm,
+    paddingTop: spacing.s12,
+    paddingBottom: spacing.sm,
+    gap: HOME_EVENT_GAP,
   },
-  /* 48% rather than half: the remaining 4% is the gap between the pair, and a
-     flat 50% leaves no room for it and wraps the second card. */
   card: {
-    width: '48%',
-    borderRadius: 16,
+    width: HOME_EVENT_CARD_WIDTH,
+    borderRadius: 18,
     backgroundColor: colors.background,
     overflow: 'hidden',
     ...shadow,
@@ -1072,13 +1072,13 @@ export const homeUi = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 3,
   },
-  dateChipText: { color: PE_NAVY, fontSize: 9.5, fontWeight: '800' },
+  dateChipText: { color: PE_NAVY, fontSize: 11, lineHeight: 14, fontWeight: '800' },
 
   /* Fills whatever height the row settled on, which is what gives the price
      row below something to be pushed to the bottom of. */
-  body: { flex: 1, padding: 10, gap: 2 },
-  title: { color: PE_NAVY, fontSize: 12.5, lineHeight: 16, fontWeight: '800' },
-  kind: { color: PE_MUTED, fontSize: 10, lineHeight: 14, marginBottom: 2 },
+  body: { flex: 1, padding: spacing.s12, gap: 4 },
+  title: { color: PE_NAVY, fontSize: 13.5, lineHeight: 18, fontWeight: '800' },
+  kind: { color: PE_MUTED, fontSize: 12, lineHeight: 17, flexShrink: 1 },
   /*
    * On the floor of the card, not under the last line of text.
    *
@@ -1095,18 +1095,35 @@ export const homeUi = StyleSheet.create({
     marginTop: 'auto',
     paddingTop: 8,
   },
-  price: { color: PE_ACCENT, fontSize: 11.5, fontWeight: '800', flexShrink: 1 },
+  /* A date or venue line: a small tinted disc with the icon, then the text. */
+  metaLine: { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  metaIcon: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pricePill: {
+    flexShrink: 1,
+    borderRadius: 10,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+  },
+  priceFrom: { color: PE_MUTED, fontSize: 11, lineHeight: 16, fontWeight: '600' },
+  priceAmount: { fontSize: 13, lineHeight: 17, fontWeight: '800' },
   view: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 1,
+    gap: 2,
     borderRadius: 999,
-    backgroundColor: PE_ACCENT_SOFT,
-    paddingLeft: 8,
-    paddingRight: 4,
-    paddingVertical: 4,
+    overflow: 'hidden',
+    paddingLeft: 10,
+    paddingRight: 6,
+    paddingVertical: 5,
+    flexShrink: 0,
   },
-  viewText: { color: PE_ACCENT, fontSize: 9.5, fontWeight: '800' },
+  viewText: { color: '#ffffff', fontSize: 10.5, lineHeight: 14, fontWeight: '700' },
 
   note: {
     color: PE_MUTED,

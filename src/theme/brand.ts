@@ -44,8 +44,14 @@ export const brand = {
   disabledBg: '#efede8',
   /** Secondary copy, and the label on a disabled CTA. */
   textMuted: '#5d6674',
-  /** Placeholder text — lighter than `textMuted`, which is real content. */
-  textPlaceholder: '#9ba1ab',
+  /**
+   * Placeholder text — lighter than `textMuted`, which is real content.
+   *
+   * Warm, not cold. Every surface this sits on is a cream white, and a blue-
+   * grey placeholder was the one cool thing on the page; it read as a field
+   * that had failed rather than one not answered yet.
+   */
+  textPlaceholder: '#a79a92',
 
   /** Reassurance notes ("never share your code"). */
   green: '#2d5f4c',

@@ -1,5 +1,6 @@
 import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
-import { EventlyText, OccasionArt } from '../../../Components';
+import { EventlyText, GradientFill, OccasionArt } from '../../../Components';
+import { OCCASION_TILE_GRADIENT, OCCASION_TINT, SECTION_TONE_GRADIENT } from '../constants';
 import { OCCASIONS_PER_PAGE, OCCASION_TILE_ART, occasionGridStyles as s } from '../styles';
 import type { OccasionTile, OccasionsViewModel } from '../types';
 import { SectionHead } from './SectionHead';
@@ -18,6 +19,10 @@ interface OccasionGridProps {
  * "reception" at a glance is the whole job of the tile.
  */
 function Tile({ tile, onPress }: { tile: OccasionTile; onPress: () => void }) {
+  /* Each occasion's own colour. A grid of six identical cream squares is read
+     label by label; six colours are scanned. */
+  const tint = OCCASION_TINT[tile.art];
+
   return (
     <TouchableOpacity
       style={s.tile}
@@ -26,11 +31,23 @@ function Tile({ tile, onPress }: { tile: OccasionTile; onPress: () => void }) {
       accessibilityRole="button"
       accessibilityLabel={tile.note ? `${tile.label}. ${tile.note}.` : tile.label}
     >
-      <View style={s.tileArt}>
+      <View
+        style={[
+          s.tileArt,
+          /* The photograph, when the organizer has one, keeps its own colours —
+             a wash under a picture only muddies it. */
+          tile.photoUrl ? null : { backgroundColor: tint.bg, borderColor: tint.edge },
+        ]}
+      >
         {tile.photoUrl ? (
           <Image source={{ uri: tile.photoUrl }} style={s.tilePhoto} resizeMode="cover" />
         ) : (
-          <OccasionArt art={tile.art} width={OCCASION_TILE_ART} height={OCCASION_TILE_ART} />
+          <>
+            {/* A two-tone wash behind the drawing: a celebration app's
+                occasions should look like them. */}
+            <GradientFill colors={OCCASION_TILE_GRADIENT[tile.art]} direction="diagonal" />
+            <OccasionArt art={tile.art} width={OCCASION_TILE_ART} height={OCCASION_TILE_ART} />
+          </>
         )}
       </View>
       {/*
@@ -38,7 +55,7 @@ function Tile({ tile, onPress }: { tile: OccasionTile; onPress: () => void }) {
         quarter of a phone on one line, and ellipsising them to "Naming…"
         leaves the customer guessing at half the grid.
       */}
-      <EventlyText variant="small" style={s.tileLabel} numberOfLines={2}>
+      <EventlyText variant="small" style={[s.tileLabel, { color: tint.ink }]} numberOfLines={2}>
         {tile.label}
       </EventlyText>
     </TouchableOpacity>
@@ -81,7 +98,7 @@ export function OccasionGrid({ data, onPressOccasion }: OccasionGridProps) {
   return (
     <View>
       {/* No strapline: the tiles are the instruction. */}
-      <SectionHead title={data.title} />
+      <SectionHead title={data.title} tone={SECTION_TONE_GRADIENT.occasions} />
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}

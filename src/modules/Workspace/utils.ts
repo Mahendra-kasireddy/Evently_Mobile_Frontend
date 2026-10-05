@@ -1,10 +1,10 @@
+import { artFor } from '../../Components';
 import {
   PAYMENT_STATUS_LABEL,
   TASK_STATUS_LABEL,
   WORKSPACE_COPY,
   WORKSPACE_STATUS_LABEL,
 } from './constants';
-import type { OccasionArtKey } from '../../Components/OccasionArt';
 import type {
   BookingDetailDTO,
   TaskStatus,
@@ -84,19 +84,10 @@ const TASK_STATUSES: TaskStatus[] = ['pending', 'in_progress', 'done', 'blocked'
  * for. Anything unrecognised falls back rather than indexing the gradient map
  * to undefined.
  */
-const ART_KEYS: OccasionArtKey[] = [
-  'wedding',
-  'birthday',
-  'housewarming',
-  'naming',
-  'anniversary',
-  'corporate',
-];
-
-export function artFor(occasion: string): OccasionArtKey {
-  const key = (occasion ?? '').trim().toLowerCase();
-  return (ART_KEYS as string[]).includes(key) ? (key as OccasionArtKey) : 'wedding';
-}
+/* Moved to Components/OccasionArt, beside the key type and the drawings it
+   chooses between — the brief needs it too now. Re-exported so this module's
+   own callers are unchanged. */
+export { artFor };
 
 /** "5 September 2026" -> { month: 'SEP', day: '5' }, for the date chip. */
 export function chipFor(label: string): { month: string; day: string } | null {

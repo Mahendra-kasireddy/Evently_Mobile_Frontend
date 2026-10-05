@@ -1,7 +1,7 @@
 import { TouchableOpacity, View } from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
 import { colors } from '../../../theme';
-import { HOME_NAVY } from '../constants';
+import { HERO_ACCENT_COLOR, HOME_NAVY } from '../constants';
 import { homeHeaderStyles as s } from '../styles';
 
 interface HomeHeaderProps {
@@ -82,7 +82,11 @@ export function HomeHeader({
             accessibilityRole="button"
             accessibilityLabel="Search"
           >
-            <EventlyIcon name="magnify" size={23} color={tint} />
+            <EventlyIcon
+              name="magnify"
+              size={22}
+              color={onPhoto ? HERO_ACCENT_COLOR : tint}
+            />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -95,12 +99,15 @@ export function HomeHeader({
                 : 'Notifications'
             }
           >
-            <EventlyIcon name="bell-outline" size={23} color={tint} />
+            <EventlyIcon
+              name="bell-outline"
+              size={22}
+              color={onPhoto ? '#7c5cdb' : tint}
+            />
             <Badge count={unreadCount} />
           </TouchableOpacity>
         </View>
       </View>
-
     </View>
   );
 }
