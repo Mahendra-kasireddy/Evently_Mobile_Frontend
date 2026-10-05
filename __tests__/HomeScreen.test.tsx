@@ -178,6 +178,14 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
+declare const __dirname: string;
+const fs = require('fs');
+const path = require('path');
+
+/** A source file, read as text — the cheapest way to assert where a section sits. */
+const read = (dir: string, file: string): string =>
+  fs.readFileSync(path.join(__dirname, '..', 'src', dir, file), 'utf8');
+
 describe('the basics form', () => {
   /*
    * It used to be gated on having no live event, which sounded reasonable and
@@ -447,6 +455,30 @@ describe('the event cards Home draws', () => {
       }),
     );
     expect(render()).toContain('Verified organizers only');
+  });
+
+  /*
+   * Public events on Home.
+   *
+   * It belongs under the occasions: those are "plan something of your own",
+   * this is the other half of the same question — somebody else already
+   * planned one and there are seats. At the foot of the page a customer with
+   * nothing to plan never reached it.
+   */
+  it('puts events near you under the occasions, not at the foot of the page', () => {
+    const screen = read('modules/Home', 'HomeScreen.tsx');
+    const occasions = screen.indexOf('<OccasionGrid');
+    const near = screen.indexOf('<EventsNearYou');
+    const offers = screen.indexOf('<Offers');
+
+    expect(near).toBeGreaterThan(occasions);
+    expect(near).toBeLessThan(offers);
+  });
+
+  it('sends See all to the tab that holds the whole catalogue', () => {
+    expect(read('modules/Home', 'HomeScreen.tsx')).toMatch(
+      /onPressAction=\{\(\) => navigation\.navigate\('Events'\)\}/,
+    );
   });
 
   it('always offers the link, and it opens the full list', () => {

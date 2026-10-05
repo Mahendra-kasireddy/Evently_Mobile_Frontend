@@ -42,6 +42,8 @@ import { Offers } from './sections/Offers';
 import { CouponSheet } from './sections/CouponSheet';
 import { Packages } from './sections/Packages';
 import { SectionHead } from './sections/SectionHead';
+import { EventsNearYou } from '../PublicEvents/sections/EventsNearYou';
+import { PUBLIC_EVENTS_COPY } from '../PublicEvents/constants';
 import { TopOrganizers } from './sections/TopOrganizers';
 import { TrustStrip } from './sections/TrustStrip';
 import {
@@ -97,6 +99,7 @@ export function HomeScreen() {
     offers,
     packages,
     savedPackageIds,
+    coordinates,
     toggleSavedPackage,
     heroDraft,
     shareBudget,
@@ -375,6 +378,41 @@ export function HomeScreen() {
               />
             </View>
           )}
+
+          {/*
+            Public events, straight under the occasions.
+
+            The occasions are "plan something of your own"; this is the other
+            half of the same question — somebody else has already planned one,
+            and there are seats. It sits here rather than at the foot of the
+            page because a customer with nothing to plan has no reason to
+            scroll past the offers and the packages to find it.
+
+            A teaser, not a second catalogue: four events, and "See all" goes
+            to the Events tab, where the whole list and its filter sheet are.
+          */}
+          <View style={sectionStyles.block}>
+            {/*
+              The heading goes in rather than above: the section decides
+              whether it appears at all, and a title rendered out here stayed
+              behind when the body did not, over an empty gap.
+            */}
+            <EventsNearYou
+              header={
+                <SectionHead
+                  title={PUBLIC_EVENTS_COPY.sectionTitle}
+                  actionLabel={PUBLIC_EVENTS_COPY.seeAll}
+                  /* The Events tab, which is where the catalogue lives. */
+                  onPressAction={() => navigation.navigate('Events')}
+                  testID="home-events-see-all"
+                />
+              }
+              coordinates={coordinates ?? null}
+              onOpenEvent={eventId =>
+                navigation.navigate('PublicEventDetail', { eventId })
+              }
+            />
+          </View>
 
           {/*
           The booked card replaces the hero for the booking itself — the two are

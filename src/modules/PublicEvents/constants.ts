@@ -7,6 +7,9 @@ export const BOOKINGS_ENDPOINT = '/public-event/bookings';
 
 export const PUBLIC_EVENTS_COPY = {
   sectionTitle: 'Events near you',
+  seeAll: 'See all',
+  viewEvent: 'View event',
+  from: 'From',
   sectionHint: 'Shows, workshops and nights out you can book a seat at',
   screenTitle: 'Public events',
   empty: 'No public events are on sale right now. Check back soon.',
@@ -96,11 +99,47 @@ export const EVENT_CATEGORIES: Array<{ value: string; label: string }> = [
   { value: 'Conference', label: 'Conference' },
 ];
 
-export type SortKey = 'soon' | 'price' | 'new';
+export type SortKey = 'soon' | 'price' | 'new' | 'popular';
 export const SORT_OPTIONS: Array<{ key: SortKey; label: string }> = [
+  /* What has actually sold, counted from the tickets rather than from views —
+     a view is somebody who looked, a sale is somebody who came. */
+  { key: 'popular', label: 'Popular' },
   { key: 'soon', label: 'Soonest' },
   { key: 'price', label: 'Cheapest' },
   { key: 'new', label: 'Just added' },
+];
+
+/**
+ * How far out to look, and how far ahead.
+ *
+ * Both are real filters the catalogue understands: the first needs the
+ * customer's coordinates, which this app already keeps, and the second is a
+ * window rather than two dates — "this weekend" is the question somebody
+ * browsing on a Thursday actually asks.
+ */
+export const DISTANCE_OPTIONS: Array<{ km: number; label: string }> = [
+  /*
+   * The number, and only the number.
+   *
+   * "Within 10 km" and "Any distance" are each a word and a half too long for
+   * a third of a phone's width, so the chip clipped them and the customer saw
+   * "Any distan…" — a filter whose own value you cannot read. The chip's icon
+   * already says what it filters; the label only has to say what it is set to.
+   */
+  { km: 10, label: '10 km' },
+  { km: 25, label: '25 km' },
+  { km: 50, label: '50 km' },
+  { km: 0, label: 'Distance' },
+];
+
+export type WhenKey = 'any' | 'today' | 'weekend' | 'month';
+export const WHEN_OPTIONS: Array<{ key: WhenKey; label: string }> = [
+  /* Short, for the same reason as the distances above — and "This weekend"
+     reads as a weekend whether or not the word "this" is in front of it. */
+  { key: 'any', label: 'Date' },
+  { key: 'today', label: 'Today' },
+  { key: 'weekend', label: 'Weekend' },
+  { key: 'month', label: '30 days' },
 ];
 
 /** A category's pill colour, read off its words, so cards scan by kind. */

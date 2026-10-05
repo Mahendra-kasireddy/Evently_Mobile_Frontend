@@ -996,3 +996,123 @@ export const filterUi = StyleSheet.create({
   actions: { flexDirection: 'row', gap: spacing.s12, marginTop: spacing.lg },
   action: { flex: 1 },
 });
+
+/* ---------------------------------------------------------------------------
+ * Events near you — the teaser on Home.
+ *
+ * Two to a row rather than the full-width rows the Discover tab uses: this is
+ * a glance on the way past, not a screen somebody came to read, and four
+ * events in two rows cost Home half of what four stacked ones would.
+ * ------------------------------------------------------------------------- */
+export const homeUi = StyleSheet.create({
+  chipRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    marginTop: 10,
+  },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: 4,
+    height: 36,
+    paddingHorizontal: 9,
+    borderRadius: 11,
+    borderWidth: 1,
+    borderColor: '#e6eaf2',
+    backgroundColor: colors.background,
+  },
+  chipOn: { borderColor: PE_ACCENT, backgroundColor: PE_ACCENT_SOFT },
+  chipText: {
+    flex: 1,
+    minWidth: 0,
+    color: PE_NAVY,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  chipTextOn: { color: PE_ACCENT },
+
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    /* Every card on a row takes that row's height, so a title that wraps to
+       two lines makes its neighbour taller rather than taller than it. */
+    alignItems: 'stretch',
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.sm,
+    gap: spacing.sm,
+  },
+  /* 48% rather than half: the remaining 4% is the gap between the pair, and a
+     flat 50% leaves no room for it and wraps the second card. */
+  card: {
+    width: '48%',
+    borderRadius: 16,
+    backgroundColor: colors.background,
+    overflow: 'hidden',
+    ...shadow,
+  },
+  cover: { width: '100%', aspectRatio: 16 / 10, backgroundColor: '#eef0f6' },
+  coverTop: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    right: 8,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 6,
+  },
+  dateChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+  },
+  dateChipText: { color: PE_NAVY, fontSize: 9.5, fontWeight: '800' },
+
+  /* Fills whatever height the row settled on, which is what gives the price
+     row below something to be pushed to the bottom of. */
+  body: { flex: 1, padding: 10, gap: 2 },
+  title: { color: PE_NAVY, fontSize: 12.5, lineHeight: 16, fontWeight: '800' },
+  kind: { color: PE_MUTED, fontSize: 10, lineHeight: 14, marginBottom: 2 },
+  /*
+   * On the floor of the card, not under the last line of text.
+   *
+   * `auto` eats the slack: a one-line title leaves more of it and the price
+   * still lands level with the card beside it. Pinned to the content instead,
+   * the two prices in a row sat at different heights and the pair read as
+   * misaligned.
+   */
+  foot: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 6,
+    marginTop: 'auto',
+    paddingTop: 8,
+  },
+  price: { color: PE_ACCENT, fontSize: 11.5, fontWeight: '800', flexShrink: 1 },
+  view: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 1,
+    borderRadius: 999,
+    backgroundColor: PE_ACCENT_SOFT,
+    paddingLeft: 8,
+    paddingRight: 4,
+    paddingVertical: 4,
+  },
+  viewText: { color: PE_ACCENT, fontSize: 9.5, fontWeight: '800' },
+
+  note: {
+    color: PE_MUTED,
+    fontSize: 12.5,
+    lineHeight: 18,
+    paddingHorizontal: spacing.md,
+    marginTop: 10,
+  },
+});

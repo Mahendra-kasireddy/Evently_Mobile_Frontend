@@ -8,6 +8,7 @@ import {
   setShareBudget,
   type HeroDraftTextField,
 } from '../../store/heroDraftSlice';
+import { selectLocationCoordinates } from '../../store/locationSlice';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { todayIso } from '../../Components';
 import { DEFAULT_GUESTS } from '../Pickers/constants';
@@ -36,6 +37,14 @@ const EMPTY_VIEW_MODEL: HomeViewModel = {
 
 export interface HomeContainerResult extends HomeViewModel {
   header: HomeHeaderViewModel;
+  /**
+   * Where the customer is, when the app knows.
+   *
+   * Null until they have granted location or picked a city — the "events near
+   * you" section then offers every distance rather than pretending to measure
+   * one.
+   */
+  coordinates: { latitude: number; longitude: number } | null;
   isLoading: boolean;
   isError: boolean;
   errorMessage: string | null;
@@ -110,6 +119,14 @@ export function useHomeContainer(): HomeContainerResult {
    * through navigation params would need to know which screen pushed it.
    */
   const storedDraft = useAppSelector(selectHeroDraft);
+  /*
+   * The coordinates the app already keeps, for the "events near you" section.
+   *
+   * Read here rather than in the screen because the screen is rendered in
+   * tests without a Redux provider — the container is the one piece they mock,
+   * and that is the whole point of it holding every read.
+   */
+  const coordinates = useAppSelector(selectLocationCoordinates);
   const [quotesRequested, setQuotesRequested] = useState(false);
   const requestQuotesCall = useRequestQuotes();
 
@@ -276,5 +293,6 @@ export function useHomeContainer(): HomeContainerResult {
     requestQuoteFrom,
     savedPackageIds,
     toggleSavedPackage,
+    coordinates,
   };
 }

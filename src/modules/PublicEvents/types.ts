@@ -183,7 +183,13 @@ export interface BrowseQuery {
   q?: string;
   category?: string;
   city?: string;
-  sort?: 'soon' | 'price' | 'new';
+  /** A window on the calendar, not two dates — "this weekend" is the question. */
+  when?: 'any' | 'today' | 'weekend' | 'month';
+  sort?: 'soon' | 'price' | 'new' | 'popular';
+  /** With a radius, these turn the catalogue into "near me". */
+  lat?: number;
+  lng?: number;
+  radiusKm?: number;
   limit?: number;
 }
 
