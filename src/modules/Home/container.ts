@@ -18,6 +18,7 @@ import {
   useRequestQuotes,
   useRequestQuoteFromOrganizer,
 } from './hooks';
+import { absoluteFileUrl } from '../../services/urls';
 import { initialsOf, mapHomeFeed } from './utils';
 import type { HeroDraft, HomeHeaderViewModel, HomeViewModel } from './types';
 
@@ -265,6 +266,7 @@ export function useHomeContainer(): HomeContainerResult {
        * that has not been named still has to draw something.
        */
       initials: data?.user?.initials?.trim() || initialsOf(data?.user?.name ?? ''),
+      photoUrl: absoluteFileUrl(data?.user?.photoUrl),
       displayName: data?.user?.name?.trim() ?? '',
     }),
     [data],

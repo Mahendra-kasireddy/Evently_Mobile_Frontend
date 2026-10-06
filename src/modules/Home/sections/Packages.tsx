@@ -12,6 +12,7 @@ import {
   EventlyText,
   GradientFill,
   OccasionArt,
+  PressableScale,
 } from '../../../Components';
 import { CATEGORY_GRADIENT, SECTION_TONE_GRADIENT } from '../constants';
 import { PACKAGE_STACK_RATIO, packageCardStyles as s } from '../styles';
@@ -116,9 +117,9 @@ function PackageCard({
         accessible name. The heart is its sibling rather than a child: nesting
         it would make keeping a package and opening it the same gesture.
       */}
-      <TouchableOpacity
+      <PressableScale
+        containerStyle={s.pressArea}
         style={s.press}
-        activeOpacity={0.92}
         onPress={onPress}
         accessibilityRole="button"
         accessibilityLabel={[
@@ -243,7 +244,7 @@ function PackageCard({
             </EventlyText>
           </View>
         </View>
-      </TouchableOpacity>
+      </PressableScale>
 
       <TouchableOpacity
         style={s.heart}

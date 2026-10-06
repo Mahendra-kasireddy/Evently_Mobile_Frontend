@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
-import { EventlyIcon, EventlyText, GradientFill } from '../../../Components';
+import { EventlyIcon, EventlyText, GradientFill, PressableScale } from '../../../Components';
 import { SECTION_TONE_GRADIENT } from '../constants';
 import { organizerRowStyles as s } from '../styles';
 import { SectionHead } from './SectionHead';
@@ -61,9 +61,9 @@ function OrganizerCard({
     .join('. ');
 
   return (
-    <TouchableOpacity
-      style={[s.card, inGrid && s.cardInGrid]}
-      activeOpacity={0.9}
+    <PressableScale
+      containerStyle={inGrid ? s.cardInGrid : undefined}
+      style={[s.card, inGrid && s.cardFill]}
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`${spoken}. View profile.`}
@@ -192,7 +192,7 @@ function OrganizerCard({
         ) : null}
 
       </View>
-    </TouchableOpacity>
+    </PressableScale>
   );
 }
 

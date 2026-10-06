@@ -15,6 +15,8 @@ export interface VerifyOtpUserDTO {
   city: string;
   roles: string[];
   status: string;
+  /** Which side the account opens on: 'customer', 'organizer' or 'vendor'. */
+  defaultRole?: string;
 }
 
 export interface VerifyOtpResponseDTO {

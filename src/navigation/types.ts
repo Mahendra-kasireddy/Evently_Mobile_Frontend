@@ -37,8 +37,16 @@ export type RootStackParamList = {
   UseChoice: undefined;
   Login: undefined;
   Join: undefined;
-  ComingSoon: { role: JoinRole };
-  OrganizerOnboarding: undefined;
+  /**
+   * Registering a business: OTP if signed out, then the organizer's review
+   * status or the sub-vendor sign-up wizard. See BusinessRegisterScreen.
+   */
+  BusinessRegister: { role: JoinRole };
+  /**
+   * An organizer's or sub-vendor's home: the web dashboard, in place of the
+   * customer tabs. The portal follows the active view, so it takes no params.
+   */
+  BusinessHome: undefined;
   /**
    * Typed with the tab list so a screen can name a tab — `navigate('Main', {
    * screen: 'Plan' })` — from either side of the boundary: from a tab it

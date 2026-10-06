@@ -1,0 +1,40 @@
+import { View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { EventlyButton, EventlyIcon, EventlyText } from '../../../Components';
+import { PENDING_COPY, REG_ACCENT } from '../constants';
+import { PENDING_TONE, pendingStyles as s } from '../styles';
+
+interface PendingPanelProps {
+  /** The organizer profile's onboarding status, straight from the API. */
+  status: string;
+  onContinue: () => void;
+}
+
+/**
+ * Straight after registering: where the organizer stands, and the way on.
+ *
+ * Every status leads into the dashboard. A new registration waits on our
+ * review, but waiting is no reason to hold someone on a dead-end screen —
+ * the dashboard itself shows the same gate until it opens.
+ */
+export function PendingPanel({ status, onContinue }: PendingPanelProps) {
+  const copy = PENDING_COPY[status] ?? PENDING_COPY.pending_review;
+  const tone = PENDING_TONE[copy.tone];
+
+  return (
+    <SafeAreaView style={s.container} edges={['top', 'bottom']}>
+      <View style={[s.badge, { backgroundColor: tone.fill }]}>
+        <EventlyIcon name={copy.icon} size={44} color={tone.icon} />
+      </View>
+      <EventlyText variant="h1" style={s.title}>
+        {copy.title}
+      </EventlyText>
+      <EventlyText variant="body" style={s.body}>
+        {copy.body}
+      </EventlyText>
+      <EventlyButton title={copy.cta} onPress={onContinue} accentColor={REG_ACCENT} style={s.button} />
+    </SafeAreaView>
+  );
+}
+
+export default PendingPanel;

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { setActiveView, setSession } from '../../store/authSlice';
+import { setActiveView, setSession, toAppView } from '../../store/authSlice';
 import { useAppDispatch } from '../../store/hooks';
 import { setHasSeenOnboarding } from '../../store/onboardingSlice';
 import {
@@ -107,10 +107,11 @@ export function useLoginContainer(): LoginContainerResult {
             refreshToken: response.refreshToken ?? null,
           }),
         );
-        // This screen is the customer entry point, so land in the customer app
-        // even for an account that also holds the organizer role. Organizers
-        // switch from Profile.
-        dispatch(setActiveView('customer'));
+        // One sign-in for every role: the account's own default decides where
+        // it lands. A business account opens its dashboard; everyone else —
+        // including every brand-new number — the customer app. The navigator
+        // re-checks the role against the token, so a stale default is safe.
+        dispatch(setActiveView(toAppView(response.user?.defaultRole)));
         dispatch(setHasSeenOnboarding());
       })
       .catch(() => {

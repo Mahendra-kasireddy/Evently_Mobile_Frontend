@@ -9,6 +9,8 @@ export interface ProfileSummaryDTO {
   name: string;
   initials: string;
   location: string;
+  /** The account's photo; absent or '' when none (older servers send nothing). */
+  photoUrl?: string;
 }
 
 export interface HeroDraft {
@@ -745,6 +747,8 @@ export interface HomeHeaderViewModel {
   savedCount: number;
   /** The monogram on the header's avatar. */
   initials: string;
+  /** The account's photo, absolute; '' to show the monogram. */
+  photoUrl: string;
   /** The account's own name, for the avatar's accessibility label. */
   displayName: string;
 }

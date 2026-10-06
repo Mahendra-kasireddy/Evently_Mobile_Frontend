@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
 import { colors, spacing } from '../../theme';
 import {
@@ -255,88 +255,100 @@ export const jumpToStyles = StyleSheet.create({
 });
 
 /* Bookings: the event tickets section and the planned-events states. */
-export const ticketSectionStyles = StyleSheet.create({
-  section: { paddingHorizontal: spacing.md, marginBottom: spacing.lg },
-  head: {
+/* A Bookings section heading: gradient badge, title, count, "See all". */
+export const sectionHeadStyles = StyleSheet.create({
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: spacing.s12,
   },
-  headTitle: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  title: {
-    color: BOOKING_NAVY,
-    fontWeight: '800',
-    fontSize: 16,
-    lineHeight: 22,
+  left: { flexDirection: 'row', alignItems: 'center', gap: 10, flexShrink: 1 },
+  badge: {
+    width: 28,
+    height: 28,
+    borderRadius: 9,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
+  title: { color: BOOKING_NAVY, fontWeight: '800', fontSize: 16, lineHeight: 21, flexShrink: 1 },
   count: {
     minWidth: 22,
     height: 22,
     borderRadius: 11,
     paddingHorizontal: 6,
-    backgroundColor: BOOKING_ACCENT_SOFT,
+    backgroundColor: '#f3f1fb',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  countText: {
-    color: BOOKING_ACCENT,
-    fontWeight: '800',
-    fontSize: 11.5,
-    lineHeight: 15,
-  },
-  seeAll: { flexDirection: 'row', alignItems: 'center' },
-  seeAllText: {
-    color: BOOKING_ACCENT,
-    fontWeight: '700',
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  card: {
-    backgroundColor: colors.background,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: HAIRLINE,
-    paddingHorizontal: spacing.md,
-  },
-  row: {
+  countText: { fontWeight: '800', fontSize: 11.5, lineHeight: 15 },
+  seeAll: { fontWeight: '700', fontSize: 13, lineHeight: 18 },
+});
+
+/* The event tickets: each a little ticket, with a perforation and a stub. */
+export const ticketSectionStyles = StyleSheet.create({
+  section: { paddingHorizontal: spacing.md, marginBottom: spacing.lg },
+  list: { gap: spacing.s12 },
+  ticket: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.s12,
-    paddingVertical: spacing.md,
+    backgroundColor: colors.background,
+    borderRadius: 18,
+    padding: 10,
+    paddingRight: 0,
+    overflow: 'hidden',
+    ...Platform.select({
+      ios: {
+        shadowColor: BOOKING_NAVY,
+        shadowOpacity: 0.07,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 4 },
+      },
+      android: { elevation: 2 },
+    }),
   },
-  rowDivider: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#e6e1dd',
+  thumbWrap: { width: 76, height: 84, borderRadius: 14, overflow: 'hidden', backgroundColor: '#e9edf5' },
+  thumb: { width: '100%', height: '100%' },
+  thumbDate: {
+    position: 'absolute',
+    left: 5,
+    bottom: 5,
+    alignItems: 'center',
+    borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.94)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
   },
-  thumb: {
-    width: 72,
-    height: 72,
-    borderRadius: 14,
-    backgroundColor: '#e9edf5',
-  },
-  body: { flex: 1, gap: 4 },
-  rowTitle: {
-    color: BOOKING_NAVY,
-    fontWeight: '800',
-    fontSize: 14,
-    lineHeight: 19,
-  },
+  thumbDay: { color: BOOKING_NAVY, fontWeight: '800', fontSize: 13, lineHeight: 15 },
+  thumbMonth: { color: BOOKING_ACCENT, fontWeight: '800', fontSize: 8.5, lineHeight: 10, letterSpacing: 0.5 },
+  body: { flex: 1, gap: 4, paddingLeft: spacing.s12, paddingRight: 6 },
+  rowTitle: { color: BOOKING_NAVY, fontWeight: '800', fontSize: 14, lineHeight: 19 },
   line: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  lineText: { color: '#6b7385', fontSize: 12, lineHeight: 17, flexShrink: 1 },
-  pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 2 },
+  lineText: { color: '#6b7385', fontSize: 11.5, lineHeight: 16, flexShrink: 1 },
+  pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginTop: 2 },
   pill: { borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
   pillText: { fontWeight: '700', fontSize: 10.5, lineHeight: 15 },
   typePill: { backgroundColor: BOOKING_ACCENT_SOFT },
   typePillText: { color: BOOKING_ACCENT },
+  /* The perforation: notches cut from the top and bottom edges in the page's
+     colour, and a dashed line between them. */
+  perf: { width: 16, alignSelf: 'stretch', alignItems: 'center', marginVertical: -10 },
+  perfNotch: { width: 16, height: 16, borderRadius: 8, backgroundColor: BOOKING_CANVAS },
+  perfNotchTop: { marginTop: -8 },
+  perfNotchBottom: { marginBottom: -8 },
+  perfLine: { flex: 1, justifyContent: 'space-evenly', paddingVertical: 4 },
+  perfDash: { width: 1.5, height: 5, borderRadius: 1, backgroundColor: '#dfe3ea' },
+  stub: { width: 64, alignItems: 'center', justifyContent: 'center', gap: 4 },
   qr: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: '#f3f4f7',
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
   },
+  stubText: { color: '#6b7385', fontWeight: '700', fontSize: 10.5, lineHeight: 13 },
 });
 
 export const bookingStateStyles = StyleSheet.create({
@@ -354,41 +366,32 @@ export const bookingStateStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.s12,
-    backgroundColor: colors.background,
     borderRadius: 18,
-    borderWidth: 1,
-    borderColor: HAIRLINE,
+    overflow: 'hidden',
     padding: spacing.md,
   },
   inlineIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: BOOKING_ACCENT_SOFT,
+    width: 46,
+    height: 46,
+    borderRadius: 15,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
   },
   inlineText: { flex: 1, gap: 2 },
-  inlineTitle: {
-    color: BOOKING_NAVY,
-    fontWeight: '700',
-    fontSize: 14,
-    lineHeight: 19,
-  },
-  inlineBody: { color: colors.textMuted, fontSize: 12.5, lineHeight: 18 },
+  inlineTitle: { color: BOOKING_NAVY, fontWeight: '800', fontSize: 14, lineHeight: 19 },
+  inlineBody: { color: colors.textMuted, fontSize: 12, lineHeight: 17 },
   inlineCta: {
-    borderRadius: 10,
-    borderWidth: 1.5,
-    borderColor: BOOKING_ACCENT,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    borderRadius: 999,
+    overflow: 'hidden',
+    paddingLeft: 13,
+    paddingRight: 9,
+    paddingVertical: 8,
   },
-  inlineCtaText: {
-    color: BOOKING_ACCENT,
-    fontWeight: '700',
-    fontSize: 12.5,
-    lineHeight: 17,
-  },
+  inlineCtaText: { color: '#ffffff', fontWeight: '800', fontSize: 12.5, lineHeight: 16 },
   /* Nothing booked at all. */
   empty: {
     flex: 1,
@@ -409,6 +412,7 @@ export const bookingStateStyles = StyleSheet.create({
     height: 50,
     borderRadius: 14,
     backgroundColor: BOOKING_ACCENT,
+    overflow: 'hidden',
   },
   primaryText: {
     color: colors.onPrimary,
@@ -434,4 +438,58 @@ export const bookingStateStyles = StyleSheet.create({
     lineHeight: 20,
   },
   scroll: { paddingTop: spacing.sm, paddingBottom: spacing.xl },
+  headPad: { paddingHorizontal: spacing.md },
+  emptyIcon: {
+    width: 72,
+    height: 72,
+    borderRadius: 24,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  /* The two kinds of booking, as a segmented switch. */
+  segTabs: {
+    flexDirection: 'row',
+    gap: 4,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.xs,
+    marginBottom: spacing.md,
+    padding: 4,
+    borderRadius: 16,
+    backgroundColor: colors.background,
+    ...Platform.select({
+      ios: {
+        shadowColor: BOOKING_NAVY,
+        shadowOpacity: 0.07,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 4 },
+      },
+      android: { elevation: 2 },
+    }),
+  },
+  segTab: {
+    flex: 1,
+    height: 42,
+    borderRadius: 12,
+    overflow: 'hidden',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5,
+    paddingHorizontal: 6,
+  },
+  segText: { color: colors.textMuted, fontWeight: '700', fontSize: 12.5, lineHeight: 16, flexShrink: 1 },
+  segTextOn: { color: '#ffffff' },
+  segCount: {
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    paddingHorizontal: 5,
+    backgroundColor: '#eef0f5',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  segCountOn: { backgroundColor: 'rgba(255,255,255,0.28)' },
+  segCountText: { color: colors.textMuted, fontWeight: '800', fontSize: 10.5, lineHeight: 13 },
+  segCountTextOn: { color: '#ffffff' },
 });

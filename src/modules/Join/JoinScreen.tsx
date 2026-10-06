@@ -4,6 +4,8 @@ import { Pressable, ScrollView, StatusBar, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EventlyIcon, EventlyText } from '../../Components';
 import type { JoinRole, RootStackParamList } from '../../navigation/types';
+import { selectAuthToken } from '../../store/authSlice';
+import { useAppSelector } from '../../store/hooks';
 import { brand } from '../../theme';
 import { JOIN_COPY, ROLE_CARDS } from './constants';
 import { RequirementNote } from './sections/RequirementNote';
@@ -15,31 +17,31 @@ type JoinNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 /**
  * Registering a business profile: organizer or sub-vendor.
  *
- * Reached only from the sign-in screen's business card, and closed rather than
- * backed out of — it is a detour off the customer flow, not a step in it,
- * which is why the header carries an X and not a back arrow.
+ * Reached from the sign-in screen's business link and from Profile's "List
+ * your business", and closed rather than backed out of — it is a detour off
+ * the customer flow, not a step in it, which is why the header carries an X
+ * and not a back arrow.
  *
- * Organizer routes into the native onboarding wizard; sub-vendor is still a
- * "coming soon" placeholder until that wizard exists.
+ * Both roles continue into BusinessRegister: OTP (when signed out), then the
+ * organizer's review status or the sub-vendor sign-up wizard.
  */
 export function JoinScreen() {
   const navigation = useNavigation<JoinNavigationProp>();
   const insets = useSafeAreaInsets();
+  const isSignedIn = useAppSelector(selectAuthToken) !== null;
 
   const handleClose = () => {
     if (navigation.canGoBack()) {
       navigation.goBack();
       return;
     }
-    navigation.navigate('Login');
+    // Nothing underneath: a registration that verified the OTP and was then
+    // abandoned leaves this as the first screen of the signed-in stack.
+    navigation.reset({ index: 0, routes: [{ name: isSignedIn ? 'Main' : 'Login' }] });
   };
 
   const handleSelectRole = (role: JoinRole) => {
-    if (role === 'organizer') {
-      navigation.navigate('OrganizerOnboarding');
-      return;
-    }
-    navigation.navigate('ComingSoon', { role });
+    navigation.navigate('BusinessRegister', { role });
   };
 
   return (

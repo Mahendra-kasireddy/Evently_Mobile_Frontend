@@ -3,7 +3,6 @@ import { SeeAllScreen } from '../modules/Home';
 import { AreaPickerScreen, OccasionPickerScreen } from '../modules/Pickers';
 import { ConversationScreen } from '../modules/Chat';
 import { GuestListScreen } from '../modules/GuestList';
-import { ComingSoonScreen } from '../modules/ComingSoon';
 import {
   CompareQuotesScreen,
   LineByLineScreen,
@@ -18,13 +17,14 @@ import { NotificationScreen } from '../modules/Notification';
 import { OrganizerScreen, ReviewsScreen } from '../modules/Organizer';
 import { PaymentsScreen } from '../modules/Payments';
 import { OnboardingScreen } from '../modules/Onboarding';
-import { OrganizerOnboardingScreen } from '../modules/OrganizerOnboarding';
 import { ProfileScreen } from '../modules/Profile';
 import { SavedPackagesScreen } from '../modules/SavedPackages';
 import { SearchScreen } from '../modules/Search';
 import { SettingsScreen } from '../modules/Settings';
 import { SplashScreen } from '../modules/Splash';
 import { BookingScreen } from '../modules/Booking';
+import { BusinessHomeScreen } from '../modules/BusinessHome';
+import { BusinessRegisterScreen } from '../modules/BusinessRegister';
 import { UseChoiceScreen } from '../modules/UseChoice';
 import { IdeaBoardScreen, WorkspaceScreen } from '../modules/Workspace';
 import {
@@ -37,7 +37,11 @@ import {
   PublicEventDetailScreen,
   PublicEventLiveScreen,
 } from '../modules/PublicEvents';
-import { selectAuthToken, selectIsAuthHydrated } from '../store/authSlice';
+import {
+  selectAuthToken,
+  selectIsAuthHydrated,
+  selectIsBusinessView,
+} from '../store/authSlice';
 import {
   selectHasSeenOnboarding,
   selectIsOnboardingHydrated,
@@ -53,6 +57,7 @@ export function RootNavigator() {
   const isAuthHydrated = useAppSelector(selectIsAuthHydrated);
   const hasSeenOnboarding = useAppSelector(selectHasSeenOnboarding);
   const isOnboardingHydrated = useAppSelector(selectIsOnboardingHydrated);
+  const isBusinessView = useAppSelector(selectIsBusinessView);
 
   if (!isAuthHydrated || !isOnboardingHydrated) {
     return <SplashScreen />;
@@ -60,7 +65,19 @@ export function RootNavigator() {
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {token ? (
+      {token && isBusinessView ? (
+        /*
+         * An organizer or sub-vendor account: the web dashboard and nothing of
+         * the customer app. Switching to the customer side (from inside the
+         * dashboard) swaps this branch out for the one below.
+         */
+        <>
+          <Stack.Screen name="BusinessHome" component={BusinessHomeScreen} />
+          {/* Present in every branch so a registration in progress survives
+              the branch swap when its role becomes the active view. */}
+          <Stack.Screen name="BusinessRegister" component={BusinessRegisterScreen} />
+        </>
+      ) : token ? (
         <>
           <Stack.Screen name="Main" component={MainTabNavigator} />
           <Stack.Screen name="Location" component={LocationScreen} />
@@ -117,11 +134,11 @@ export function RootNavigator() {
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen name="LegalSupport" component={LegalSupportScreen} />
           <Stack.Screen name="Contact" component={ContactScreen} />
-          {/* Also present here (see below) so verifying OTP mid-onboarding doesn't unmount the wizard. */}
-          <Stack.Screen
-            name="OrganizerOnboarding"
-            component={OrganizerOnboardingScreen}
-          />
+          {/* "List your business" from Profile: the same role picker a
+              signed-out visitor gets, then registration on this account. */}
+          <Stack.Screen name="Join" component={JoinScreen} />
+          {/* Also present in the other branches — see BusinessRegisterScreen. */}
+          <Stack.Screen name="BusinessRegister" component={BusinessRegisterScreen} />
         </>
       ) : (
         <>
@@ -133,15 +150,11 @@ export function RootNavigator() {
               opens on sign-in; first run reaches it from Onboarding. */}
           <Stack.Screen name="UseChoice" component={UseChoiceScreen} />
           <Stack.Screen name="Join" component={JoinScreen} />
-          <Stack.Screen name="ComingSoon" component={ComingSoonScreen} />
-          {/* Organizer onboarding is OTP-first and starts unauthenticated; the same
-              screen name is registered in the authenticated branch above too, so
-              React Navigation preserves this route's state when the in-flow OTP
-              verify flips `token` and swaps which branch renders. */}
-          <Stack.Screen
-            name="OrganizerOnboarding"
-            component={OrganizerOnboardingScreen}
-          />
+          {/* Business registration is OTP-first and starts signed out; the same
+              screen name is registered in the signed-in branches too, so React
+              Navigation keeps this route's state when the in-flow OTP verify
+              flips `token` and swaps which branch renders. */}
+          <Stack.Screen name="BusinessRegister" component={BusinessRegisterScreen} />
         </>
       )}
     </Stack.Navigator>

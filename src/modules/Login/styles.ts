@@ -46,30 +46,61 @@ export const styles = StyleSheet.create({
   errorText: { color: '#b3261e', flex: 1, fontSize: 13, lineHeight: 19 },
 });
 
+/** The round photo tucked into the top-right corner of the number step. */
+export const CORNER_SIZE = 200;
+export const cornerStyles = StyleSheet.create({
+  ring: {
+    position: 'absolute',
+    // Far enough into the corner to stay clear of the centred wordmark.
+    right: -90,
+    width: CORNER_SIZE + 16,
+    height: CORNER_SIZE + 16,
+    borderRadius: (CORNER_SIZE + 16) / 2,
+    padding: 8,
+    backgroundColor: '#f9d4c0',
+  },
+  circle: {
+    flex: 1,
+    borderRadius: CORNER_SIZE / 2,
+    overflow: 'hidden',
+    backgroundColor: AUTH_BORDER,
+  },
+  image: { ...StyleSheet.absoluteFill, width: '100%', height: '100%' },
+});
+
 /** The brand block and headings on both steps. */
 export const heroStyles = StyleSheet.create({
-  brand: { alignItems: 'center', marginTop: spacing.sm },
+  brand: { alignItems: 'center' },
+  logoRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  logoMark: { width: 46, height: 46 },
   wordmark: {
-    fontFamily: AUTH_SERIF,
-    fontWeight: '700',
     fontSize: 34,
     lineHeight: 42,
+    fontWeight: '700',
     color: AUTH_NAVY,
-    marginTop: 2,
+    letterSpacing: -0.5,
   },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: spacing.lg,
+  },
+  rule: { width: 28, height: 1.5, borderRadius: 1, backgroundColor: '#f2a582' },
   title: {
     fontFamily: AUTH_SERIF,
     fontWeight: '700',
-    fontSize: 25,
-    lineHeight: 32,
+    fontSize: 32,
+    lineHeight: 40,
     color: AUTH_NAVY,
     textAlign: 'center',
+    marginTop: spacing.md,
   },
   titleGap: { marginTop: spacing.lg },
   subtitle: {
-    color: AUTH_MUTED,
-    fontSize: 14,
-    lineHeight: 21,
+    color: '#5b6478',
+    fontSize: 16,
+    lineHeight: 24,
     textAlign: 'center',
     marginTop: spacing.sm,
     marginBottom: spacing.xl,
@@ -113,12 +144,21 @@ export const fieldStyles = StyleSheet.create({
   phoneRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 56,
-    borderRadius: 14,
+    height: 60,
+    borderRadius: 18,
     borderWidth: 1.5,
-    borderColor: AUTH_BORDER,
+    borderColor: '#f1ebe6',
     backgroundColor: '#ffffff',
-    paddingHorizontal: spacing.s12,
+    paddingHorizontal: spacing.md,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#c8907a',
+        shadowOpacity: 0.12,
+        shadowRadius: 14,
+        shadowOffset: { width: 0, height: 6 },
+      },
+      android: { elevation: 2 },
+    }),
   },
   phoneRowFocused: { borderColor: AUTH_ACCENT },
   dialButton: {
@@ -221,35 +261,39 @@ export const otpStyles = StyleSheet.create({
   safetyText: { color: AUTH_MUTED, fontSize: 12.5, lineHeight: 18 },
 });
 
+/** The primary action: a warm gradient, left to right. */
+export const AUTH_CTA_GRADIENT: [string, string] = ['#f47b4d', '#f9a679'];
+
 export const ctaStyles = StyleSheet.create({
   button: {
-    height: 54,
-    borderRadius: 14,
-    backgroundColor: AUTH_ACCENT,
+    height: 58,
+    borderRadius: 29,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: spacing.lg,
+    backgroundColor: AUTH_ACCENT,
     ...Platform.select({
       ios: {
-        shadowColor: AUTH_ACCENT,
-        shadowOpacity: 0.25,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 5 },
+        shadowColor: '#f47b4d',
+        shadowOpacity: 0.32,
+        shadowRadius: 14,
+        shadowOffset: { width: 0, height: 8 },
       },
-      android: { elevation: 2 },
+      android: { elevation: 3 },
     }),
   },
-  /* Not yet actionable: a pale wash of the accent, its label still legible. */
+  /* Not yet actionable: the same pill at a lighter strength, label still legible. */
   buttonIdle: {
-    backgroundColor: '#f6d9cb',
+    opacity: 0.62,
     ...Platform.select({
-      ios: { shadowOpacity: 0 },
+      ios: { shadowOpacity: 0.12 },
       android: { elevation: 0 },
     }),
   },
   buttonPressed: { opacity: 0.88 },
-  label: { color: '#ffffff', fontSize: 16, fontWeight: '700', lineHeight: 21 },
-  labelIdle: { color: '#ffffff' },
+  label: { color: '#ffffff', fontSize: 17, fontWeight: '700', lineHeight: 22 },
+  arrow: { position: 'absolute', right: 22 },
 });
 
 /** The way into the business side, as a quiet line rather than a card. */

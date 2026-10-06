@@ -112,6 +112,16 @@ describe('mapProfile', () => {
     expect(mapProfile(user({ name: '', phone: '' })).initials).toBe('·');
   });
 
+  it('carries the account photo as a full URL, and none when there is none', () => {
+    expect(mapProfile(user({ photoUrl: 'https://cdn.example/p.jpg' })).photoUrl).toBe(
+      'https://cdn.example/p.jpg',
+    );
+    expect(mapProfile(user({ photoUrl: '/api/upload/file/profileImage/p.jpg' })).photoUrl).toMatch(
+      /^https?:\/\/.+\/api\/upload\/file\/profileImage\/p\.jpg$/,
+    );
+    expect(mapProfile(user()).photoUrl).toBe('');
+  });
+
   it('names every role the account holds, not just the first', () => {
     expect(mapProfile(user({ roles: ['customer', 'organizer'] })).roles).toEqual([
       'Customer',
@@ -144,10 +154,10 @@ describe('maskPhone', () => {
 
 describe('the menu', () => {
   it('offers to list a business only to someone who has not', () => {
-    const asCustomer = groupsFor(false)
+    const asCustomer = groupsFor([])
       .flatMap((g) => g.rows)
       .map((r) => r.action);
-    const asOrganizer = groupsFor(true)
+    const asOrganizer = groupsFor(['organizer'])
       .flatMap((g) => g.rows)
       .map((r) => r.action);
 
@@ -156,6 +166,30 @@ describe('the menu', () => {
     // Dropped, not disabled — a greyed row invites a tap that does nothing.
     expect(asOrganizer).toContain('help');
     expect(asOrganizer).toContain('signOut');
+  });
+
+  it('offers a way into each dashboard the account holds, and no other', () => {
+    const actionsFor = (views: Parameters<typeof groupsFor>[0]) =>
+      groupsFor(views)
+        .flatMap((g) => g.rows)
+        .map((r) => r.action);
+
+    expect(actionsFor([])).not.toContain('switchOrganizer');
+    expect(actionsFor(['organizer'])).toContain('switchOrganizer');
+    expect(actionsFor(['organizer'])).not.toContain('switchVendor');
+    expect(actionsFor(['organizer', 'vendor'])).toEqual(
+      expect.arrayContaining(['switchOrganizer', 'switchVendor']),
+    );
+    // At the top: it is the reason a business account opens this screen.
+    expect(groupsFor(['vendor'])[0].key).toBe('business');
+  });
+
+  it('reads the business roles off the account', () => {
+    expect(mapProfile(user({ roles: ['customer'] })).businessViews).toEqual([]);
+    expect(mapProfile(user({ roles: ['customer', 'vendor', 'organizer'] })).businessViews).toEqual([
+      'organizer',
+      'vendor',
+    ]);
   });
 
   it('does not promise a stored address book', () => {
@@ -260,7 +294,7 @@ describe('render dump', () => {
       return (
         <>
           <ProfileIdentity profile={profile} onEdit={noop} />
-          {groupsFor(profile.isOrganizer).map((group) => (
+          {groupsFor(profile.businessViews).map((group) => (
             <ProfileGroup
               key={group.key}
               group={group}

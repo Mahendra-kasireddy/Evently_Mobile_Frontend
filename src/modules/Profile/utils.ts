@@ -1,5 +1,6 @@
-import { PROFILE_COPY, PROFILE_GROUPS, ROLE_LABEL } from './constants';
-import type { ProfileGroupSpec, ProfileViewModel, UserDetailsDTO } from './types';
+import { absoluteFileUrl } from '../../services/urls';
+import { BUSINESS_GROUP_TITLE, PROFILE_COPY, PROFILE_GROUPS, ROLE_LABEL, SWITCH_ROWS } from './constants';
+import type { BusinessView, ProfileGroupSpec, ProfileViewModel, UserDetailsDTO } from './types';
 
 /**
  * The monogram on the avatar.
@@ -68,28 +69,38 @@ export function mapProfile(user: UserDetailsDTO): ProfileViewModel {
   return {
     displayName: (user.name ?? '').trim(),
     initials: initialsOf(user.name, user.phone),
+    photoUrl: absoluteFileUrl(user.photoUrl),
     maskedPhone: maskPhone(user.phone),
     // Every role the account holds: one that is both customer and organizer
     // previously read as "Customer" alone.
     roles: roles.map((role) => ROLE_LABEL[role] ?? role).filter(Boolean),
     isOrganizer: roles.includes('organizer'),
+    businessViews: (['organizer', 'vendor'] as const).filter((view) => roles.includes(view)),
   };
 }
 
 /**
  * The menu for this particular account.
  *
- * Only one row is conditional, and it is dropped rather than disabled: an
- * organizer has already listed their business, and a greyed-out row invites a
- * tap that will do nothing.
+ * An account that runs a business gets a way into each of its dashboards, at
+ * the top, and loses "List your business" — dropped rather than disabled: a
+ * greyed-out row invites a tap that will do nothing.
  */
-export function groupsFor(isOrganizer: boolean): ProfileGroupSpec[] {
-  if (!isOrganizer) return PROFILE_GROUPS;
-  return PROFILE_GROUPS.map((group) =>
-    group.key === 'more'
-      ? { ...group, rows: group.rows.filter((row) => row.action !== 'listBusiness') }
-      : group,
-  );
+export function groupsFor(businessViews: readonly BusinessView[]): ProfileGroupSpec[] {
+  if (businessViews.length === 0) return PROFILE_GROUPS;
+  const business: ProfileGroupSpec = {
+    key: 'business',
+    title: BUSINESS_GROUP_TITLE,
+    rows: businessViews.map((view) => SWITCH_ROWS[view]),
+  };
+  return [
+    business,
+    ...PROFILE_GROUPS.map((group) =>
+      group.key === 'more'
+        ? { ...group, rows: group.rows.filter((row) => row.action !== 'listBusiness') }
+        : group,
+    ),
+  ];
 }
 
 export { PROFILE_COPY };

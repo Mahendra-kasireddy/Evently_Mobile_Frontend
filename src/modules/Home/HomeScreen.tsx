@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EventlyText, GradientFill } from '../../Components';
+import { EventlyText, FadeInUp, GradientFill } from '../../Components';
 import type {
   MainTabParamList,
   RootStackParamList,
@@ -48,6 +48,9 @@ import { CouponSheet } from './sections/CouponSheet';
 import { Packages } from './sections/Packages';
 import { SectionHead } from './sections/SectionHead';
 import { EventsNearYou } from '../PublicEvents/sections/EventsNearYou';
+import { FeaturedEvents } from '../PublicEvents/sections/FeaturedEvents';
+import { LiveStreams } from '../PublicEvents/sections/LiveStreams';
+import { LIVE_STREAMS_COPY } from '../PublicEvents/constants';
 import { PUBLIC_EVENTS_COPY } from '../PublicEvents/constants';
 import { TopOrganizers } from './sections/TopOrganizers';
 import { TrustStrip } from './sections/TrustStrip';
@@ -63,6 +66,9 @@ type HomeNavigationProp = CompositeNavigationProp<
 >;
 
 /** Renders whatever sections the container provides. No fetching, no mapping here. */
+/** The Live Stream heading's badge: broadcast red. */
+const LIVE_TONE: readonly [string, string] = ['#ff6b7d', '#d93b3b'];
+
 export function HomeScreen() {
   const navigation = useNavigation<HomeNavigationProp>();
   /* The coupon whose terms are open, or null. Local because it is a reading
@@ -163,6 +169,7 @@ export function HomeScreen() {
 
   const headerProps = {
     initials: header.initials,
+    photoUrl: header.photoUrl,
     displayName: header.displayName,
     unreadCount: header.unreadCount,
     /* Profile is no longer a tab — this avatar is the way in, and it pushes,
@@ -377,14 +384,14 @@ export function HomeScreen() {
           the point where somebody who did not want the form had given up.
         */}
           {occasions && (
-            <View style={sectionStyles.block}>
+            <FadeInUp delay={60} style={sectionStyles.block}>
               <OccasionGrid
                 data={occasions}
                 onPressOccasion={occasionId =>
                   navigation.navigate('Plan', { occasionId })
                 }
               />
-            </View>
+            </FadeInUp>
           )}
 
           {/*
@@ -399,7 +406,37 @@ export function HomeScreen() {
             A teaser, not a second catalogue: four events, and "See all" goes
             to the Events tab, where the whole list and its filter sheet are.
           */}
-          <View style={sectionStyles.block}>
+          {/* The featured banner leads the events: the biggest nights out,
+              one at a time. It removes itself when there is nothing to feature. */}
+          <FadeInUp delay={100}>
+            <FeaturedEvents
+              style={sectionStyles.block}
+              onOpenEvent={eventId =>
+                navigation.navigate('PublicEventDetail', { eventId })
+              }
+            />
+          </FadeInUp>
+
+          {/* Events streaming this minute. Gone entirely when nothing is live. */}
+          <FadeInUp delay={110}>
+            <LiveStreams
+              renderHeader={liveCount => (
+                <View style={sectionStyles.block}>
+                  <SectionHead
+                    title={LIVE_STREAMS_COPY.title}
+                    tone={LIVE_TONE}
+                    icon="broadcast"
+                    actionLabel={`${liveCount} live`}
+                  />
+                </View>
+              )}
+              onOpenStream={eventId =>
+                navigation.navigate('PublicEventLive', { eventId })
+              }
+            />
+          </FadeInUp>
+
+          <FadeInUp delay={120} style={sectionStyles.block}>
             {/*
               The heading goes in rather than above: the section decides
               whether it appears at all, and a title rendered out here stayed
@@ -421,7 +458,7 @@ export function HomeScreen() {
                 navigation.navigate('PublicEventDetail', { eventId })
               }
             />
-          </View>
+          </FadeInUp>
 
           {/*
           The booked card replaces the hero for the booking itself — the two are
@@ -461,7 +498,7 @@ export function HomeScreen() {
           of them, then "See all" — the Events list is the full set.
         */}
           {visibleOtherEvents.length ? (
-            <View style={sectionStyles.block}>
+            <FadeInUp delay={180} style={sectionStyles.block}>
               {/*
               "See all", always — the same head every other section on Home
               uses.
@@ -498,11 +535,11 @@ export function HomeScreen() {
                     : undefined
                 }
               />
-            </View>
+            </FadeInUp>
           ) : null}
 
           {packages && (
-            <View style={sectionStyles.block}>
+            <FadeInUp delay={240} style={sectionStyles.block}>
               <Packages
                 data={packages}
                 // A package's art key is its occasion id, so opening one lands
@@ -516,13 +553,13 @@ export function HomeScreen() {
                 savedIds={savedPackageIds}
                 onToggleSaved={toggleSavedPackage}
               />
-            </View>
+            </FadeInUp>
           )}
 
           {/* Coupons straight after the packages: a customer comparing
               prices is the one a discount code is for. */}
           {offers && (
-            <View style={sectionStyles.block}>
+            <FadeInUp delay={300} style={sectionStyles.block}>
               <Offers
                 data={offers}
                 /*
@@ -537,11 +574,11 @@ export function HomeScreen() {
                   navigation.navigate('SeeAll', { kind: 'offers' })
                 }
               />
-            </View>
+            </FadeInUp>
           )}
 
           {topOrganizers && (
-            <View style={sectionStyles.block}>
+            <FadeInUp delay={360} style={sectionStyles.block}>
               <TopOrganizers
                 data={topOrganizers}
                 // The full profile screen, not the old sheet: a sheet was the
@@ -555,7 +592,7 @@ export function HomeScreen() {
                 }
                 onPressChangeCity={() => navigation.navigate('Location')}
               />
-            </View>
+            </FadeInUp>
           )}
 
           {/*

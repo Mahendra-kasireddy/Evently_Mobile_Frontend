@@ -17,6 +17,8 @@ import { useLoginContainer } from './container';
 import { AuthCta } from './sections/AuthCta';
 import { AuthHero } from './sections/AuthHero';
 import { BusinessEntryCard } from './sections/BusinessEntryCard';
+import { LoginBackdrop } from './sections/LoginBackdrop';
+import { LoginCornerPhoto } from './sections/LoginCornerPhoto';
 import { OtpArt } from './sections/OtpArt';
 import { OtpEntry } from './sections/OtpEntry';
 import { OtpSafetyNote } from './sections/OtpSafetyNote';
@@ -27,11 +29,18 @@ import { formatSentTo } from './utils';
 
 type LoginNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
+/** Space above the logo on the number step, below the status bar. */
+const PHONE_STEP_TOP = 96;
+
 /**
  * Sign in: a number, then the code that was texted to it.
  *
  * Both steps share one layout — back arrow, a heading block, the field and
  * its CTA, then a footer — so moving between them does not reflow the screen.
+ * Behind both: a drawn backdrop of soft shapes and confetti. The number step
+ * adds a round photo in the top-right corner cycling through the events
+ * Evently plans; the code step keeps its own illustration, since by then the
+ * person is mid-task.
  *
  * The footer is pushed to the bottom by a flexible spacer rather than sitting
  * wherever the content happens to end: with the keyboard down that fills what
@@ -67,6 +76,8 @@ export function LoginScreen() {
   } = useLoginContainer();
 
   const isPhoneStep = step === 'phone';
+  // The number step has no top bar; clear the status bar and the corner photo.
+  const contentTop = isPhoneStep ? insets.top + PHONE_STEP_TOP : 0;
 
   const bodyOpacity = useRef(new Animated.Value(0)).current;
   const bodyTranslateY = useRef(new Animated.Value(10)).current;
@@ -96,36 +107,34 @@ export function LoginScreen() {
         backgroundColor="transparent"
         translucent
       />
+      <LoginBackdrop />
+      {isPhoneStep ? <LoginCornerPhoto /> : null}
 
-      {/* Back: on the code step it returns to the number; on the number step
-          it goes wherever the person came from, when there is somewhere. */}
-      <View style={[styles.topBar, { marginTop: insets.top }]}>
-        {!isPhoneStep || navigation.canGoBack() ? (
+      {/* Back only on the code step, where it returns to the number. The
+          number step has no bar at all: its photos run to the top of the
+          screen, under the status bar, and a bar above the scroll view would
+          clip them (a scroll view cuts off whatever is pulled above it). */}
+      {!isPhoneStep ? (
+        <View style={[styles.topBar, { marginTop: insets.top }]}>
           <Pressable
             style={styles.back}
-            onPress={isPhoneStep ? navigation.goBack : changeNumber}
+            onPress={changeNumber}
             hitSlop={8}
             accessibilityRole="button"
-            accessibilityLabel={
-              isPhoneStep ? 'Go back' : 'Go back and change number'
-            }
-            testID={isPhoneStep ? 'login-back' : 'otp-back'}
+            accessibilityLabel="Go back and change number"
+            testID="otp-back"
           >
-            <EventlyIcon
-              name={isPhoneStep ? 'arrow-left' : 'chevron-left'}
-              size={24}
-              color={AUTH_NAVY}
-            />
+            <EventlyIcon name="chevron-left" size={24} color={AUTH_NAVY} />
           </Pressable>
-        ) : null}
-      </View>
+        </View>
+      ) : null}
 
       <KeyboardAvoider style={styles.flex}>
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={[
             styles.content,
-            { paddingBottom: insets.bottom + 16 },
+            { paddingTop: contentTop, paddingBottom: insets.bottom + 16 },
           ]}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"

@@ -10,8 +10,18 @@ import { decodeJwtRoles } from '../services/jwt';
  * (this) are different questions, and the app needs both. Deciding the UI
  * from roles alone is what sent every customer login into the organizer
  * dashboard.
+ *
+ * Seeded at sign-in from the account's server-side `defaultRole`, and changed
+ * only by an explicit switch (which updates that default too). `customer` is
+ * the native app; `organizer` and `vendor` are the business portals, which
+ * render the web dashboard — see the BusinessHome module.
  */
-export type AppView = 'customer' | 'organizer';
+export type AppView = 'customer' | 'organizer' | 'vendor';
+
+/** The views a role string from the API can map to; anything else is `customer`. */
+export function toAppView(role: string | null | undefined): AppView {
+  return role === 'organizer' || role === 'vendor' ? role : 'customer';
+}
 
 interface AuthState {
   token: string | null;
@@ -99,6 +109,22 @@ export const selectCanUseOrganizerView = (state: { auth: AuthState }): boolean =
   selectAuthRoles(state).includes('organizer');
 
 export const selectActiveView = (state: { auth: AuthState }): AppView => state.auth.activeView;
+
+/**
+ * The side of the product to render: the chosen view, but only if the token
+ * actually carries that role. A stale stored view — persisted before the role
+ * was revoked, or from another account — falls back to the customer app
+ * rather than opening a portal the server would refuse.
+ */
+export const selectEffectiveView = (state: { auth: AuthState }): AppView => {
+  const view = state.auth.activeView;
+  if (view === 'customer') return 'customer';
+  return selectAuthRoles(state).includes(view) ? view : 'customer';
+};
+
+/** True while a business portal (organizer or sub-vendor) is what the app shows. */
+export const selectIsBusinessView = (state: { auth: AuthState }): boolean =>
+  selectEffectiveView(state) !== 'customer';
 
 /**
  * The one selector the UI should branch on.

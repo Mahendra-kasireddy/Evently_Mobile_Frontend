@@ -15,7 +15,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText } from '../../Components';
+import { EventlyIcon, EventlyText, FadeInUp, PopIn } from '../../Components';
 import { absoluteFileUrl } from '../../services/urls';
 import type { RootStackParamList } from '../../navigation/types';
 import { calendarUrl, formatEventWhen, formatPrice } from './constants';
@@ -75,15 +75,18 @@ export function EventBookingSuccessScreen() {
         contentContainerStyle={s.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={s.tick}>
+        {/* The tick lands with a pop; everything under it follows. */}
+        <PopIn style={s.tick}>
           <EventlyIcon name="check" size={40} color="#ffffff" />
-        </View>
-        <EventlyText variant="h1" style={s.heading}>
-          You’re Going!
-        </EventlyText>
-        <EventlyText variant="body" style={s.sub}>
-          Your booking has been confirmed.
-        </EventlyText>
+        </PopIn>
+        <FadeInUp delay={180}>
+          <EventlyText variant="h1" style={s.heading}>
+            You’re Going!
+          </EventlyText>
+          <EventlyText variant="body" style={s.sub}>
+            Your booking has been confirmed.
+          </EventlyText>
+        </FadeInUp>
 
         <View style={ui.card}>
           {data?.coverUrl ? (

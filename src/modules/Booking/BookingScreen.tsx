@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
@@ -9,7 +10,13 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
+import {
+  AppHeader,
+  EventlyIcon,
+  EventlyText,
+  FadeInUp,
+  GradientFill,
+} from '../../Components';
 import { colors } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
 import { BOOKING_ACCENT, BOOKING_COPY as COPY } from './constants';
@@ -23,6 +30,11 @@ import { bookingStateStyles as st, styles } from './styles';
 import type { BookingItem, JumpKey } from './types';
 
 type EventsNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+/** Planned events' colour: violet, beside the tickets' coral. */
+const PLANNED_GRADIENT: [string, string] = ['#a084ff', '#5a35e0'];
+/** Event tickets' colour, for its tab. */
+const TICKETS_TAB_GRADIENT: [string, string] = ['#ff8a5c', '#e8433a'];
 
 /**
  * The customer's bookings — their own events, and the public-event tickets
@@ -86,17 +98,21 @@ export function BookingScreen() {
 
   /* Tickets bought for public events, still ahead — they are bookings too. */
   const myTickets = useMyTickets('all');
+  /* Which of the two kinds of booking is showing, when there are both. */
+  const [section, setSection] = useState<'tickets' | 'planned'>('tickets');
   const tickets = (myTickets.data ?? []).filter(
     t => t.state === 'upcoming' || t.state === 'checked_in',
   );
-  const ticketStrip = (
-    <EventTicketsSection
-      tickets={tickets}
-      onOpen={t =>
-        navigation.navigate('DigitalTicket', { ticketId: t.ticketId })
-      }
-      onSeeAll={() => navigation.navigate('MyTickets')}
-    />
+  const allTickets = (
+    <FadeInUp>
+      <EventTicketsSection
+        tickets={tickets}
+        limit={tickets.length}
+        showHead={false}
+        onOpen={t => navigation.navigate('DigitalTicket', { ticketId: t.ticketId })}
+        onSeeAll={() => navigation.navigate('MyTickets')}
+      />
+    </FadeInUp>
   );
   const refreshAll = () => {
     refetch();
@@ -158,12 +174,9 @@ export function BookingScreen() {
         <SafeAreaView style={styles.container} edges={['top']}>
           {header}
           <View style={st.empty}>
-            <View style={styles.centeredIcon}>
-              <EventlyIcon
-                name="calendar-heart"
-                size={28}
-                color={BOOKING_ACCENT}
-              />
+            <View style={st.emptyIcon}>
+              <GradientFill colors={PLANNED_GRADIENT} direction="diagonal" />
+              <EventlyIcon name="calendar-heart" size={30} color="#ffffff" />
             </View>
             <EventlyText variant="h2" style={styles.emptyTitle}>
               No bookings yet
@@ -179,6 +192,7 @@ export function BookingScreen() {
                 onPress={exploreEvents}
                 accessibilityRole="button"
               >
+                <GradientFill colors={['#ff8a5c', '#e8433a']} direction="across" />
                 <EventlyIcon
                   name="ticket-confirmation-outline"
                   size={18}
@@ -210,8 +224,8 @@ export function BookingScreen() {
       );
     }
 
-    /* Tickets, but nothing planned: the tickets lead, and planned events get a
-       small prompt — not a full-screen "No events yet" under a booking. */
+    /* Tickets, and nothing planned: just the tickets. A Planned Events
+       heading over nothing is a section that need not exist. */
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         {header}
@@ -221,37 +235,7 @@ export function BookingScreen() {
             <RefreshControl refreshing={isLoading} onRefresh={refreshAll} />
           }
         >
-          {ticketStrip}
-          <EventlyText variant="subtitle" style={st.sectionTitle}>
-            Planned Events
-          </EventlyText>
-          <View style={st.inline}>
-            <View style={st.inlineIcon}>
-              <EventlyIcon
-                name="calendar-heart"
-                size={22}
-                color={BOOKING_ACCENT}
-              />
-            </View>
-            <View style={st.inlineText}>
-              <EventlyText variant="body" style={st.inlineTitle}>
-                No planned events yet
-              </EventlyText>
-              <EventlyText variant="caption" style={st.inlineBody}>
-                Plan a celebration and book an organizer.
-              </EventlyText>
-            </View>
-            <TouchableOpacity
-              style={st.inlineCta}
-              onPress={planEvent}
-              accessibilityRole="button"
-              accessibilityLabel={COPY.emptyCta}
-            >
-              <EventlyText variant="caption" style={st.inlineCtaText}>
-                Plan
-              </EventlyText>
-            </TouchableOpacity>
-          </View>
+          {allTickets}
         </ScrollView>
       </SafeAreaView>
     );
@@ -259,20 +243,85 @@ export function BookingScreen() {
 
   const emptyForTab = tab === 'active' ? 'emptyActive' : 'emptyPast';
 
+  const hasTickets = tickets.length > 0;
+  const showTickets = hasTickets && section === 'tickets';
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {header}
+      {/* Two kinds of booking, two tabs — shown only when both have something
+          in them. */}
+      {hasTickets ? (
+        <View style={st.segTabs} accessibilityRole="tablist">
+          {(
+            [
+              {
+                key: 'tickets',
+                label: 'Event Tickets',
+                count: tickets.length,
+                icon: 'ticket-confirmation',
+                gradient: TICKETS_TAB_GRADIENT,
+              },
+              {
+                key: 'planned',
+                label: 'Planned Events',
+                count: items.length,
+                icon: 'calendar-heart',
+                gradient: PLANNED_GRADIENT,
+              },
+            ] as const
+          ).map(t => {
+            const on = section === t.key;
+            return (
+              <TouchableOpacity
+                key={t.key}
+                style={st.segTab}
+                onPress={() => setSection(t.key)}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: on }}
+              >
+                {on ? <GradientFill colors={t.gradient} direction="across" /> : null}
+                <EventlyIcon
+                  name={t.icon}
+                  size={15}
+                  color={on ? '#ffffff' : t.gradient[1]}
+                />
+                <EventlyText
+                  variant="caption"
+                  style={[st.segText, on && st.segTextOn]}
+                  numberOfLines={1}
+                >
+                  {t.label}
+                </EventlyText>
+                <View style={[st.segCount, on && st.segCountOn]}>
+                  <EventlyText
+                    variant="caption"
+                    style={[st.segCountText, on && st.segCountTextOn]}
+                  >
+                    {t.count}
+                  </EventlyText>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      ) : null}
+
+      {showTickets ? (
+        <ScrollView
+          contentContainerStyle={st.scroll}
+          refreshControl={
+            <RefreshControl refreshing={isLoading} onRefresh={refreshAll} />
+          }
+        >
+          {allTickets}
+        </ScrollView>
+      ) : (
       <FlatList
         ListHeaderComponent={
           /* Out to the screen edges, as they sat before they moved into the
              list: the list's own side padding is for the cards below. */
           <View style={styles.listBleed}>
-            {ticketStrip}
-            {tickets.length > 0 ? (
-              <EventlyText variant="subtitle" style={st.sectionTitle}>
-                Planned Events
-              </EventlyText>
-            ) : null}
             <EventTabs
               value={tab}
               onChange={setTab}
@@ -316,6 +365,7 @@ export function BookingScreen() {
           ) : null
         }
       />
+      )}
     </SafeAreaView>
   );
 }

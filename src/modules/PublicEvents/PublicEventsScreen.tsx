@@ -11,8 +11,16 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
+import {
+  AppHeader,
+  EventlyIcon,
+  EventlyText,
+  FadeInUp,
+  GradientFill,
+  PressableScale,
+} from '../../Components';
 import { absoluteFileUrl } from '../../services/urls';
 import { useAppSelector } from '../../store/hooks';
 import { selectLocationPlace } from '../../store/locationSlice';
@@ -22,11 +30,15 @@ import {
   PUBLIC_EVENTS_COPY,
   SORT_OPTIONS,
   formatEventWhen,
+  CATEGORY_LOOK,
+  categoryGradient,
+  dateBlock,
   formatPrice,
   saleNote,
+  weekdayTime,
 } from './constants';
 import { usePublicEvents } from './hooks';
-import { CategoryPill, InfoLine, LivePill } from './sections/ui';
+import { LivePill } from './sections/ui';
 import {
   FilterSheet,
   NO_EVENT_FILTERS,
@@ -43,6 +55,9 @@ import type { EventCard } from './types';
    is a tab, and the places it leads to are pushed on the stack above. */
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
+/** The hero band: violet warming into coral. */
+const HERO_GRADIENT: [string, string] = ['#6d4df2', '#ef6a45'];
+
 /** Long enough to skip the keystrokes of a word being typed. */
 const SEARCH_DEBOUNCE_MS = 300;
 
@@ -55,6 +70,9 @@ function EventListCard({
 }) {
   const live = event.liveEnabled && event.liveState === 'live';
   const where = [event.venueName, event.city].filter(Boolean).join(', ');
+  const gradient = categoryGradient(event.category);
+  const date = dateBlock(event.startDateTime, event.timezone);
+  const shadeId = `eventPoster-${event.id}`;
   /* Sold out, sales not open yet, sales closed — or '' when it is on sale
      and the price is the thing to show. */
   const note = saleNote(
@@ -64,9 +82,8 @@ function EventListCard({
     event.timezone,
   );
   return (
-    <TouchableOpacity
+    <PressableScale
       style={s.card}
-      activeOpacity={0.9}
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`${event.title}, ${formatEventWhen(
@@ -75,47 +92,142 @@ function EventListCard({
       )}`}
       testID={`public-event-${event.id}`}
     >
-      <View style={s.cover}>
+      <View style={s.poster}>
         {/* A local storage driver answers with a root-relative path. */}
         <Image
           source={{ uri: absoluteFileUrl(event.coverUrl) }}
-          style={s.coverImage}
+          style={s.posterImage}
           resizeMode="cover"
         />
-        <View style={s.coverPill}>
-          <CategoryPill category={event.category} />
+        {/* Dark at the foot, so the white title reads on any poster. */}
+        <View style={s.posterShade} pointerEvents="none">
+          <Svg width="100%" height="100%">
+            <Defs>
+              <LinearGradient id={shadeId} x1="0" y1="0" x2="0" y2="1">
+                <Stop offset="0" stopColor="#0b0f24" stopOpacity={0.15} />
+                <Stop offset="0.45" stopColor="#0b0f24" stopOpacity={0.05} />
+                <Stop offset="1" stopColor="#0b0f24" stopOpacity={0.85} />
+              </LinearGradient>
+            </Defs>
+            <Rect
+              x={0}
+              y={0}
+              width="100%"
+              height="100%"
+              fill={`url(#${shadeId})`}
+            />
+          </Svg>
         </View>
+
+        {event.category ? (
+          <View style={s.categoryPill}>
+            <GradientFill colors={gradient} direction="across" />
+            <EventlyText
+              variant="caption"
+              style={s.categoryPillText}
+              numberOfLines={1}
+            >
+              {event.category}
+            </EventlyText>
+          </View>
+        ) : null}
+
+        {/* The day, big, on frosted glass — the first thing a poster says. */}
+        {date ? (
+          <View style={s.dateBlock}>
+            <EventlyText variant="h2" style={s.dateDay}>
+              {date.day}
+            </EventlyText>
+            <EventlyText variant="caption" style={s.dateMonth}>
+              {date.month}
+            </EventlyText>
+          </View>
+        ) : null}
+
         {live ? (
-          <View style={s.coverRight}>
+          <View style={s.livePill}>
             <LivePill />
           </View>
         ) : null}
+
+        <View style={s.posterText}>
+          <EventlyText variant="h2" style={s.title} numberOfLines={2}>
+            {event.title}
+          </EventlyText>
+          <View style={s.posterLine}>
+            <EventlyIcon
+              name="clock-outline"
+              size={13}
+              color="rgba(255,255,255,0.85)"
+            />
+            <EventlyText
+              variant="caption"
+              style={s.posterLineText}
+              numberOfLines={1}
+            >
+              {weekdayTime(event.startDateTime, event.timezone)}
+            </EventlyText>
+          </View>
+          {where ? (
+            <View style={s.posterLine}>
+              <EventlyIcon
+                name="map-marker"
+                size={13}
+                color="rgba(255,255,255,0.85)"
+              />
+              <EventlyText
+                variant="caption"
+                style={s.posterLineText}
+                numberOfLines={1}
+              >
+                {where}
+              </EventlyText>
+            </View>
+          ) : null}
+        </View>
       </View>
-      <View style={s.body}>
-        <EventlyText variant="body" style={s.title} numberOfLines={2}>
-          {event.title}
-        </EventlyText>
-        <InfoLine
-          icon="calendar-month-outline"
-          text={formatEventWhen(event.startDateTime, event.timezone)}
-        />
-        <InfoLine icon="map-marker-outline" text={where} />
+
+      <View style={s.strip}>
         {note ? (
-          <EventlyText
-            variant="caption"
-            style={event.soldOut ? s.soldOut : s.saleNote}
-          >
-            {note}
-          </EventlyText>
+          <View style={[s.notePill, event.soldOut && s.notePillSold]}>
+            <EventlyIcon
+              name={event.soldOut ? 'ticket-outline' : 'clock-alert-outline'}
+              size={13}
+              color={event.soldOut ? '#d93b3b' : PE_NAVY}
+            />
+            <EventlyText
+              variant="caption"
+              style={[s.noteText, event.soldOut && s.noteTextSold]}
+              numberOfLines={1}
+            >
+              {note}
+            </EventlyText>
+          </View>
         ) : (
-          <EventlyText variant="caption" style={s.price}>
-            {event.startingPrice > 0
-              ? `From ${formatPrice(event.startingPrice)}`
-              : 'Free'}
-          </EventlyText>
+          <View style={s.priceBlock}>
+            <EventlyText variant="caption" style={s.priceFrom}>
+              {event.startingPrice > 0 ? 'Tickets from' : 'Entry'}
+            </EventlyText>
+            <EventlyText variant="h2" style={s.price}>
+              {event.startingPrice > 0
+                ? formatPrice(event.startingPrice)
+                : 'Free'}
+            </EventlyText>
+          </View>
         )}
+        {/* Drawn as a button, pressed as part of the card. */}
+        <View style={s.book}>
+          <GradientFill
+            colors={note ? ['#8a93a3', '#5b6475'] : gradient}
+            direction="across"
+          />
+          <EventlyText variant="caption" style={s.bookText}>
+            {note ? 'View details' : 'Book now'}
+          </EventlyText>
+          <EventlyIcon name="arrow-right" size={14} color="#ffffff" />
+        </View>
       </View>
-    </TouchableOpacity>
+    </PressableScale>
   );
 }
 
@@ -129,7 +241,9 @@ function EventListCard({
  */
 export function PublicEventsScreen() {
   const navigation = useNavigation<Nav>();
+  const insets = useSafeAreaInsets();
   const place = useAppSelector(selectLocationPlace);
+
   const city = place?.locality ?? '';
 
   const [search, setSearch] = useState('');
@@ -157,84 +271,84 @@ export function PublicEventsScreen() {
   const filtered = Boolean(query || category || filters.city);
 
   return (
-    <SafeAreaView style={ui.screen} edges={['top']}>
-      <AppHeader
-        title="Public Events"
-        /* A tab with nothing under it: Back returns to Home rather than
-           doing nothing. */
-        onBackPress={() =>
-          navigation.canGoBack()
-            ? navigation.goBack()
-            : navigation.navigate('Main', { screen: 'Home' })
-        }
-        /* What you have already bought, beside the catalogue it was bought
-           from — rather than a sixth tab for a list most people open twice a
-           year. */
-        rightElement={
-          <TouchableOpacity
-            onPress={() => navigation.navigate('MyTickets')}
-            hitSlop={8}
-            accessibilityRole="button"
-            accessibilityLabel={PUBLIC_EVENTS_COPY.ticketsTitle}
-            testID="open-my-tickets"
-            style={s.ticketsButton}
-          >
-            <EventlyIcon
-              name="ticket-confirmation-outline"
-              size={16}
-              color={PE_ACCENT}
-            />
-            <EventlyText variant="caption" style={s.ticketsButtonText}>
-              My Tickets
-            </EventlyText>
-          </TouchableOpacity>
-        }
-      />
+    <View style={ui.screen}>
+      {/* The app's one header — the same title, size and back arrow as
+          every other screen. */}
+      <View style={[s.header, { paddingTop: insets.top }]}>
+        <AppHeader
+          title="Events near you"
+          onBackPress={() =>
+            navigation.canGoBack()
+              ? navigation.goBack()
+              : navigation.navigate('Main', { screen: 'Home' })
+          }
+          rightElement={
+            /* What you have already bought, beside the catalogue it was
+               bought from. */
+            <TouchableOpacity
+              onPress={() => navigation.navigate('MyTickets')}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={PUBLIC_EVENTS_COPY.ticketsTitle}
+              testID="open-my-tickets"
+              style={s.ticketsButton}
+            >
+              <EventlyIcon name="ticket-confirmation-outline" size={15} color={PE_ACCENT} />
+              <EventlyText variant="caption" style={s.ticketsButtonText}>
+                My Tickets
+              </EventlyText>
+            </TouchableOpacity>
+          }
+        />
 
       <View style={s.searchRow}>
-        <View style={s.searchField}>
-          <EventlyIcon name="magnify" size={18} color={PE_MUTED} />
-          <TextInput
-            style={s.searchInput}
-            value={search}
-            onChangeText={setSearch}
-            placeholder="Search events, categories or cities"
-            placeholderTextColor={PE_MUTED}
-            returnKeyType="search"
-            accessibilityLabel="Search public events"
-          />
-          {search ? (
-            <TouchableOpacity
-              onPress={() => setSearch('')}
-              hitSlop={8}
-              accessibilityLabel="Clear search"
-            >
-              <EventlyIcon name="close-circle" size={16} color={PE_MUTED} />
-            </TouchableOpacity>
-          ) : null}
+          <View style={s.searchField}>
+            <EventlyIcon name="magnify" size={18} color={PE_MUTED} />
+            <TextInput
+              style={s.searchInput}
+              value={search}
+              onChangeText={setSearch}
+              placeholder="Search events, artists or cities"
+              placeholderTextColor={PE_MUTED}
+              returnKeyType="search"
+              accessibilityLabel="Search public events"
+            />
+            {search ? (
+              <TouchableOpacity
+                onPress={() => setSearch('')}
+                hitSlop={8}
+                accessibilityLabel="Clear search"
+              >
+                <EventlyIcon name="close-circle" size={16} color={PE_MUTED} />
+              </TouchableOpacity>
+            ) : null}
+          </View>
+          <TouchableOpacity
+            style={[s.filterButton, filterCount > 0 && s.filterButtonOn]}
+            onPress={() => setFiltersOpen(true)}
+            accessibilityRole="button"
+            accessibilityLabel={
+              filterCount > 0 ? `Filters, ${filterCount} applied` : 'Filters'
+            }
+            testID="open-filters"
+          >
+            {filterCount > 0 ? (
+              <GradientFill colors={HERO_GRADIENT} direction="diagonal" />
+            ) : null}
+            <EventlyIcon
+              name="tune-variant"
+              size={20}
+              color={filterCount > 0 ? '#ffffff' : PE_NAVY}
+            />
+            {filterCount > 0 ? (
+              <View style={s.filterBadge}>
+                <EventlyText variant="caption" style={s.filterBadgeText}>
+                  {filterCount}
+                </EventlyText>
+              </View>
+            ) : null}
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={[s.filterButton, filterCount > 0 && s.filterButtonOn]}
-          onPress={() => setFiltersOpen(true)}
-          accessibilityRole="button"
-          accessibilityLabel={
-            filterCount > 0 ? `Filters, ${filterCount} applied` : 'Filters'
-          }
-          testID="open-filters"
-        >
-          <EventlyIcon
-            name="tune-variant"
-            size={20}
-            color={filterCount > 0 ? '#ffffff' : PE_NAVY}
-          />
-          {filterCount > 0 ? (
-            <View style={s.filterBadge}>
-              <EventlyText variant="caption" style={s.filterBadgeText}>
-                {filterCount}
-              </EventlyText>
-            </View>
-          ) : null}
-        </TouchableOpacity>
       </View>
 
       {/* What is applied, each removable on its own. */}
@@ -281,6 +395,7 @@ export function PublicEventsScreen() {
         >
           {EVENT_CATEGORIES.map(c => {
             const on = c.value === category;
+            const look = CATEGORY_LOOK[c.label] ?? CATEGORY_LOOK.All;
             return (
               <TouchableOpacity
                 key={c.label}
@@ -289,6 +404,14 @@ export function PublicEventsScreen() {
                 accessibilityRole="button"
                 accessibilityState={{ selected: on }}
               >
+                {on ? (
+                  <GradientFill colors={look.gradient} direction="across" />
+                ) : null}
+                <EventlyIcon
+                  name={look.icon}
+                  size={15}
+                  color={on ? '#ffffff' : look.gradient[1]}
+                />
                 <EventlyText
                   variant="caption"
                   style={[s.chipText, on && s.chipTextOn]}
@@ -304,13 +427,16 @@ export function PublicEventsScreen() {
       <FlatList
         data={events}
         keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <EventListCard
-            event={item}
-            onPress={() =>
-              navigation.navigate('PublicEventDetail', { eventId: item.id })
-            }
-          />
+        renderItem={({ item, index }) => (
+          /* Each card rises in a beat after the one above it. */
+          <FadeInUp delay={index * 70}>
+            <EventListCard
+              event={item}
+              onPress={() =>
+                navigation.navigate('PublicEventDetail', { eventId: item.id })
+              }
+            />
+          </FadeInUp>
         )}
         contentContainerStyle={s.list}
         showsVerticalScrollIndicator={false}
@@ -351,7 +477,7 @@ export function PublicEventsScreen() {
         onApply={setFilters}
         onClose={() => setFiltersOpen(false)}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 

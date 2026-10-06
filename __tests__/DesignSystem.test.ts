@@ -112,10 +112,11 @@ describe('the header and control measurements', () => {
   });
 
   it('separates the back icon from its touch target', () => {
-    // The icon is what you see, the target is what you hit. 20pt of chevron
-    // inside 44pt of tappable area.
-    expect(layout.backIcon).toBe(20);
+    // The icon is what you see, the target is what you hit. 24pt of chevron
+    // inside 44pt of tappable area — the icon always well inside its target.
+    expect(layout.backIcon).toBe(24);
     expect(layout.backTouch).toBe(44);
+    expect(layout.backIcon).toBeLessThan(layout.backTouch);
   });
 
   it('gives inputs and buttons the same height', () => {

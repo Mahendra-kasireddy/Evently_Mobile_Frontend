@@ -1,4 +1,4 @@
-import type { ProfileGroupSpec } from './types';
+import type { BusinessView, ProfileAction, ProfileGroupSpec, ProfileRowSpec } from './types';
 
 export const GET_USER_DETAILS_ENDPOINT = '/user/getUserDetails';
 export const LOGOUT_ENDPOINT = '/auth/logoutUser';
@@ -14,10 +14,31 @@ export const PROFILE_GREEN = '#1d9e75';
 /** The page's own ground, matching Your events. */
 export const PROFILE_CANVAS = '#faf8f7';
 
+/** The identity card: coral warming into violet. */
+export const PROFILE_HEADER_GRADIENT: [string, string] = ['#ff8a5c', '#7c5cdb'];
+
+/** Each menu row's icon tile. Log out is the one red. */
+export const PROFILE_ROW_GRADIENT: Record<ProfileAction, [string, string]> = {
+  bookings: ['#ff8a5c', '#e8433a'],
+  savedPackages: ['#ff6f9f', '#c2416b'],
+  invitations: ['#a084ff', '#5a35e0'],
+  guestList: ['#3cc9a1', '#0e8a68'],
+  payments: ['#5b9bff', '#2554b8'],
+  location: ['#ffb547', '#e8791a'],
+  notifications: ['#f472b6', '#be185d'],
+  settings: ['#8a9ab3', '#4a5872'],
+  listBusiness: ['#2fb894', '#0e7358'],
+  switchOrganizer: ['#ff8a5c', '#7c5cdb'],
+  switchVendor: ['#5b9bff', '#7c5cdb'],
+  help: ['#38bdf8', '#0369a1'],
+  signOut: ['#ff7a7a', '#d93b3b'],
+};
+
 export const ROLE_LABEL: Record<string, string> = {
   customer: 'Customer',
   organizer: 'Organizer',
   subvendor: 'Sub-vendor',
+  vendor: 'Sub-vendor',
   admin: 'Admin',
 };
 
@@ -64,12 +85,25 @@ export const PROFILE_GROUPS: ProfileGroupSpec[] = [
   },
 ];
 
+/**
+ * Opens a business dashboard and makes it the default, so the app opens
+ * there from now on. Shown, in their own group at the top, only for the
+ * business roles the account actually holds.
+ */
+export const SWITCH_ROWS: Record<BusinessView, ProfileRowSpec> = {
+  organizer: { action: 'switchOrganizer', icon: 'briefcase-outline', label: 'Switch to organizer dashboard' },
+  vendor: { action: 'switchVendor', icon: 'account-switch-outline', label: 'Switch to sub-vendor dashboard' },
+};
+
+export const BUSINESS_GROUP_TITLE = 'Your business';
+
 export const PROFILE_COPY = {
   title: 'Profile',
   /** An account with no name yet — a prompt, not a fake name. */
   noName: 'Add your name',
   edit: 'Edit',
   signingOut: 'Signing out…',
+  switching: 'Opening…',
 
   savedBadge: (n: number) => `${n} saved`,
   approveBadge: (n: number) => (n === 1 ? '1 to approve' : `${n} to approve`),

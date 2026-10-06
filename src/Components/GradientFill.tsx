@@ -10,6 +10,12 @@ interface GradientFillProps {
    * 'diagonal' is the corner-to-corner sweep a tile reads best in.
    */
   direction?: 'across' | 'down' | 'diagonal';
+  /**
+   * Opacity at each end, for a gradient that fades to see-through (a scrim
+   * over a photo). Use this rather than rgba colours: SVG stops do not
+   * reliably honour an rgba alpha, and draw the colour solid instead.
+   */
+  opacities?: readonly [number, number];
   /** Laid over the parent, so the parent's radius clips it. */
   style?: StyleProp<ViewStyle>;
 }
@@ -36,6 +42,7 @@ const ENDS: Record<string, { x2: string; y2: string }> = {
 export function GradientFill({
   colors,
   direction = 'diagonal',
+  opacities = [1, 1],
   style,
 }: GradientFillProps) {
   const id = `g${useId().replace(/:/g, '')}`;
@@ -49,8 +56,8 @@ export function GradientFill({
       <Svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
         <Defs>
           <LinearGradient id={id} x1="0%" y1="0%" x2={end.x2} y2={end.y2}>
-            <Stop offset="0" stopColor={colors[0]} />
-            <Stop offset="1" stopColor={colors[1]} />
+            <Stop offset="0" stopColor={colors[0]} stopOpacity={opacities[0]} />
+            <Stop offset="1" stopColor={colors[1]} stopOpacity={opacities[1]} />
           </LinearGradient>
         </Defs>
         <Rect x={0} y={0} width={100} height={100} fill={`url(#${id})`} />

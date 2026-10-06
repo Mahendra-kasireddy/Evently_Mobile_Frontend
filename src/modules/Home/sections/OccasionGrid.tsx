@@ -1,5 +1,5 @@
-import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
-import { EventlyText, GradientFill, OccasionArt } from '../../../Components';
+import { Image, ScrollView, View } from 'react-native';
+import { EventlyText, GradientFill, OccasionArt, PressableScale } from '../../../Components';
 import { OCCASION_TILE_GRADIENT, OCCASION_TINT, SECTION_TONE_GRADIENT } from '../constants';
 import { OCCASIONS_PER_PAGE, OCCASION_TILE_ART, occasionGridStyles as s } from '../styles';
 import type { OccasionTile, OccasionsViewModel } from '../types';
@@ -24,9 +24,8 @@ function Tile({ tile, onPress }: { tile: OccasionTile; onPress: () => void }) {
   const tint = OCCASION_TINT[tile.art];
 
   return (
-    <TouchableOpacity
+    <PressableScale
       style={s.tile}
-      activeOpacity={0.8}
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={tile.note ? `${tile.label}. ${tile.note}.` : tile.label}
@@ -58,7 +57,7 @@ function Tile({ tile, onPress }: { tile: OccasionTile; onPress: () => void }) {
       <EventlyText variant="small" style={[s.tileLabel, { color: tint.ink }]} numberOfLines={2}>
         {tile.label}
       </EventlyText>
-    </TouchableOpacity>
+    </PressableScale>
   );
 }
 

@@ -1,7 +1,6 @@
-import { ActivityIndicator, Pressable } from 'react-native';
-import { EventlyText } from '../../../Components';
-import { brand } from '../../../theme';
-import { ctaStyles } from '../styles';
+import { ActivityIndicator, Pressable, View } from 'react-native';
+import { EventlyIcon, EventlyText, GradientFill } from '../../../Components';
+import { AUTH_CTA_GRADIENT, ctaStyles } from '../styles';
 
 interface AuthCtaProps {
   /** Shown while the field is incomplete — it names what is missing, e.g. "Enter 10 digits". */
@@ -16,10 +15,9 @@ interface AuthCtaProps {
 /**
  * One button, two states, and the inert state still says something useful.
  *
- * It is deliberately not `EventlyButton`: that component's disabled state is a
- * 50% fade of the accent, which on this screen sat directly above a keypad and
- * read as "tap me". Here the inert state is a filled neutral chip whose label
- * is the instruction.
+ * A warm gradient pill with an arrow. Not yet actionable, it keeps its shape
+ * and colour at a lighter strength, and its label is the instruction ("Enter
+ * 10 digits") — a greyed-out button says only "no".
  */
 export function AuthCta({
   idleLabel,
@@ -45,12 +43,16 @@ export function AuthCta({
       accessibilityState={{ disabled, busy: loading }}
       testID={testID}
     >
+      <GradientFill colors={AUTH_CTA_GRADIENT} direction="across" />
       {loading ? (
-        <ActivityIndicator color={brand.onAccent} />
+        <ActivityIndicator color="#ffffff" />
       ) : (
-        <EventlyText style={[ctaStyles.label, !ready && ctaStyles.labelIdle]}>
-          {ready ? readyLabel : idleLabel}
-        </EventlyText>
+        <>
+          <EventlyText style={ctaStyles.label}>{ready ? readyLabel : idleLabel}</EventlyText>
+          <View style={ctaStyles.arrow}>
+            <EventlyIcon name="arrow-right" size={20} color="#ffffff" />
+          </View>
+        </>
       )}
     </Pressable>
   );

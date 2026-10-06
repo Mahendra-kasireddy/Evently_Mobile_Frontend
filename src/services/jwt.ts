@@ -34,3 +34,26 @@ export function decodeJwtRoles(token: string): string[] {
     return [];
   }
 }
+
+/**
+ * Seconds-since-epoch expiry of a JWT, or null when it carries none or is
+ * unreadable. Unverified, like `decodeJwtRoles` — used only to decide whether
+ * a token is worth handing to the web dashboard before the server sees it.
+ */
+export function decodeJwtExp(token: string): number | null {
+  try {
+    const payloadSegment = token.split('.')[1];
+    if (!payloadSegment) return null;
+    const payload = JSON.parse(base64Decode(payloadSegment)) as { exp?: unknown };
+    return typeof payload.exp === 'number' ? payload.exp : null;
+  } catch {
+    return null;
+  }
+}
+
+/** True when the token has at least `marginSeconds` of life left. */
+export function isJwtFresh(token: string, marginSeconds = 60): boolean {
+  const exp = decodeJwtExp(token);
+  if (exp === null) return true; // nothing to judge by — let the server decide
+  return exp - marginSeconds > Date.now() / 1000;
+}

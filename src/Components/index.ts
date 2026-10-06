@@ -13,3 +13,4 @@ export { GradientFill } from './GradientFill';
 export type { EventlyTextVariant } from './EventlyText';
 export type { EventlyButtonVariant } from './EventlyButton';
 export type { OccasionArtKey } from './OccasionArt';
+export { FadeInUp, PopIn, PressableScale, useReducedMotion } from './Motion';

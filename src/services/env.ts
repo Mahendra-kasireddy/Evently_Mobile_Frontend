@@ -4,6 +4,9 @@ import {
   API_BASE_URL_QA,
   API_BASE_URL_PRODUCTION,
   APP_NAME,
+  WEB_APP_URL_DEVELOPMENT,
+  WEB_APP_URL_QA,
+  WEB_APP_URL_PRODUCTION,
 } from '@env';
 
 // Android emulators can't resolve the host machine's `localhost` — 10.0.2.2
@@ -27,12 +30,28 @@ const URL_BY_ENV: Record<AppEnv, string | undefined> = {
 
 const apiBaseUrl = URL_BY_ENV[APP_ENV] ?? DEFAULT_DEV_URL;
 
+// The web app's Vite dev server, by the same loopback rules as the API.
+const DEFAULT_DEV_WEB_URL = Platform.select({
+  android: 'http://10.0.2.2:5173',
+  default: 'http://localhost:5173',
+});
+
+const WEB_URL_BY_ENV: Record<AppEnv, string | undefined> = {
+  development: WEB_APP_URL_DEVELOPMENT || DEFAULT_DEV_WEB_URL,
+  qa: WEB_APP_URL_QA,
+  production: WEB_APP_URL_PRODUCTION,
+};
+
+/** Where the organizer and sub-vendor dashboards are served from. No trailing slash. */
+const webAppUrl = (WEB_URL_BY_ENV[APP_ENV] ?? DEFAULT_DEV_WEB_URL).replace(/\/+$/, '');
+
 if (!apiBaseUrl) {
   throw new Error(`Missing API base URL for env "${APP_ENV}". Check src/.env.`);
 }
 
 export const env = Object.freeze({
   apiBaseUrl,
+  webAppUrl,
   appName: APP_NAME || 'Evently',
   isDev: __DEV__,
   mode: APP_ENV,

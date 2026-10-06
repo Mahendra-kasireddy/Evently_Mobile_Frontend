@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ActivityIndicator, ScrollView, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
+import { AppHeader, EventlyIcon, EventlyText, FadeInUp } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
 import { PROFILE_ACCENT, PROFILE_COPY as COPY } from './constants';
 import { useProfileContainer } from './container';
@@ -24,8 +24,19 @@ type ProfileNavigationProp = NativeStackNavigationProp<RootStackParamList>;
  */
 export function ProfileScreen() {
   const navigation = useNavigation<ProfileNavigationProp>();
-  const { profile, groups, badges, isLoading, isError, errorMessage, isLoggingOut, logout, refetch } =
-    useProfileContainer();
+  const {
+    profile,
+    groups,
+    badges,
+    isLoading,
+    isError,
+    errorMessage,
+    isLoggingOut,
+    logout,
+    switchingTo,
+    switchTo,
+    refetch,
+  } = useProfileContainer();
 
   const openSettings = () => navigation.navigate('Settings');
 
@@ -49,9 +60,15 @@ export function ProfileScreen() {
       case 'settings':
         return openSettings();
       case 'listBusiness':
-        // Straight into the organizer wizard: the /join role picker is only
-        // registered for signed-out visitors, and this caller is signed in.
-        return navigation.navigate('OrganizerOnboarding');
+        // The same organizer / sub-vendor picker a signed-out visitor gets;
+        // registration then joins this account rather than making another.
+        return navigation.navigate('Join');
+      case 'switchOrganizer':
+        if (!switchingTo) switchTo('organizer');
+        return;
+      case 'switchVendor':
+        if (!switchingTo) switchTo('vendor');
+        return;
       case 'help':
         return navigation.navigate('LegalSupport');
       case 'signOut':
@@ -70,6 +87,8 @@ export function ProfileScreen() {
       return COPY.approveBadge(badges.invitationsToApprove);
     }
     if (action === 'signOut' && isLoggingOut) return COPY.signingOut;
+    if (action === 'switchOrganizer' && switchingTo === 'organizer') return COPY.switching;
+    if (action === 'switchVendor' && switchingTo === 'vendor') return COPY.switching;
     return '';
   };
 
@@ -120,9 +139,13 @@ export function ProfileScreen() {
           needs the back arrow every other pushed screen has. */}
       <AppHeader title={COPY.title} />
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <ProfileIdentity profile={profile} onEdit={openSettings} />
-        {groups.map((group) => (
-          <ProfileGroup key={group.key} group={group} badgeFor={badgeFor} onPress={go} />
+        <FadeInUp>
+          <ProfileIdentity profile={profile} onEdit={openSettings} />
+        </FadeInUp>
+        {groups.map((group, index) => (
+          <FadeInUp key={group.key} delay={90 * (index + 1)}>
+            <ProfileGroup group={group} badgeFor={badgeFor} onPress={go} />
+          </FadeInUp>
         ))}
       </ScrollView>
     </SafeAreaView>

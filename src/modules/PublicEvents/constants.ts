@@ -245,3 +245,104 @@ export function saleNote(
       return '';
   }
 }
+
+/* ------------------------------------------------------------ Poster list */
+
+/** Each category's chip and pill: an icon and a gradient. */
+export const CATEGORY_LOOK: Record<string, { icon: string; gradient: [string, string] }> = {
+  All: { icon: 'view-grid-outline', gradient: ['#ff8a5c', '#e8433a'] },
+  Music: { icon: 'music-note', gradient: ['#a084ff', '#5a35e0'] },
+  Concert: { icon: 'microphone-variant', gradient: ['#ff6f9f', '#c2416b'] },
+  Workshop: { icon: 'palette-outline', gradient: ['#3cc9a1', '#0e8a68'] },
+  Comedy: { icon: 'emoticon-happy-outline', gradient: ['#ffb547', '#e8791a'] },
+  Festival: { icon: 'party-popper', gradient: ['#f472b6', '#be185d'] },
+  Conference: { icon: 'account-group-outline', gradient: ['#5b9bff', '#2554b8'] },
+};
+
+/** A category's gradient, read off its words when it is not one of the chips. */
+export function categoryGradient(category: string): [string, string] {
+  const exact = CATEGORY_LOOK[category];
+  if (exact) return exact.gradient;
+  const c = (category ?? '').toLowerCase();
+  if (/concert|gig|launch/.test(c)) return CATEGORY_LOOK.Concert.gradient;
+  if (/music|dj|band/.test(c)) return CATEGORY_LOOK.Music.gradient;
+  if (/workshop|class|course|art/.test(c)) return CATEGORY_LOOK.Workshop.gradient;
+  if (/comedy|stand/.test(c)) return CATEGORY_LOOK.Comedy.gradient;
+  if (/festival|fest|fair/.test(c)) return CATEGORY_LOOK.Festival.gradient;
+  if (/conference|talk|summit|meetup/.test(c)) return CATEGORY_LOOK.Conference.gradient;
+  return CATEGORY_LOOK.All.gradient;
+}
+
+/** "17" and "OCT" for the date block on a poster, in the event's own zone. */
+export function dateBlock(
+  iso: string | null | undefined,
+  timezone: string,
+): { day: string; month: string } | null {
+  if (!iso) return null;
+  const at = new Date(iso);
+  if (Number.isNaN(at.getTime())) return null;
+  const part = (opts: Intl.DateTimeFormatOptions) => {
+    try {
+      return new Intl.DateTimeFormat('en-US', { ...opts, timeZone: timezone || undefined }).format(at);
+    } catch {
+      return new Intl.DateTimeFormat('en-US', opts).format(at);
+    }
+  };
+  return { day: part({ day: 'numeric' }), month: part({ month: 'short' }).toUpperCase() };
+}
+
+/** "Thu · 6:29 PM" — the time line on a poster, beside the date block. */
+export function weekdayTime(iso: string | null | undefined, timezone: string): string {
+  if (!iso) return '';
+  const at = new Date(iso);
+  if (Number.isNaN(at.getTime())) return '';
+  const fmt = (opts: Intl.DateTimeFormatOptions) => {
+    try {
+      return new Intl.DateTimeFormat('en-US', { ...opts, timeZone: timezone || undefined }).format(at);
+    } catch {
+      return new Intl.DateTimeFormat('en-US', opts).format(at);
+    }
+  };
+  return `${fmt({ weekday: 'short' })} · ${fmt({ hour: 'numeric', minute: '2-digit' })}`;
+}
+
+/** The featured banner on Home (sections/FeaturedEvents). */
+export const FEATURED_COPY = {
+  eyebrow: 'FEATURED EVENT',
+  explore: 'Explore',
+};
+
+/**
+ * "Oct 25 – 27", "Oct 31 – Nov 2" or just "Oct 25", in the event's own zone:
+ * the span a festival runs, short enough for a pill.
+ */
+export function formatDateSpan(
+  startIso: string | null | undefined,
+  endIso: string | null | undefined,
+  timezone: string,
+): string {
+  const parts = (iso: string) => {
+    const at = new Date(iso);
+    if (Number.isNaN(at.getTime())) return null;
+    const fmt = (opts: Intl.DateTimeFormatOptions) => {
+      try {
+        return new Intl.DateTimeFormat('en-IN', { ...opts, timeZone: timezone || undefined }).format(at);
+      } catch {
+        return new Intl.DateTimeFormat('en-IN', opts).format(at);
+      }
+    };
+    return { month: fmt({ month: 'short' }), day: fmt({ day: 'numeric' }), key: fmt({ year: 'numeric', month: 'numeric', day: 'numeric' }) };
+  };
+  const start = startIso ? parts(startIso) : null;
+  if (!start) return '';
+  const end = endIso ? parts(endIso) : null;
+  if (!end || end.key === start.key) return `${start.month} ${start.day}`;
+  if (end.month === start.month) return `${start.month} ${start.day} – ${end.day}`;
+  return `${start.month} ${start.day} – ${end.month} ${end.day}`;
+}
+
+/** The "Live Stream" row on Home (sections/LiveStreams). */
+export const LIVE_STREAMS_COPY = {
+  title: 'Live Stream',
+  live: 'LIVE',
+};

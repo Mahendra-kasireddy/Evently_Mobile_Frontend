@@ -191,6 +191,8 @@ export interface BrowseQuery {
   lng?: number;
   radiusKm?: number;
   limit?: number;
+  /** Events streaming right now, or with a stream scheduled and not yet begun. */
+  live?: 'now' | 'upcoming';
 }
 
 export type EventMemoryKind = 'photo' | 'video';

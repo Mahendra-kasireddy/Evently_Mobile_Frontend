@@ -1,7 +1,8 @@
 import { Fragment } from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, EventlyText, GradientFill } from '../../../Components';
 import { colors } from '../../../theme';
+import { PROFILE_ROW_GRADIENT } from '../constants';
 import { groupStyles as g, rowStyles as s } from '../styles';
 import type { ProfileAction, ProfileGroupSpec } from '../types';
 
@@ -38,8 +39,20 @@ export function ProfileGroup({ group, badgeFor, onPress }: ProfileGroupProps) {
                 accessibilityRole="button"
                 accessibilityLabel={badge ? `${row.label}, ${badge}` : row.label}
               >
-                <EventlyIcon name={row.icon} size={21} color="#5b6470" />
-                <EventlyText variant="body" style={s.label} numberOfLines={1}>
+                {/* Each row's icon on its own gradient tile, so the menu is
+                    found by colour as much as by word. */}
+                <View style={s.iconTile}>
+                  <GradientFill
+                    colors={PROFILE_ROW_GRADIENT[row.action]}
+                    direction="diagonal"
+                  />
+                  <EventlyIcon name={row.icon} size={17} color="#ffffff" />
+                </View>
+                <EventlyText
+                  variant="body"
+                  style={[s.label, row.action === 'signOut' && s.labelDanger]}
+                  numberOfLines={1}
+                >
                   {row.label}
                 </EventlyText>
                 {badge ? (
@@ -49,7 +62,7 @@ export function ProfileGroup({ group, badgeFor, onPress }: ProfileGroupProps) {
                     </EventlyText>
                   </View>
                 ) : null}
-                <EventlyIcon name="chevron-right" size={20} color={colors.textMuted} />
+                <EventlyIcon name="chevron-right" size={18} color={colors.textMuted} />
               </TouchableOpacity>
             </Fragment>
           );

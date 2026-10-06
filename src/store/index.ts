@@ -1,6 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer, { setActiveView, setAuthHydrated, setSession, type AppView } from './authSlice';
+import authReducer, {
+  setActiveView,
+  setAuthHydrated,
+  setSession,
+  toAppView,
+  type AppView,
+} from './authSlice';
 import heroDraftReducer from './heroDraftSlice';
 import locationReducer from './locationSlice';
 import onboardingReducer, { setHasSeenOnboarding, setOnboardingHydrated } from './onboardingSlice';
@@ -52,8 +58,8 @@ store.subscribe(() => {
   }
 });
 
-// Same mirror-to-disk pattern, so switching to the organizer dashboard sticks
-// across an app restart. It is cleared with the session on sign-out.
+// Same mirror-to-disk pattern, so the chosen side (customer, organizer or
+// sub-vendor) sticks across an app restart. Reset with the session on sign-out.
 let lastPersistedView: AppView = 'customer';
 store.subscribe(() => {
   const view = store.getState().auth.activeView;
@@ -85,10 +91,10 @@ async function hydrateAuth(): Promise<void> {
       lastPersistedRefreshToken = refreshToken;
       store.dispatch(setSession({ token, refreshToken }));
       // Only meaningful with a session; a stored view without a token is stale.
-      const view = await AsyncStorage.getItem(ACTIVE_VIEW_KEY);
-      if (view === 'organizer') {
-        lastPersistedView = 'organizer';
-        store.dispatch(setActiveView('organizer'));
+      const view = toAppView(await AsyncStorage.getItem(ACTIVE_VIEW_KEY));
+      if (view !== 'customer') {
+        lastPersistedView = view;
+        store.dispatch(setActiveView(view));
       }
     }
   } catch {

@@ -1,6 +1,11 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText, GradientFill } from '../../../Components';
+import {
+  EventlyIcon,
+  EventlyText,
+  GradientFill,
+  PressableScale,
+} from '../../../Components';
 import { absoluteFileUrl } from '../../../services/urls';
 import {
   DISTANCE_OPTIONS,
@@ -230,10 +235,9 @@ export function EventsNearYou({ header, coordinates, onOpenEvent }: EventsNearYo
                different nights out rather than one card repeated. */
             const accent = CARD_ACCENTS[index % CARD_ACCENTS.length];
             return (
-              <TouchableOpacity
+              <PressableScale
                 key={event.id}
                 style={s.card}
-                activeOpacity={0.85}
                 onPress={() => onOpenEvent(event.id)}
                 accessibilityRole="button"
                 accessibilityLabel={`${event.title}, ${formatEventWhen(
@@ -333,7 +337,7 @@ export function EventsNearYou({ header, coordinates, onOpenEvent }: EventsNearYo
                     </View>
                   </View>
                 </View>
-              </TouchableOpacity>
+              </PressableScale>
             );
           })}
         </ScrollView>

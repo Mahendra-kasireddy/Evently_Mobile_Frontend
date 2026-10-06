@@ -1,4 +1,5 @@
-import { TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Image, TouchableOpacity, View } from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
 import { colors } from '../../../theme';
 import { HERO_ACCENT_COLOR, HOME_NAVY } from '../constants';
@@ -7,6 +8,8 @@ import { homeHeaderStyles as s } from '../styles';
 interface HomeHeaderProps {
   /** The monogram on the avatar — the account's own, never an organizer's. */
   initials: string;
+  /** The account's own photo, absolute; '' (or one that fails to load) shows the monogram. */
+  photoUrl?: string;
   /** Only for the avatar's label, so it names who it opens. */
   displayName: string;
   unreadCount: number;
@@ -36,8 +39,9 @@ function Badge({ count }: { count: number }) {
  *
  * The avatar on the left is the way into Profile, which is no longer a tab:
  * the account is one destination reached from one place, not a peer of the
- * feed. It carries the account's initials, because the API has no photograph
- * for a customer — a stock face would be somebody else's. The badge on the
+ * feed. It shows the photo the customer added at first sign-in, and their
+ * initials when there is none or it will not load — never a stock face, which
+ * would be somebody else's. The badge on the
  * bell is a real count and disappears at zero.
  *
  * One row, not two. Search is an icon here rather than a field drawn to look
@@ -48,6 +52,7 @@ function Badge({ count }: { count: number }) {
  */
 export function HomeHeader({
   initials,
+  photoUrl = '',
   displayName,
   unreadCount,
   onPhoto = false,
@@ -59,6 +64,10 @@ export function HomeHeader({
      disc; on the canvas it is navy and unadorned. */
   const tint = onPhoto ? colors.onPrimary : HOME_NAVY;
   const iconButton = [s.iconButton, onPhoto && s.iconButtonOnPhoto];
+  // A photo that fails to load falls back to the monogram, not a blank disc.
+  const [photoFailed, setPhotoFailed] = useState(false);
+  useEffect(() => setPhotoFailed(false), [photoUrl]);
+  const showPhoto = photoUrl !== '' && !photoFailed;
   return (
     <View style={s.container}>
       <View style={s.topRow}>
@@ -70,9 +79,18 @@ export function HomeHeader({
             displayName ? `Your profile, ${displayName}` : 'Your profile'
           }
         >
-          <EventlyText variant="subtitle" style={s.avatarText}>
-            {initials}
-          </EventlyText>
+          {showPhoto ? (
+            <Image
+              source={{ uri: photoUrl }}
+              style={s.avatarImage}
+              onError={() => setPhotoFailed(true)}
+              accessibilityIgnoresInvertColors
+            />
+          ) : (
+            <EventlyText variant="subtitle" style={s.avatarText}>
+              {initials}
+            </EventlyText>
+          )}
         </TouchableOpacity>
 
         <View style={s.actions}>

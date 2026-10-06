@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText } from '../../Components';
+import { EventlyIcon, EventlyText, GradientFill } from '../../Components';
 import { absoluteFileUrl } from '../../services/urls';
 import type { RootStackParamList } from '../../navigation/types';
 import {
@@ -32,10 +32,20 @@ import {
 } from './constants';
 import { useEventDetail } from './hooks';
 import { CategoryPill, LivePill } from './sections/ui';
-import { PE_ACCENT, PE_GREEN, PE_NAVY } from './styles';
-import { PE_MUTED, PE_PURPLE, detailUi as s, ui } from './ui.styles';
+import { PE_ACCENT, PE_NAVY } from './styles';
+import { detailUi as s, ui } from './ui.styles';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'PublicEventDetail'>;
+
+/** A white icon on a small gradient tile — every fact and feature row's mark. */
+function IconTile({ icon, gradient }: { icon: string; gradient: [string, string] }) {
+  return (
+    <View style={s.iconTile}>
+      <GradientFill colors={gradient} direction="diagonal" />
+      <EventlyIcon name={icon} size={17} color="#ffffff" />
+    </View>
+  );
+}
 type Route = RouteProp<RootStackParamList, 'PublicEventDetail'>;
 
 /**
@@ -118,6 +128,9 @@ export function PublicEventDetailScreen() {
   const nothingOnSale = sellable && onSaleWithSeats.length === 0;
   const canBookMore = sellable && !limitReached && !nothingOnSale;
   const featured = data.ticketTypes[0] ?? null;
+  const lowestPrice = data.ticketTypes.length
+    ? Math.min(...data.ticketTypes.map(t => t.price))
+    : null;
   const venueLine = [data.venue?.name, data.venue?.city]
     .filter(Boolean)
     .join(', ');
@@ -188,12 +201,11 @@ export function PublicEventDetailScreen() {
           </EventlyText>
 
           <View style={s.fact}>
-            <EventlyIcon
-              name="calendar-month-outline"
-              size={17}
-              color={PE_NAVY}
-            />
+            <IconTile icon="calendar-month" gradient={['#ff8a5c', '#e8433a']} />
             <View style={s.factText}>
+              <EventlyText variant="caption" style={s.factLabel}>
+                Date & time
+              </EventlyText>
               <EventlyText variant="body" style={s.factValue}>
                 {formatEventWhen(data.startDateTime, data.timezone)}
               </EventlyText>
@@ -202,12 +214,11 @@ export function PublicEventDetailScreen() {
 
           {venueLine || data.venue?.address ? (
             <View style={s.fact}>
-              <EventlyIcon
-                name="map-marker-outline"
-                size={17}
-                color={PE_NAVY}
-              />
+              <IconTile icon="map-marker" gradient={['#a084ff', '#5a35e0']} />
               <View style={s.factText}>
+                <EventlyText variant="caption" style={s.factLabel}>
+                  Venue
+                </EventlyText>
                 <EventlyText variant="body" style={s.factValue}>
                   {venueLine}
                 </EventlyText>
@@ -226,17 +237,27 @@ export function PublicEventDetailScreen() {
 
           {data.contactName ? (
             <View style={s.organizer}>
-              <View style={s.avatar}>
-                <EventlyText variant="caption" style={s.avatarText}>
-                  {initialsOf(data.contactName)}
+              {/* Initials in a ring of the brand's gradient. */}
+              <View style={s.avatarRing}>
+                <GradientFill colors={['#ff8a5c', '#7c5cdb']} direction="diagonal" />
+                <View style={s.avatar}>
+                  <EventlyText variant="caption" style={s.avatarText}>
+                    {initialsOf(data.contactName)}
+                  </EventlyText>
+                </View>
+              </View>
+              <View style={s.organizerText}>
+                <EventlyText variant="caption" style={s.factLabel}>
+                  Hosted by
+                </EventlyText>
+                <EventlyText variant="body" style={s.organizerName} numberOfLines={1}>
+                  {data.contactName}
                 </EventlyText>
               </View>
-              <View>
-                <EventlyText variant="body" style={s.organizerName}>
-                  {`By ${data.contactName}`}
-                </EventlyText>
-                <EventlyText variant="caption" style={ui.muted}>
-                  Event Organizer
+              <View style={s.organizerBadge}>
+                <EventlyIcon name="check-decagram" size={13} color="#2554b8" />
+                <EventlyText variant="caption" style={s.organizerBadgeText}>
+                  Organizer
                 </EventlyText>
               </View>
             </View>
@@ -245,12 +266,15 @@ export function PublicEventDetailScreen() {
           {/* Already booked: say so first, and where the ticket lives. */}
           {holder ? (
             <View style={s.going}>
-              <EventlyIcon name="check-circle" size={22} color={PE_GREEN} />
+              <GradientFill colors={['#3cc9a1', '#0e8a68']} direction="diagonal" />
+              <View style={s.goingIcon}>
+                <EventlyIcon name="ticket-confirmation" size={20} color="#0e8a68" />
+              </View>
               <View style={s.featureText}>
-                <EventlyText variant="body" style={s.featureTitle}>
+                <EventlyText variant="body" style={s.goingTitle}>
                   {data.you.checkedIn ? 'You’re checked in!' : 'You’re going!'}
                 </EventlyText>
-                <EventlyText variant="caption" style={ui.muted}>
+                <EventlyText variant="caption" style={s.goingBody}>
                   Your ticket is saved in My Tickets.
                 </EventlyText>
               </View>
@@ -298,16 +322,15 @@ export function PublicEventDetailScreen() {
               word when there is not, so they are not left looking for it. */}
           {live.enabled ? (
             <TouchableOpacity
-              style={[s.feature, s.featureLive]}
+              style={s.feature}
               onPress={() =>
                 navigation.navigate('PublicEventLive', { eventId: data.id })
               }
               accessibilityRole="button"
             >
-              <EventlyIcon
-                name={live.state === 'live' ? 'broadcast' : 'television-play'}
-                size={22}
-                color="#d93b3b"
+              <IconTile
+                icon={live.state === 'live' ? 'broadcast' : 'television-play'}
+                gradient={['#ff7a7a', '#d93b3b']}
               />
               <View style={s.featureText}>
                 <EventlyText variant="body" style={s.featureTitle}>
@@ -325,7 +348,7 @@ export function PublicEventDetailScreen() {
             </TouchableOpacity>
           ) : holder ? (
             <View style={[s.feature, s.featureOff]}>
-              <EventlyIcon name="television-off" size={22} color={PE_MUTED} />
+              <IconTile icon="television-off" gradient={['#b8c0cc', '#8a93a3']} />
               <View style={s.featureText}>
                 <EventlyText variant="body" style={s.featureTitle}>
                   Live Stream
@@ -346,11 +369,7 @@ export function PublicEventDetailScreen() {
               }
               accessibilityRole="button"
             >
-              <EventlyIcon
-                name="image-multiple-outline"
-                size={22}
-                color={PE_PURPLE}
-              />
+              <IconTile icon="image-multiple" gradient={['#a084ff', '#5a35e0']} />
               <View style={s.featureText}>
                 <EventlyText variant="body" style={s.featureTitle}>
                   Event Memories
@@ -365,11 +384,7 @@ export function PublicEventDetailScreen() {
             </TouchableOpacity>
           ) : holder ? (
             <View style={[s.feature, s.featureOff]}>
-              <EventlyIcon
-                name="image-off-outline"
-                size={22}
-                color={PE_MUTED}
-              />
+              <IconTile icon="image-off-outline" gradient={['#b8c0cc', '#8a93a3']} />
               <View style={s.featureText}>
                 <EventlyText variant="body" style={s.featureTitle}>
                   Event Memories
@@ -416,6 +431,9 @@ export function PublicEventDetailScreen() {
               }
               accessibilityRole="button"
             >
+              <View style={s.ticketStrip}>
+                <GradientFill colors={['#ff8a5c', '#7c5cdb']} direction="down" />
+              </View>
               <View style={s.ticketHead}>
                 <EventlyText
                   variant="body"
@@ -424,9 +442,11 @@ export function PublicEventDetailScreen() {
                 >
                   {featured.name}
                 </EventlyText>
-                <EventlyText variant="body" style={s.ticketPrice}>
-                  {formatPrice(featured.price)}
-                </EventlyText>
+                <View style={s.ticketPricePill}>
+                  <EventlyText variant="body" style={s.ticketPrice}>
+                    {formatPrice(featured.price)}
+                  </EventlyText>
+                </View>
               </View>
               {featured.description ? (
                 <EventlyText
@@ -476,28 +496,50 @@ export function PublicEventDetailScreen() {
             You’ve booked the most tickets allowed per person for this event.
           </EventlyText>
         ) : null}
-        <TouchableOpacity
-          style={[ui.primary, !canBookMore && ui.primaryOff]}
-          disabled={!canBookMore}
-          onPress={() =>
-            navigation.navigate('EventTicketSelection', { eventId: data.id })
-          }
-          accessibilityRole="button"
-          accessibilityLabel={PUBLIC_EVENTS_COPY.bookCta}
-          testID="book-ticket"
-        >
-          <EventlyText variant="body" style={ui.primaryText}>
-            {data.soldOut
-              ? PUBLIC_EVENTS_COPY.soldOut
-              : limitReached
-              ? 'Booking Limit Reached'
-              : nothingOnSale
-              ? note || 'Tickets Not On Sale'
-              : holder
-              ? 'Book More Tickets'
-              : PUBLIC_EVENTS_COPY.bookCta}
-          </EventlyText>
-        </TouchableOpacity>
+        <View style={s.barRow}>
+          {/* What it costs from, beside the button that buys it. */}
+          {lowestPrice !== null && canBookMore ? (
+            <View style={s.barPrice}>
+              <EventlyText variant="caption" style={s.barPriceLabel}>
+                Starting at
+              </EventlyText>
+              <EventlyText variant="h2" style={s.barPriceValue}>
+                {formatPrice(lowestPrice)}
+              </EventlyText>
+            </View>
+          ) : null}
+          <TouchableOpacity
+            style={[s.bookButton, !canBookMore && s.bookButtonOff]}
+            disabled={!canBookMore}
+            onPress={() =>
+              navigation.navigate('EventTicketSelection', { eventId: data.id })
+            }
+            accessibilityRole="button"
+            accessibilityLabel={PUBLIC_EVENTS_COPY.bookCta}
+            testID="book-ticket"
+          >
+            <GradientFill
+              colors={canBookMore ? ['#ff8a5c', '#e8433a'] : ['#c4cad4', '#9aa3b2']}
+              direction="across"
+            />
+            <EventlyIcon
+              name={canBookMore ? 'ticket-confirmation' : 'lock-outline'}
+              size={17}
+              color="#ffffff"
+            />
+            <EventlyText variant="body" style={s.bookText} numberOfLines={1}>
+              {data.soldOut
+                ? PUBLIC_EVENTS_COPY.soldOut
+                : limitReached
+                ? 'Booking Limit Reached'
+                : nothingOnSale
+                ? note || 'Tickets Not On Sale'
+                : holder
+                ? 'Book More Tickets'
+                : PUBLIC_EVENTS_COPY.bookCta}
+            </EventlyText>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );

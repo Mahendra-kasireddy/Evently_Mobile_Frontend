@@ -28,7 +28,7 @@ export const layout = {
   headerHeight: 56,
   headerPadding: 16,
   /** The back chevron itself. */
-  backIcon: 20,
+  backIcon: 24,
   /** Its touch target — the icon is 20, the tappable area is not. */
   backTouch: 44,
   /** Gap between the back button and the title. */

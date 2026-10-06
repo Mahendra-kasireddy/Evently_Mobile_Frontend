@@ -4,11 +4,8 @@ import {
 } from '@react-navigation/bottom-tabs';
 import { ChatScreen } from '../modules/Chat';
 import { HomeScreen } from '../modules/Home';
-import { OrganizerHomeScreen } from '../modules/OrganizerHome';
 import { PlanScreen } from '../modules/Plan';
 import { PublicEventsScreen } from '../modules/PublicEvents';
-import { selectIsOrganizerView } from '../store/authSlice';
-import { useAppSelector } from '../store/hooks';
 import { EventlyTabBar } from './EventlyTabBar';
 import type { MainTabParamList } from './types';
 
@@ -18,13 +15,11 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
    component — and remount it — every time it renders. */
 const renderTabBar = (props: BottomTabBarProps) => <EventlyTabBar {...props} />;
 
+/**
+ * The customer app's tabs. Business accounts never see these: the root stack
+ * renders BusinessHome (the web dashboard) in their place.
+ */
 export function MainTabNavigator() {
-  /*
-   * The chosen view, not the role list. An account that holds both roles —
-   * anyone who registered as an organizer keeps the customer role too — used to be
-   * forced into the organizer dashboard on every login.
-   */
-  const isOrganizer = useAppSelector(selectIsOrganizerView);
   return (
     <Tab.Navigator
       /* The app's own bar: a floating card, each tab in its own gradient.
@@ -32,13 +27,7 @@ export function MainTabNavigator() {
       tabBar={renderTabBar}
       screenOptions={{ headerShown: false }}
     >
-      {/* The organizer dashboard replaces the customer feed only while the
-          organizer view is active — switched from Profile. Plan/Chat stay
-          shared for now. */}
-      <Tab.Screen
-        name="Home"
-        component={isOrganizer ? OrganizerHomeScreen : HomeScreen}
-      />
+      <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Plan" component={PlanScreen} />
       {/* Public events — shows, workshops and nights out with tickets. The
           customer's own bookings, and the tickets bought here, are on the

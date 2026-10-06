@@ -114,7 +114,9 @@ export const homeHeaderStyles = StyleSheet.create({
     backgroundColor: HOME_ACCENT_SOFT,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
+  avatarImage: { width: '100%', height: '100%' },
   /* On the photo it needs an edge of its own, so a pale disc on a pale part
      of the picture still reads as a control. */
   avatarOnPhoto: {
@@ -2029,6 +2031,7 @@ export const packageCardStyles = StyleSheet.create({
       android: { elevation: 3 },
     }),
   },
+  pressArea: { flex: 1 },
   press: { flex: 1, borderRadius: 22, overflow: 'hidden' },
   fill: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
   art: {
@@ -2153,6 +2156,8 @@ export const organizerRowStyles = StyleSheet.create({
     }),
   },
   cardInGrid: { width: '48.5%' },
+  /* In the grid the touch area takes the column; the card fills it. */
+  cardFill: { width: '100%' },
   cover: { height: 124 },
   coverImage: {
     width: '100%',
