@@ -56,11 +56,24 @@ const fs: {
 
 const feed = (over: Partial<HomeFeedDTO>): HomeFeedDTO => over as HomeFeedDTO;
 
+/*
+ * Every tree is unmounted after its test. A card with a running animation —
+ * the hero's pulsing status dot loops for as long as it is mounted — would
+ * otherwise keep its timers alive and Jest would never exit.
+ */
+const mounted: ReactTestRenderer.ReactTestRenderer[] = [];
+afterEach(() => {
+  ReactTestRenderer.act(() => {
+    mounted.splice(0).forEach(tree => tree.unmount());
+  });
+});
+
 function render(node: React.ReactElement) {
   let tree!: ReactTestRenderer.ReactTestRenderer;
   ReactTestRenderer.act(() => {
     tree = ReactTestRenderer.create(node);
   });
+  mounted.push(tree);
   return tree;
 }
 
@@ -758,7 +771,11 @@ describe('EventHero', () => {
 
     expect(text).toContain('Quotes received');
     expect(text).toContain('Naming ceremony');
-    expect(text).toContain('5 Sep 2026 · Kukatpally · 150 guests');
+    // The facts are chips now, one each — and the headcount says "guests" once.
+    expect(text).toContain('5 Sep 2026');
+    expect(text).toContain('Kukatpally');
+    expect(text).toContain('150 guests');
+    expect(text).not.toContain('guests guests');
     expect(text).toContain(
       'Your request went to 4 organizers · 3 have replied',
     );
@@ -812,6 +829,25 @@ describe('EventHero', () => {
     );
     expect(text).not.toContain('Lowest');
     expect(text).not.toContain('line items');
+  });
+
+  it('shows where a sent brief is while waiting on replies', () => {
+    const text = textOf(
+      render(
+        hero({
+          stage: 'submitted',
+          quoteCount: 0,
+          lowestQuote: 0,
+          highestQuote: 0,
+          quotes: [],
+          awaiting: [],
+        }),
+      ),
+    );
+    expect(text).toContain('Awaiting organizer response');
+    expect(text).toContain('Brief sent');
+    expect(text).toContain('Organizers reviewing');
+    expect(text).toContain('Quotes arrive');
   });
 
   it('is two controls while the rows are not tappable', () => {

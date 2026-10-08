@@ -541,3 +541,37 @@ export const ORGANIZER_COPY = {
  * has to land somewhere that is actually about that package.
  */
 export const PACKAGE_EXPLORE_CTA = 'Explore package';
+
+/**
+ * The current-event card's status pill, per stage, as a gradient: amber while
+ * waiting on someone, green once there is something to act on, blue while a
+ * booking settles, coral on the day, violet when it is done.
+ */
+export const CURRENT_EVENT_STAGE_GRADIENT: Record<CurrentEventStage, [string, string]> = {
+  draft: ['#9aa7c7', '#6b7a9e'],
+  submitted: ['#ffb547', '#f0791a'],
+  quotes_received: ['#3cc9a1', '#0e8a68'],
+  quote_accepted: ['#3cc9a1', '#0e8a68'],
+  booking_created: ['#5b9bff', '#2554b8'],
+  booking_confirmed: ['#3cc9a1', '#0e8a68'],
+  in_progress: ['#ff8a5c', '#e8433a'],
+  completed: ['#a084ff', '#5a35e0'],
+};
+
+/** The card's ground: a warm blush into a soft lavender. */
+export const EVENT_HERO_GRADIENT: [string, string] = ['#fff3ea', '#efe9ff'];
+/** The event's name: coral through rose into violet. */
+export const EVENT_HERO_TITLE_GRADIENT = ['#e8633a', '#e2477a', '#7c5cdb'] as const;
+/** Each fact's icon disc. */
+export const EVENT_FACT_GRADIENT = {
+  when: ['#ff8a5c', '#e8433a'] as [string, string],
+  where: ['#a084ff', '#5a35e0'] as [string, string],
+  guests: ['#3cc9a1', '#0e8a68'] as [string, string],
+};
+/** "23 days to go". */
+export const EVENT_DAYS_GRADIENT: [string, string] = ['#ff6f9f', '#c2416b'];
+/** Its main button. */
+export const EVENT_HERO_CTA_GRADIENT: [string, string] = ['#f47b4d', '#e2477a'];
+
+/** The three steps a sent brief walks through before the quotes are in. */
+export const BRIEF_JOURNEY_STEPS = ['Brief sent', 'Organizers reviewing', 'Quotes arrive'] as const;

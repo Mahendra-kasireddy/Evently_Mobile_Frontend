@@ -84,6 +84,13 @@ export function PaymentScreen() {
         bookingId: booking.id,
         organizerName: booking.organizer?.name ?? '',
         inCash,
+        ref: booking.ref,
+        title: booking.title,
+        location: booking.location,
+        eventDate: booking.eventDate ?? null,
+        advanceAmount: booking.advanceAmount,
+        balanceAmount: booking.balanceAmount,
+        respondBy: booking.organizerRespondBy ?? null,
       }),
     [navigation],
   );

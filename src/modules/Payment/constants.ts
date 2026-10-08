@@ -80,18 +80,39 @@ export const PAYMENT_COPY = {
 
 export const SUCCESS_COPY = {
   title: 'Payment',
+  // "Advance paid", not "confirmed": the organizer has yet to accept.
   heading: 'Advance paid',
-  /** Filled with the organizer's name and what happens next. */
-  body: (organizer: string) =>
-    `${organizer} has been notified. They have 48 hours to confirm, and the balance is due before your event.`,
+  /** Filled with the organizer's name. */
+  body: (organizer: string) => `${organizer} has been notified and has 48 hours to confirm.`,
   /*
    * The cash receipt says something different because something different
    * happened: the event is booked, but the advance is still owed. Calling this
-   * "Advance paid" would tell the customer money had changed hands when it has
-   * not — and the amount is theirs to hand over.
+   * "paid" would tell the customer money had changed hands when it has not —
+   * and the amount is theirs to hand over.
    */
   cashHeading: 'Booked · pay in cash',
   cashBody: (organizer: string) =>
     `${organizer} has been notified and has 48 hours to confirm. Pay them the advance directly — it shows as paid here once they confirm it.`,
+  advance: 'Advance',
+  balance: 'Balance due',
+  date: 'Event date',
+  venue: 'Venue',
+  paid: 'Paid',
+  payInCash: 'Pay in cash',
+  nextTitle: 'What happens next',
+  /** The three steps after booking, per way of paying. */
+  next: {
+    cash: (organizer: string, advance: string, by: string) => [
+      { icon: 'account-check-outline', title: `${organizer} confirms`, body: by ? `They accept or decline by ${by}.` : 'They have 48 hours to accept or decline.' },
+      { icon: 'cash', title: `Hand over ${advance || 'the advance'}`, body: 'Pay your organizer directly, in cash.' },
+      { icon: 'check-decagram-outline', title: 'Marked as paid', body: 'It shows as paid here once they confirm receiving it.' },
+    ],
+    online: (organizer: string, balance: string, by: string) => [
+      { icon: 'account-check-outline', title: `${organizer} confirms`, body: by ? `They accept or decline by ${by}.` : 'They have 48 hours to accept or decline.' },
+      { icon: 'clipboard-text-outline', title: 'Plan it together', body: 'Tasks, ideas and invitations live in your workspace.' },
+      { icon: 'wallet-outline', title: balance ? `Pay ${balance} balance` : 'Pay the balance', body: 'Due before your event.' },
+    ],
+  },
   cta: 'Open workspace',
+  home: 'Back to home',
 } as const;

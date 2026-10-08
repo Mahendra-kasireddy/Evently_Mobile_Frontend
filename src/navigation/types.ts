@@ -180,6 +180,14 @@ export type RootStackParamList = {
     bookingId: string;
     organizerName?: string;
     inCash?: boolean;
+    /** The receipt, from the booking the server just wrote. All optional. */
+    ref?: string;
+    title?: string;
+    location?: string;
+    eventDate?: string | null;
+    advanceAmount?: number;
+    balanceAmount?: number;
+    respondBy?: string | null;
   };
   /** One organizer's full profile. `name` is only for the first render. */
   Organizer: { organizerId: string; name?: string };

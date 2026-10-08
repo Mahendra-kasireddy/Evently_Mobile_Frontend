@@ -4,7 +4,7 @@ import { absoluteFileUrl } from '../../../services/urls';
 import { colors } from '../../../theme';
 import { INVITATION_COPY as COPY, INV_ACCENT } from '../constants';
 import { artworkStyles as s } from '../styles';
-import { canPlayVideo, HeroVideo } from './HeroVideo';
+import { canPlayVideo, HeroVideo, type VideoMode } from './HeroVideo';
 import type { InvitationDTO } from '../types';
 
 /** The uploaded invitation, or nothing at all. */
@@ -39,7 +39,16 @@ export function artworkOf(invitation: InvitationDTO): Artwork | null {
  * crop would cut the names off the top of somebody's wedding card. The ground
  * behind it is dark so a card with a white border still reads as a card.
  */
-function Media({ artwork, style }: { artwork: Artwork; style: object }) {
+function Media({
+  artwork,
+  style,
+  mode = 'ambient',
+}: {
+  artwork: Artwork;
+  style: object;
+  /** `ambient` in the card (a tap opens the viewer); `player` full screen. */
+  mode?: VideoMode;
+}) {
   if (artwork.kind === 'video') {
     /* A video this build cannot play is not a broken invitation — it is one
        the customer has to be told about rather than shown a black box. */
@@ -53,7 +62,7 @@ function Media({ artwork, style }: { artwork: Artwork; style: object }) {
         </View>
       );
     }
-    return <HeroVideo uri={absoluteFileUrl(artwork.url)} style={style} />;
+    return <HeroVideo uri={absoluteFileUrl(artwork.url)} style={style} mode={mode} fit="contain" />;
   }
   return (
     <EventlyImage
@@ -129,7 +138,7 @@ export function ArtworkViewer({
   return (
     <Modal visible={visible && artwork !== null} animationType="fade" onRequestClose={onClose}>
       <View style={s.viewer}>
-        {artwork ? <Media artwork={artwork} style={s.viewerMedia} /> : null}
+        {artwork ? <Media artwork={artwork} style={s.viewerMedia} mode="player" /> : null}
         <TouchableOpacity
           style={s.viewerClose}
           activeOpacity={0.8}

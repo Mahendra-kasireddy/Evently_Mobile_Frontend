@@ -35,6 +35,14 @@ export interface PaidBookingDTO {
   id: string;
   ref: string;
   organizer: { id: string; name: string } | null;
+  /* The rest of the booking, for the receipt. Optional: an older server sends less. */
+  title?: string;
+  location?: string;
+  eventDate?: string | null;
+  advanceAmount?: number;
+  balanceAmount?: number;
+  /** When the organizer must accept or decline by. */
+  organizerRespondBy?: string | null;
 }
 
 /**
