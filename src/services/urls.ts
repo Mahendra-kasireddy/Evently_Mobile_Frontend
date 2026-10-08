@@ -3,7 +3,7 @@ import { env } from './env';
 /**
  * The API's origin — scheme and host, without the `/api` path.
  *
- * `env.apiBaseUrl` is "http://10.0.2.2:3000/api"; an uploaded file's URL from
+ * `env.apiBaseUrl` is e.g. "http://10.0.2.2:3000/api"; an uploaded file's URL from
  * the local storage driver is "/api/upload/file/<key>", which already carries
  * that path. Joining them naively would produce "…/api/api/upload/…".
  */

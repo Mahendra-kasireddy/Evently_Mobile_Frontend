@@ -23,7 +23,9 @@ describe('invitation video', () => {
 
   it('cannot be broken out of by the URL', () => {
     const html = videoHtml('https://x/a.mp4"><script>alert(1)</script>', 'player', 'contain');
-    expect(html).not.toContain('<script>');
+    // The page's own one script, and no second one smuggled in by the URL.
+    expect(html.split('<script>').length - 1).toBe(1);
+    expect(html).not.toContain('alert(1)</script>');
     expect(html).toContain('&quot;&gt;&lt;script&gt;');
   });
 });
