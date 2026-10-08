@@ -1,6 +1,11 @@
 import { View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
-import { EventlyIcon, EventlyImage, EventlyText, OccasionArt } from '../../../Components';
+import {
+  EventlyIcon,
+  EventlyImage,
+  EventlyText,
+  OccasionArt,
+} from '../../../Components';
 import type { OccasionArtKey } from '../../../Components/OccasionArt';
 import { absoluteFileUrl } from '../../../services/urls';
 import {
@@ -26,7 +31,9 @@ const ART_KEYS: OccasionArtKey[] = [
 
 function artFor(occasion: string): OccasionArtKey {
   const key = (occasion ?? '').trim().toLowerCase();
-  return (ART_KEYS as string[]).includes(key) ? (key as OccasionArtKey) : 'wedding';
+  return (ART_KEYS as string[]).includes(key)
+    ? (key as OccasionArtKey)
+    : 'wedding';
 }
 
 /**
@@ -41,7 +48,9 @@ export function normalizeTemplate(
   template: InvitationTemplateDTO | undefined,
 ): InvitationTemplateDTO {
   if (!template) return COVER_FALLBACK_TEMPLATE;
-  const stops = Array.isArray(template.heroStops) ? template.heroStops.filter(Boolean) : [];
+  const stops = Array.isArray(template.heroStops)
+    ? template.heroStops.filter(Boolean)
+    : [];
   return {
     ...template,
     heroStops: stops.length >= 2 ? stops : COVER_FALLBACK_TEMPLATE.heroStops,
@@ -52,7 +61,7 @@ export function normalizeTemplate(
 /** The chosen theme, or the one this build falls back to. */
 export function templateFor(invitation: InvitationDTO): InvitationTemplateDTO {
   const id = invitation.details.template;
-  const found = invitation.templates?.find((t) => t.id === id);
+  const found = invitation.templates?.find(t => t.id === id);
   return normalizeTemplate(found ?? invitation.templates?.[0]);
 }
 
@@ -85,7 +94,9 @@ export function coverContent(invitation: InvitationDTO) {
   const address = (details.venueAddress ?? '').trim();
   const flat = (v: string) => v.toLowerCase().replace(/[\s,.]/g, '');
   const venue =
-    name && address && (flat(address).includes(flat(name)) || flat(name).includes(flat(address)))
+    name &&
+    address &&
+    (flat(address).includes(flat(name)) || flat(name).includes(flat(address)))
       ? [name, address].sort((a, b) => b.length - a.length)[0]
       : [name, address].filter(Boolean).join(', ');
 
@@ -127,16 +138,20 @@ export function CoverBlock({ invitation, mode }: CoverBlockProps) {
   const { eyebrow, names, when, venue, message } = coverContent(invitation);
 
   const fontId = details.fontStyle ?? COVER_FONT_FALLBACK;
-  const nameFont = COVER_FONT_STYLE[fontId] ?? COVER_FONT_STYLE[COVER_FONT_FALLBACK];
-  const nameText = fontId === COVER_FONT_UPPERCASE ? names.toUpperCase() : names;
+  const nameFont =
+    COVER_FONT_STYLE[fontId] ?? COVER_FONT_STYLE[COVER_FONT_FALLBACK];
+  const nameText =
+    fontId === COVER_FONT_UPPERCASE ? names.toUpperCase() : names;
 
   const mediaType = details.heroMediaType ?? '';
   const mediaUrl = (details.heroMediaUrl ?? '').trim();
   const showImage = mediaType === 'image' && mediaUrl.length > 0;
-  const showVideo = mediaType === 'video' && mediaUrl.length > 0 && canPlayVideo;
+  const showVideo =
+    mediaType === 'video' && mediaUrl.length > 0 && canPlayVideo;
   /* A saved video this build cannot play is not a broken cover — it falls back
      to the theme, and only the editor is told why. */
-  const videoUnplayable = mediaType === 'video' && mediaUrl.length > 0 && !canPlayVideo;
+  const videoUnplayable =
+    mediaType === 'video' && mediaUrl.length > 0 && !canPlayVideo;
   const hasMedia = showImage || showVideo;
 
   const stops = template.heroStops;
@@ -145,7 +160,12 @@ export function CoverBlock({ invitation, mode }: CoverBlockProps) {
   const body = (
     <>
       <View style={s.layer}>
-        <Svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <Svg
+          width="100%"
+          height="100%"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+        >
           <Defs>
             <LinearGradient id={gradientId} x1="12%" y1="0%" x2="88%" y2="100%">
               {stops.map((colour, i) => (
@@ -157,7 +177,13 @@ export function CoverBlock({ invitation, mode }: CoverBlockProps) {
               ))}
             </LinearGradient>
           </Defs>
-          <Rect x={0} y={0} width={100} height={100} fill={`url(#${gradientId})`} />
+          <Rect
+            x={0}
+            y={0}
+            width={100}
+            height={100}
+            fill={`url(#${gradientId})`}
+          />
         </Svg>
       </View>
 
@@ -189,7 +215,10 @@ export function CoverBlock({ invitation, mode }: CoverBlockProps) {
       ) : null}
 
       {/* Photographs are unpredictable; the words on top are not optional. */}
-      <View style={[s.layer, hasMedia ? s.scrimStrong : s.scrim]} pointerEvents="none" />
+      <View
+        style={[s.layer, hasMedia ? s.scrimStrong : s.scrim]}
+        pointerEvents="none"
+      />
 
       <View style={s.body}>
         {eyebrow ? (
@@ -228,7 +257,11 @@ export function CoverBlock({ invitation, mode }: CoverBlockProps) {
           <EventlyText variant="caption" style={s.scrollText}>
             {COPY.coverScroll.toUpperCase()}
           </EventlyText>
-          <EventlyIcon name="chevron-down" size={18} color="rgba(255,255,255,0.72)" />
+          <EventlyIcon
+            name="chevron-down"
+            size={18}
+            color="rgba(255,255,255,0.72)"
+          />
         </View>
 
         {/* Only the customer is told this, and only when it is true. */}
@@ -242,7 +275,10 @@ export function CoverBlock({ invitation, mode }: CoverBlockProps) {
   );
 
   return (
-    <View style={[s.card, mode === 'guest' && s.full]} testID="invitation-cover">
+    <View
+      style={[s.card, mode === 'guest' && s.full]}
+      testID="invitation-cover"
+    >
       {body}
     </View>
   );

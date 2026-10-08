@@ -107,70 +107,60 @@ export const sectionStyles = StyleSheet.create({
   emptyText: { color: colors.textMuted, fontSize: 13.5, lineHeight: 19 },
 });
 
-export const milestoneStyles = StyleSheet.create({
-  row: { ...globalStyles.row, gap: spacing.sm, paddingVertical: spacing.sm - 2 },
-  dot: {
-    width: 20,
-    height: 20,
-    borderRadius: 999,
-    backgroundColor: '#e6e9f0',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dotDone: { backgroundColor: colors.success },
-  label: { color: colors.textMuted, flex: 1 },
-  labelDone: { color: WORKSPACE_NAVY, fontWeight: '700' },
-});
 
-export const paymentStyles = StyleSheet.create({
-  statusRow: { ...globalStyles.row, justifyContent: 'space-between' },
-  statusLabel: { color: WORKSPACE_NAVY, fontWeight: '700' },
-  total: { color: colors.textMuted, fontSize: 13, lineHeight: 18 },
-  track: {
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.surface,
-    marginTop: spacing.sm,
-    overflow: 'hidden',
-  },
-  fill: { height: '100%', backgroundColor: WORKSPACE_ACCENT, borderRadius: 4 },
-  amounts: { ...globalStyles.row, justifyContent: 'space-between', marginTop: spacing.sm },
-  amountLabel: { color: colors.textMuted, fontSize: 12.5, lineHeight: 17 },
-  amountValue: { color: WORKSPACE_NAVY, fontSize: 14, lineHeight: 19, fontWeight: '700' },
-});
 
-export const taskStyles = StyleSheet.create({
-  row: { paddingVertical: spacing.sm },
-  divider: { borderTopWidth: 1, borderTopColor: colors.border },
-  headRow: { ...globalStyles.row, justifyContent: 'space-between', gap: spacing.sm },
-  title: {
-    color: WORKSPACE_NAVY,
-    fontSize: 14,
-    lineHeight: 19,
-    fontWeight: '700',
-    flexShrink: 1,
-  },
-  statusPill: { borderRadius: 999, paddingHorizontal: spacing.sm, paddingVertical: 2 },
-  statusText: { fontWeight: '700', fontSize: 11 },
-  meta: { color: colors.textMuted, fontSize: 12.5, lineHeight: 17, marginTop: 2 },
-});
 
-export const timelineStyles = StyleSheet.create({
-  row: { flexDirection: 'row', gap: spacing.sm },
-  rail: { width: 20, alignItems: 'center' },
-  dot: { width: 9, height: 9, borderRadius: 999, backgroundColor: WORKSPACE_ACCENT, marginTop: 5 },
-  line: { flex: 1, width: 1, backgroundColor: colors.border, marginTop: 2 },
-  body: { flex: 1, paddingBottom: spacing.md },
-  label: { color: WORKSPACE_NAVY, fontSize: 14, lineHeight: 19, fontWeight: '700' },
-  note: { color: colors.textMuted, fontSize: 12.5, lineHeight: 17, marginTop: 1 },
-  at: { color: colors.textMuted, fontSize: 12, lineHeight: 16, marginTop: 2 },
-});
 
 /**
  * The two "open something bigger" rows in the workspace: the ideas board and
  * the guest invitation. Both summarise real state and lead to their own
  * screen, so they share one layout.
  */
+/**
+ * The two "open something bigger" rows in the workspace: the ideas board and
+ * the guest invitation. Both summarise real state and lead to their own
+ * screen, so they share one layout.
+ */
+export const summaryRowStyles = StyleSheet.create({
+  /*
+   * Tight gaps and a button that never grows. Poppins sets wider than the
+   * platform faces this row was first measured in, and the description here is
+   * the longest text on the screen — every point taken from the gutters and
+   * from the button's padding is a point the sentence gets back.
+   */
+  row: { ...globalStyles.row, gap: 12, alignItems: 'flex-start' },
+  iconChip: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: WORKSPACE_ACCENT_SOFT,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  /* The two cards are different errands — one is a conversation about the
+     event, the other is a document to approve — so they are told apart by
+     colour before they are read. */
+  iconChipIdeas: { backgroundColor: WORKSPACE_VIOLET_SOFT },
+  iconChipInvite: { backgroundColor: WORKSPACE_GREEN_SOFT },
+  text: { flex: 1 },
+  title: { color: WORKSPACE_NAVY, fontSize: 14, lineHeight: 19, fontWeight: '700' },
+  body: { color: colors.textMuted, fontSize: 12.5, lineHeight: 17, marginTop: 2 },
+  cta: {
+    ...globalStyles.row,
+    gap: 2,
+    flexShrink: 0,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: spacing.sm,
+    backgroundColor: WORKSPACE_ACCENT,
+  },
+  ctaGhost: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.border },
+  ctaText: { color: colors.onPrimary, fontSize: 12.5, fontWeight: '700' },
+  ctaGhostText: { color: WORKSPACE_NAVY, fontSize: 12.5, fontWeight: '700' },
+  /** The organizer has not shared an invitation yet — a step, not an error. */
+  pendingText: { color: colors.textMuted, fontSize: 12.5, lineHeight: 17 },
+});
+
 /* ---------------------------------------------------------------------------
  * The ideas & planning card.
  *
@@ -259,45 +249,6 @@ export const ideasCardStyles = StyleSheet.create({
   ctaText: { color: colors.onPrimary, fontSize: 13.5, fontWeight: '700' },
 });
 
-export const summaryRowStyles = StyleSheet.create({
-  /*
-   * Tight gaps and a button that never grows. Poppins sets wider than the
-   * platform faces this row was first measured in, and the description here is
-   * the longest text on the screen — every point taken from the gutters and
-   * from the button's padding is a point the sentence gets back.
-   */
-  row: { ...globalStyles.row, gap: 12, alignItems: 'flex-start' },
-  iconChip: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: WORKSPACE_ACCENT_SOFT,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  /* The two cards are different errands — one is a conversation about the
-     event, the other is a document to approve — so they are told apart by
-     colour before they are read. */
-  iconChipIdeas: { backgroundColor: WORKSPACE_VIOLET_SOFT },
-  iconChipInvite: { backgroundColor: WORKSPACE_GREEN_SOFT },
-  text: { flex: 1 },
-  title: { color: WORKSPACE_NAVY, fontSize: 14, lineHeight: 19, fontWeight: '700' },
-  body: { color: colors.textMuted, fontSize: 12.5, lineHeight: 17, marginTop: 2 },
-  cta: {
-    ...globalStyles.row,
-    gap: 2,
-    flexShrink: 0,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: spacing.sm,
-    backgroundColor: WORKSPACE_ACCENT,
-  },
-  ctaGhost: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.border },
-  ctaText: { color: colors.onPrimary, fontSize: 12.5, fontWeight: '700' },
-  ctaGhostText: { color: WORKSPACE_NAVY, fontSize: 12.5, fontWeight: '700' },
-  /** The organizer has not shared an invitation yet — a step, not an error. */
-  pendingText: { color: colors.textMuted, fontSize: 12.5, lineHeight: 17 },
-});
 
 export const boardStyles = StyleSheet.create({
   content: { paddingBottom: spacing.xl },
@@ -612,237 +563,5 @@ export const boardStyles = StyleSheet.create({
  * put the rest where it can be looked for rather than scrolled past.
  * ------------------------------------------------------------------------- */
 
-export const overviewStyles = StyleSheet.create({
-  /*
-   * The picture, the wash over it and everything written on it are one block
-   * — not a banner with a sheet pulled over its foot. The identity used to
-   * sit on a card lifted over a gradient, and the seam between the two was a
-   * line across the screen exactly where the eye lands. The photograph runs
-   * the whole height instead and simply stops being a photograph by the
-   * bottom of it.
-   */
-  /* White, because the fade over the artwork reaches solid white exactly
-     where the artwork ends — anything else here would show as a band under
-     a booking whose lines run past the foot of the picture. */
-  top: { backgroundColor: colors.background, overflow: 'hidden' },
-  /* The picture's box, and the fade's: the same geometry given to both, so
-     they are laid out identically. Pinned to the top at the full width, its
-     height coming from the source's own ratio, so the artwork is scaled down
-     to fit rather than stretched to whatever height the block came to. */
-  art: { position: 'absolute', top: 0, left: 0, width: '100%' },
-  body: { paddingHorizontal: spacing.md, paddingBottom: 18 },
-
-  topRow: { ...globalStyles.row, gap: 6 },
-  back: {
-    width: 38,
-    height: 38,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: -9,
-  },
-  topTitle: {
-    color: WORKSPACE_NAVY_DEEP,
-    fontSize: 16,
-    lineHeight: 21,
-    fontWeight: '700',
-    letterSpacing: -0.2,
-    flexShrink: 1,
-  },
-
-  titleRow: { ...globalStyles.row, alignItems: 'flex-start', gap: 10, marginTop: 14 },
-  title: {
-    flex: 1,
-    color: WORKSPACE_NAVY_DEEP,
-    fontSize: 20,
-    lineHeight: 26,
-    fontWeight: '700',
-    letterSpacing: -0.5,
-  },
-  /* What it costs and the day it falls on, held together against the right
-     edge so the name has the whole left to itself. */
-  chips: { ...globalStyles.row, gap: 8, flexShrink: 0, marginTop: 3 },
-  amountChip: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 10,
-    backgroundColor: WORKSPACE_ACCENT_SOFT,
-    paddingHorizontal: 11,
-    paddingVertical: 7,
-  },
-  amountChipText: { color: WORKSPACE_ACCENT, fontSize: 13, fontWeight: '700' },
-  dateChip: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 12,
-    backgroundColor: WORKSPACE_NAVY,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  dateChipMonth: {
-    color: 'rgba(255,255,255,0.8)',
-    fontSize: 9.5,
-    fontWeight: '700',
-    letterSpacing: 1,
-    lineHeight: 12,
-  },
-  dateChipDay: {
-    color: colors.onPrimary,
-    fontSize: 15,
-    fontWeight: '700',
-    lineHeight: 18,
-  },
-
-  factRow: { ...globalStyles.row, gap: 8, marginTop: 8 },
-  /* The address is the one fact that runs to three lines; its icon belongs
-     beside the first of them rather than in the middle of the block. */
-  factRowTall: { alignItems: 'flex-start' },
-  /* The box the row's leftover width goes to; the text inside it wraps
-     against this rather than against the screen. */
-  factText: { flex: 1, minWidth: 0 },
-  factValue: {
-    color: WORKSPACE_NAVY_DEEP,
-    fontSize: 12.5,
-    lineHeight: 17,
-    fontWeight: '500',
-  },
-  ref: {
-    color: colors.textMuted,
-    fontSize: 11,
-    lineHeight: 15,
-    letterSpacing: 0.3,
-    marginTop: 5,
-    marginLeft: 24,
-  },
-
-  byRow: { ...globalStyles.row, gap: 10, marginTop: 12 },
-  /* Takes the row's slack, so the pill lands at the far end when there is an
-     organizer and sits quietly at the left when there is not yet one. */
-  byWho: { ...globalStyles.row, gap: 8, flex: 1, minWidth: 0 },
-  byAvatar: {
-    width: 22,
-    height: 22,
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  byAvatarText: { color: colors.onPrimary, fontSize: 9.5, fontWeight: '700' },
-  byText: { color: colors.textMuted, fontSize: 12.5, lineHeight: 17, flexShrink: 1 },
-  /* Pushed to the row's far end, so the organizer's name and the booking's
-     standing read as two facts rather than one sentence. */
-  statusPill: {
-    ...globalStyles.row,
-    gap: 6,
-    flexShrink: 0,
-    borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.82)',
-    borderWidth: 1,
-    borderColor: 'rgba(14,26,51,0.08)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
-  statusDot: { width: 7, height: 7, borderRadius: 999 },
-  statusText: {
-    color: WORKSPACE_NAVY_DEEP,
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 0.3,
-  },
-
-  /*
-   * Three figures on one white card over the foot of the picture: how long is
-   * left, how much is ready, how much is paid. The card is what separates
-   * them from the photograph — as three loose tiles they read as part of the
-   * wash, and the numbers are the reason the customer opened the screen.
-   */
-  stats: {
-    ...globalStyles.row,
-    alignItems: 'center',
-    backgroundColor: colors.background,
-    borderRadius: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 11,
-    marginTop: 14,
-    shadowColor: '#0e1a33',
-    shadowOpacity: 0.08,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 3,
-  },
-  stat: { ...globalStyles.row, flex: 1, gap: 8 },
-  statText: { flexShrink: 1, minWidth: 0 },
-  /* A tinted tile carrying the figure's own icon, so the three read as three
-     different measures before the words under them are read. */
-  statMark: {
-    width: 28,
-    height: 28,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  statMarkTime: { backgroundColor: WORKSPACE_ACCENT_SOFT },
-  statMarkReady: { backgroundColor: WORKSPACE_GREEN_SOFT },
-  statMarkPaid: { backgroundColor: WORKSPACE_VIOLET_SOFT },
-  statValue: {
-    color: WORKSPACE_NAVY_DEEP,
-    fontSize: 15,
-    lineHeight: 19,
-    fontWeight: '700',
-    letterSpacing: -0.3,
-  },
-  statLabel: {
-    color: colors.textMuted,
-    fontSize: 10,
-    lineHeight: 13,
-    fontWeight: '500',
-  },
-
-  /* Edge to edge, so the rule under the tabs runs the width of the screen
-     and the three of them have every point of it to fit in. */
-  tabs: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#efe9e5',
-  },
-  /* The rail the tabs sit on. They size to their own words rather than
-     splitting the width three ways, which would have given "Details" as much
-     room as "Guest invitation". It scrolls if a larger text size pushes them
-     past the edge; at the ordinary size all three are in view. */
-  /* 12, not the page's 16: the three labels are long, and the eight points
-     saved at each end are what keeps all of them on screen at this size. */
-  tabsRow: { ...globalStyles.row, paddingHorizontal: 12 },
-  tab: {
-    ...globalStyles.row,
-    /* Never squeezed. A tab on a sideways rail is as wide as its own word;
-       let it shrink and every label ends in an ellipsis, which is the one
-       thing a tab cannot afford — it is the word that says where it goes. */
-    flexShrink: 0,
-    gap: 6,
-    alignItems: 'center',
-    /* 13 and 13: with the label's own line this comes to a 44pt row, which
-       is the smallest a thing worth tapping should be. */
-    paddingVertical: 13,
-    paddingHorizontal: 9,
-  },
-  /* Nothing behind the one you are on. The word and its mark go to the
-     accent and the rule under it does the rest; a filled tab read as a
-     button, which is a thing you press once, not a place you are. */
-  tabActive: {},
-  tabLabel: {
-    color: colors.textMuted,
-    fontSize: 14.5,
-    lineHeight: 19,
-    fontWeight: '600',
-    flexShrink: 0,
-  },
-  tabLabelActive: { color: WORKSPACE_ACCENT, fontWeight: '700' },
-  tabUnderline: {
-    position: 'absolute',
-    left: 8,
-    right: 8,
-    bottom: -1,
-    height: 2.5,
-    borderRadius: 999,
-    backgroundColor: WORKSPACE_ACCENT,
-  },
-});
 
 

@@ -62,7 +62,7 @@ export function StoryBlock({ cards, title, onOpen }: StoryBlockProps) {
       <FlatList
         ref={listRef}
         data={cards}
-        keyExtractor={(card) => card.id}
+        keyExtractor={card => card.id}
         horizontal
         showsHorizontalScrollIndicator={false}
         /* Snapped to the card, not paged to the screen: the cards are narrower
@@ -75,7 +75,10 @@ export function StoryBlock({ cards, title, onOpen }: StoryBlockProps) {
         scrollEventThrottle={16}
         renderItem={({ item, index }) => (
           <View
-            style={[{ width: CARD_WIDTH }, index < cards.length - 1 && s.cardGap]}
+            style={[
+              { width: CARD_WIDTH },
+              index < cards.length - 1 && s.cardGap,
+            ]}
           >
             <TouchableOpacity
               style={s.frame}
@@ -94,7 +97,11 @@ export function StoryBlock({ cards, title, onOpen }: StoryBlockProps) {
               />
             </TouchableOpacity>
             {item.caption ? (
-              <EventlyText variant="caption" style={s.caption} numberOfLines={3}>
+              <EventlyText
+                variant="caption"
+                style={s.caption}
+                numberOfLines={3}
+              >
                 {item.caption}
               </EventlyText>
             ) : null}
@@ -110,10 +117,7 @@ export function StoryBlock({ cards, title, onOpen }: StoryBlockProps) {
       <View style={s.progress}>
         <View style={s.dots}>
           {cards.map((card, index) => (
-            <View
-              key={card.id}
-              style={[s.dot, index === active && s.dotOn]}
-            />
+            <View key={card.id} style={[s.dot, index === active && s.dotOn]} />
           ))}
         </View>
         <EventlyText variant="caption" style={s.count}>

@@ -1,23 +1,47 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { ActivityIndicator, RefreshControl, ScrollView, TouchableOpacity, View } from 'react-native';
+import {
+  Animated,
+  ActivityIndicator,
+  RefreshControl,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
+import {
+  AppHeader,
+  EventlyIcon,
+  EventlyText,
+  FadeInUp,
+} from '../../Components';
+import { useOpenWithOrganizer } from '../Chat';
 import { colors } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
 import { WORKSPACE_ACCENT, WORKSPACE_COPY, WORKSPACE_TABS } from './constants';
 import { useWorkspaceContainer } from './container';
 import { WorkspaceOverview } from './sections/WorkspaceOverview';
-import { Milestones, Payment, Tasks, Timeline } from './sections/WorkspaceSections';
-import { IdeasSummary, InvitationSummary } from './sections/WorkspaceLinks';
+import { WorkspaceTabs } from './sections/WorkspaceTabs';
+import { PinnedHeader } from './sections/PinnedHeader';
+import {
+  Milestones,
+  Payment,
+  Tasks,
+  Timeline,
+} from './sections/WorkspaceSections';
+import { IdeasSummary } from './sections/WorkspaceLinks';
+import { InvitationTab } from './sections/InvitationTab';
 import { ReviewPrompt } from './sections/ReviewPrompt';
 import { LeaveReviewSheet, useCanReview } from '../Organizer';
 import { styles } from './styles';
+import { screenUi, tabsWrap } from './premium.styles';
 import type { WorkspaceTab } from './types';
 
-type WorkspaceNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Workspace'>;
+type WorkspaceNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Workspace'
+>;
 type WorkspaceRouteProp = RouteProp<RootStackParamList, 'Workspace'>;
 
 /**
@@ -34,11 +58,21 @@ export function WorkspaceScreen() {
   const canReview = useCanReview(params.bookingId);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [tab, setTab] = useState<WorkspaceTab>('details');
+  /*
+   * The pinned header: how far the page has scrolled, where the in-page tabs
+   * sit, and whether the pinned copy is showing (it only takes touches then).
+   */
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const [tabsY, setTabsY] = useState(0);
+  const [pinned, setPinned] = useState(false);
+  const pinAt = Math.max(1, tabsY - 70);
+  const openThread = useOpenWithOrganizer();
   const {
     workspace,
     ideaCounts,
     latestFromOrganizer,
     invitation,
+    guestSummary,
     isLoading,
     isError,
     errorMessage,
@@ -57,7 +91,10 @@ export function WorkspaceScreen() {
 
   // Until the booking loads there is no occasion to name the workspace after,
   // so the header carries whatever name the caller already knew.
-  const headerTitle = workspace?.workspaceName ?? params.workspaceName ?? WORKSPACE_COPY.fallbackName;
+  const headerTitle =
+    workspace?.workspaceName ??
+    params.workspaceName ??
+    WORKSPACE_COPY.fallbackName;
 
   const header = <AppHeader title={headerTitle} compact onBackPress={goBack} />;
 
@@ -108,6 +145,22 @@ export function WorkspaceScreen() {
       authorName: workspace.customerName ?? undefined,
     });
 
+  const messageOrganizer = () => {
+    if (!workspace.organizerId || openThread.loading) return;
+    openThread
+      .execute(workspace.organizerId)
+      .then(conversation =>
+        navigation.navigate('Conversation', {
+          conversationId: conversation.id,
+          withName: workspace.organizerName ?? undefined,
+        }),
+      )
+      .catch(() => undefined);
+  };
+
+  const openGuests = () =>
+    navigation.navigate('GuestList', { bookingId: workspace.id, title: workspace.title });
+
   const openInvitation = () =>
     navigation.navigate('Invitations', {
       bookingId: workspace.id,
@@ -120,20 +173,32 @@ export function WorkspaceScreen() {
      * back button is inset instead. Insetting the screen would draw a white
      * strip above the picture.
      */
-    <View style={styles.container}>
-      <ScrollView
+    <View style={[styles.container, screenUi.page]}>
+      <Animated.ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
+        scrollEventThrottle={16}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+          useNativeDriver: true,
+          listener: (e: { nativeEvent: { contentOffset: { y: number } } }) => {
+            const next = e.nativeEvent.contentOffset.y >= pinAt;
+            if (next !== pinned) setPinned(next);
+          },
+        })}
+        refreshControl={
+          <RefreshControl refreshing={isLoading} onRefresh={refetch} />
+        }
       >
         <WorkspaceOverview
           data={workspace}
           onBack={goBack}
-          tab={tab}
-          tabs={WORKSPACE_TABS}
-          onSelectTab={setTab}
+          onMessage={workspace.organizerId ? messageOrganizer : undefined}
+          isOpeningMessage={openThread.loading}
         />
+        <View style={tabsWrap.wrap} onLayout={e => setTabsY(e.nativeEvent.layout.y)}>
+          <WorkspaceTabs tabs={WORKSPACE_TABS} tab={tab} onSelectTab={setTab} />
+        </View>
 
         {/*
           One tab's worth at a time.
@@ -144,7 +209,7 @@ export function WorkspaceScreen() {
           the workspace for.
         */}
         {tab === 'details' ? (
-          <>
+          <FadeInUp key="details">
             <Milestones data={workspace} />
             {/* Only for a delivered booking this customer has not reviewed —
                 both decided by the server, so the ask never repeats. */}
@@ -172,7 +237,7 @@ export function WorkspaceScreen() {
             <Payment data={workspace} />
             <Tasks data={workspace} />
             <Timeline data={workspace} />
-          </>
+          </FadeInUp>
         ) : null}
 
         {/*
@@ -183,22 +248,42 @@ export function WorkspaceScreen() {
           covered them.
         */}
         {tab === 'ideas' ? (
-          <IdeasSummary
-            counts={ideaCounts}
-            organizerName={workspace.organizerName}
-            latest={latestFromOrganizer}
-            onPress={openIdeas}
-          />
+          <FadeInUp key="ideas">
+            <IdeasSummary
+              counts={ideaCounts}
+              organizerName={workspace.organizerName}
+              latest={latestFromOrganizer}
+              onPress={openIdeas}
+            />
+          </FadeInUp>
         ) : null}
 
         {tab === 'invitation' ? (
-          <InvitationSummary
-            invitation={invitation}
-            organizerName={workspace.organizerName}
-            onPress={openInvitation}
-          />
+          <FadeInUp key="invitation">
+            <InvitationTab
+              workspace={workspace}
+              invitation={invitation}
+              guests={guestSummary}
+              onOpenInvitation={openInvitation}
+              onOpenGuests={openGuests}
+            />
+          </FadeInUp>
         ) : null}
-      </ScrollView>
+      </Animated.ScrollView>
+
+      <PinnedHeader
+        opacity={scrollY.interpolate({
+          inputRange: [pinAt - 40, pinAt],
+          outputRange: [0, 1],
+          extrapolate: 'clamp',
+        })}
+        active={pinned}
+        title={workspace.title}
+        onBack={goBack}
+        tabs={WORKSPACE_TABS}
+        tab={tab}
+        onSelectTab={setTab}
+      />
 
       <LeaveReviewSheet
         visible={reviewOpen}

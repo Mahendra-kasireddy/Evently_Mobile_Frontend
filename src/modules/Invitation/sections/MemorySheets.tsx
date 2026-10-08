@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Modal, Pressable, ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { EventlyIcon, EventlyImage, EventlyText } from '../../../Components';
 import { colors } from '../../../theme';
 import { absoluteFileUrl } from '../../../services/urls';
@@ -30,15 +37,33 @@ export function AddMemorySheet({
   onRecordReel: () => void;
 }) {
   const options: Array<[string, string, string, () => void]> = [
-    ['camera-outline', COPY.memoryTakePhoto, COPY.memoryTakePhotoNote, onTakePhoto],
-    ['image-multiple-outline', COPY.memoryPick, COPY.memoryPickNote, onPickMedia],
+    [
+      'camera-outline',
+      COPY.memoryTakePhoto,
+      COPY.memoryTakePhotoNote,
+      onTakePhoto,
+    ],
+    [
+      'image-multiple-outline',
+      COPY.memoryPick,
+      COPY.memoryPickNote,
+      onPickMedia,
+    ],
     ['video-outline', COPY.memoryRecord, COPY.memoryRecordNote, onRecordReel],
   ];
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+    >
       <Pressable style={sheetStyles.backdrop} onPress={onClose}>
-        <Pressable style={sheetStyles.container} onPress={(e) => e.stopPropagation()}>
+        <Pressable
+          style={sheetStyles.container}
+          onPress={e => e.stopPropagation()}
+        >
           <EventlyText variant="h2" style={s.sheetTitle}>
             {COPY.memoryAddTitle}
           </EventlyText>
@@ -66,7 +91,11 @@ export function AddMemorySheet({
                   {note}
                 </EventlyText>
               </View>
-              <EventlyIcon name="chevron-right" size={20} color={colors.textMuted} />
+              <EventlyIcon
+                name="chevron-right"
+                size={20}
+                color={colors.textMuted}
+              />
             </TouchableOpacity>
           ))}
         </Pressable>
@@ -138,7 +167,11 @@ export function ConfirmMemorySheet({
                    is represented rather than previewed — honest, and it is the
                    file the person just recorded. */
                 <View style={[s.preview, s.play]}>
-                  <EventlyIcon name="video-outline" size={38} color="rgba(255,255,255,0.9)" />
+                  <EventlyIcon
+                    name="video-outline"
+                    size={38}
+                    color="rgba(255,255,255,0.9)"
+                  />
                   <EventlyText variant="caption" style={s.lengthText}>
                     {picked.reel ? COPY.memoryReel : COPY.memoryVideos}
                     {picked.durationSec ? ` · ${picked.durationSec}s` : ''}
@@ -157,23 +190,28 @@ export function ConfirmMemorySheet({
               {COPY.memoryWhichEvent}
             </EventlyText>
             <View style={s.eventRow}>
-              {[{ id: '', name: COPY.memoryTheCelebration }, ...subEvents].map((e) => {
-                const on = subEventId === e.id;
-                return (
-                  <TouchableOpacity
-                    key={e.id || 'own'}
-                    style={[s.tab, on && s.tabOn]}
-                    activeOpacity={0.9}
-                    onPress={() => setSubEventId(e.id)}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected: on }}
-                  >
-                    <EventlyText variant="caption" style={[s.tabText, on && s.tabTextOn]}>
-                      {e.name}
-                    </EventlyText>
-                  </TouchableOpacity>
-                );
-              })}
+              {[{ id: '', name: COPY.memoryTheCelebration }, ...subEvents].map(
+                e => {
+                  const on = subEventId === e.id;
+                  return (
+                    <TouchableOpacity
+                      key={e.id || 'own'}
+                      style={[s.tab, on && s.tabOn]}
+                      activeOpacity={0.9}
+                      onPress={() => setSubEventId(e.id)}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: on }}
+                    >
+                      <EventlyText
+                        variant="caption"
+                        style={[s.tabText, on && s.tabTextOn]}
+                      >
+                        {e.name}
+                      </EventlyText>
+                    </TouchableOpacity>
+                  );
+                },
+              )}
             </View>
 
             <EventlyText variant="caption" style={s.fieldLabel}>
@@ -189,7 +227,10 @@ export function ConfirmMemorySheet({
               maxLength={MEMORY_CAPTION_MAX + 20}
               editable={!busy}
             />
-            <EventlyText variant="caption" style={[s.counter, over && s.counterOver]}>
+            <EventlyText
+              variant="caption"
+              style={[s.counter, over && s.counterOver]}
+            >
               {caption.length} / {MEMORY_CAPTION_MAX}
             </EventlyText>
 
@@ -197,7 +238,10 @@ export function ConfirmMemorySheet({
               <>
                 <View style={s.progressTrack}>
                   <View
-                    style={[s.progressFill, { width: `${Math.round(progress * 100)}%` }]}
+                    style={[
+                      s.progressFill,
+                      { width: `${Math.round(progress * 100)}%` },
+                    ]}
                   />
                 </View>
                 <EventlyText variant="caption" style={s.sayText}>
@@ -208,7 +252,10 @@ export function ConfirmMemorySheet({
 
             {error ? (
               <View style={[s.say, s.sayWarn]}>
-                <EventlyText variant="caption" style={[s.sayText, s.sayTextWarn]}>
+                <EventlyText
+                  variant="caption"
+                  style={[s.sayText, s.sayTextWarn]}
+                >
                   {error}
                 </EventlyText>
               </View>
@@ -269,7 +316,12 @@ export function MemoryViewer({
   const item = index >= 0 ? items[index] : undefined;
 
   return (
-    <Modal visible={Boolean(item)} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={Boolean(item)}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       <View style={artworkStyles.viewer}>
         <TouchableOpacity
           style={artworkStyles.viewerClose}
@@ -284,7 +336,9 @@ export function MemoryViewer({
           <>
             <EventlyImage
               source={{
-                uri: absoluteFileUrl(item.kind === 'photo' ? item.displayUrl : item.thumbnailUrl),
+                uri: absoluteFileUrl(
+                  item.kind === 'photo' ? item.displayUrl : item.thumbnailUrl,
+                ),
               }}
               style={artworkStyles.viewerMedia}
               resizeMode="contain"
@@ -302,7 +356,11 @@ export function MemoryViewer({
                 <EventlyIcon name="chevron-left" size={18} color="#fff" />
               </TouchableOpacity>
 
-              <EventlyText variant="caption" style={s.viewerCaption} numberOfLines={2}>
+              <EventlyText
+                variant="caption"
+                style={s.viewerCaption}
+                numberOfLines={2}
+              >
                 {item.caption || COPY.memoryPosition(index + 1, items.length)}
               </EventlyText>
 

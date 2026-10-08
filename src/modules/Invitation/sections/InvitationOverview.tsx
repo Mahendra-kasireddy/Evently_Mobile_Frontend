@@ -11,7 +11,11 @@ import {
 import { overviewStyles as s } from '../styles';
 import { blockIsWritten } from '../utils';
 import { blockIcon, rendererFor } from './InvitationParts';
-import type { InvitationBlockDTO, InvitationDTO, InvitationStage } from '../types';
+import type {
+  InvitationBlockDTO,
+  InvitationDTO,
+  InvitationStage,
+} from '../types';
 
 interface InsideListProps {
   /** The invitation the blocks belong to — the cover is judged by its own. */
@@ -28,9 +32,13 @@ interface InsideListProps {
  * a contents page now: what is in it, whether each part is written, and a way
  * into any one of them.
  */
-export function InsideList({ invitation, blocks, onPressBlock }: InsideListProps) {
+export function InsideList({
+  invitation,
+  blocks,
+  onPressBlock,
+}: InsideListProps) {
   const yoursToWrite = blocks.filter(
-    (b) => b.owner === 'customer' && !blockIsWritten(invitation, b),
+    b => b.owner === 'customer' && !blockIsWritten(invitation, b),
   ).length;
 
   return (
@@ -59,10 +67,10 @@ export function InsideList({ invitation, blocks, onPressBlock }: InsideListProps
           const state = needsYou
             ? COPY.insideYours
             : block.approved
-              ? COPY.insideApproved
-              : written
-                ? COPY.insideWritten
-                : COPY.insideEmpty;
+            ? COPY.insideApproved
+            : written
+            ? COPY.insideWritten
+            : COPY.insideEmpty;
 
           return (
             <TouchableOpacity
@@ -89,15 +97,19 @@ export function InsideList({ invitation, blocks, onPressBlock }: InsideListProps
                     needsYou
                       ? INV_ACCENT
                       : block.approved
-                        ? INV_GREEN
-                        : written
-                          ? INV_NAVY_DEEP
-                          : colors.textMuted
+                      ? INV_GREEN
+                      : written
+                      ? INV_NAVY_DEEP
+                      : colors.textMuted
                   }
                 />
               </View>
 
-              <EventlyText variant="body" style={s.insideName} numberOfLines={1}>
+              <EventlyText
+                variant="body"
+                style={s.insideName}
+                numberOfLines={1}
+              >
                 {name}
               </EventlyText>
 
@@ -112,7 +124,11 @@ export function InsideList({ invitation, blocks, onPressBlock }: InsideListProps
               >
                 {state}
               </EventlyText>
-              <EventlyIcon name="chevron-right" size={16} color={colors.textMuted} />
+              <EventlyIcon
+                name="chevron-right"
+                size={16}
+                color={colors.textMuted}
+              />
             </TouchableOpacity>
           );
         })}
@@ -132,12 +148,20 @@ export function PrimaryAction({
   onPress: () => void;
 }) {
   const icon =
-    stage === 'write' ? 'pencil-outline' : stage === 'approve' ? 'check' : 'whatsapp';
+    stage === 'write'
+      ? 'pencil-outline'
+      : stage === 'approve'
+      ? 'check'
+      : 'whatsapp';
 
   return (
     <View>
       <TouchableOpacity
-        style={[s.cta, stage === 'approve' && s.ctaApprove, disabled && s.ctaDisabled]}
+        style={[
+          s.cta,
+          stage === 'approve' && s.ctaApprove,
+          disabled && s.ctaDisabled,
+        ]}
         activeOpacity={0.9}
         disabled={disabled}
         onPress={onPress}

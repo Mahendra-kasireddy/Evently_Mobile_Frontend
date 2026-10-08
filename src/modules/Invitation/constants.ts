@@ -41,9 +41,17 @@ export const COVER_FALLBACK_TEMPLATE: InvitationTemplateDTO = {
  */
 export const COVER_FONT_STYLE: Record<string, TextStyle> = {
   elegant: { fontFamily: 'serif', fontWeight: '400', letterSpacing: 1.2 },
-  classic: { fontFamily: fontFor('700'), fontWeight: '700', letterSpacing: -0.4 },
+  classic: {
+    fontFamily: fontFor('700'),
+    fontWeight: '700',
+    letterSpacing: -0.4,
+  },
   romantic: { fontFamily: 'serif', fontStyle: 'italic', letterSpacing: 0.4 },
-  modern: { fontFamily: fontFor('800'), fontWeight: '800', letterSpacing: -0.8 },
+  modern: {
+    fontFamily: fontFor('800'),
+    fontWeight: '800',
+    letterSpacing: -0.8,
+  },
   traditional: { fontFamily: 'serif', fontWeight: '700', letterSpacing: 3 },
 };
 export const COVER_FONT_FALLBACK = 'elegant';
@@ -114,17 +122,18 @@ export const OCCASION_ICON_FALLBACK = 'email-heart-outline';
  * map is where a new block is registered when its turn comes — one line,
  * rather than a branch added to every screen that draws a block.
  */
-export const BLOCK_RENDERER: Record<InvitationBlockType, 'cover' | 'generic'> = {
-  cover: 'cover',
-  story: 'generic',
-  countdown: 'generic',
-  memories: 'generic',
-  guestWall: 'generic',
-  liveStream: 'generic',
-  saveTheDate: 'generic',
-  ride: 'generic',
-  generic: 'generic',
-};
+export const BLOCK_RENDERER: Record<InvitationBlockType, 'cover' | 'generic'> =
+  {
+    cover: 'cover',
+    story: 'generic',
+    countdown: 'generic',
+    memories: 'generic',
+    guestWall: 'generic',
+    liveStream: 'generic',
+    saveTheDate: 'generic',
+    ride: 'generic',
+    generic: 'generic',
+  };
 
 /**
  * What each badge means. The organizer assembles most of the invitation; a few
@@ -194,11 +203,16 @@ export const INVITATION_COPY = {
       : `${total} sections`,
   /* How the stage line reads under its own title. */
   stageWriteNote: (n: number) =>
-    n === 1 ? 'One section is still yours to write.' : `${n} sections are still yours to write.`,
+    n === 1
+      ? 'One section is still yours to write.'
+      : `${n} sections are still yours to write.`,
   stageApproveNote: (n: number) =>
-    n === 1 ? 'One section is waiting on you.' : `${n} sections are waiting on you.`,
+    n === 1
+      ? 'One section is waiting on you.'
+      : `${n} sections are waiting on you.`,
   stageShareNote: 'Every section is approved. Your guest link is live.',
-  approveAll: (n: number) => (n === 1 ? 'Approve the last block' : `Approve all ${n} blocks`),
+  approveAll: (n: number) =>
+    n === 1 ? 'Approve the last block' : `Approve all ${n} blocks`,
   approveAllNote: 'Approve each block, or ask your organizer for a change.',
   /* Said under the send button because it is the promise the button makes. */
   shareNote: 'Nothing is shared until you send the link.',
@@ -221,7 +235,9 @@ export const INVITATION_COPY = {
   edit: 'Edit',
   ask: 'Ask',
   hiddenCount: (n: number) =>
-    n === 1 ? '1 section is hidden from guests' : `${n} sections are hidden from guests`,
+    n === 1
+      ? '1 section is hidden from guests'
+      : `${n} sections are hidden from guests`,
   /** A section the organizer has not written yet. */
   blockEmpty: 'Your organizer has not written this section yet.',
   /** The same state, on a section the customer owns and can write now. */
@@ -237,7 +253,8 @@ export const INVITATION_COPY = {
   listReview: 'Review',
   listView: 'View',
   detailTitle: 'Guest invitation',
-  eyebrow: (organizer: string) => `GUEST INVITATION · PREPARED BY ${organizer.toUpperCase()}`,
+  eyebrow: (organizer: string) =>
+    `GUEST INVITATION · PREPARED BY ${organizer.toUpperCase()}`,
   heading: 'Your guest invitation',
   sub: 'Review each section, personalize what’s yours, and approve to publish the guest link.',
 
@@ -261,7 +278,8 @@ export const INVITATION_COPY = {
   sections: 'Sections',
   hidden: 'Hidden from guests',
   ready: 'Ready',
-  pendingRequests: (n: number) => `${n} change ${n === 1 ? 'request' : 'requests'} with your organizer`,
+  pendingRequests: (n: number) =>
+    `${n} change ${n === 1 ? 'request' : 'requests'} with your organizer`,
 
   // Personalize
   personalizeTitle: 'Personalize this section',
@@ -292,8 +310,10 @@ export const INVITATION_COPY = {
   previewShareSection: 'Send this section',
   previewShareAll: 'Send to guests',
   /** Why the send button is not offered — stated, never left as a dead button. */
-  previewShareNotApproved: 'Approve the invitation first — then you can send it to guests.',
-  previewShareHidden: 'Hidden sections can’t be sent. Unhide it from Personalize first.',
+  previewShareNotApproved:
+    'Approve the invitation first — then you can send it to guests.',
+  previewShareHidden:
+    'Hidden sections can’t be sent. Unhide it from Personalize first.',
   previewOwnerCustomer: 'Yours to personalize',
   previewOwnerOrganizer: 'Built by your organizer',
   previewHiddenNote: (n: number) =>
@@ -302,13 +322,16 @@ export const INVITATION_COPY = {
    * A hidden section has no guest appearance to show. Saying so is the whole
    * answer to "what does this look like to a guest" — nothing.
    */
-  previewHiddenSection: 'This section is hidden, so guests never see it. Unhide it from Personalize to include it.',
-  previewEmptySection: 'This section has nothing in it yet, so guests see only its heading.',
+  previewHiddenSection:
+    'This section is hidden, so guests never see it. Unhide it from Personalize to include it.',
+  previewEmptySection:
+    'This section has nothing in it yet, so guests see only its heading.',
 
   // Share
   /* The sheet, as the design words it. "Share", not "Send": nothing leaves
      until the customer picks who, and the button says so. */
-  shareHeading: (section?: string) => (section ? `Share “${section}”` : 'Share the invitation'),
+  shareHeading: (section?: string) =>
+    section ? `Share “${section}”` : 'Share the invitation',
   shareLead: 'Guests open this straight from the WhatsApp link. No app needed.',
   shareSelected: (n: number) => `${n} selected`,
   shareSelectAll: 'Select all',
@@ -320,13 +343,15 @@ export const INVITATION_COPY = {
   shareManageGuests: 'Manage guest list',
   shareEmptyGroup: (label: string) => `Nobody is filed under ${label} yet.`,
   shareTitle: 'Send to guests',
-  shareIntro: 'Pick who to send it to, or add someone new. Guests need no account.',
+  shareIntro:
+    'Pick who to send it to, or add someone new. Guests need no account.',
   shareLoading: 'Loading your guest list…',
   shareNoGuests: 'No guests yet — add the first one below.',
   shareAddGuest: 'Add a guest',
   shareGuestName: 'Guest name',
   shareGuestPhone: 'WhatsApp number',
-  sharePhoneHint: 'Indian mobiles need no country code; for anywhere else start with +.',
+  sharePhoneHint:
+    'Indian mobiles need no country code; for anywhere else start with +.',
   shareNeedGuest: 'Choose at least one guest, or add a new one.',
   shareNeedName: 'Enter the guest’s name.',
   shareNeedPhone: 'Enter a WhatsApp number.',
@@ -334,10 +359,12 @@ export const INVITATION_COPY = {
   shareViewed: 'Opened it',
   shareSend: 'Send on WhatsApp',
   shareSending: 'Sending…',
-  shareNotApproved: 'Approve the invitation first — then you can send it to guests.',
+  shareNotApproved:
+    'Approve the invitation first — then you can send it to guests.',
   shareWhatsappCaveat:
     'We can’t check whether a number has WhatsApp — if it doesn’t, the message won’t arrive.',
-  shareHandoff: 'WhatsApp opens with the message ready — press send there to deliver it.',
+  shareHandoff:
+    'WhatsApp opens with the message ready — press send there to deliver it.',
   shareOpenWhatsapp: 'Open WhatsApp',
   shareFailed: 'That could not be sent.',
   shareDone: 'Done',
@@ -353,6 +380,8 @@ export const INVITATION_COPY = {
   /** The screen's own name. It is the invitation, not a builder for one. */
   artworkTitle: 'Invitation',
   artworkView: 'View full screen',
+  artworkViewShort: 'Full screen',
+  artworkVideoChip: 'Video',
   artworkVideoNoPlayer:
     'This build can\u2019t play video yet. Your organizer sent a video invitation \u2014 it is saved, and guests will see it once video playback is enabled.',
   artworkPendingTitle: 'Being prepared',
@@ -362,18 +391,70 @@ export const INVITATION_COPY = {
   artworkWaiting: 'Waiting for your approval',
   artworkWaitingNote: 'Nothing reaches a guest until you approve it.',
   artworkApproved: 'Approved \u00b7 your guest link is live',
-  artworkApprovedNote: 'Your organizer has been told. You can still ask for a change.',
+  artworkApprovedNote:
+    'Your organizer has been told. You can still ask for a change.',
   artworkApprove: 'Approve this invitation',
+  artworkApproveUpdate: 'Approve the update',
+  /* An update out for review while an approved version is live. */
+  artworkUpdate: 'An update is ready',
+  artworkUpdateNote:
+    'Your guests still see the version you approved until you approve this update.',
+  /* The customer has asked for changes and the organizer has not sent them yet. */
+  artworkAsked: 'Changes requested',
+  artworkAskedNote:
+    'Your organizer has your note and will send an updated invitation. You can still approve this one.',
   artworkApproving: 'Approving\u2026',
   artworkAsk: 'Ask for a change',
   artworkAskNote: 'Your organizer updates the design and sends it again.',
   artworkGuests: 'Guest list',
+  /* ---- The next-step card: one state, one button ---- */
+  nextReviewTitle: 'Your invitation is ready',
+  nextReviewNote: 'Take a look. Guests get nothing until you approve it.',
+  nextApprove: 'Approve & go live',
+  nextUpdateTitle: 'A new version is ready',
+  nextUpdateNoteSince: (date: string) =>
+    `Guests still see the version you approved on ${date} until you approve this one.`,
+  nextAskedTitle: 'Your organizer is on it',
+  nextAskedNote: 'They have your note and will send an updated version.',
+  nextYouAsked: 'You asked',
+  nextYouAskedMany: (n: number) => `You asked · ${n} notes`,
+  nextApproveAnyway: 'Approve this version anyway',
+  nextAskMore: 'Add to your request',
+  nextLiveTitle: 'Your guest link is live',
+  nextLiveNote: 'One link has it all — invitation, live stream and memories.',
+  nextAddGuests: 'Add guests & share',
+  nextShareMore: (n: number) =>
+    `Share with ${n} more ${n === 1 ? 'guest' : 'guests'}`,
+  nextShareAgain: 'Share again',
+  nextSentOf: (sent: number, total: number) => `Sent to ${sent} of ${total}`,
+  nextOpened: (n: number) => `${n} opened`,
+  momentLive: 'Live now — watch the stream',
+  momentMemories: 'The day is done — see everyone’s memories',
   /* ---- Save the Date ---- */
   saveTheDateTitle: 'Save the Date',
   saveTheDateLead: 'Celebrate every beautiful moment with us',
   saveTheDateDress: 'Dress code',
   saveTheDateAdd: 'Add to Calendar',
   saveTheDateNoDate: 'This celebration has no date yet.',
+  /* ---- The three sections, and the one link behind them ---- */
+  sectionInvitation: 'Invitation',
+  sectionLive: 'Live stream',
+  sectionMemories: 'Memories',
+  oneLinkTitle: 'Already in your guest link',
+  oneLinkLive:
+    'Guests watch the stream on the same invitation link you sent — no new link. Send it again as a "we are live" reminder.',
+  oneLinkMemories:
+    'Guests add and see photos on the same invitation link you sent. Nothing extra to share.',
+  oneLinkPending:
+    'Once you approve the invitation, one link gives guests the invitation, the live stream and the memories.',
+  oneLinkShare: 'Send the link again',
+  liveEmptyTitle: 'Nothing on air yet',
+  liveEmptyBody:
+    'When the organizer starts the stream, it plays here — and at the top of your guests’ invitation.',
+  memoriesEmptyTitle: 'Memories are not open yet',
+  memoriesEmptyBody:
+    'Photos and reels from your guests will collect here once the organizer opens Shared Memories.',
+
   /* ---- F6: shared memories ---- */
   memoriesTitle: 'Shared Memories',
   memoriesLead: 'Everything your guests photographed, in one place.',
@@ -468,7 +549,8 @@ export const INVITATION_COPY = {
   coverMediaImage: 'Photo behind the cover',
   coverMediaVideo: 'Video behind the cover',
   coverUploading: 'Uploading…',
-  coverVideoTooLong: (max: number) => `A cover video can be at most ${max} seconds.`,
+  coverVideoTooLong: (max: number) =>
+    `A cover video can be at most ${max} seconds.`,
   coverVideoUnknownLength:
     'We could not read that video\u2019s length, so it can\u2019t be used as a cover.',
   coverVideoSilent: 'It plays on its own, without sound, and loops.',

@@ -14,7 +14,15 @@ import ReactTestRenderer from 'react-test-renderer';
 
 jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
   const { Text } = require('react-native');
-  return function MockIcon({ name, size, color }: { name: string; size?: number; color?: string }) {
+  return function MockIcon({
+    name,
+    size,
+    color,
+  }: {
+    name: string;
+    size?: number;
+    color?: string;
+  }) {
     return <Text style={{ fontSize: size, color }}>{` icon:${name}`}</Text>;
   };
 });
@@ -37,9 +45,17 @@ import {
 } from '../src/modules/Invitation/sections/InvitationArtwork';
 import { canPlayVideo } from '../src/modules/Invitation/sections/HeroVideo';
 import { StoryBlock } from '../src/modules/Invitation/sections/StoryBlock';
+import {
+  NextStep,
+  type InvitationStage,
+  type GuestProgress,
+} from '../src/modules/Invitation/sections/NextStep';
 import { CountdownBlock } from '../src/modules/Invitation/sections/CountdownBlock';
 import { SaveTheDate } from '../src/modules/Invitation/sections/SaveTheDate';
-import { LiveBlock, liveOf } from '../src/modules/Invitation/sections/LiveBlock';
+import {
+  LiveBlock,
+  liveOf,
+} from '../src/modules/Invitation/sections/LiveBlock';
 import {
   MemoriesBlock,
   MemoriesOffCard,
@@ -48,8 +64,14 @@ import { AddMemorySheet } from '../src/modules/Invitation/sections/MemorySheets'
 import * as memoriesService from '../src/modules/Invitation/memories.service';
 import { useMemories } from '../src/modules/Invitation/memories.hooks';
 import { isPlayerUrl } from '../src/modules/Invitation/sections/LivePlayer';
-import { PreviewSheet, ShareSheet } from '../src/modules/Invitation/sections/Sheets';
-import { blockIsWritten, mapInvitationList } from '../src/modules/Invitation/utils';
+import {
+  PreviewSheet,
+  ShareSheet,
+} from '../src/modules/Invitation/sections/Sheets';
+import {
+  blockIsWritten,
+  mapInvitationList,
+} from '../src/modules/Invitation/utils';
 import type {
   GuestDTO,
   InvitationBlockDTO,
@@ -58,8 +80,10 @@ import type {
 } from '../src/modules/Invitation/types';
 
 declare const process: { env: Record<string, string | undefined> };
-const fs: { writeFileSync(p: string, d: string, e: string): void; existsSync(p: string): boolean } =
-  require('fs');
+const fs: {
+  writeFileSync(p: string, d: string, e: string): void;
+  existsSync(p: string): boolean;
+} = require('fs');
 
 const block = (over: Partial<InvitationBlockDTO> = {}): InvitationBlockDTO => ({
   key: 'story',
@@ -97,13 +121,24 @@ const invitation = (over: Partial<InvitationDTO> = {}): InvitationDTO =>
     },
     blocks: [
       block({ key: 'header', title: 'Invitation header', icon: 'image' }),
-      block({ key: 'countdown', title: 'Countdown', icon: 'clock', owner: 'organizer' }),
-      block({ key: 'ride', title: 'Book a ride', icon: 'car', owner: 'organizer', hidden: true }),
+      block({
+        key: 'countdown',
+        title: 'Countdown',
+        icon: 'clock',
+        owner: 'organizer',
+      }),
+      block({
+        key: 'ride',
+        title: 'Book a ride',
+        icon: 'car',
+        owner: 'organizer',
+        hidden: true,
+      }),
     ],
     subEvents: [],
     changeRequests: [],
     ...over,
-  }) as InvitationDTO;
+  } as InvitationDTO);
 
 function render(node: React.ReactElement) {
   let tree!: ReactTestRenderer.ReactTestRenderer;
@@ -150,112 +185,39 @@ function labels(tree: ReactTestRenderer.ReactTestRenderer): string[] {
 
 const noop = () => {};
 
-import { ApproveRow } from '../src/modules/Invitation/sections/ApproveRow';
-
-describe('the approval pass', () => {
-  it('shows the section itself, not a summary of it', () => {
-    /*
-     * Approving something you have not read is the one thing this screen must
-     * not make easy, so the row carries the words a guest would read.
-     */
-    const tree = render(
-      <ApproveRow
-        block={block({
-          title: 'How it began',
-          body: 'Two families, one long evening of chai and plans.',
-        })}
-        isApproving={false}
-        canShare={false}
-        onShare={() => {}}
-        onAccept={() => {}}
-        onRequestChange={() => {}}
-      />,
-    );
-    const text = textOf(tree);
-    expect(text).toContain('Two families, one long evening of chai');
-    expect(text).toContain('WAITING ON YOU');
-  });
-
-  it('says so, and offers nothing to press, once a section is signed off', () => {
-    const tree = render(
-      <ApproveRow
-        block={block({ approved: true })}
-        isApproving={false}
-        canShare={false}
-        onShare={() => {}}
-        onAccept={() => {}}
-        onRequestChange={() => {}}
-      />,
-    );
-    expect(textOf(tree)).toContain('Approved by you');
-    expect(
-      tree.root.findAll(
-        (n) =>
-          typeof n.props?.testID === 'string' &&
-          n.props.testID.startsWith('approve-block-'),
-      ),
-    ).toHaveLength(0);
-  });
-
-  it('offers to send a section only once the invitation is published', () => {
-    /*
-     * Signing one section off does not publish the invitation — the API
-     * refuses to send anything off an unapproved one — so the button appears
-     * with the last approval, not the first.
-     */
-    const approved = block({ approved: true });
-    const locked = render(
-      <ApproveRow
-        block={approved}
-        isApproving={false}
-        canShare={false}
-        onShare={() => {}}
-        onAccept={() => {}}
-        onRequestChange={() => {}}
-      />,
-    );
-    expect(textOf(locked)).not.toContain('Share this block');
-
-    const live = render(
-      <ApproveRow
-        block={approved}
-        isApproving={false}
-        canShare
-        onShare={() => {}}
-        onAccept={() => {}}
-        onRequestChange={() => {}}
-      />,
-    );
-    expect(textOf(live)).toContain('Share this block');
-  });
-
-  it('names the empty section rather than asking for approval of nothing', () => {
-    const tree = render(
-      <ApproveRow
-        block={block({ body: '' })}
-        isApproving={false}
-        canShare={false}
-        onShare={() => {}}
-        onAccept={() => {}}
-        onRequestChange={() => {}}
-      />,
-    );
-    expect(textOf(tree)).toContain('has not written this section yet');
-  });
-});
-
 describe('InvitationHero', () => {
   it('says plainly whether anything is live yet', () => {
-    expect(textOf(render(<InvitationHero invitation={invitation()} organizerName="MAHENDRA EVENTS" />))).toContain(
-      'Nothing is live yet. Approve to publish the guest link.',
-    );
     expect(
-      textOf(render(<InvitationHero invitation={invitation({ status: 'approved' })} organizerName="ME" />)),
+      textOf(
+        render(
+          <InvitationHero
+            invitation={invitation()}
+            organizerName="MAHENDRA EVENTS"
+          />,
+        ),
+      ),
+    ).toContain('Nothing is live yet. Approve to publish the guest link.');
+    expect(
+      textOf(
+        render(
+          <InvitationHero
+            invitation={invitation({ status: 'approved' })}
+            organizerName="ME"
+          />,
+        ),
+      ),
     ).toContain('the guest link is live');
   });
 
   it('credits the organizer who prepared it', () => {
-    const text = textOf(render(<InvitationHero invitation={invitation()} organizerName="MAHENDRA EVENTS" />));
+    const text = textOf(
+      render(
+        <InvitationHero
+          invitation={invitation()}
+          organizerName="MAHENDRA EVENTS"
+        />,
+      ),
+    );
     expect(text).toContain('PREPARED BY MAHENDRA EVENTS');
   });
 });
@@ -284,7 +246,13 @@ describe('the invitation cover', () => {
     // Organizers routinely paste the full address into both fields.
     const full = 'Hi-tech city, Patrika Nagar, Hyderabad';
     const text = textOf(
-      card({ details: { ...invitation().details, venueName: full, venueAddress: full } }),
+      card({
+        details: {
+          ...invitation().details,
+          venueName: full,
+          venueAddress: full,
+        },
+      }),
     );
     expect(text.split('Patrika Nagar')).toHaveLength(2);
   });
@@ -326,7 +294,11 @@ describe('the uploaded invitation', () => {
     expect(
       artworkOf(
         invitation({
-          details: { ...invitation().details, heroMediaUrl: '/x.png', heroMediaType: '' },
+          details: {
+            ...invitation().details,
+            heroMediaUrl: '/x.png',
+            heroMediaType: '',
+          },
         }),
       ),
     ).toBeNull();
@@ -339,9 +311,10 @@ describe('the uploaded invitation', () => {
         onView={noop}
       />,
     );
-    expect(textOf(tree)).toContain('View full screen');
-    // The artwork and the button, and nothing else to operate.
-    expect(labels(tree)).toEqual(['View full screen', 'View full screen']);
+    // A corner chip on the preview, not a second link below it.
+    expect(textOf(tree)).toContain('Full screen');
+    // The artwork itself is the one thing to operate.
+    expect(labels(tree)).toEqual(['View full screen']);
   });
 
   it('says plainly when a video invitation cannot be played here', () => {
@@ -383,7 +356,9 @@ describe('save the date', () => {
     render(
       <SaveTheDate
         subEvents={subEvents}
-        palette={[{ id: 'saffron', label: 'Saffron', wash: '#fdf6e3', ink: '#9a7b12' }]}
+        palette={[
+          { id: 'saffron', label: 'Saffron', wash: '#fdf6e3', ink: '#9a7b12' },
+        ]}
         defaultMinutes={120}
         invitationName="Meera & Arjun"
       />,
@@ -412,16 +387,23 @@ describe('save the date', () => {
     // A mehendi listed before a ceremony on the same day carries information
     // a sort would throw away.
     const text = textOf(
-      block([sub({ id: 'a', name: 'Sangeet' }), sub({ id: 'b', name: 'Reception' })]),
+      block([
+        sub({ id: 'a', name: 'Sangeet' }),
+        sub({ id: 'b', name: 'Reception' }),
+      ]),
     );
     expect(text.indexOf('Sangeet')).toBeLessThan(text.indexOf('Reception'));
   });
 
   it('offers a calendar handoff per celebration', () => {
-    expect(labels(block([sub({ id: 'a', name: 'Haldi' }), sub({ id: 'b', name: 'Sangeet' })]))).toEqual([
-      'Add to Calendar — Haldi',
-      'Add to Calendar — Sangeet',
-    ]);
+    expect(
+      labels(
+        block([
+          sub({ id: 'a', name: 'Haldi' }),
+          sub({ id: 'b', name: 'Sangeet' }),
+        ]),
+      ),
+    ).toEqual(['Add to Calendar — Haldi', 'Add to Calendar — Sangeet']);
   });
 
   it('says so rather than offering a dead button when a card has no date', () => {
@@ -459,7 +441,10 @@ describe('shared memories', () => {
     ...over,
   });
 
-  const block = (items: ReturnType<typeof memory>[], props: Record<string, unknown> = {}) =>
+  const block = (
+    items: ReturnType<typeof memory>[],
+    props: Record<string, unknown> = {},
+  ) =>
     render(
       <MemoriesBlock
         gallery={gallery() as never}
@@ -496,13 +481,15 @@ describe('shared memories', () => {
         uploadWindowDays: 7,
         window: { open: true, reason: '', opensAt: '', closesAt: '' },
       });
-    const list = jest.spyOn(memoriesService, 'fetchMemories').mockResolvedValue({
-      items: [],
-      nextCursor: '',
-      counts: { all: 0, photo: 0, video: 0, reel: 0 },
-      awaiting: 0,
-      subEvents: [],
-    });
+    const list = jest
+      .spyOn(memoriesService, 'fetchMemories')
+      .mockResolvedValue({
+        items: [],
+        nextCursor: '',
+        counts: { all: 0, photo: 0, video: 0, reel: 0 },
+        awaiting: 0,
+        subEvents: [],
+      });
 
     let seen: ReturnType<typeof useMemories> | undefined;
     function Probe() {
@@ -528,7 +515,9 @@ describe('shared memories', () => {
      * no way to tell an invitation without one from a screen that failed to
      * load. The setting belongs to the customer and this is their app.
      */
-    const text = textOf(render(<MemoriesOffCard busy={false} onEnable={() => undefined} />));
+    const text = textOf(
+      render(<MemoriesOffCard busy={false} onEnable={() => undefined} />),
+    );
     expect(text).toContain('Shared Memories');
     expect(text).toContain('Switch it on');
   });
@@ -591,10 +580,14 @@ describe('shared memories', () => {
       thumbnailUrl: '/api/upload/file/memoryPhoto/2026/09/abc.thumb.webp',
     });
     const uris = block([relative])
-      .root.findAll((n: any) => typeof n.props?.source?.uri === 'string', { deep: true })
+      .root.findAll((n: any) => typeof n.props?.source?.uri === 'string', {
+        deep: true,
+      })
       .map((n: any) => n.props.source.uri as string);
     expect(uris.some((u: string) => u.startsWith('/'))).toBe(false);
-    expect(uris.some((u: string) => /^https?:\/\/.+\.thumb\.webp$/.test(u))).toBe(true);
+    expect(
+      uris.some((u: string) => /^https?:\/\/.+\.thumb\.webp$/.test(u)),
+    ).toBe(true);
   });
 
   it('draws the grid from thumbnails, never the original', () => {
@@ -604,7 +597,9 @@ describe('shared memories', () => {
      * couple of hundred pixels wide.
      */
     const sources = block([memory()])
-      .root.findAll((n: any) => typeof n.props?.source?.uri === 'string', { deep: true })
+      .root.findAll((n: any) => typeof n.props?.source?.uri === 'string', {
+        deep: true,
+      })
       .map((n: any) => n.props.source.uri as string);
     expect(sources).toContain('https://cdn.example/original.thumb.webp');
     expect(sources).not.toContain('https://cdn.example/original.jpg');
@@ -614,13 +609,17 @@ describe('shared memories', () => {
   it('offers no way to add one when the server says uploads are shut', () => {
     // The window and the permission are both the server's answers; hiding the
     // button is the courtesy, and the route refuses regardless.
-    expect(textOf(block([memory()], { canUpload: false }))).not.toContain('Add a memory');
+    expect(textOf(block([memory()], { canUpload: false }))).not.toContain(
+      'Add a memory',
+    );
     expect(textOf(block([memory()]))).toContain('Add a memory');
   });
 
   it('invites the first memory rather than showing an empty frame', () => {
     expect(textOf(block([]))).toContain('Be the first to share a moment.');
-    expect(textOf(block([], { canUpload: false }))).toContain('No photos have been shared yet.');
+    expect(textOf(block([], { canUpload: false }))).toContain(
+      'No photos have been shared yet.',
+    );
   });
 
   it('names the celebrations from the invitation, never a fixed list', () => {
@@ -650,7 +649,9 @@ describe('shared memories', () => {
   it('draws every icon it names from the bundled set', () => {
     const glyphs = require('react-native-vector-icons/glyphmaps/MaterialCommunityIcons.json');
     const names = block([memory({ kind: 'video', durationSec: 30 })])
-      .root.findAll((n: any) => typeof n.props?.name === 'string', { deep: true })
+      .root.findAll((n: any) => typeof n.props?.name === 'string', {
+        deep: true,
+      })
       .map((n: any) => n.props.name as string);
     expect(names.length).toBeGreaterThan(0);
     expect(names.filter((n: string) => !(n in glyphs))).toEqual([]);
@@ -712,9 +713,12 @@ describe('the live stream', () => {
   });
 
   it('takes the first event that is on when several are', () => {
-    expect(liveOf([sub({ id: 'a', name: 'Mehendi' }), sub({ id: 'b', name: 'Ceremony' })])?.name).toBe(
-      'Mehendi',
-    );
+    expect(
+      liveOf([
+        sub({ id: 'a', name: 'Mehendi' }),
+        sub({ id: 'b', name: 'Ceremony' }),
+      ])?.name,
+    ).toBe('Mehendi');
   });
 
   it('draws every icon it names from the bundled set', () => {
@@ -730,9 +734,11 @@ describe('the live stream', () => {
       tree.root
         .findAll((n: any) => typeof n.props?.name === 'string', { deep: true })
         .map((n: any) => n.props.name as string);
-    const names = named(block([sub({ live360Url: STREAM, liveVrUrl: STREAM })]));
+    const names = named(
+      block([sub({ live360Url: STREAM, liveVrUrl: STREAM })]),
+    );
     expect(names.length).toBeGreaterThan(0);
-    expect(names.filter((n) => !(n in glyphs))).toEqual([]);
+    expect(names.filter(n => !(n in glyphs))).toEqual([]);
   });
 
   it('plays the stream in place, rather than handing it off', () => {
@@ -742,8 +748,12 @@ describe('the live stream', () => {
      * stopped resolving, which is exactly the regression worth catching.
      */
     const tree = block([sub()]);
-    expect(tree.root.findAllByProps({ testID: 'live-player' }).length).toBeGreaterThan(0);
-    expect(textOf(tree)).not.toContain('Opens in your browser or the streaming app.');
+    expect(
+      tree.root.findAllByProps({ testID: 'live-player' }).length,
+    ).toBeGreaterThan(0);
+    expect(textOf(tree)).not.toContain(
+      'Opens in your browser or the streaming app.',
+    );
   });
 
   describe('where the embedded player may navigate', () => {
@@ -766,7 +776,9 @@ describe('the live stream', () => {
     });
 
     it('is not fooled by an allowed host appearing inside another', () => {
-      expect(isPlayerUrl('https://www.youtube.com.evil.example/embed')).toBe(false);
+      expect(isPlayerUrl('https://www.youtube.com.evil.example/embed')).toBe(
+        false,
+      );
       expect(isPlayerUrl('https://notyoutube.com/embed')).toBe(false);
     });
   });
@@ -799,7 +811,9 @@ describe('the countdown', () => {
   });
 
   it('splits the gap into days, hours, minutes and seconds', () => {
-    const text = textOf(at(2 * 86_400_000 + 3 * 3_600_000 + 4 * 60_000 + 5_000));
+    const text = textOf(
+      at(2 * 86_400_000 + 3 * 3_600_000 + 4 * 60_000 + 5_000),
+    );
     expect(text).toContain('2');
     expect(text).toContain('03');
     expect(text).toContain('04');
@@ -830,7 +844,9 @@ describe('the countdown', () => {
   it('is not there at all when the event has no date', () => {
     expect(render(<CountdownBlock countdown={null} />).toJSON()).toBeNull();
     expect(
-      render(<CountdownBlock countdown={{ ...target(0), startsAt: null }} />).toJSON(),
+      render(
+        <CountdownBlock countdown={{ ...target(0), startsAt: null }} />,
+      ).toJSON(),
     ).toBeNull();
   });
 });
@@ -921,7 +937,12 @@ describe('the cover block', () => {
 
   it('shows the welcome message a guest reads first', () => {
     const text = textOf(
-      cover({ details: { ...invitation().details, message: 'Come celebrate with us.' } }),
+      cover({
+        details: {
+          ...invitation().details,
+          message: 'Come celebrate with us.',
+        },
+      }),
     );
     expect(text).toContain('Come celebrate with us.');
   });
@@ -966,12 +987,17 @@ describe('the cover block', () => {
      * from. The cover falls back to a palette rather than failing to render.
      */
     const legacy = invitation({
-      templates: [{ id: 'garden', label: 'Garden' } as unknown as (typeof templates)[number]],
+      templates: [
+        {
+          id: 'garden',
+          label: 'Garden',
+        } as unknown as (typeof templates)[number],
+      ],
       details: { ...invitation().details, template: 'garden' },
     });
-    expect(textOf(render(<CoverBlock invitation={legacy} mode="guest" />))).toContain(
-      'Meera & Arjun',
-    );
+    expect(
+      textOf(render(<CoverBlock invitation={legacy} mode="guest" />)),
+    ).toContain('Meera & Arjun');
   });
 
   it('judges the cover by its own content, not by an empty body', () => {
@@ -980,7 +1006,12 @@ describe('the cover block', () => {
      * live on the details — a cover judged by its body would be permanently
      * unwritten, and the invitation permanently unapprovable.
      */
-    const header = block({ key: 'header', title: 'Invitation header', type: 'cover', body: '' });
+    const header = block({
+      key: 'header',
+      title: 'Invitation header',
+      type: 'cover',
+      body: '',
+    });
     expect(blockIsWritten(invitation(), header)).toBe(true);
     const blank = invitation({
       details: {
@@ -997,7 +1028,13 @@ describe('the cover block', () => {
 
 describe('the stage', () => {
   const list = (blocks: InvitationBlockDTO[]) =>
-    render(<InsideList invitation={invitation()} blocks={blocks} onPressBlock={noop} />);
+    render(
+      <InsideList
+        invitation={invitation()}
+        blocks={blocks}
+        onPressBlock={noop}
+      />,
+    );
 
   it('names a section the customer still has to write', () => {
     /*
@@ -1029,7 +1066,9 @@ describe('the stage', () => {
 
 describe('GuestPreview', () => {
   it('shows one section under the invitation header when asked for one', () => {
-    const text = textOf(render(<GuestPreview invitation={invitation()} blockKey="countdown" />));
+    const text = textOf(
+      render(<GuestPreview invitation={invitation()} blockKey="countdown" />),
+    );
 
     // The header is the context a guest reads the section in.
     expect(text).toContain('Meera & Arjun');
@@ -1039,7 +1078,9 @@ describe('GuestPreview', () => {
   });
 
   it('says a hidden section has no guest appearance at all', () => {
-    const text = textOf(render(<GuestPreview invitation={invitation()} blockKey="ride" />));
+    const text = textOf(
+      render(<GuestPreview invitation={invitation()} blockKey="ride" />),
+    );
 
     expect(text).toContain('This section is hidden, so guests never see it');
     expect(text).not.toContain('Book a ride');
@@ -1057,9 +1098,9 @@ describe('GuestPreview', () => {
   });
 
   it('counts what is hidden, so a short invitation is not mistaken for a broken one', () => {
-    expect(textOf(render(<GuestPreview invitation={invitation()} />))).toContain(
-      '1 section is hidden from guests.',
-    );
+    expect(
+      textOf(render(<GuestPreview invitation={invitation()} />)),
+    ).toContain('1 section is hidden from guests.');
   });
 
   it('falls back to the occasion, not the booking row, when no hosts are named', () => {
@@ -1098,7 +1139,9 @@ const guest = (over: Partial<GuestDTO> = {}): GuestDTO => ({
 });
 
 describe('ShareSheet', () => {
-  const sheet = (props: Partial<React.ComponentProps<typeof ShareSheet>> = {}) =>
+  const sheet = (
+    props: Partial<React.ComponentProps<typeof ShareSheet>> = {},
+  ) =>
     render(
       <ShareSheet
         visible
@@ -1118,16 +1161,28 @@ describe('ShareSheet', () => {
   it('states the WhatsApp caveat before the customer relies on it', () => {
     // We cannot verify a number has WhatsApp; a message to one that does not
     // simply never arrives.
-    expect(textOf(sheet())).toContain("We can’t check whether a number has WhatsApp");
+    expect(textOf(sheet())).toContain(
+      'We can’t check whether a number has WhatsApp',
+    );
   });
 
   it('marks a guest who already has this section', () => {
-    const text = textOf(sheet({ sectionKey: 'story', guests: [guest({ sharedSections: ['story'] })] }));
+    const text = textOf(
+      sheet({
+        sectionKey: 'story',
+        guests: [guest({ sharedSections: ['story'] })],
+      }),
+    );
     expect(text).toContain('Already sent');
   });
 
-  it("does not mark a guest who has a different section", () => {
-    const text = textOf(sheet({ sectionKey: 'story', guests: [guest({ sharedSections: ['countdown'] })] }));
+  it('does not mark a guest who has a different section', () => {
+    const text = textOf(
+      sheet({
+        sectionKey: 'story',
+        guests: [guest({ sharedSections: ['countdown'] })],
+      }),
+    );
     expect(text).not.toContain('Already sent');
   });
 
@@ -1142,7 +1197,7 @@ describe('ShareSheet', () => {
     const tree = sheet({ onSend });
     const send = tree.root
       .findAll(
-        (n) =>
+        n =>
           n.props?.accessibilityLabel === 'Pick who receives it' &&
           typeof n.props?.disabled === 'boolean',
       )
@@ -1162,7 +1217,7 @@ describe('ShareSheet', () => {
     const tree = sheet();
     const manage = tree.root
       .findAllByProps({ accessibilityRole: 'button' })
-      .find((n) => n.props.accessibilityLabel === 'Manage guest list');
+      .find(n => n.props.accessibilityLabel === 'Manage guest list');
     expect(manage).toBeTruthy();
   });
 
@@ -1178,8 +1233,18 @@ describe('ShareSheet', () => {
     const text = textOf(
       sheet({
         outcomes: [
-          { guest: guest(), status: 'handoff', url: 'https://x', handoffUrl: 'https://wa.me/x' },
-          { guest: guest({ id: 'g2', name: 'Priya' }), status: 'failed', url: 'https://y', error: 'No number' },
+          {
+            guest: guest(),
+            status: 'handoff',
+            url: 'https://x',
+            handoffUrl: 'https://wa.me/x',
+          },
+          {
+            guest: guest({ id: 'g2', name: 'Priya' }),
+            status: 'failed',
+            url: 'https://y',
+            error: 'No number',
+          },
         ],
       }),
     );
@@ -1191,7 +1256,9 @@ describe('ShareSheet', () => {
 });
 
 describe('PreviewSheet', () => {
-  const sheet = (props: Partial<React.ComponentProps<typeof PreviewSheet>> = {}) =>
+  const sheet = (
+    props: Partial<React.ComponentProps<typeof PreviewSheet>> = {},
+  ) =>
     render(
       <PreviewSheet
         visible
@@ -1212,8 +1279,12 @@ describe('PreviewSheet', () => {
   });
 
   it('names who owns the section being previewed', () => {
-    expect(textOf(sheet({ blockKey: 'header' }))).toContain('Yours to personalize');
-    expect(textOf(sheet({ blockKey: 'countdown' }))).toContain('Built by your organizer');
+    expect(textOf(sheet({ blockKey: 'header' }))).toContain(
+      'Yours to personalize',
+    );
+    expect(textOf(sheet({ blockKey: 'countdown' }))).toContain(
+      'Built by your organizer',
+    );
   });
 
   it('offers the send straight from the preview', () => {
@@ -1223,7 +1294,7 @@ describe('PreviewSheet', () => {
     const tree = sheet({ blockKey: 'header', onShare });
     const send = tree.root
       .findAllByProps({ accessibilityRole: 'button' })
-      .find((n) => n.props.accessibilityLabel === 'Send this section');
+      .find(n => n.props.accessibilityLabel === 'Send this section');
 
     expect(send).toBeDefined();
     ReactTestRenderer.act(() => send!.props.onPress());
@@ -1231,7 +1302,11 @@ describe('PreviewSheet', () => {
   });
 
   it('withholds the send before approval, and says why', () => {
-    const tree = sheet({ invitation: invitation({ status: 'sent' }), canShare: false, blockKey: 'header' });
+    const tree = sheet({
+      invitation: invitation({ status: 'sent' }),
+      canShare: false,
+      blockKey: 'header',
+    });
 
     expect(labels(tree)).not.toContain('Send this section');
     expect(textOf(tree)).toContain('Approve the invitation first');
@@ -1250,7 +1325,9 @@ describe('PreviewSheet', () => {
   });
 });
 
-const summary = (over: Partial<InvitationSummaryDTO> = {}): InvitationSummaryDTO =>
+const summary = (
+  over: Partial<InvitationSummaryDTO> = {},
+): InvitationSummaryDTO =>
   ({
     bookingId: 'bk1',
     status: 'sent',
@@ -1261,7 +1338,7 @@ const summary = (over: Partial<InvitationSummaryDTO> = {}): InvitationSummaryDTO
     sentAt: null,
     approvedAt: null,
     ...over,
-  }) as InvitationSummaryDTO;
+  } as InvitationSummaryDTO);
 
 describe('mapInvitationList', () => {
   it('gives every row a name of its own', () => {
@@ -1272,7 +1349,7 @@ describe('mapInvitationList', () => {
       summary({ bookingId: 'bk2', bookingTitle: 'Your Wedding · 12 Dec 2026' }),
     ]);
 
-    expect(rows.map((r) => r.title)).toEqual([
+    expect(rows.map(r => r.title)).toEqual([
       'Your Naming · 5 Sept 2026',
       'Your Wedding · 12 Dec 2026',
     ]);
@@ -1293,25 +1370,43 @@ describe('mapInvitationList', () => {
 
   it('orders the rest by how soon the event is', () => {
     const rows = mapInvitationList([
-      summary({ bookingId: 'later', status: 'approved', eventDate: '2027-01-01T00:00:00.000Z' }),
-      summary({ bookingId: 'sooner', status: 'approved', eventDate: '2026-09-05T00:00:00.000Z' }),
+      summary({
+        bookingId: 'later',
+        status: 'approved',
+        eventDate: '2027-01-01T00:00:00.000Z',
+      }),
+      summary({
+        bookingId: 'sooner',
+        status: 'approved',
+        eventDate: '2026-09-05T00:00:00.000Z',
+      }),
     ]);
 
-    expect(rows.map((r) => r.bookingId)).toEqual(['sooner', 'later']);
+    expect(rows.map(r => r.bookingId)).toEqual(['sooner', 'later']);
   });
 
   it('sorts on the timestamp, not on the formatted label', () => {
     // "5 Sept 2026" does not parse back into a Date, and a comparator
     // returning NaN leaves the list in arrival order.
     const rows = mapInvitationList([
-      summary({ bookingId: 'b', status: 'approved', eventDate: '2026-12-12T00:00:00.000Z' }),
-      summary({ bookingId: 'a', status: 'approved', eventDate: '2026-09-05T00:00:00.000Z' }),
+      summary({
+        bookingId: 'b',
+        status: 'approved',
+        eventDate: '2026-12-12T00:00:00.000Z',
+      }),
+      summary({
+        bookingId: 'a',
+        status: 'approved',
+        eventDate: '2026-09-05T00:00:00.000Z',
+      }),
     ]);
-    expect(rows.map((r) => r.bookingId)).toEqual(['a', 'b']);
+    expect(rows.map(r => r.bookingId)).toEqual(['a', 'b']);
   });
 
   it('names an untitled booking rather than rendering nothing', () => {
-    expect(mapInvitationList([summary({ bookingTitle: '' })])[0].title).toBe('Your event');
+    expect(mapInvitationList([summary({ bookingTitle: '' })])[0].title).toBe(
+      'Your event',
+    );
   });
 
   it('survives a booking with no date', () => {
@@ -1366,7 +1461,11 @@ describe('render dump', () => {
         { id: 'classic', label: 'Classic', note: 'The app\u2019s own face' },
         { id: 'romantic', label: 'Romantic', note: 'Serif italic' },
         { id: 'modern', label: 'Modern', note: 'Bold and tight' },
-        { id: 'traditional', label: 'Traditional', note: 'Serif, set in capitals' },
+        {
+          id: 'traditional',
+          label: 'Traditional',
+          note: 'Serif, set in capitals',
+        },
       ],
       limits: { welcomeMessage: 200, heroVideoSeconds: 30 },
       details: {
@@ -1377,16 +1476,53 @@ describe('render dump', () => {
       },
       blocks: [
         block({ key: 'header', title: 'Cover', icon: 'image', type: 'cover' }),
-        block({ key: 'story', title: 'Our story', icon: 'sparkles', body: 'Ten years, one courtyard.' }),
-        block({ key: 'countdown', title: 'Countdown', icon: 'clock', owner: 'organizer' }),
-        block({ key: 'save-the-date', title: 'Save the date', icon: 'calendar', owner: 'organizer' }),
-        block({ key: 'live-stream', title: 'Live stream', icon: 'play', owner: 'organizer' }),
+        block({
+          key: 'story',
+          title: 'Our story',
+          icon: 'sparkles',
+          body: 'Ten years, one courtyard.',
+        }),
+        block({
+          key: 'countdown',
+          title: 'Countdown',
+          icon: 'clock',
+          owner: 'organizer',
+        }),
+        block({
+          key: 'save-the-date',
+          title: 'Save the date',
+          icon: 'calendar',
+          owner: 'organizer',
+        }),
+        block({
+          key: 'live-stream',
+          title: 'Live stream',
+          icon: 'play',
+          owner: 'organizer',
+        }),
         block({ key: 'memories', title: 'Shared memories', icon: 'camera' }),
-        block({ key: 'wall', title: 'Share your wishes, messages, photos and blessings', icon: 'users', body: 'Leave a note for the family.' }),
-        block({ key: 'ride', title: 'Book a ride', icon: 'car', owner: 'organizer', hidden: true }),
+        block({
+          key: 'wall',
+          title: 'Share your wishes, messages, photos and blessings',
+          icon: 'users',
+          body: 'Leave a note for the family.',
+        }),
+        block({
+          key: 'ride',
+          title: 'Book a ride',
+          icon: 'car',
+          owner: 'organizer',
+          hidden: true,
+        }),
       ],
       changeRequests: [
-        { id: 'c1', blockKey: 'countdown', blockTitle: 'Countdown', note: 'Start at 6pm', at: '' },
+        {
+          id: 'c1',
+          blockKey: 'countdown',
+          blockTitle: 'Countdown',
+          note: 'Start at 6pm',
+          at: '',
+        },
       ],
       subEvents: [
         {
@@ -1407,16 +1543,45 @@ describe('render dump', () => {
     const review = (
       <>
         <PrimaryAction stage="write" onPress={noop} />
-        <InsideList invitation={full} blocks={full.blocks} onPressBlock={noop} />
+        <InsideList
+          invitation={full}
+          blocks={full.blocks}
+          onPressBlock={noop}
+        />
       </>
     );
 
     const shareGuests = [
-      guest({ id: 'g1', name: 'Sruthi Reddy', phoneDisplay: '+91 98490 11234', group: 'family' }),
-      guest({ id: 'g2', name: 'Venkat Rao', phoneDisplay: '+91 99590 44821', group: 'family' }),
-      guest({ id: 'g3', name: 'Anitha Naidu', phoneDisplay: '+91 90000 77231', group: 'family' }),
-      guest({ id: 'g4', name: 'Ravi Kumar', phoneDisplay: '+91 97010 22187', group: 'friends' }),
-      guest({ id: 'g5', name: 'Deepa Shetty', phoneDisplay: '+91 98861 55490', group: 'friends' }),
+      guest({
+        id: 'g1',
+        name: 'Sruthi Reddy',
+        phoneDisplay: '+91 98490 11234',
+        group: 'family',
+      }),
+      guest({
+        id: 'g2',
+        name: 'Venkat Rao',
+        phoneDisplay: '+91 99590 44821',
+        group: 'family',
+      }),
+      guest({
+        id: 'g3',
+        name: 'Anitha Naidu',
+        phoneDisplay: '+91 90000 77231',
+        group: 'family',
+      }),
+      guest({
+        id: 'g4',
+        name: 'Ravi Kumar',
+        phoneDisplay: '+91 97010 22187',
+        group: 'friends',
+      }),
+      guest({
+        id: 'g5',
+        name: 'Deepa Shetty',
+        phoneDisplay: '+91 98861 55490',
+        group: 'friends',
+      }),
     ];
 
     const panels: Array<[string, string]> = [
@@ -1462,7 +1627,8 @@ describe('render dump', () => {
                 timezone: 'Asia/Kolkata',
                 venueName: 'Taj Krishna',
                 venueAddress: 'Banjara Hills, Hyderabad',
-                postEventMessage: 'We\u2019re Married!\nThank you for celebrating with us.',
+                postEventMessage:
+                  'We\u2019re Married!\nThank you for celebrating with us.',
               }}
             />,
           ).toJSON(),
@@ -1478,11 +1644,22 @@ describe('render dump', () => {
                 {
                   id: 's1',
                   imageUrl: '/a.jpg',
-                  caption: 'Where our story began, on a wet Tuesday in Hyderabad.',
+                  caption:
+                    'Where our story began, on a wet Tuesday in Hyderabad.',
                   order: 0,
                 },
-                { id: 's2', imageUrl: '/b.jpg', caption: 'Our first adventure together.', order: 1 },
-                { id: 's3', imageUrl: '/c.jpg', caption: 'And then came the proposal\u2026', order: 2 },
+                {
+                  id: 's2',
+                  imageUrl: '/b.jpg',
+                  caption: 'Our first adventure together.',
+                  order: 1,
+                },
+                {
+                  id: 's3',
+                  imageUrl: '/c.jpg',
+                  caption: 'And then came the proposal\u2026',
+                  order: 2,
+                },
               ]}
               onOpen={noop}
             />,
@@ -1549,13 +1726,107 @@ describe('render dump', () => {
         'The whole invitation, before approval',
         toHtml(
           render(
-            <PreviewSheet visible invitation={full} canShare={false} onShare={noop} onClose={noop} />,
+            <PreviewSheet
+              visible
+              invitation={full}
+              canShare={false}
+              onShare={noop}
+              onClose={noop}
+            />,
           ).toJSON(),
         ),
       ],
     ];
 
-    fs.writeFileSync(out, page(panels, { title: 'Guest invitation', width: 390, background: '#fff', padding: 0 }), 'utf8');
+    fs.writeFileSync(
+      out,
+      page(panels, {
+        title: 'Guest invitation',
+        width: 390,
+        background: '#fff',
+        padding: 0,
+      }),
+      'utf8',
+    );
     expect(fs.existsSync(out)).toBe(true);
+  });
+});
+
+describe('the next-step card', () => {
+  const render = (
+    stage: InvitationStage,
+    guests: GuestProgress | null = null,
+    extra = {},
+  ) => {
+    let tree!: ReactTestRenderer.ReactTestRenderer;
+    ReactTestRenderer.act(() => {
+      tree = ReactTestRenderer.create(
+        <NextStep
+          stage={stage}
+          publishedAt="2026-10-01T10:00:00.000Z"
+          requests={[
+            {
+              id: 'r1',
+              blockKey: '',
+              blockTitle: '',
+              note: 'Bigger names please',
+              at: '',
+            },
+          ]}
+          guests={guests}
+          approving={false}
+          error={null}
+          requestSent={false}
+          onApprove={() => undefined}
+          onShare={() => undefined}
+          onAsk={() => undefined}
+          {...extra}
+        />,
+      );
+    });
+    return tree;
+  };
+
+  it('first review: one button to approve, asking is the quiet link', () => {
+    expect(labels(render('review'))).toEqual([
+      'Approve & go live',
+      'Ask for a change',
+    ]);
+  });
+
+  it('an update: says guests keep the approved version, offers to approve the update', () => {
+    const tree = render('update');
+    expect(textOf(tree)).toContain(
+      'Guests still see the version you approved on',
+    );
+    expect(labels(tree)).toEqual(['Approve the update', 'Ask for a change']);
+  });
+
+  it("changes asked: no big button — it is the organizer's turn — and the note is quoted", () => {
+    const tree = render('asked');
+    expect(textOf(tree)).toContain('Bigger names please');
+    expect(labels(tree)).toEqual([
+      'Approve this version anyway',
+      'Add to your request',
+    ]);
+  });
+
+  it('live with nobody on the list: start the list', () => {
+    expect(labels(render('live', { total: 0, sent: 0, viewed: 0 }))[0]).toBe(
+      'Add guests & share',
+    );
+  });
+
+  it('live, part-way: the number still waiting, and the progress', () => {
+    const tree = render('live', { total: 40, sent: 12, viewed: 8 });
+    expect(labels(tree)[0]).toBe('Share with 28 more guests');
+    expect(textOf(tree)).toContain('Sent to 12 of 40');
+    expect(textOf(tree)).toContain('8 opened');
+  });
+
+  it('live, everyone has it: share again', () => {
+    expect(labels(render('live', { total: 3, sent: 3, viewed: 1 }))[0]).toBe(
+      'Share again',
+    );
   });
 });

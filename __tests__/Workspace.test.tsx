@@ -28,7 +28,6 @@ jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
 
 import { page, toHtml } from '../test-utils/rn-to-html';
 import { mapWorkspace, formatINR } from '../src/modules/Workspace/utils';
-import { WORKSPACE_TABS } from '../src/modules/Workspace/constants';
 import { WorkspaceOverview } from '../src/modules/Workspace/sections/WorkspaceOverview';
 import {
   Milestones,
@@ -36,7 +35,8 @@ import {
   Tasks,
   Timeline,
 } from '../src/modules/Workspace/sections/WorkspaceSections';
-import { IdeasSummary, InvitationSummary } from '../src/modules/Workspace/sections/WorkspaceLinks';
+import { IdeasSummary } from '../src/modules/Workspace/sections/WorkspaceLinks';
+import { InvitationTab } from '../src/modules/Workspace/sections/InvitationTab';
 import type { BookingDetailDTO } from '../src/modules/Workspace/types';
 
 declare const process: { env: Record<string, string | undefined> };
@@ -79,6 +79,32 @@ const detail = (over: Partial<BookingDetailDTO> = {}): BookingDetailDTO =>
   }) as BookingDetailDTO;
 
 describe('mapWorkspace', () => {
+  it('says what is really still owed, not the total less an advance nobody paid', () => {
+    const vm = mapWorkspace(
+      detail({
+        amount: 313538,
+        advanceAmount: 94061,
+        balanceAmount: 219477,
+        amountPaid: 0,
+        paymentStatus: 'unpaid',
+        advanceMethod: 'cash',
+      }),
+    );
+    expect(vm.payment.dueLabel).toBe('₹3,13,538');
+    expect(vm.payment.paidHeadline).toBe('₹0');
+    expect(vm.payment.advanceLabel).toBe('₹94,061');
+    expect(vm.payment.advanceState).toBe('cash_due');
+    expect(vm.payment.balanceLabel).toBe('₹2,19,477');
+  });
+
+  it('marks the advance paid once the money is in', () => {
+    const vm = mapWorkspace(
+      detail({ amount: 313538, advanceAmount: 94061, amountPaid: 94061, paymentStatus: 'advance_paid' }),
+    );
+    expect(vm.payment.advanceState).toBe('paid');
+    expect(vm.payment.dueLabel).toBe('₹2,19,477');
+  });
+
   /*
    * The heading is the event's name and nothing else. The backend titles a
    * booking by occasion and date — "Corporate 2026-09-29" — which is a
@@ -244,15 +270,12 @@ describe('render dump', () => {
     }: {
       data: ReturnType<typeof mapWorkspace>;
       counts: { shared: number; planned: number; awaitingApproval: number } | null;
-      invitation: Parameters<typeof InvitationSummary>[0]['invitation'];
+      invitation: Parameters<typeof InvitationTab>[0]['invitation'];
     }) => (
       <View>
         <WorkspaceOverview
           data={data}
           onBack={() => {}}
-          tab="details"
-          tabs={WORKSPACE_TABS}
-          onSelectTab={() => {}}
         />
         <Milestones data={data} />
         <IdeasSummary
@@ -261,7 +284,13 @@ describe('render dump', () => {
           latest={counts && counts.shared > 0 ? latestIdea : null}
           onPress={() => {}}
         />
-        <InvitationSummary invitation={invitation} organizerName={data.organizerName} onPress={() => {}} />
+        <InvitationTab
+          workspace={data}
+          invitation={invitation}
+          guests={null}
+          onOpenInvitation={() => {}}
+          onOpenGuests={() => {}}
+        />
         <Payment data={data} />
         <Tasks data={data} />
         <Timeline data={data} />

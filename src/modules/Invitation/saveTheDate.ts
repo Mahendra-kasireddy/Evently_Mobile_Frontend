@@ -21,7 +21,11 @@ export function cardDate(day: string): string {
   if (!day) return '';
   const d = new Date(`${day}T00:00:00`);
   if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  return d.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 }
 
 /** `18:00` → `6:00 PM`; anything unparseable comes back as it went in. */
@@ -51,7 +55,7 @@ export function cardTone(
   palette: CardColourDTO[] | undefined,
   fallbackInk: string,
 ): CardTone {
-  const picked = (palette ?? []).find((c) => c.id === colourId);
+  const picked = (palette ?? []).find(c => c.id === colourId);
   if (picked) return { wash: picked.wash, ink: picked.ink };
   return { wash: '#ffffff', ink: fallbackInk };
 }

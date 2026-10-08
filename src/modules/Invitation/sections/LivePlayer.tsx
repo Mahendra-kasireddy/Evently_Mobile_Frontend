@@ -26,13 +26,18 @@ type WebViewProps = {
   mediaPlaybackRequiresUserAction: boolean;
   originWhitelist: string[];
   setSupportMultipleWindows: boolean;
-  onShouldStartLoadWithRequest: (req: { url: string; isTopFrame?: boolean }) => boolean;
+  onShouldStartLoadWithRequest: (req: {
+    url: string;
+    isTopFrame?: boolean;
+  }) => boolean;
 };
 
 function resolveWebView(): React.ComponentType<WebViewProps> | null {
   try {
     const mod = require('react-native-webview');
-    return (mod?.WebView ?? mod?.default ?? null) as React.ComponentType<WebViewProps> | null;
+    return (mod?.WebView ??
+      mod?.default ??
+      null) as React.ComponentType<WebViewProps> | null;
   } catch {
     return null;
   }
@@ -74,7 +79,7 @@ export function isPlayerUrl(url: string): boolean {
   if (!host) return false;
   /* Suffix match on a dot boundary, so `youtube.com.evil.example` does not
      pass by containing an allowed name. */
-  return PLAYER_HOSTS.some((h) => host === h || host.endsWith(`.${h}`));
+  return PLAYER_HOSTS.some(h => host === h || host.endsWith(`.${h}`));
 }
 
 /** The player, 16:9, with the stream's own controls inside it. */
@@ -96,7 +101,7 @@ export function LivePlayer({ uri }: { uri: string }) {
         mediaPlaybackRequiresUserAction
         originWhitelist={['https://*']}
         setSupportMultipleWindows={false}
-        onShouldStartLoadWithRequest={(req) => {
+        onShouldStartLoadWithRequest={req => {
           if (isPlayerUrl(req.url)) return true;
           Linking.openURL(req.url).catch(() => undefined);
           return false;

@@ -1,18 +1,18 @@
 import { useCallback } from 'react';
 import { useAsync, type AsyncResult } from '../../hooks/useAsync';
-import { useAsyncCallback, type AsyncCallbackResult } from '../../hooks/useAsyncCallback';
 import {
-  approveBlock,
+  useAsyncCallback,
+  type AsyncCallbackResult,
+} from '../../hooks/useAsyncCallback';
+import {
   approveInvitation,
   fetchGuests,
   fetchInvitation,
   fetchMyInvitations,
-  personalizeBlock,
   requestInvitationChange,
   shareInvitation,
 } from './services';
 import type {
-  BlockPatch,
   GuestDTO,
   InvitationDTO,
   InvitationSummaryDTO,
@@ -23,21 +23,18 @@ export function useMyInvitations(): AsyncResult<InvitationSummaryDTO[]> {
   return useAsync(fetchMyInvitations, []);
 }
 
-export function useInvitation(bookingId: string): AsyncResult<InvitationDTO | null> {
+export function useInvitation(
+  bookingId: string,
+): AsyncResult<InvitationDTO | null> {
   const load = useCallback(() => fetchInvitation(bookingId), [bookingId]);
   return useAsync(load, [bookingId]);
 }
 
-export function useApproveInvitation(): AsyncCallbackResult<[string], InvitationDTO> {
+export function useApproveInvitation(): AsyncCallbackResult<
+  [string],
+  InvitationDTO
+> {
   return useAsyncCallback(approveInvitation);
-}
-
-export function useApproveBlock(): AsyncCallbackResult<[string, string], InvitationDTO> {
-  return useAsyncCallback(approveBlock);
-}
-
-export function usePersonalizeBlock(): AsyncCallbackResult<[string, string, BlockPatch], InvitationDTO> {
-  return useAsyncCallback(personalizeBlock);
 }
 
 export function useRequestInvitationChange(): AsyncCallbackResult<
@@ -52,7 +49,14 @@ export function useGuests(): AsyncCallbackResult<[string], GuestDTO[]> {
 }
 
 export function useShareInvitation(): AsyncCallbackResult<
-  [string, { section?: string; guestIds: string[]; newGuests: Array<{ name: string; phone: string }> }],
+  [
+    string,
+    {
+      section?: string;
+      guestIds: string[];
+      newGuests: Array<{ name: string; phone: string }>;
+    },
+  ],
   ShareResultDTO
 > {
   return useAsyncCallback(shareInvitation);

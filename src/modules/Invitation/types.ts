@@ -291,6 +291,13 @@ export interface InvitationDTO {
   status: InvitationStatus;
   sentAt: string | null;
   approvedAt: string | null;
+  /**
+   * Guests can open it — it has been approved at least once. Stays true while
+   * an update is out for review: guests keep the approved version meanwhile.
+   */
+  isLive?: boolean;
+  /** When the version guests see was approved. */
+  publishedAt?: string | null;
   details: InvitationDetailsDTO;
   blocks: InvitationBlockDTO[];
   subEvents: InvitationSubEventDTO[];

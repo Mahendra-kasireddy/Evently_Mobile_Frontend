@@ -1,4 +1,11 @@
-import { Modal, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import {
+  Image,
+  Modal,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { EventlyIcon, EventlyImage, EventlyText } from '../../../Components';
 import { absoluteFileUrl } from '../../../services/urls';
 import { colors } from '../../../theme';
@@ -43,11 +50,14 @@ function Media({
   artwork,
   style,
   mode = 'ambient',
+  onAspect,
 }: {
   artwork: Artwork;
   style: object;
   /** `ambient` in the card (a tap opens the viewer); `player` full screen. */
   mode?: VideoMode;
+  /** Reports a video's own shape once it has loaded. */
+  onAspect?: (aspect: number) => void;
 }) {
   if (artwork.kind === 'video') {
     /* A video this build cannot play is not a broken invitation — it is one
@@ -55,14 +65,30 @@ function Media({
     if (!canPlayVideo) {
       return (
         <View style={[style, s.unplayable]}>
-          <EventlyIcon name="play-circle-outline" size={34} color={colors.onPrimaryMuted} />
+          <EventlyIcon
+            name="play-circle-outline"
+            size={34}
+            color={colors.onPrimaryMuted}
+          />
           <EventlyText variant="caption" style={s.unplayableText}>
             {COPY.artworkVideoNoPlayer}
           </EventlyText>
         </View>
       );
     }
-    return <HeroVideo uri={absoluteFileUrl(artwork.url)} style={style} mode={mode} fit="contain" />;
+    return (
+      <HeroVideo
+        uri={absoluteFileUrl(artwork.url)}
+        style={style}
+        mode={mode}
+        /* The card's frame takes the video's shape once it reports it, so
+           cover crops nothing then — and until it does, cover fills the
+           frame instead of showing bands that look like a broken player.
+           Full screen keeps the whole frame. */
+        fit={mode === 'player' ? 'contain' : 'cover'}
+        onAspect={onAspect}
+      />
+    );
   }
   return (
     <EventlyImage
@@ -73,12 +99,27 @@ function Media({
   );
 }
 
+/** Width ÷ height the frame starts at, before the media's own shape is known. */
+const DEFAULT_ASPECT = 4 / 5;
+/** The tallest the preview may be, so the decision below stays on screen. */
+const MAX_HEIGHT = 420;
+
+/** "2:15" for a video's length, or '' when it is not known. */
+function lengthLabel(seconds: number): string {
+  if (!seconds || seconds <= 0) return '';
+  const total = Math.round(seconds);
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
+}
+
 /**
- * What the organizer sent, and the one way to look at it properly.
+ * What the organizer sent, at its own shape.
  *
- * The card is a preview at the size a screen allows; the invitation is meant
- * to be read full-bleed, which is how a guest will get it — so opening it is
- * the only control on this block.
+ * The frame takes the artwork's proportions — measured from the image, or
+ * reported by the video once it loads — so a landscape reel is a landscape
+ * card and a portrait card is a portrait one, edge to edge. A fixed portrait
+ * frame put a widescreen video between two black bands that read as a broken
+ * player. Capped in height so the decision under it stays in view; opening it
+ * full screen is the chip on its corner.
  */
 export function InvitationArtwork({
   artwork,
@@ -87,33 +128,65 @@ export function InvitationArtwork({
   artwork: Artwork;
   onView: () => void;
 }) {
+  const { width: screen } = useWindowDimensions();
+  const [aspect, setAspect] = useState(DEFAULT_ASPECT);
+  const url = absoluteFileUrl(artwork.url);
+
+  useEffect(() => {
+    if (artwork.kind !== 'image' || !url) return;
+    let alive = true;
+    Image.getSize(
+      url,
+      (w, h) => {
+        if (alive && w > 0 && h > 0) setAspect(w / h);
+      },
+      () => undefined,
+    );
+    return () => {
+      alive = false;
+    };
+  }, [artwork.kind, url]);
+
+  const maxWidth = screen - 32;
+  let width = maxWidth;
+  let height = width / aspect;
+  if (height > MAX_HEIGHT) {
+    height = MAX_HEIGHT;
+    width = height * aspect;
+  }
+  const length = artwork.kind === 'video' ? lengthLabel(artwork.seconds) : '';
+
   return (
     <View style={s.block}>
       <TouchableOpacity
-        style={s.frame}
+        style={[s.frame, { width, height }]}
         activeOpacity={0.92}
         onPress={onView}
         accessibilityRole="button"
         accessibilityLabel={COPY.artworkView}
         testID="invitation-artwork"
       >
-        <Media artwork={artwork} style={s.media} />
-      </TouchableOpacity>
-
-      {/* Said under the thumbnail rather than drawn as a full-width button:
-          it opens a picture, it is not the decision this screen asks for. */}
-      <TouchableOpacity
-        style={s.view}
-        activeOpacity={0.85}
-        onPress={onView}
-        accessibilityRole="button"
-        accessibilityLabel={COPY.artworkView}
-        testID="invitation-view"
-      >
-        <EventlyIcon name="arrow-expand" size={15} color={INV_ACCENT} />
-        <EventlyText variant="subtitle" style={s.viewText}>
-          {COPY.artworkView}
-        </EventlyText>
+        <Media artwork={artwork} style={s.media} onAspect={setAspect} />
+        {artwork.kind === 'video' ? (
+          <View style={s.kindChip} pointerEvents="none">
+            <EventlyIcon name="play" size={12} color="#ffffff" />
+            <EventlyText variant="caption" style={s.kindChipText}>
+              {length
+                ? `${COPY.artworkVideoChip} · ${length}`
+                : COPY.artworkVideoChip}
+            </EventlyText>
+          </View>
+        ) : null}
+        <View
+          style={s.expandChip}
+          pointerEvents="none"
+          testID="invitation-view"
+        >
+          <EventlyIcon name="arrow-expand" size={14} color="#ffffff" />
+          <EventlyText variant="caption" style={s.expandChipText}>
+            {COPY.artworkViewShort}
+          </EventlyText>
+        </View>
       </TouchableOpacity>
     </View>
   );
@@ -136,9 +209,15 @@ export function ArtworkViewer({
   onClose: () => void;
 }) {
   return (
-    <Modal visible={visible && artwork !== null} animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={visible && artwork !== null}
+      animationType="fade"
+      onRequestClose={onClose}
+    >
       <View style={s.viewer}>
-        {artwork ? <Media artwork={artwork} style={s.viewerMedia} mode="player" /> : null}
+        {artwork ? (
+          <Media artwork={artwork} style={s.viewerMedia} mode="player" />
+        ) : null}
         <TouchableOpacity
           style={s.viewerClose}
           activeOpacity={0.8}

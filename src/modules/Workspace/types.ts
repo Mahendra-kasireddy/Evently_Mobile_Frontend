@@ -60,6 +60,8 @@ export interface BookingDetailDTO {
   amount: number;
   advanceAmount: number;
   advancePercentage: number;
+  /** How the advance is being settled. Absent on older servers — read as online. */
+  advanceMethod?: 'online' | 'cash';
   balanceAmount: number;
   paymentStatus: PaymentStatus;
   amountPaid: number;
@@ -135,7 +137,17 @@ export interface WorkspaceViewModel {
     statusLabel: string;
     /** Share of the total already paid, for the bar. */
     paidPercent: number;
+    /** "₹0" style figure for the headline — '₹0' rather than '' when nothing is paid. */
+    paidHeadline: string;
+    /** The advance and where it stands; '' amount when the booking has none. */
+    advanceLabel: string;
+    advanceState: 'paid' | 'cash_due' | 'due';
+    /** What is left after the advance — due before the event. */
+    balanceLabel: string;
   };
+  /** Tasks done and in all, for the stats ring. */
+  tasksDone: number;
+  tasksTotal: number;
   tasks: WorkspaceTask[];
   timeline: WorkspaceTimelineEntry[];
   organizerName: string | null;
@@ -256,6 +268,18 @@ export interface InvitationDTO {
     eventTime: string;
     venueName: string;
     venueAddress: string;
+    /** The invitation's cover, when the organizer uploaded one. */
+    heroMediaType?: 'image' | 'video' | '';
+    heroMediaUrl?: string;
   };
   subEvents: Array<{ id: string; name: string; eventDate: string; venueName: string }>;
+}
+
+/** The guest list, counted for the invitation tab. */
+export interface GuestSummary {
+  total: number;
+  /** Guests the invitation has gone to at least once. */
+  sent: number;
+  /** Guests who have opened it. */
+  viewed: number;
 }

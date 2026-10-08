@@ -17,7 +17,9 @@ jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
   };
 });
 
-import { IdeasSummary, InvitationSummary } from '../src/modules/Workspace/sections/WorkspaceLinks';
+import { IdeasSummary } from '../src/modules/Workspace/sections/WorkspaceLinks';
+import { InvitationTab } from '../src/modules/Workspace/sections/InvitationTab';
+import { mapWorkspace } from '../src/modules/Workspace/utils';
 import type { IdeaDTO, InvitationDTO } from '../src/modules/Workspace/types';
 
 function render(node: React.ReactElement) {
@@ -179,47 +181,134 @@ describe('IdeasSummary', () => {
 });
 
 const invitation = (over: Partial<InvitationDTO> = {}): InvitationDTO =>
-  ({ id: 'i1', bookingId: 'b1', bookingTitle: 'T', status: 'sent', ...over }) as InvitationDTO;
+  ({
+    id: 'i1',
+    bookingId: 'b1',
+    bookingTitle: 'T',
+    status: 'sent',
+    sentAt: null,
+    approvedAt: null,
+    details: {
+      eyebrow: 'Together with their families',
+      hostOne: 'Aarav',
+      hostTwo: 'Diya',
+      joiner: '&',
+      eventDate: '2026-11-06',
+      eventTime: '7:00 PM',
+      venueName: 'Taj Krishna',
+      venueAddress: '',
+    },
+    subEvents: [],
+    ...over,
+  }) as InvitationDTO;
 
-describe('InvitationSummary', () => {
-  it('reads as a pending step, not an error, before the organizer shares it', () => {
-    const text = textOf(
-      render(<InvitationSummary invitation={null} organizerName="MAHENDRA EVENTS" onPress={noop} />),
-    );
+const workspace = mapWorkspace({
+  id: 'b1',
+  ref: 'EVT-1',
+  title: 'Birthday',
+  description: '',
+  occasion: 'birthday',
+  location: 'Hitech city, Hyderabad',
+  eventDate: '2026-11-06T00:00:00.000Z',
+  daysToGo: 30,
+  amount: 100000,
+  advanceAmount: 30000,
+  advancePercentage: 30,
+  balanceAmount: 70000,
+  paymentStatus: 'unpaid',
+  amountPaid: 0,
+  progress: 40,
+  status: 'confirmed',
+  steps: [],
+  tasks: [],
+  timeline: [],
+  organizer: { id: 'o1', name: 'MAHENDRA EVENTS', initials: 'ME', avatarColor: '#333' },
+  customer: null,
+} as unknown as Parameters<typeof mapWorkspace>[0]);
 
-    expect(text).toContain('MAHENDRA EVENTS is still preparing your guest invitation');
-    // Nothing to open yet, so no action is offered.
-    expect(text).not.toContain('Review');
+const tab = (props: Partial<Parameters<typeof InvitationTab>[0]> = {}) => (
+  <InvitationTab
+    workspace={workspace}
+    invitation={invitation()}
+    guests={null}
+    onOpenInvitation={noop}
+    onOpenGuests={noop}
+    {...props}
+  />
+);
+
+describe('InvitationTab', () => {
+  it('reads as a step under way, not an error, before the organizer shares it', () => {
+    const text = textOf(render(tab({ invitation: null })));
+
+    expect(text).toContain('Being designed');
+    expect(text).toContain('MAHENDRA EVENTS is crafting your invitation');
+    // Nothing to open yet, so no review is offered — but the guest list can start.
+    expect(text).not.toContain('Review invitation');
+    expect(text).toContain('Start guest list');
   });
 
-  it('asks for a review once it has been shared', () => {
-    const text = textOf(render(<InvitationSummary invitation={invitation()} organizerName="ME" onPress={noop} />));
+  it('draws the invitation itself: its hosts, date and venue', () => {
+    const text = textOf(render(tab()));
+    expect(text).toContain('Aarav & Diya');
+    expect(text).toContain('7:00 PM');
+    expect(text).toContain('Taj Krishna');
+  });
 
-    expect(text).toContain('Your invitation is ready to review');
-    expect(text).toContain('awaiting your approval');
-    expect(text).toContain('Review');
+  it('asks for a review once it has been shared, and opens it rather than approving here', () => {
+    const onOpenInvitation = jest.fn();
+    const tree = render(tab({ onOpenInvitation }));
+    const text = textOf(tree);
+    expect(text).toContain('Ready for your review');
+
+    // Approving is a decision made after reading the thing.
+    const button = tree.root
+      .findAllByProps({ accessibilityRole: 'button' })
+      .find((n) => String(n.props.accessibilityLabel).startsWith('Review invitation'));
+    expect(button).toBeDefined();
+    ReactTestRenderer.act(() => button!.props.onPress());
+    expect(onOpenInvitation).toHaveBeenCalledTimes(1);
   });
 
   it('reports the live guest link once approved', () => {
-    const text = textOf(
-      render(<InvitationSummary invitation={invitation({ status: 'approved' })} organizerName="ME" onPress={noop} />),
-    );
-
-    expect(text).toContain('Your invitation is approved');
-    expect(text).toContain('the guest link is live');
-    expect(text).toContain('View');
+    const text = textOf(render(tab({ invitation: invitation({ status: 'approved' }) })));
+    expect(text).toContain('Approved & live');
+    expect(text).toContain('View & share');
   });
 
-  it('opens the invitation rather than approving from the summary', () => {
-    // Approving is a decision made after reading the thing.
-    const onPress = jest.fn();
-    const tree = render(<InvitationSummary invitation={invitation()} organizerName="ME" onPress={onPress} />);
+  it('says in one line how far an approved invitation has reached', () => {
+    const text = textOf(
+      render(
+        tab({
+          invitation: invitation({ status: 'approved' }),
+          guests: { total: 12, sent: 5, viewed: 3 },
+        }),
+      ),
+    );
+    expect(text).toContain('Sent to 5 of 12 guests');
+    // One screen, one decision: no guest rings, no second tile, no programme.
+    expect(text).not.toContain('Invited');
+    expect(text).not.toContain('The programme');
+  });
+
+  it('offers exactly one main action', () => {
+    const tree = render(tab());
+    const buttons = tree.root
+      .findAllByProps({ accessibilityRole: 'button' })
+      .filter((n) => typeof n.props.onPress === 'function')
+      .map((n) => String(n.props.accessibilityLabel));
+    // The card itself (opens the invitation) and the one next-step button.
+    expect(new Set(buttons)).toEqual(new Set(['Open your guest invitation', 'Review invitation']));
+  });
+
+  it('starts the guest list while the invitation is still being designed', () => {
+    const onOpenGuests = jest.fn();
+    const tree = render(tab({ invitation: null, guests: { total: 0, sent: 0, viewed: 0 }, onOpenGuests }));
     const button = tree.root
       .findAllByProps({ accessibilityRole: 'button' })
-      .find((n) => String(n.props.accessibilityLabel).startsWith('Review'));
-
+      .find((n) => n.props.accessibilityLabel === 'Start guest list');
     expect(button).toBeDefined();
     ReactTestRenderer.act(() => button!.props.onPress());
-    expect(onPress).toHaveBeenCalledTimes(1);
+    expect(onOpenGuests).toHaveBeenCalledTimes(1);
   });
 });

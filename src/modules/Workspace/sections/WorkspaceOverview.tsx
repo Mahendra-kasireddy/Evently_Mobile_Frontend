@@ -1,366 +1,286 @@
-import {
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { useEffect, useRef } from 'react';
+import { Animated, Image, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText } from '../../../Components';
-import { colors } from '../../../theme';
 import {
-  WORKSPACE_ACCENT,
+  Confetti,
+  EventlyIcon,
+  EventlyText,
+  PressableScale,
+  useReducedMotion,
+} from '../../../Components';
+import {
+  OCCASION_THEME,
+  STAT_RING,
   WORKSPACE_COPY,
-  WORKSPACE_GREEN,
-  WORKSPACE_NAVY_DEEP,
+  WORKSPACE_PREMIUM_COPY as P,
   WORKSPACE_STATUS_COLOR,
-  WORKSPACE_VIOLET,
 } from '../constants';
-import { overviewStyles as s } from '../styles';
-import type { WorkspaceViewModel, WorkspaceTab, WorkspaceTabItem } from '../types';
+import { heroStyles as s } from '../premium.styles';
+import type { WorkspaceViewModel } from '../types';
+import { ProgressRing } from './ProgressRing';
 
-/*
- * The artwork behind the header.
- *
- * Bundled rather than fetched: a remote banner leaves the screen grey on a
- * cold start, and the workspace is opened over hotel wifi as often as
- * anywhere else.
- *
- * The picture is composed for this job — the spray sits in the top-right and
- * the rest of it is empty cream — so it is laid in at its own proportions and
- * left alone, rather than cropped to fill the block. Nothing washes across it
- * sideways: the empty half is the artwork doing what a gradient would
- * otherwise have to fake, and a wash over it would only grey the flowers.
- */
+/** The bundled floral spray, laid faintly into the poster's light corner. */
 const HERO_ART = require('../../../assets/images/flowers_workspace.png');
-/** The source is 1536 × 1024. Its own ratio, so nothing is ever stretched. */
-const HERO_RATIO = 1536 / 1024;
 
 interface WorkspaceOverviewProps {
   data: WorkspaceViewModel;
   onBack: () => void;
-  tab: WorkspaceTab;
-  tabs: WorkspaceTabItem[];
-  onSelectTab: (tab: WorkspaceTab) => void;
+  /** Opens the conversation with the organizer; absent when there is none. */
+  onMessage?: () => void;
+  isOpeningMessage?: boolean;
+}
+
+/** A slow breath for the status dot while something is still pending. */
+function LiveDot({ color, active }: { color: string; active: boolean }) {
+  const reduceMotion = useReducedMotion();
+  const pulse = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    if (!active || reduceMotion) return undefined;
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, { toValue: 0.25, duration: 800, useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 1, duration: 800, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [active, reduceMotion, pulse]);
+  return <Animated.View style={[s.statusDot, { backgroundColor: color, opacity: pulse }]} />;
+}
+
+/** One of the three figures under the poster, as a ring you can read at a glance. */
+function Stat({
+  percent,
+  colors,
+  value,
+  label,
+}: {
+  percent: number;
+  colors: readonly [string, string];
+  value: string;
+  label: string;
+}) {
+  return (
+    <View style={s.stat}>
+      <ProgressRing percent={percent} size={58} stroke={6} colors={colors} trackColor="#f1edf8">
+        <EventlyText style={s.statValue} numberOfLines={1}>
+          {value}
+        </EventlyText>
+      </ProgressRing>
+      <EventlyText variant="caption" style={s.statLabel}>
+        {label}
+      </EventlyText>
+    </View>
+  );
 }
 
 /**
- * The top of the workspace: which event this is, when it is, and where the
- * rest of it lives.
+ * The top of the workspace — a poster for the event, not a form header.
  *
- * The picture runs the full width and the whole height of the block — the
- * identity is written over it rather than under it, and a wash carries the
- * photograph from full strength in the top-right corner to plain white by the
- * foot, so the text has paper under it and the page below has nothing to seam
- * against. The three figures ride on a card of their own over the last of it.
+ * Painted in the occasion's own colours (a birthday does not open on a
+ * wedding's blush), with the countdown as its centrepiece: a ring that fills
+ * as the event gets ready, the days left inside it. The date and the place
+ * sit beside it, the organizer — and a way to message them — under it. Three
+ * figures float on a card across the poster's foot. The tabs follow it in the
+ * screen (see WorkspaceTabs), and pin to the top with a compact header once
+ * the poster has scrolled away.
+ *
+ * Every figure is the booking's own; a booking with no date shows its date
+ * chip instead of a countdown, and one with no amount drops the paid ring.
  */
 export function WorkspaceOverview({
   data,
   onBack,
-  tab,
-  tabs,
-  onSelectTab,
+  onMessage,
+  isOpeningMessage = false,
 }: WorkspaceOverviewProps) {
   const insets = useSafeAreaInsets();
-  const statusColor = WORKSPACE_STATUS_COLOR[data.status] ?? colors.textMuted;
-  /*
-   * One height, in points, for the picture and for the fade over it.
-   *
-   * Both used to be given the source's ratio and left to work it out, and
-   * they worked it out differently: an Image carries its own intrinsic size,
-   * so it ignored the ratio and grew to the block, while the plain View
-   * beside it obeyed. The fade then stopped two thirds of the way down the
-   * picture and the rest of the flowers came back at full strength under a
-   * hard line — the band across the banner.
-   *
-   * Measured from the screen instead. Nothing is inferred, so nothing can
-   * disagree, and the artwork is only ever scaled down to fit its width.
-   */
-  const { width } = useWindowDimensions();
-  const artHeight = Math.round(width / HERO_RATIO);
+  const theme = OCCASION_THEME[data.art] ?? OCCASION_THEME.wedding;
+  const statusColor = WORKSPACE_STATUS_COLOR[data.status] ?? '#ffffff';
+  const pending = data.status === 'pending' || data.status === 'awaiting_organizer';
+  const days = data.daysToGo;
 
   return (
     <View>
-      <View style={s.top}>
-        {/*
-          The artwork at the full width and its own 3:2, so it is scaled down
-          to fit and never stretched to whatever height the booking's lines
-          come to — which is what blew the flowers up and made a sharp
-          photograph look like a poor one.
-
-          The fade is a second box of exactly the same measured height, so it
-          always covers the picture and nothing but: it reaches solid white
-          precisely where the artwork ends, and the page under it is white, so
-          there is no line to see. Sized to the block instead, it drifted up
-          across the flowers on a short booking and left a hard edge on a
-          long one.
-        */}
-        <Image
-          source={HERO_ART}
-          style={[s.art, { height: artHeight }]}
-          resizeMode="cover"
-          accessible={false}
-        />
-        <View style={[s.art, { height: artHeight }]} pointerEvents="none">
+      <View style={[s.poster, { paddingTop: insets.top + 6 }]}>
+        {/* The poster's colour: deep corner to warm light, three stops. */}
+        <View style={s.fill} pointerEvents="none">
           <Svg width="100%" height="100%" preserveAspectRatio="none">
             <Defs>
-              <LinearGradient id="wsDown" x1="0%" y1="0%" x2="0%" y2="100%">
-                <Stop offset="0" stopColor="#ffffff" stopOpacity={0} />
-                <Stop offset="0.5" stopColor="#ffffff" stopOpacity={0.04} />
-                <Stop offset="0.76" stopColor="#ffffff" stopOpacity={0.45} />
-                <Stop offset="0.92" stopColor="#ffffff" stopOpacity={0.93} />
-                <Stop offset="1" stopColor="#ffffff" stopOpacity={1} />
+              <LinearGradient id="wsPoster" x1="0" y1="1" x2="1" y2="0">
+                <Stop offset="0" stopColor={theme.from} />
+                <Stop offset="0.55" stopColor={theme.via} />
+                <Stop offset="1" stopColor={theme.to} />
               </LinearGradient>
             </Defs>
-            <Rect x={0} y={0} width="100%" height="100%" fill="url(#wsDown)" />
+            <Rect x={0} y={0} width="100%" height="100%" fill="url(#wsPoster)" />
           </Svg>
         </View>
+        <View style={[s.glow, s.glowOne, { backgroundColor: theme.glow }]} pointerEvents="none" />
+        <View style={[s.glow, s.glowTwo]} pointerEvents="none" />
+        <Image source={HERO_ART} style={s.art} resizeMode="cover" accessible={false} />
+        <View style={s.confetti} pointerEvents="none">
+          <Confetti />
+        </View>
 
-        <View style={[s.body, { paddingTop: insets.top + 8 }]}>
-          {/*
-            The way back and the screen's name, on the picture. Navy rather
-            than white: the corner they sit in is the pale end of the wash, and
-            white on it is invisible. No disc behind the chevron — it was a
-            shape to notice for a control in the same corner of every screen.
-          */}
-          <View style={s.topRow}>
-            <TouchableOpacity
-              style={s.back}
-              activeOpacity={0.7}
-              onPress={onBack}
-              accessibilityRole="button"
-              accessibilityLabel="Go back"
-            >
-              <EventlyIcon name="chevron-left" size={22} color={WORKSPACE_NAVY_DEEP} />
-            </TouchableOpacity>
-            <EventlyText variant="subtitle" style={s.topTitle} numberOfLines={1}>
-              {WORKSPACE_COPY.screenTitle}
-            </EventlyText>
-          </View>
-
-          {/*
-            The name on the left; what it costs and the day it falls on held
-            together on the right. Each chip is dropped rather than drawn
-            empty — a booking with nothing agreed has no amount to show.
-          */}
-          <View style={s.titleRow}>
-            <EventlyText variant="h1" style={s.title} numberOfLines={2}>
-              {data.title}
-            </EventlyText>
-
-            <View style={s.chips}>
-              {data.payment.totalLabel ? (
-                <View style={s.amountChip}>
-                  <EventlyText variant="caption" style={s.amountChipText}>
-                    {data.payment.totalLabel}
-                  </EventlyText>
-                </View>
-              ) : null}
-              {data.dateChip ? (
-                <View style={s.dateChip}>
-                  <EventlyText variant="caption" style={s.dateChipMonth}>
-                    {data.dateChip.month}
-                  </EventlyText>
-                  <EventlyText variant="subtitle" style={s.dateChipDay}>
-                    {data.dateChip.day}
-                  </EventlyText>
-                </View>
-              ) : null}
+        <View style={s.topRow}>
+          <PressableScale
+            style={s.glassButton}
+            onPress={onBack}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <EventlyIcon name="chevron-left" size={24} color="#ffffff" />
+          </PressableScale>
+          <EventlyText variant="caption" style={s.topTitle}>
+            {WORKSPACE_COPY.screenTitle}
+          </EventlyText>
+          {data.ref ? (
+            <View style={s.refChip}>
+              <EventlyIcon name="pound" size={12} color="rgba(255,255,255,0.85)" />
+              <EventlyText variant="caption" style={s.refText} numberOfLines={1}>
+                {data.ref}
+              </EventlyText>
             </View>
-          </View>
+          ) : (
+            <View style={s.topSpacer} />
+          )}
+        </View>
 
-          {data.dateLabel ? (
-            <View style={s.factRow}>
-              <EventlyIcon
-                name="calendar-blank-outline"
-                size={16}
-                color={WORKSPACE_NAVY_DEEP}
-              />
-              <View style={s.factText}>
-                <EventlyText variant="body" style={s.factValue}>
+        <View style={s.eyebrowRow}>
+          <EventlyText style={s.emoji}>{theme.emoji}</EventlyText>
+          {data.statusLabel ? (
+            <View style={s.statusPill}>
+              <LiveDot color={statusColor === '#ffffff' ? '#ffffff' : statusColor} active={pending} />
+              <EventlyText variant="caption" style={s.statusText} numberOfLines={1}>
+                {data.statusLabel}
+              </EventlyText>
+            </View>
+          ) : null}
+        </View>
+
+        <EventlyText variant="h1" style={s.title} numberOfLines={2} accessibilityRole="header">
+          {data.title}
+        </EventlyText>
+
+        <View style={s.countRow}>
+          {days != null ? (
+            <ProgressRing
+              percent={data.progress}
+              size={112}
+              stroke={8}
+              colors={['#ffffff', theme.glow]}
+              trackColor="rgba(255,255,255,0.18)"
+            >
+              <View style={s.countInner}>
+                {days > 0 ? (
+                  <>
+                    <EventlyText style={s.countNumber}>{days}</EventlyText>
+                    <EventlyText variant="caption" style={s.countLabel}>
+                      {P.daysToGo(days)}
+                    </EventlyText>
+                  </>
+                ) : (
+                  <EventlyText variant="caption" style={s.countToday}>
+                    {days === 0 ? P.today : P.past}
+                  </EventlyText>
+                )}
+              </View>
+            </ProgressRing>
+          ) : data.dateChip ? (
+            <View style={s.dateBlock}>
+              <EventlyText variant="caption" style={s.dateMonth}>
+                {data.dateChip.month}
+              </EventlyText>
+              <EventlyText style={s.dateDay}>{data.dateChip.day}</EventlyText>
+            </View>
+          ) : null}
+
+          <View style={s.facts}>
+            {data.dateLabel ? (
+              <View style={s.fact}>
+                <View style={s.factIcon}>
+                  <EventlyIcon name="calendar-heart" size={15} color="#ffffff" />
+                </View>
+                <EventlyText variant="body" style={s.factText} numberOfLines={2}>
                   {data.dateLabel}
                 </EventlyText>
               </View>
-            </View>
-          ) : null}
-
-          {data.venue ? (
-            <View style={[s.factRow, s.factRowTall]}>
-              <EventlyIcon
-                name="map-marker-outline"
-                size={16}
-                color={WORKSPACE_NAVY_DEEP}
-              />
-              {/*
-                Wrapped in a box that takes the row's slack, not flexed on the
-                text itself. A Text given `flex` in a row lays itself out at
-                its natural width on iOS and then spills past the screen — a
-                long Hyderabad address ran off the right edge with its tail
-                cut off by the block. The box is what the row divides up; the
-                text simply fills it.
-
-                Three lines, not two. A real venue line is a building, a road
-                and a landmark; clipped at two, addresses became riddles.
-              */}
-              <View style={s.factText}>
-                <EventlyText
-                  variant="body"
-                  style={s.factValue}
-                  numberOfLines={3}
-                  ellipsizeMode="tail"
-                >
+            ) : null}
+            {data.venue ? (
+              <View style={s.fact}>
+                <View style={s.factIcon}>
+                  <EventlyIcon name="map-marker" size={15} color="#ffffff" />
+                </View>
+                <EventlyText variant="body" style={s.factText} numberOfLines={3}>
                   {data.venue}
                 </EventlyText>
               </View>
-            </View>
-          ) : null}
-
-          {/* The booking's reference, set small and quiet under the address —
-              it is what you quote on the phone, not something you read. */}
-          {data.ref ? (
-            <EventlyText variant="caption" style={s.ref}>
-              {data.ref}
-            </EventlyText>
-          ) : null}
-
-          {/* Who is running it, and where it stands. Both are real answers the
-              banner used to carry; they keep their place under the facts
-              rather than sitting on the photograph. */}
-          {data.organizerName || data.statusLabel ? (
-            <View style={s.byRow}>
-              {data.organizerName ? (
-                <View style={s.byWho}>
-                  <View
-                    style={[s.byAvatar, { backgroundColor: data.organizerAvatarColor }]}
-                  >
-                    <EventlyText variant="caption" style={s.byAvatarText}>
-                      {data.organizerInitials || '·'}
-                    </EventlyText>
-                  </View>
-                  <EventlyText variant="caption" style={s.byText} numberOfLines={1}>
-                    {`Organized by ${data.organizerName}`}
-                  </EventlyText>
-                </View>
-              ) : null}
-
-              {data.statusLabel ? (
-                <View style={s.statusPill}>
-                  <View style={[s.statusDot, { backgroundColor: statusColor }]} />
-                  <EventlyText variant="caption" style={s.statusText} numberOfLines={1}>
-                    {data.statusLabel}
-                  </EventlyText>
-                </View>
-              ) : null}
-            </View>
-          ) : null}
-
-          {/*
-            The three figures, on a card of their own over the last of the
-            photograph. Each is dropped when its figure does not exist yet: a
-            booking with no date has no countdown, one with no agreed amount
-            has nothing paid, and a tile reading "0%" answers a question
-            nobody can ask.
-          */}
-          <View style={s.stats}>
-            {data.daysToGo != null ? (
-              <View style={s.stat}>
-                <View style={[s.statMark, s.statMarkTime]}>
-                  <EventlyIcon
-                    name="calendar-blank-outline"
-                    size={15}
-                    color={WORKSPACE_ACCENT}
-                  />
-                </View>
-                <View style={s.statText}>
-                  <EventlyText variant="h2" style={s.statValue}>
-                    {data.daysToGo}
-                  </EventlyText>
-                  <EventlyText variant="caption" style={s.statLabel} numberOfLines={1}>
-                    {data.daysToGo === 1 ? 'day to go' : 'days to go'}
-                  </EventlyText>
-                </View>
-              </View>
             ) : null}
-
-            <View style={s.stat}>
-              <View style={[s.statMark, s.statMarkReady]}>
-                <EventlyIcon name="check-circle-outline" size={15} color={WORKSPACE_GREEN} />
-              </View>
-              <View style={s.statText}>
-                <EventlyText variant="h2" style={s.statValue}>
-                  {`${data.progress}%`}
-                </EventlyText>
-                <EventlyText variant="caption" style={s.statLabel} numberOfLines={1}>
-                  ready
-                </EventlyText>
-              </View>
-            </View>
-
             {data.payment.totalLabel ? (
-              <View style={s.stat}>
-                <View style={[s.statMark, s.statMarkPaid]}>
-                  <EventlyIcon name="database-outline" size={15} color={WORKSPACE_VIOLET} />
+              <View style={s.fact}>
+                <View style={s.factIcon}>
+                  <EventlyIcon name="wallet" size={15} color="#ffffff" />
                 </View>
-                <View style={s.statText}>
-                  <EventlyText variant="h2" style={s.statValue}>
-                    {`${data.payment.paidPercent}%`}
-                  </EventlyText>
-                  <EventlyText variant="caption" style={s.statLabel} numberOfLines={1}>
-                    paid
-                  </EventlyText>
-                </View>
+                <EventlyText variant="body" style={[s.factText, s.factStrong]} numberOfLines={1}>
+                  {data.payment.totalLabel}
+                </EventlyText>
               </View>
             ) : null}
           </View>
         </View>
-      </View>
 
-      {/*
-        One row, every destination. A segmented control rather than a scroll
-        of everything, so the sections below are chosen, not passed.
-
-        It scrolls sideways because five of them with their marks come to more
-        than a phone is wide. Cutting the words down to fit — "Ideas",
-        "Invite" — would have fitted, and neither one says what the tab opens.
-      */}
-      <View style={s.tabs}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={s.tabsRow}
-        >
-          {tabs.map(item => {
-            const active = item.key === tab;
-            return (
-              <TouchableOpacity
-                key={item.key}
-                style={[s.tab, active && s.tabActive]}
-                activeOpacity={0.8}
-                onPress={() => onSelectTab(item.key)}
-                accessibilityRole="tab"
-                accessibilityState={{ selected: active }}
-                accessibilityLabel={item.label}
-                testID={`workspace-tab-${item.key}`}
+        {data.organizerName ? (
+          <View style={s.organizerBar}>
+            <View style={[s.avatar, { backgroundColor: data.organizerAvatarColor }]}>
+              <EventlyText style={s.avatarText}>{data.organizerInitials || '·'}</EventlyText>
+            </View>
+            <View style={s.organizerText}>
+              <EventlyText variant="caption" style={s.organizerLead}>
+                Organized by
+              </EventlyText>
+              <EventlyText variant="subtitle" style={s.organizerName} numberOfLines={1}>
+                {data.organizerName}
+              </EventlyText>
+            </View>
+            {onMessage ? (
+              <PressableScale
+                style={s.messageButton}
+                onPress={onMessage}
+                disabled={isOpeningMessage}
+                accessibilityRole="button"
+                accessibilityLabel={`${P.message} ${data.organizerName}`}
               >
-                <EventlyIcon
-                  name={item.icon}
-                  size={17}
-                  color={active ? WORKSPACE_ACCENT : colors.textMuted}
-                />
-                <EventlyText
-                  variant="body"
-                  style={[s.tabLabel, active && s.tabLabelActive]}
-                  numberOfLines={1}
-                >
-                  {item.label}
+                <EventlyIcon name="chat-processing-outline" size={16} color={theme.via} />
+                <EventlyText variant="caption" style={[s.messageText, { color: theme.via }]}>
+                  {P.message}
                 </EventlyText>
-                {active ? <View style={s.tabUnderline} /> : null}
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
+              </PressableScale>
+            ) : null}
+          </View>
+        ) : null}
       </View>
+
+      {/* Three figures, floating across the poster's foot. */}
+      <View style={s.statsCard}>
+        <Stat percent={data.progress} colors={STAT_RING.ready} value={`${data.progress}%`} label={P.ready} />
+        {data.payment.totalLabel ? (
+          <Stat
+            percent={data.payment.paidPercent}
+            colors={STAT_RING.paid}
+            value={`${data.payment.paidPercent}%`}
+            label={P.paid}
+          />
+        ) : null}
+        <Stat
+          percent={data.tasksTotal > 0 ? (data.tasksDone / data.tasksTotal) * 100 : 0}
+          colors={STAT_RING.tasks}
+          value={data.tasksTotal > 0 ? `${data.tasksDone}/${data.tasksTotal}` : '—'}
+          label={data.tasksTotal > 0 ? P.tasks : P.noTasksShort}
+        />
+      </View>
+
     </View>
   );
 }

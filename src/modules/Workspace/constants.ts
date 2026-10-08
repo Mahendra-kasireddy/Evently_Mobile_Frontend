@@ -1,4 +1,5 @@
 import { colors } from '../../theme';
+import type { OccasionArtKey } from '../../Components';
 import type {
   BoardFilter,
   IdeaApproval,
@@ -289,3 +290,93 @@ export function plannedPercent(planned: number, shared: number): number {
   if (shared <= 0) return 0;
   return Math.min(100, Math.round((planned / shared) * 100));
 }
+
+// ---------------------------------------------------------------------------
+// The workspace's look, per occasion.
+// ---------------------------------------------------------------------------
+
+/**
+ * Each occasion's poster colours: the hero's sweep, deep at the corner where
+ * the words sit, warm where the light comes in. A birthday should not open on
+ * a wedding's blush, and neither should open on an office's navy.
+ */
+export const OCCASION_THEME: Record<
+  OccasionArtKey,
+  { from: string; via: string; to: string; glow: string; emoji: string }
+> = {
+  wedding: { from: '#3b0f3f', via: '#a3285b', to: '#f2795a', glow: '#ffb48a', emoji: '💍' },
+  birthday: { from: '#2a1460', via: '#8a2bd1', to: '#ff5fa2', glow: '#ffc35c', emoji: '🎂' },
+  housewarming: { from: '#0f3b3a', via: '#1f8a6d', to: '#f2b045', glow: '#ffe08a', emoji: '🏡' },
+  naming: { from: '#1b2a6b', via: '#4c6fe0', to: '#f59ac2', glow: '#ffd6e8', emoji: '👶' },
+  anniversary: { from: '#3d0b1f', via: '#b0204a', to: '#ff8a7a', glow: '#ffc1b3', emoji: '💞' },
+  corporate: { from: '#0b1736', via: '#1f3fa0', to: '#29b6c9', glow: '#9be7ff', emoji: '🏢' },
+};
+
+/** Ring colours for the three stats. */
+export const STAT_RING = {
+  ready: ['#3cc9a1', '#0e8a68'] as [string, string],
+  paid: ['#a084ff', '#5a35e0'] as [string, string],
+  tasks: ['#ffb547', '#f0791a'] as [string, string],
+};
+
+/** The active tab, the done milestones, the primary actions. */
+export const WORKSPACE_ACTION_GRADIENT: [string, string] = ['#f47b4d', '#e2477a'];
+
+export const WORKSPACE_PREMIUM_COPY = {
+  daysToGo: (n: number) => (n === 1 ? 'day to go' : 'days to go'),
+  today: 'It’s today!',
+  past: 'Event day has passed',
+  ready: 'Ready',
+  paid: 'Paid',
+  tasks: 'Tasks',
+  noTasksShort: 'None yet',
+  message: 'Message',
+  journey: 'Your journey',
+  now: 'Now',
+  paidOf: (total: string) => `paid of ${total}`,
+  advance: 'Advance',
+  balance: 'Balance',
+  advancePaid: 'Paid',
+  advanceCashDue: 'Due in cash',
+  advanceDue: 'Due now',
+  balanceDue: 'Before the event',
+  stillDue: (amount: string) => `${amount} still to pay`,
+  allPaid: 'All paid — nothing left to settle',
+  activity: 'Activity',
+};
+
+/** The Guest invitation tab (sections/InvitationTab). */
+export const INVITE_TAB_COPY = {
+  eyebrow: 'You are invited',
+  yourOrganizer: 'Your organizer',
+  video: 'Video',
+  openPoster: 'Open your guest invitation',
+  draftTitle: 'Being designed',
+  draftBody: (organizer: string) =>
+    `${organizer} is crafting your invitation. You’ll review and approve it here before any guest sees it.`,
+  reviewTitle: 'Ready for your review',
+  reviewBody: (organizer: string) => `${organizer} has shared it. Look it over and approve it — or ask for changes.`,
+  liveTitle: 'Approved & live',
+  liveBody: 'Your guest link is live. Share it with everyone on your list.',
+  liveGuests: (sent: number, total: number) =>
+    sent >= total
+      ? `Sent to all ${total} ${total === 1 ? 'guest' : 'guests'} on your list.`
+      : `Sent to ${sent} of ${total} guests — share it with the rest.`,
+  guestsTitle: 'Guests',
+  openRate: (pct: number) => `${pct}% opened`,
+  invited: 'Invited',
+  sent: 'Sent',
+  viewed: 'Opened',
+  notSentYet: (n: number) => `${n} ${n === 1 ? 'guest hasn’t' : 'guests haven’t'} been sent it yet.`,
+  sendAfterApproval: 'You can send it to your guests once you approve it.',
+  noGuests: 'No guests yet. Start your list now — the invitation can go out the moment it’s approved.',
+  reviewAction: 'Review invitation',
+  reviewActionBody: 'Approve it or ask for changes',
+  viewTitle: 'View & share',
+  viewBody: 'Open it and send it to guests',
+  manageGuests: 'Guest list',
+  manageGuestsBody: 'Add, group and invite guests',
+  startGuests: 'Start guest list',
+  startGuestsBody: 'Add the people you’re inviting',
+  programme: 'The programme',
+};

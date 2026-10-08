@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
-import { useBookingDetail, useIdeaBoard, useInvitation } from './hooks';
+import { useBookingDetail, useGuests, useIdeaBoard, useInvitation } from './hooks';
 import { mapWorkspace } from './utils';
-import type { IdeaCounts, IdeaDTO, InvitationDTO, WorkspaceViewModel } from './types';
+import type { GuestSummary, IdeaCounts, IdeaDTO, InvitationDTO, WorkspaceViewModel } from './types';
 
 export interface WorkspaceContainerResult {
   workspace: WorkspaceViewModel | null;
@@ -15,6 +15,8 @@ export interface WorkspaceContainerResult {
   latestFromOrganizer: IdeaDTO | null;
   /** null while the invitation is still the organizer's draft. */
   invitation: InvitationDTO | null;
+  /** Guests invited, sent to and viewed; null while loading or if it failed. */
+  guestSummary: GuestSummary | null;
   isLoading: boolean;
   isError: boolean;
   errorMessage: string | null;
@@ -32,6 +34,16 @@ export function useWorkspaceContainer(bookingId: string): WorkspaceContainerResu
    */
   const board = useIdeaBoard(bookingId);
   const invitation = useInvitation(bookingId);
+  const guests = useGuests(bookingId);
+
+  const guestSummary = useMemo<GuestSummary | null>(() => {
+    if (!guests.data) return null;
+    return {
+      total: guests.data.length,
+      sent: guests.data.filter(g => !!g.lastSharedAt).length,
+      viewed: guests.data.filter(g => g.viewed).length,
+    };
+  }, [guests.data]);
 
   const workspace = useMemo<WorkspaceViewModel | null>(() => (data ? mapWorkspace(data) : null), [data]);
 
@@ -52,13 +64,15 @@ export function useWorkspaceContainer(bookingId: string): WorkspaceContainerResu
     refetch();
     board.refetch();
     invitation.refetch();
-  }, [refetch, board, invitation]);
+    guests.refetch();
+  }, [refetch, board, invitation, guests]);
 
   return {
     workspace,
     ideaCounts: board.data?.counts ?? null,
     latestFromOrganizer,
     invitation: invitation.data ?? null,
+    guestSummary,
     isLoading: loading,
     isError: error !== null,
     errorMessage: error?.message ?? null,

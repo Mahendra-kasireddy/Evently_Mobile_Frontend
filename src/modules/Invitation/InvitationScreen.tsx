@@ -13,11 +13,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  AppHeader,
-  EventlyIcon,
-  EventlyText,
-} from '../../Components';
+import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
 import { colors } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
 import {
@@ -44,7 +40,19 @@ import {
   artworkOf,
 } from './sections/InvitationArtwork';
 import { CountdownBlock } from './sections/CountdownBlock';
-import { LiveBlock } from './sections/LiveBlock';
+import { LiveBlock, liveOf } from './sections/LiveBlock';
+import {
+  MomentStrip,
+  NextStep,
+  type GuestProgress,
+  type InvitationStage,
+} from './sections/NextStep';
+import {
+  OneLinkNote,
+  SectionEmpty,
+  SectionSwitch,
+  type InvitationSection,
+} from './sections/SectionSwitch';
 import { MemoriesBlock, MemoriesOffCard } from './sections/MemoriesBlock';
 import {
   AddMemorySheet,
@@ -57,19 +65,13 @@ import { SaveTheDate } from './sections/SaveTheDate';
 import { StoryBlock } from './sections/StoryBlock';
 import type { Artwork } from './sections/InvitationArtwork';
 import { RequestChangeSheet, ShareSheet } from './sections/Sheets';
-import {
-  artworkStyles as w,
-  listStyles as l,
-  shellStyles as sh,
-  styles,
-} from './styles';
-import type {
-  GuestDTO,
-  InvitationDTO,
-  ShareOutcomeDTO,
-} from './types';
+import { listStyles as l, shellStyles as sh, styles } from './styles';
+import type { GuestDTO, InvitationDTO, ShareOutcomeDTO } from './types';
 
-type InvitationNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Invitations'>;
+type InvitationNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Invitations'
+>;
 type InvitationRouteProp = RouteProp<RootStackParamList, 'Invitations'>;
 
 /** Which sheet is open, and what it is about. */
@@ -90,7 +92,7 @@ function InvitationList() {
   const navigation = useNavigation<InvitationNavigationProp>();
   const { data, loading, error, refetch } = useMyInvitations();
   const items = useMemo(() => mapInvitationList(data ?? []), [data]);
-  const needsYou = items.filter((i) => i.needsYou).length;
+  const needsYou = items.filter(i => i.needsYou).length;
 
   if (loading && items.length === 0) {
     return (
@@ -114,7 +116,11 @@ function InvitationList() {
     return (
       <View style={styles.centered}>
         <View style={styles.centeredIcon}>
-          <EventlyIcon name="email-heart-outline" size={28} color={INV_ACCENT} />
+          <EventlyIcon
+            name="email-heart-outline"
+            size={28}
+            color={INV_ACCENT}
+          />
         </View>
         <EventlyText variant="h2" style={styles.centeredTitle}>
           {COPY.emptyTitle}
@@ -129,12 +135,16 @@ function InvitationList() {
   return (
     <FlatList
       data={items}
-      keyExtractor={(item) => item.bookingId}
+      keyExtractor={item => item.bookingId}
       contentContainerStyle={styles.listContent}
-      refreshControl={<RefreshControl refreshing={loading} onRefresh={refetch} />}
+      refreshControl={
+        <RefreshControl refreshing={loading} onRefresh={refetch} />
+      }
       /* The question this list exists to answer, answered before the rows. */
       ListHeaderComponent={
-        <View style={[l.summary, needsYou > 0 ? l.summaryAction : l.summaryDone]}>
+        <View
+          style={[l.summary, needsYou > 0 ? l.summaryAction : l.summaryDone]}
+        >
           <EventlyIcon
             name={needsYou > 0 ? 'clock-outline' : 'check-circle'}
             size={18}
@@ -149,7 +159,9 @@ function InvitationList() {
         <TouchableOpacity
           style={[l.row, item.needsYou && l.rowNeedsYou]}
           activeOpacity={0.85}
-          onPress={() => navigation.push('Invitations', { bookingId: item.bookingId })}
+          onPress={() =>
+            navigation.push('Invitations', { bookingId: item.bookingId })
+          }
           accessibilityRole="button"
           accessibilityLabel={`${item.title}, ${item.statusLabel}`}
         >
@@ -171,10 +183,18 @@ function InvitationList() {
                 </EventlyText>
               ) : null}
             </View>
-            <View style={[l.statusChip, item.needsYou ? l.statusChipAction : l.statusChipDone]}>
+            <View
+              style={[
+                l.statusChip,
+                item.needsYou ? l.statusChipAction : l.statusChipDone,
+              ]}
+            >
               <EventlyText
                 variant="caption"
-                style={[l.statusText, { color: item.needsYou ? INV_ACCENT : INV_GREEN }]}
+                style={[
+                  l.statusText,
+                  { color: item.needsYou ? INV_ACCENT : INV_GREEN },
+                ]}
                 numberOfLines={1}
               >
                 {item.statusLabel}
@@ -185,7 +205,11 @@ function InvitationList() {
           <View style={l.footer}>
             {item.dateLabel ? (
               <View style={l.meta}>
-                <EventlyIcon name="calendar-blank-outline" size={14} color={colors.textMuted} />
+                <EventlyIcon
+                  name="calendar-blank-outline"
+                  size={14}
+                  color={colors.textMuted}
+                />
                 <EventlyText variant="caption" style={l.metaText}>
                   {item.dateLabel}
                 </EventlyText>
@@ -207,7 +231,13 @@ function InvitationList() {
 }
 
 /** The screen's own row: the arrow, its name, and the guest list. */
-function InvitationBar({ onBack, onGuests }: { onBack: () => void; onGuests?: () => void }) {
+function InvitationBar({
+  onBack,
+  onGuests,
+}: {
+  onBack: () => void;
+  onGuests?: () => void;
+}) {
   return (
     <View style={sh.bar}>
       <TouchableOpacity
@@ -267,6 +297,7 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
   const [sheet, setSheet] = useState<Sheet>(null);
   const [requestSent, setRequestSent] = useState(false);
   const [viewing, setViewing] = useState(false);
+  const [section, setSection] = useState<InvitationSection>('invitation');
   /*
    * What the full-screen viewer is showing. The invitation itself when it is
    * null, and a story photograph when it is not — one viewer rather than two,
@@ -287,7 +318,9 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
    * choice is remembered, the sheet closes, and the picker opens after the
    * dismissal has finished.
    */
-  const [pendingPick, setPendingPick] = useState<'photo' | 'library' | 'reel' | null>(null);
+  const [pendingPick, setPendingPick] = useState<
+    'photo' | 'library' | 'reel' | null
+  >(null);
   const [viewingMemory, setViewingMemory] = useState(-1);
   const [say, setSay] = useState('');
   const [sayWarn, setSayWarn] = useState(false);
@@ -316,8 +349,8 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
         action === 'photo'
           ? upload.takePhoto
           : action === 'library'
-            ? upload.pickFromLibrary
-            : upload.recordReel;
+          ? upload.pickFromLibrary
+          : upload.recordReel;
       open().catch(() => undefined);
     });
     return () => task.cancel();
@@ -326,15 +359,38 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
 
   const invitation = patched ?? data;
 
-  const openShare = () => {
-    setOutcomes(null);
-    setSheet({ kind: 'share' });
+  /*
+   * Who has it so far — loaded with the screen, so the live card can say
+   * "Share with 28 more" rather than a bare "Share". Reloaded when the share
+   * sheet closes, because that is when the numbers change.
+   */
+  const loadGuests = () =>
     guestList
       .execute(bookingId)
       .then(setGuests)
       .catch(() => {
         // error surfaces through guestList.error
       });
+  useEffect(() => {
+    loadGuests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookingId]);
+  const progress = useMemo<GuestProgress | null>(
+    () =>
+      guestList.loading && guests.length === 0
+        ? null
+        : {
+            total: guests.length,
+            sent: guests.filter(g => !!g.lastSharedAt).length,
+            viewed: guests.filter(g => g.viewed).length,
+          },
+    [guests, guestList.loading],
+  );
+
+  const openShare = () => {
+    setOutcomes(null);
+    setSheet({ kind: 'share' });
+    loadGuests();
   };
 
   if (loading && !invitation) {
@@ -384,6 +440,37 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
 
   const approved = invitation.status === 'approved';
   const artwork = artworkOf(invitation);
+  /*
+   * One invitation, one decision — and one line saying where it stands:
+   * approved, waiting on the customer's changes, an update to approve while
+   * guests keep the approved version, or a first review.
+   */
+  const stage: InvitationStage = approved
+    ? 'live'
+    : (invitation.changeRequests ?? []).length > 0
+    ? 'asked'
+    : invitation.isLive
+    ? 'update'
+    : 'review';
+  const liveNow = liveOf(invitation.subEvents ?? []) !== null;
+  /* A day after the event starts, the memories matter more than the card. */
+  const startsAt = invitation.countdown?.startsAt
+    ? Date.parse(invitation.countdown.startsAt)
+    : NaN;
+  const eventOver =
+    Number.isFinite(startsAt) && Date.now() - startsAt > 6 * 3600 * 1000;
+  const moment: 'live' | 'memories' | null = liveNow
+    ? 'live'
+    : eventOver && memories.canView
+    ? 'memories'
+    : null;
+  const doApprove = () =>
+    approve
+      .execute(bookingId)
+      .then(setPatched)
+      .catch(() => {
+        // error surfaces on the card
+      });
 
   return (
     <>
@@ -400,189 +487,138 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
         }
       />
 
+      <SectionSwitch value={section} onChange={setSection} liveNow={liveNow} />
+
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={refetch} />}
+        refreshControl={
+          <RefreshControl refreshing={loading} onRefresh={refetch} />
+        }
       >
-        {/* The invitation, then where it stands, then the two decisions. */}
-        {artwork ? (
-          <InvitationArtwork artwork={artwork} onView={() => setViewing(true)} />
-        ) : (
-          <ArtworkPending />
-        )}
-
-        {artwork ? (
+        {section === 'invitation' ? (
           <>
-            <View style={w.status}>
-              <View style={[w.statusDot, approved && w.statusDotDone]} />
-              <View style={w.statusText}>
-                <EventlyText
-                  variant="subtitle"
-                  style={[w.statusTitle, approved && w.statusTitleDone]}
-                >
-                  {approved ? COPY.artworkApproved : COPY.artworkWaiting}
-                </EventlyText>
-                <EventlyText variant="caption" style={w.statusNote}>
-                  {approved ? COPY.artworkApprovedNote : COPY.artworkWaitingNote}
-                </EventlyText>
-              </View>
-            </View>
+            {moment ? (
+              <MomentStrip kind={moment} onPress={() => setSection(moment)} />
+            ) : null}
 
-            <View style={w.actions}>
-              {/* Before approval the one thing to do is approve; after it, the
-                  one thing to do is send it. Never both at once. */}
-              {approved ? (
-                <TouchableOpacity
-                  style={[w.approve, w.share]}
-                  activeOpacity={0.9}
-                  onPress={openShare}
-                  accessibilityRole="button"
-                  accessibilityLabel={COPY.shareAll}
-                  testID="invitation-share"
-                >
-                  <EventlyIcon name="whatsapp" size={18} color={colors.onPrimary} />
-                  <EventlyText variant="subtitle" style={w.approveText}>
-                    {COPY.shareAll}
-                  </EventlyText>
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  style={[w.approve, approve.loading && w.approveDisabled]}
-                  activeOpacity={0.9}
-                  disabled={approve.loading}
-                  onPress={() =>
-                    approve
-                      .execute(bookingId)
-                      .then(setPatched)
-                      .catch(() => {
-                        // error surfaces below
-                      })
-                  }
-                  accessibilityRole="button"
-                  accessibilityLabel={COPY.artworkApprove}
-                  testID="invitation-approve"
-                >
-                  {approve.loading ? (
-                    <ActivityIndicator size="small" color={colors.onPrimary} />
-                  ) : (
-                    <EventlyIcon name="check" size={18} color={colors.onPrimary} />
-                  )}
-                  <EventlyText variant="subtitle" style={w.approveText}>
-                    {approve.loading ? COPY.artworkApproving : COPY.artworkApprove}
-                  </EventlyText>
-                </TouchableOpacity>
-              )}
+            {/* The invitation, then where it stands and the one next step. */}
+            {artwork ? (
+              <InvitationArtwork
+                artwork={artwork}
+                onView={() => setViewing(true)}
+              />
+            ) : (
+              <ArtworkPending />
+            )}
 
-              {/* Always available: approving ends this round, not the
-                  conversation with the organizer. */}
-              <TouchableOpacity
-                style={w.ask}
-                activeOpacity={0.85}
-                onPress={() => {
+            {artwork ? (
+              <NextStep
+                stage={stage}
+                publishedAt={invitation.publishedAt ?? null}
+                requests={invitation.changeRequests ?? []}
+                guests={progress}
+                approving={approve.loading}
+                error={approve.error?.message ?? null}
+                requestSent={requestSent}
+                onApprove={doApprove}
+                onShare={openShare}
+                onAsk={() => {
                   setRequestSent(false);
                   setSheet({ kind: 'request' });
                 }}
-                accessibilityRole="button"
-                accessibilityLabel={COPY.artworkAsk}
-                testID="invitation-ask"
-              >
-                <EventlyIcon
-                  name="message-question-outline"
-                  size={17}
-                  color={INV_NAVY_DEEP}
-                />
-                <EventlyText variant="subtitle" style={w.askText}>
-                  {COPY.artworkAsk}
-                </EventlyText>
-              </TouchableOpacity>
+              />
+            ) : null}
 
-              <EventlyText variant="caption" style={w.askNote}>
-                {COPY.artworkAskNote}
-              </EventlyText>
+            <CountdownBlock countdown={invitation.countdown ?? null} />
 
-              {approve.error ? (
-                <EventlyText variant="caption" style={w.errorText}>
-                  {approve.error.message}
-                </EventlyText>
-              ) : null}
-              {requestSent ? (
-                <EventlyText variant="caption" style={w.sentText}>
-                  {COPY.requestSent}
-                </EventlyText>
-              ) : null}
-            </View>
+            {/*
+             * Save the Date: one card per celebration. The list arrives already
+             * filtered by the server, so nothing here decides who sees what.
+             */}
+            <SaveTheDate
+              subEvents={invitation.subEvents ?? []}
+              palette={invitation.cardPalette}
+              defaultMinutes={invitation.defaultSubEventMinutes ?? 120}
+              invitationName={invitation.bookingTitle || invitation.occasion}
+            />
+
+            <StoryBlock
+              cards={invitation.storyCards ?? []}
+              title={invitation.details.storyTitle ?? ''}
+              onOpen={imageUrl => {
+                setViewingPhoto({ kind: 'image', url: imageUrl, seconds: 0 });
+                setViewing(true);
+              }}
+            />
           </>
         ) : null}
 
-        {/*
-         * The countdown, below the invitation. Independent of everything else
-         * on the screen: it ticks whether or not the invitation is approved.
-         */}
-        {/*
-         * The live stream, above the countdown: it is the thing happening
-         * right now, and everything below it is what has not happened yet.
-         * It renders itself away when nothing is on air.
-         */}
-        <LiveBlock subEvents={invitation.subEvents ?? []} />
-
-        <CountdownBlock countdown={invitation.countdown ?? null} />
-
-        {/*
-         * Save the Date: one card per celebration. The list arrives already
-         * filtered by the server, so nothing here decides who sees what.
-         */}
-        <SaveTheDate
-          subEvents={invitation.subEvents ?? []}
-          palette={invitation.cardPalette}
-          defaultMinutes={invitation.defaultSubEventMinutes ?? 120}
-          invitationName={invitation.bookingTitle || invitation.occasion}
-        />
-
-        {/*
-         * The story, below the invitation and inside the same scroll — the
-         * customer approves what their guests will get, so they have to be
-         * able to see it. It renders itself away when there are no cards.
-         */}
-        {/*
-         * Shared Memories, last: the invitation is what the hosts made, and
-         * this is what everyone brought to it. The whole section is absent
-         * unless the server says it exists for this person.
-         */}
-        {/* Known and off: offer the switch rather than showing nothing. */}
-        {memories.known && !memories.enabled ? (
-          <MemoriesOffCard
-            busy={memories.loading}
-            onEnable={() => memories.enable().catch(() => undefined)}
-          />
+        {/* Live stream: its own page here; for guests it is the top of
+            the same invitation link. */}
+        {section === 'live' ? (
+          <>
+            {liveNow ? (
+              <LiveBlock subEvents={invitation.subEvents ?? []} />
+            ) : (
+              <SectionEmpty
+                icon="broadcast"
+                title={COPY.liveEmptyTitle}
+                body={COPY.liveEmptyBody}
+              />
+            )}
+            <OneLinkNote
+              body={COPY.oneLinkLive}
+              approved={invitation.isLive === true || approved}
+              onShare={openShare}
+            />
+          </>
         ) : null}
 
-        {memories.canView ? (
-          <MemoriesBlock
-            gallery={memories.gallery}
-            items={memories.items}
-            kind={memories.kind}
-            subEvent={memories.subEvent}
-            paging={memories.paging}
-            canUpload={memories.canUpload}
-            say={say}
-            sayWarn={sayWarn}
-            onFilter={memories.changeFilter}
-            onMore={() => memories.loadMore().catch(() => undefined)}
-            onOpen={setViewingMemory}
-            onAdd={() => setAdding(true)}
-          />
-        ) : null}
+        {/* Shared Memories: absent unless the server says it exists for
+            this person — an honest empty page otherwise. */}
+        {section === 'memories' ? (
+          <>
+            {/* Known and off: offer the switch rather than showing nothing. */}
+            {memories.known && !memories.enabled ? (
+              <MemoriesOffCard
+                busy={memories.loading}
+                onEnable={() => memories.enable().catch(() => undefined)}
+              />
+            ) : null}
 
-        <StoryBlock
-          cards={invitation.storyCards ?? []}
-          title={invitation.details.storyTitle ?? ''}
-          onOpen={(imageUrl) => {
-            setViewingPhoto({ kind: 'image', url: imageUrl, seconds: 0 });
-            setViewing(true);
-          }}
-        />
+            {memories.canView ? (
+              <MemoriesBlock
+                gallery={memories.gallery}
+                items={memories.items}
+                kind={memories.kind}
+                subEvent={memories.subEvent}
+                paging={memories.paging}
+                canUpload={memories.canUpload}
+                say={say}
+                sayWarn={sayWarn}
+                onFilter={memories.changeFilter}
+                onMore={() => memories.loadMore().catch(() => undefined)}
+                onOpen={setViewingMemory}
+                onAdd={() => setAdding(true)}
+              />
+            ) : null}
+
+            {!memories.canView && !(memories.known && !memories.enabled) ? (
+              <SectionEmpty
+                icon="image-multiple-outline"
+                title={COPY.memoriesEmptyTitle}
+                body={COPY.memoriesEmptyBody}
+              />
+            ) : null}
+            <OneLinkNote
+              body={COPY.oneLinkMemories}
+              approved={invitation.isLive === true || approved}
+              onShare={openShare}
+            />
+          </>
+        ) : null}
       </ScrollView>
 
       <AddMemorySheet
@@ -619,13 +655,16 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
         onSend={(subEventId, caption) => {
           upload
             .send(subEventId, caption)
-            .then((outcome) => {
-            if (!outcome) return;
-            /* The server's own sentence, shown as it arrives — duplicate,
+            .then(outcome => {
+              if (!outcome) return;
+              /* The server's own sentence, shown as it arrives — duplicate,
                quality warning or waiting for approval are all its words. */
-            setSay(outcome.message);
-            setSayWarn(outcome.status === 'duplicate' || outcome.status === 'flagged');
-            if (outcome.status !== 'duplicate') memories.load().catch(() => undefined);
+              setSay(outcome.message);
+              setSayWarn(
+                outcome.status === 'duplicate' || outcome.status === 'flagged',
+              );
+              if (outcome.status !== 'duplicate')
+                memories.load().catch(() => undefined);
             })
             .catch(() => undefined);
         }}
@@ -637,7 +676,7 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
         canDownload={memories.canDownload}
         onIndex={setViewingMemory}
         onClose={() => setViewingMemory(-1)}
-        onDownload={(item) => {
+        onDownload={item => {
           /* The original, and only because the server said downloads are on —
              the same permission it enforces on the guest route. */
           Linking.openURL(absoluteFileUrl(item.url)).catch(() => undefined);
@@ -664,8 +703,11 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
         outcomes={outcomes}
         onSend={(guestIds, newGuest) => {
           share
-            .execute(bookingId, { guestIds, newGuests: newGuest ? [newGuest] : [] })
-            .then((result) => setOutcomes(result.results))
+            .execute(bookingId, {
+              guestIds,
+              newGuests: newGuest ? [newGuest] : [],
+            })
+            .then(result => setOutcomes(result.results))
             .catch(() => {
               // error surfaces in the sheet
             });
@@ -679,7 +721,7 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
             title: invitation.bookingTitle || invitation.occasion,
           });
         }}
-        onOpenHandoff={(url) => {
+        onOpenHandoff={url => {
           Linking.openURL(url).catch(() => {
             // Nothing to recover: the outcome row still shows the link.
           });
@@ -687,6 +729,7 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
         onClose={() => {
           setSheet(null);
           setOutcomes(null);
+          loadGuests();
         }}
       />
 
@@ -694,7 +737,7 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
         visible={sheet?.kind === 'request'}
         isSending={requestChange.loading}
         errorMessage={requestChange.error?.message ?? null}
-        onSend={(note) => {
+        onSend={note => {
           requestChange
             .execute(bookingId, note, undefined)
             .then(() => {

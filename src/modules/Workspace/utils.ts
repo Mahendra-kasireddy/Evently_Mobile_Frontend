@@ -111,6 +111,8 @@ export function mapWorkspace(dto: BookingDetailDTO): WorkspaceViewModel {
 
   const amount = dto.amount ?? 0;
   const paid = dto.amountPaid ?? 0;
+  const advance = dto.advanceAmount ?? 0;
+  const advancePaid = dto.paymentStatus !== 'unpaid' || (advance > 0 && paid >= advance);
 
   const tasks: WorkspaceTask[] = (dto.tasks ?? []).map((t) => {
     const status = TASK_STATUSES.includes(t.status) ? t.status : 'pending';
@@ -154,10 +156,21 @@ export function mapWorkspace(dto: BookingDetailDTO): WorkspaceViewModel {
     payment: {
       totalLabel: formatINR(amount),
       paidLabel: formatINR(paid),
-      dueLabel: formatINR(dto.balanceAmount ?? Math.max(0, amount - paid)),
+      /*
+       * What is actually still owed: the total less what has been paid. The
+       * server's `balanceAmount` is the total less the ADVANCE, paid or not —
+       * with nothing paid yet it said ₹2,19,477 was due on a ₹3,13,538 booking.
+       */
+      dueLabel: formatINR(Math.max(0, amount - paid)),
       statusLabel: PAYMENT_STATUS_LABEL[dto.paymentStatus] ?? '',
       paidPercent: amount > 0 ? Math.min(100, Math.round((paid / amount) * 100)) : 0,
+      paidHeadline: `₹${Math.round(Math.max(0, paid)).toLocaleString('en-IN')}`,
+      advanceLabel: formatINR(advance),
+      advanceState: advancePaid ? 'paid' : dto.advanceMethod === 'cash' ? 'cash_due' : 'due',
+      balanceLabel: formatINR(dto.balanceAmount ?? Math.max(0, amount - advance)),
     },
+    tasksDone: tasks.filter((t) => t.status === 'done').length,
+    tasksTotal: tasks.length,
     tasks,
     timeline,
     organizerName: dto.organizer?.name ?? null,

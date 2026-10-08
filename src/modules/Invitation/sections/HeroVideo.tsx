@@ -38,9 +38,13 @@ type WebViewProps = {
   scrollEnabled: boolean;
   bounces: boolean;
   setSupportMultipleWindows: boolean;
+  onMessage?: (event: { nativeEvent: { data: string } }) => void;
 };
 
-function resolve<T>(load: () => unknown, pick: (mod: any) => unknown): T | null {
+function resolve<T>(
+  load: () => unknown,
+  pick: (mod: any) => unknown,
+): T | null {
   try {
     return (pick(load()) ?? null) as T | null;
   } catch {
@@ -50,11 +54,11 @@ function resolve<T>(load: () => unknown, pick: (mod: any) => unknown): T | null 
 
 const NativePlayer = resolve<React.ComponentType<NativePlayerProps>>(
   () => require('react-native-video'),
-  (mod) => mod?.default ?? mod?.Video,
+  mod => mod?.default ?? mod?.Video,
 );
 const WebViewImpl = resolve<React.ComponentType<WebViewProps>>(
   () => require('react-native-webview'),
-  (mod) => mod?.WebView ?? mod?.default,
+  mod => mod?.WebView ?? mod?.default,
 );
 
 /** True where a video can actually be drawn. Checked, never assumed. */
@@ -70,7 +74,11 @@ function attr(value: string): string {
 }
 
 /** The page the WebView renders: one <video>, edge to edge, on black. */
-export function videoHtml(uri: string, mode: VideoMode, fit: 'cover' | 'contain'): string {
+export function videoHtml(
+  uri: string,
+  mode: VideoMode,
+  fit: 'cover' | 'contain',
+): string {
   const ambient = mode === 'ambient';
   const flags = ambient
     ? 'autoplay muted loop playsinline disablepictureinpicture'
@@ -78,7 +86,9 @@ export function videoHtml(uri: string, mode: VideoMode, fit: 'cover' | 'contain'
   return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <style>html,body{margin:0;padding:0;height:100%;background:#000;overflow:hidden}
 video{width:100%;height:100%;object-fit:${fit};display:block;background:#000}</style></head>
-<body><video src="${attr(uri)}" ${flags} preload="auto"></video></body></html>`;
+<body><video src="${attr(uri)}" ${flags} preload="auto"></video>
+<script>(function(){var v=document.querySelector('video'),done=false,tries=0;function tell(){if(done||!v.videoWidth||!v.videoHeight||!window.ReactNativeWebView)return;done=true;window.ReactNativeWebView.postMessage(JSON.stringify({aspect:v.videoWidth/v.videoHeight}));}['loadedmetadata','loadeddata','canplay','playing','resize'].forEach(function(e){v.addEventListener(e,tell);});var t=setInterval(function(){tell();if(done||++tries>60)clearInterval(t);},250);})();</script>
+</body></html>`;
 }
 
 /**
@@ -94,11 +104,14 @@ export function HeroVideo({
   style,
   mode = 'ambient',
   fit = 'cover',
+  onAspect,
 }: {
   uri: string;
   style: object;
   mode?: VideoMode;
   fit?: 'cover' | 'contain';
+  /** The video's own width ÷ height, once it is known — so a frame can take its shape. */
+  onAspect?: (aspect: number) => void;
 }) {
   const html = useMemo(() => videoHtml(uri, mode, fit), [uri, mode, fit]);
 
@@ -130,6 +143,22 @@ export function HeroVideo({
         scrollEnabled={false}
         bounces={false}
         setSupportMultipleWindows={false}
+        onMessage={event => {
+          if (!onAspect) return;
+          try {
+            const { aspect } = JSON.parse(event.nativeEvent.data) as {
+              aspect?: number;
+            };
+            if (
+              typeof aspect === 'number' &&
+              Number.isFinite(aspect) &&
+              aspect > 0
+            )
+              onAspect(aspect);
+          } catch {
+            // Not ours — ignore.
+          }
+        }}
       />
     </View>
   );

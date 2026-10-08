@@ -26,7 +26,8 @@ import { CoverBlock } from './CoverBlock';
 export function rendererFor(block: InvitationBlockDTO): 'cover' | 'generic' {
   /* A server that predates typed blocks sends no type at all; the cover's key
      has been stable since the invitation existed, so it still identifies it. */
-  const type = block.type ?? (block.key === COVER_BLOCK_KEY ? 'cover' : 'generic');
+  const type =
+    block.type ?? (block.key === COVER_BLOCK_KEY ? 'cover' : 'generic');
   return BLOCK_RENDERER[type] ?? 'generic';
 }
 
@@ -50,7 +51,11 @@ export function dateLabel(value: string | null | undefined): string {
   if (!value) return '';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  return date.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 }
 
 /**
@@ -69,7 +74,11 @@ export function InvitationHero({
 
   return (
     <View style={heroStyles.card}>
-      <EventlyText variant="caption" style={heroStyles.eyebrow} numberOfLines={1}>
+      <EventlyText
+        variant="caption"
+        style={heroStyles.eyebrow}
+        numberOfLines={1}
+      >
         {COPY.eyebrow(organizerName)}
       </EventlyText>
       <EventlyText variant="h1" style={heroStyles.heading}>
@@ -80,7 +89,12 @@ export function InvitationHero({
       </EventlyText>
 
       <View style={heroStyles.statusRow}>
-        <View style={[heroStyles.statusDot, { backgroundColor: approved ? INV_GREEN : INV_ACCENT }]} />
+        <View
+          style={[
+            heroStyles.statusDot,
+            { backgroundColor: approved ? INV_GREEN : INV_ACCENT },
+          ]}
+        />
         <EventlyText variant="caption" style={heroStyles.statusText}>
           {approved ? COPY.approvedNote : COPY.awaitingNote}
         </EventlyText>
@@ -126,13 +140,17 @@ interface GuestPreviewProps {
  */
 export function GuestPreview({ invitation, blockKey }: GuestPreviewProps) {
   const { blocks, subEvents } = invitation;
-  const one = blockKey ? blocks.find((b) => b.key === blockKey) : undefined;
-  const visible = one ? (one.hidden ? [] : [one]) : blocks.filter((b) => !b.hidden);
+  const one = blockKey ? blocks.find(b => b.key === blockKey) : undefined;
+  const visible = one
+    ? one.hidden
+      ? []
+      : [one]
+    : blocks.filter(b => !b.hidden);
   const hiddenCount = one ? 0 : blocks.length - visible.length;
   const showSchedule = !blockKey && subEvents.length > 0;
 
   /* The cover is drawn as the cover, not as another heading-and-words row. */
-  const rest = visible.filter((b) => rendererFor(b) !== 'cover');
+  const rest = visible.filter(b => rendererFor(b) !== 'cover');
 
   return (
     <View style={previewStyles.wrap}>
@@ -144,10 +162,14 @@ export function GuestPreview({ invitation, blockKey }: GuestPreviewProps) {
             preview cannot drift from what the link actually opens. */}
         <CoverBlock invitation={invitation} mode="guest" />
 
-        {rest.map((block) => (
+        {rest.map(block => (
           <View key={block.key} style={previewStyles.block}>
             <View style={previewStyles.blockHead}>
-              <EventlyIcon name={blockIcon(block.icon)} size={16} color={INV_ACCENT} />
+              <EventlyIcon
+                name={blockIcon(block.icon)}
+                size={16}
+                color={INV_ACCENT}
+              />
               <EventlyText variant="caption" style={previewStyles.blockTitle}>
                 {block.heading || block.title}
               </EventlyText>
@@ -165,17 +187,30 @@ export function GuestPreview({ invitation, blockKey }: GuestPreviewProps) {
             <EventlyText variant="caption" style={previewStyles.scheduleTitle}>
               Schedule
             </EventlyText>
-            {subEvents.map((event) => (
+            {subEvents.map(event => (
               <View key={event.id} style={previewStyles.subEvent}>
                 <View
-                  style={[previewStyles.subEventBar, event.colour ? { backgroundColor: event.colour } : null]}
+                  style={[
+                    previewStyles.subEventBar,
+                    event.colour ? { backgroundColor: event.colour } : null,
+                  ]}
                 />
                 <View>
-                  <EventlyText variant="caption" style={previewStyles.subEventName}>
+                  <EventlyText
+                    variant="caption"
+                    style={previewStyles.subEventName}
+                  >
                     {event.name}
                   </EventlyText>
-                  <EventlyText variant="caption" style={previewStyles.subEventMeta}>
-                    {[dateLabel(event.eventDate), event.eventTime, event.venueName]
+                  <EventlyText
+                    variant="caption"
+                    style={previewStyles.subEventMeta}
+                  >
+                    {[
+                      dateLabel(event.eventDate),
+                      event.eventTime,
+                      event.venueName,
+                    ]
                       .filter(Boolean)
                       .join(' · ')}
                   </EventlyText>
@@ -209,7 +244,9 @@ export function GuestPreview({ invitation, blockKey }: GuestPreviewProps) {
 }
 
 export function ownerStyleFor(block: InvitationBlockDTO) {
-  return block.owner === 'customer' ? OWNER_BADGE.customer : OWNER_BADGE.organizer;
+  return block.owner === 'customer'
+    ? OWNER_BADGE.customer
+    : OWNER_BADGE.organizer;
 }
 
 export { INV_NAVY };

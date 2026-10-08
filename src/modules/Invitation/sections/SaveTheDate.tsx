@@ -2,7 +2,13 @@ import { Linking, TouchableOpacity, View } from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
 import { colors } from '../../../theme';
 import { INVITATION_COPY as COPY, INV_NAVY_DEEP } from '../constants';
-import { cardDate, cardTone, clockLabel, dayOfWeek, venueOf } from '../saveTheDate';
+import {
+  cardDate,
+  cardTone,
+  clockLabel,
+  dayOfWeek,
+  venueOf,
+} from '../saveTheDate';
 import { saveTheDateStyles as s } from '../styles';
 import type { CardColourDTO, InvitationSubEventDTO } from '../types';
 
@@ -45,10 +51,14 @@ function calendarUrl(
     explicitEnd === null
       ? start + Math.max(1, defaultMinutes) * 60_000
       : explicitEnd <= start
-        ? explicitEnd + 86_400_000
-        : explicitEnd;
+      ? explicitEnd + 86_400_000
+      : explicitEnd;
 
-  const details = [invitationName, sub.dressCode && `Dress code: ${sub.dressCode}`, sub.note]
+  const details = [
+    invitationName,
+    sub.dressCode && `Dress code: ${sub.dressCode}`,
+    sub.note,
+  ]
     .filter(Boolean)
     .join('\n');
 
@@ -80,7 +90,11 @@ function stamp(instantMs: number): string {
  * about: the first gets close, the second settles it across a DST boundary.
  * The same method the server and the web client use.
  */
-function instantOf(date: string, time: string, timeZone: string): number | null {
+function instantOf(
+  date: string,
+  time: string,
+  timeZone: string,
+): number | null {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
   const clock = /^([01]\d|2[0-3]):[0-5]\d$/.test(time) ? time : '00:00';
   const [y, m, d] = date.split('-').map(Number) as [number, number, number];
@@ -112,10 +126,16 @@ function offsetAt(instantMs: number, timeZone: string): number {
     second: '2-digit',
   }).formatToParts(new Date(instantMs));
   const read = (type: Intl.DateTimeFormatPartTypes) =>
-    Number(parts.find((p) => p.type === type)?.value ?? 0);
+    Number(parts.find(p => p.type === type)?.value ?? 0);
   return (
-    Date.UTC(read('year'), read('month') - 1, read('day'), read('hour'), read('minute'), read('second')) -
-    instantMs
+    Date.UTC(
+      read('year'),
+      read('month') - 1,
+      read('day'),
+      read('hour'),
+      read('minute'),
+      read('second'),
+    ) - instantMs
   );
 }
 
@@ -163,18 +183,30 @@ export function SaveTheDate({
         return (
           <View
             key={sub.id || `${sub.name}-${index}`}
-            style={[s.card, { backgroundColor: tone.wash, borderColor: `${tone.ink}22` }]}
+            style={[
+              s.card,
+              { backgroundColor: tone.wash, borderColor: `${tone.ink}22` },
+            ]}
           >
             <View style={[s.edge, { backgroundColor: tone.ink }]} />
 
-            <EventlyText variant="h2" style={[s.name, { color: tone.ink }]} numberOfLines={2}>
+            <EventlyText
+              variant="h2"
+              style={[s.name, { color: tone.ink }]}
+              numberOfLines={2}
+            >
               {sub.name}
             </EventlyText>
 
             {when ? (
               <Fact icon="calendar-blank-outline" text={when} strong />
             ) : null}
-            {time ? <Fact icon="clock-outline" text={ends ? `${time} – ${ends}` : time} /> : null}
+            {time ? (
+              <Fact
+                icon="clock-outline"
+                text={ends ? `${time} – ${ends}` : time}
+              />
+            ) : null}
 
             <View style={[s.hair, { backgroundColor: tone.ink }]} />
 
@@ -186,7 +218,11 @@ export function SaveTheDate({
               />
             ) : null}
             {sub.dressCode ? (
-              <Fact icon="tshirt-crew-outline" label={COPY.saveTheDateDress} sub={sub.dressCode} />
+              <Fact
+                icon="tshirt-crew-outline"
+                label={COPY.saveTheDateDress}
+                sub={sub.dressCode}
+              />
             ) : null}
 
             {sub.note ? (
@@ -206,7 +242,11 @@ export function SaveTheDate({
               accessibilityLabel={`${COPY.saveTheDateAdd} — ${sub.name}`}
               testID={`save-the-date-add-${index}`}
             >
-              <EventlyIcon name="calendar-plus" size={16} color={colors.onPrimary} />
+              <EventlyIcon
+                name="calendar-plus"
+                size={16}
+                color={colors.onPrimary}
+              />
               <EventlyText variant="subtitle" style={s.addText}>
                 {COPY.saveTheDateAdd}
               </EventlyText>
@@ -250,7 +290,10 @@ function Fact({
           </EventlyText>
         ) : null}
         {text ? (
-          <EventlyText variant="body" style={[s.factValue, strong && s.factStrong]}>
+          <EventlyText
+            variant="body"
+            style={[s.factValue, strong && s.factStrong]}
+          >
             {text}
           </EventlyText>
         ) : null}

@@ -20,8 +20,12 @@ const base = (bookingId: string) =>
   `${MY_INVITATIONS_ENDPOINT}/${encodeURIComponent(bookingId)}/memories`;
 
 /** Whether the gallery exists at all, and who may do what with it. */
-export async function fetchMemorySettings(bookingId: string): Promise<MemorySettingsDTO> {
-  const { data } = await apiClient.get<MemorySettingsDTO>(`${base(bookingId)}/settings`);
+export async function fetchMemorySettings(
+  bookingId: string,
+): Promise<MemorySettingsDTO> {
+  const { data } = await apiClient.get<MemorySettingsDTO>(
+    `${base(bookingId)}/settings`,
+  );
   return data;
 }
 
@@ -56,7 +60,8 @@ export async function fetchMemories(
 ): Promise<MemoryGalleryDTO> {
   const params = new URLSearchParams();
   if (query.kind && query.kind !== 'all') params.set('kind', query.kind);
-  if (query.subEvent && query.subEvent !== 'all') params.set('subEvent', query.subEvent);
+  if (query.subEvent && query.subEvent !== 'all')
+    params.set('subEvent', query.subEvent);
   if (query.before) params.set('before', query.before);
   const suffix = params.toString();
   const { data } = await apiClient.get<MemoryGalleryDTO>(
@@ -87,15 +92,20 @@ export async function uploadMemory(
   } as unknown as Blob);
   if (input.subEventId) body.append('subEventId', input.subEventId);
   if (input.caption) body.append('caption', input.caption);
-  if (input.durationSec !== undefined) body.append('durationSec', String(input.durationSec));
+  if (input.durationSec !== undefined)
+    body.append('durationSec', String(input.durationSec));
   if (input.reel) body.append('reel', 'true');
 
-  const { data } = await apiClient.post<MemoryUploadOutcomeDTO>(base(bookingId), body, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-    onUploadProgress: (event) => {
-      if (!onProgress || !event.total) return;
-      onProgress(Math.min(1, event.loaded / event.total));
+  const { data } = await apiClient.post<MemoryUploadOutcomeDTO>(
+    base(bookingId),
+    body,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: event => {
+        if (!onProgress || !event.total) return;
+        onProgress(Math.min(1, event.loaded / event.total));
+      },
     },
-  });
+  );
   return data;
 }

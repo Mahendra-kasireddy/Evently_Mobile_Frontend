@@ -1,4 +1,6 @@
 import { useCallback } from 'react';
+import { fetchGuests } from '../GuestList/services';
+import type { GuestDTO } from '../GuestList/types';
 import { useAsync, type AsyncResult } from '../../hooks/useAsync';
 import { useAsyncCallback, type AsyncCallbackResult } from '../../hooks/useAsyncCallback';
 import {
@@ -26,6 +28,12 @@ export function useBookingDetail(bookingId: string): AsyncResult<BookingDetailDT
 
 export function useIdeaBoard(bookingId: string): AsyncResult<IdeaBoardDTO> {
   const load = useCallback(() => fetchIdeaBoard(bookingId), [bookingId]);
+  return useAsync(load, [bookingId]);
+}
+
+/** The booking's guest list — counted for the invitation tab. */
+export function useGuests(bookingId: string): AsyncResult<GuestDTO[]> {
+  const load = useCallback(() => fetchGuests(bookingId), [bookingId]);
   return useAsync(load, [bookingId]);
 }
 

@@ -15,7 +15,11 @@ import type { InvitationCountdownDTO } from '../types';
  * screen goes — so a customer opening and closing the invitation cannot leave
  * timers running behind them.
  */
-export function CountdownBlock({ countdown }: { countdown: InvitationCountdownDTO | null }) {
+export function CountdownBlock({
+  countdown,
+}: {
+  countdown: InvitationCountdownDTO | null;
+}) {
   const targetMs = countdown?.startsAt ? Date.parse(countdown.startsAt) : NaN;
   const valid = Number.isFinite(targetMs);
   const [now, setNow] = useState(() => Date.now());
@@ -30,10 +34,13 @@ export function CountdownBlock({ countdown }: { countdown: InvitationCountdownDT
      zeros would read as "starting right now". */
   if (!countdown || !valid) return null;
 
-  const { days, hours, minutes, seconds, passed } = countdownFrom(targetMs, now);
+  const { days, hours, minutes, seconds, passed } = countdownFrom(
+    targetMs,
+    now,
+  );
   const lines = (countdown.postEventMessage || COPY.countdownStarted)
     .split('\n')
-    .map((line) => line.trim())
+    .map(line => line.trim())
     .filter(Boolean);
   const headline = lines[0] ?? '';
   const rest = lines.slice(1).join(' ');
@@ -111,7 +118,11 @@ export function CountdownBlock({ countdown }: { countdown: InvitationCountdownDT
 
           {when ? (
             <View style={s.fact}>
-              <EventlyIcon name="calendar-blank-outline" size={14} color={colors.textMuted} />
+              <EventlyIcon
+                name="calendar-blank-outline"
+                size={14}
+                color={colors.textMuted}
+              />
               <EventlyText variant="body" style={s.factText}>
                 {when}
               </EventlyText>
@@ -119,7 +130,11 @@ export function CountdownBlock({ countdown }: { countdown: InvitationCountdownDT
           ) : null}
           {venue ? (
             <View style={s.fact}>
-              <EventlyIcon name="map-marker-outline" size={14} color={colors.textMuted} />
+              <EventlyIcon
+                name="map-marker-outline"
+                size={14}
+                color={colors.textMuted}
+              />
               <EventlyText variant="body" style={s.factText} numberOfLines={3}>
                 {venue}
               </EventlyText>

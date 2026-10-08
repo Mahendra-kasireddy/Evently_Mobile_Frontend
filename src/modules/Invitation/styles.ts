@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
 import { colors, fontFor, spacing } from '../../theme';
 import {
@@ -20,7 +20,12 @@ export const styles = StyleSheet.create({
   scroll: { flex: 1 },
   content: { paddingBottom: spacing.xl },
   listContent: { padding: spacing.md, paddingBottom: spacing.xl },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.lg,
+  },
   centeredIcon: {
     width: 64,
     height: 64,
@@ -29,8 +34,17 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  centeredTitle: { color: INV_NAVY, marginTop: spacing.md, textAlign: 'center' },
-  centeredBody: { color: colors.textMuted, marginTop: spacing.sm, textAlign: 'center', lineHeight: 20 },
+  centeredTitle: {
+    color: INV_NAVY,
+    marginTop: spacing.md,
+    textAlign: 'center',
+  },
+  centeredBody: {
+    color: colors.textMuted,
+    marginTop: spacing.sm,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
   errorText: { color: colors.danger, textAlign: 'center' },
   retryButton: {
     ...globalStyles.row,
@@ -80,7 +94,11 @@ export const listStyles = StyleSheet.create({
   text: { flex: 1 },
   title: { color: INV_NAVY, fontSize: 16, fontWeight: '700' },
   ref: { color: colors.textMuted, marginTop: 1, letterSpacing: 0.4 },
-  statusChip: { borderRadius: 999, paddingHorizontal: spacing.sm, paddingVertical: 3 },
+  statusChip: {
+    borderRadius: 999,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+  },
   statusChipAction: { backgroundColor: INV_ACCENT_SOFT },
   statusChipDone: { backgroundColor: INV_GREEN_SOFT },
   statusText: { fontWeight: '700', fontSize: 11 },
@@ -115,7 +133,12 @@ export const heroStyles = StyleSheet.create({
     letterSpacing: 0.5,
     fontWeight: '700',
   },
-  heading: { color: colors.onPrimary, fontSize: 22, fontWeight: '700', marginTop: spacing.sm },
+  heading: {
+    color: colors.onPrimary,
+    fontSize: 22,
+    fontWeight: '700',
+    marginTop: spacing.sm,
+  },
   sub: { color: colors.onPrimaryMuted, marginTop: spacing.xs, lineHeight: 20 },
 
   statusRow: {
@@ -218,7 +241,11 @@ export const sectionStyles = StyleSheet.create({
   ownerBadge: { marginTop: 2 },
   ownerOrganizer: { color: colors.textMuted },
   ownerCustomer: { color: INV_ACCENT, fontWeight: '700' },
-  stateChip: { borderRadius: 999, paddingHorizontal: spacing.sm, paddingVertical: 2 },
+  stateChip: {
+    borderRadius: 999,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+  },
   stateReady: { backgroundColor: INV_GREEN_SOFT },
   stateHidden: { backgroundColor: colors.surface },
   stateText: { fontWeight: '700', fontSize: 11 },
@@ -272,7 +299,6 @@ export const previewStyles = StyleSheet.create({
     marginVertical: spacing.sm,
   },
 
-
   block: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm + 2,
@@ -283,13 +309,28 @@ export const previewStyles = StyleSheet.create({
   blockTitle: { color: INV_NAVY, fontWeight: '700', flex: 1 },
   blockBody: { color: colors.textMuted, marginTop: 2, lineHeight: 19 },
 
-  scheduleTitle: { color: INV_NAVY, fontWeight: '700', paddingHorizontal: spacing.md, paddingTop: spacing.md },
-  subEvent: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
+  scheduleTitle: {
+    color: INV_NAVY,
+    fontWeight: '700',
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
+  },
+  subEvent: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
   subEventBar: { width: 3, borderRadius: 2, backgroundColor: INV_ACCENT },
   subEventName: { color: INV_NAVY, fontWeight: '700' },
   subEventMeta: { color: colors.textMuted, marginTop: 1 },
 
-  hiddenNote: { color: colors.textMuted, padding: spacing.md, textAlign: 'center', lineHeight: 19 },
+  hiddenNote: {
+    color: colors.textMuted,
+    padding: spacing.md,
+    textAlign: 'center',
+    lineHeight: 19,
+  },
 });
 
 /** The preview sheet's own chrome: a title row, a status line, and one action. */
@@ -325,7 +366,11 @@ export const previewSheetStyles = StyleSheet.create({
 
 export const sheetStyles = StyleSheet.create({
   /* The sheet's head: title and lead on the left, a close control on the right. */
-  shareHead: { ...globalStyles.row, alignItems: 'flex-start', gap: spacing.s12 },
+  shareHead: {
+    ...globalStyles.row,
+    alignItems: 'flex-start',
+    gap: spacing.s12,
+  },
   shareHeadText: { flex: 1 },
   shareClose: {
     width: 32,
@@ -359,7 +404,11 @@ export const sheetStyles = StyleSheet.create({
   manageGuests: { alignItems: 'center', paddingVertical: spacing.s12 },
   manageGuestsText: { color: INV_ACCENT, fontWeight: '600' },
 
-  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
+  backdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'flex-end',
+  },
   container: {
     backgroundColor: colors.background,
     borderTopLeftRadius: 24,
@@ -532,7 +581,12 @@ export const shellStyles = StyleSheet.create({
     lineHeight: 19,
     fontWeight: '700',
   },
-  menuNote: { color: colors.textMuted, fontSize: 12, lineHeight: 16, marginTop: 1 },
+  menuNote: {
+    color: colors.textMuted,
+    fontSize: 12,
+    lineHeight: 16,
+    marginTop: 1,
+  },
 
   /* One action, always in the same place, whichever view is on screen. */
 });
@@ -564,7 +618,12 @@ export const approveStyles = StyleSheet.create({
     marginLeft: 'auto',
   },
   approvedChip: { ...globalStyles.row, gap: 5, marginLeft: 'auto' },
-  approvedText: { color: INV_GREEN, fontSize: 10.5, fontWeight: '700', letterSpacing: 0.8 },
+  approvedText: {
+    color: INV_GREEN,
+    fontSize: 10.5,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+  },
   eyebrow: {
     color: INV_ACCENT,
     fontSize: 11,
@@ -645,7 +704,12 @@ export const overviewStyles = StyleSheet.create({
     height: 150,
     opacity: 0.9,
   },
-  cardBody: { paddingHorizontal: spacing.lg, paddingTop: 96, paddingBottom: 22, alignItems: 'center' },
+  cardBody: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: 96,
+    paddingBottom: 22,
+    alignItems: 'center',
+  },
   cardEyebrow: {
     color: INV_ACCENT,
     fontSize: 10.5,
@@ -904,8 +968,18 @@ export const coverStyles = StyleSheet.create({
 export const coverEditorStyles = StyleSheet.create({
   head: { ...globalStyles.row, alignItems: 'flex-start', gap: spacing.s12 },
   headText: { flex: 1 },
-  title: { color: INV_NAVY_DEEP, fontSize: 17, lineHeight: 23, fontWeight: '700' },
-  sub: { color: colors.textMuted, fontSize: 12.5, lineHeight: 18, marginTop: 2 },
+  title: {
+    color: INV_NAVY_DEEP,
+    fontSize: 17,
+    lineHeight: 23,
+    fontWeight: '700',
+  },
+  sub: {
+    color: colors.textMuted,
+    fontSize: 12.5,
+    lineHeight: 18,
+    marginTop: 2,
+  },
   close: {
     width: 32,
     height: 32,
@@ -944,7 +1018,12 @@ export const coverEditorStyles = StyleSheet.create({
   /** One field under another, rather than beside it. */
   gap: { marginTop: 8 },
   /* The counter the server's own cap drives — never a second number. */
-  counter: { color: colors.textMuted, fontSize: 11, textAlign: 'right', marginTop: 4 },
+  counter: {
+    color: colors.textMuted,
+    fontSize: 11,
+    textAlign: 'right',
+    marginTop: 4,
+  },
   counterFull: { color: INV_ACCENT, fontWeight: '700' },
 
   /* Media */
@@ -962,7 +1041,12 @@ export const coverEditorStyles = StyleSheet.create({
   },
   mediaButtonText: { color: INV_NAVY_DEEP, fontSize: 12.5, fontWeight: '700' },
   mediaState: { ...globalStyles.row, gap: 6, marginTop: 8 },
-  mediaStateText: { flex: 1, color: colors.textMuted, fontSize: 12, lineHeight: 17 },
+  mediaStateText: {
+    flex: 1,
+    color: colors.textMuted,
+    fontSize: 12,
+    lineHeight: 17,
+  },
   mediaRemove: { color: INV_ACCENT, fontSize: 12, fontWeight: '700' },
 
   /* Theme and lettering: swatches and words, not a dropdown of ids. */
@@ -997,7 +1081,12 @@ export const coverEditorStyles = StyleSheet.create({
   fontChipNote: { color: colors.textMuted, fontSize: 10.5, marginTop: 1 },
 
   errorText: { color: colors.danger, fontSize: 12, marginTop: spacing.sm },
-  savedText: { color: INV_GREEN, fontSize: 12, fontWeight: '700', marginTop: spacing.sm },
+  savedText: {
+    color: INV_GREEN,
+    fontSize: 12,
+    fontWeight: '700',
+    marginTop: spacing.sm,
+  },
   save: {
     ...globalStyles.row,
     justifyContent: 'center',
@@ -1019,7 +1108,11 @@ export const coverEditorStyles = StyleSheet.create({
  * dress.
  */
 export const artworkStyles = StyleSheet.create({
-  block: { alignItems: 'center', paddingHorizontal: spacing.md, marginTop: spacing.md },
+  block: {
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.md,
+  },
   /*
    * Small on the page, full size on a tap.
    *
@@ -1030,16 +1123,47 @@ export const artworkStyles = StyleSheet.create({
    * Dark, because an invitation with a white border has to read as a card
    * rather than bleed into the page behind it.
    */
+  /* Sized in code to the artwork's own shape — see InvitationArtwork. */
   frame: {
-    /* 3:4, stated as two numbers rather than as a ratio: the frame has to hold
-       its shape while the image is still loading, and an aspect ratio with no
-       intrinsic content to measure collapses to nothing. */
-    width: 168,
-    height: 224,
-    borderRadius: 14,
+    borderRadius: 22,
     overflow: 'hidden',
     backgroundColor: INV_NAVY_DEEP,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#1a1f3d',
+        shadowOpacity: 0.18,
+        shadowRadius: 18,
+        shadowOffset: { width: 0, height: 10 },
+      },
+      android: { elevation: 6 },
+    }),
   },
+  kindChip: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 9,
+    borderRadius: 999,
+    backgroundColor: 'rgba(10,8,30,0.55)',
+  },
+  kindChipText: { color: '#ffffff', fontSize: 11.5, fontWeight: '700' },
+  expandChip: {
+    position: 'absolute',
+    right: 12,
+    bottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingVertical: 6,
+    paddingHorizontal: 11,
+    borderRadius: 999,
+    backgroundColor: 'rgba(10,8,30,0.55)',
+  },
+  expandChipText: { color: '#ffffff', fontSize: 12, fontWeight: '700' },
   media: { width: '100%', height: '100%' },
   unplayable: {
     alignItems: 'center',
@@ -1076,7 +1200,25 @@ export const artworkStyles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.45)',
   },
 
-  /* Where it stands, said once. */
+  /* Where it stands, said once — tinted by stage in code. */
+  statusCard: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    gap: 12,
+    marginHorizontal: spacing.md,
+    marginTop: 22,
+    padding: 14,
+    borderRadius: 18,
+    borderWidth: 1,
+  },
+  statusIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   status: {
     ...globalStyles.row,
     alignItems: 'flex-start',
@@ -1095,21 +1237,28 @@ export const artworkStyles = StyleSheet.create({
   statusText: { flex: 1 },
   statusTitle: {
     color: INV_NAVY_DEEP,
-    fontSize: 15.5,
+    fontSize: 16,
     lineHeight: 20,
     fontWeight: '700',
     letterSpacing: -0.2,
   },
   statusTitleDone: { color: INV_GREEN },
-  statusNote: { color: colors.textMuted, fontSize: 12.5, lineHeight: 17, marginTop: 1 },
+  statusNote: {
+    color: colors.textMuted,
+    fontSize: 12.5,
+    lineHeight: 17,
+    marginTop: 1,
+  },
 
   actions: { paddingHorizontal: spacing.md, marginTop: spacing.md },
   approve: {
     ...globalStyles.row,
     justifyContent: 'center',
     gap: 8,
-    borderRadius: 14,
+    borderRadius: 999,
+    overflow: 'hidden',
     backgroundColor: INV_ACCENT,
+    minHeight: 54,
     paddingVertical: 14,
   },
   approveDisabled: { opacity: 0.45 },
@@ -1119,7 +1268,8 @@ export const artworkStyles = StyleSheet.create({
     ...globalStyles.row,
     justifyContent: 'center',
     gap: 8,
-    borderRadius: 14,
+    borderRadius: 999,
+    backgroundColor: colors.background,
     borderWidth: 1,
     borderColor: INV_HAIRLINE,
     paddingVertical: 13,
@@ -1133,7 +1283,12 @@ export const artworkStyles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 8,
   },
-  errorText: { color: colors.danger, fontSize: 12.5, textAlign: 'center', marginTop: spacing.sm },
+  errorText: {
+    color: colors.danger,
+    fontSize: 12.5,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+  },
   sentText: {
     color: INV_GREEN,
     fontSize: 12.5,
@@ -1143,7 +1298,11 @@ export const artworkStyles = StyleSheet.create({
   },
 
   /* Nothing uploaded yet. */
-  pending: { alignItems: 'center', paddingHorizontal: spacing.lg, paddingTop: 56 },
+  pending: {
+    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingTop: 56,
+  },
   pendingIcon: {
     width: 60,
     height: 60,
@@ -1250,7 +1409,12 @@ export const countdownStyles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  flourish: { ...globalStyles.row, alignItems: 'center', gap: 10, marginBottom: 12 },
+  flourish: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 12,
+  },
   rule: { width: 46, height: 1, backgroundColor: INV_GOLD, opacity: 0.45 },
   diamond: {
     width: 6,
@@ -1279,7 +1443,12 @@ export const countdownStyles = StyleSheet.create({
   },
 
   /* ---- the timer ---- */
-  row: { ...globalStyles.row, alignItems: 'center', justifyContent: 'center', marginTop: 22 },
+  row: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 22,
+  },
   unit: {
     flex: 1,
     alignItems: 'center',
@@ -1336,7 +1505,13 @@ export const countdownStyles = StyleSheet.create({
   },
 
   /* ---- the details ---- */
-  divider: { ...globalStyles.row, alignItems: 'center', gap: 12, marginTop: 22, marginBottom: 14 },
+  divider: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 22,
+    marginBottom: 14,
+  },
   rings: { flexDirection: 'row' },
   ring: {
     width: 13,
@@ -1372,7 +1547,12 @@ export const countdownStyles = StyleSheet.create({
 export const saveTheDateStyles = StyleSheet.create({
   block: { marginTop: 30, alignItems: 'center' },
 
-  flourish: { ...globalStyles.row, alignItems: 'center', gap: 10, marginBottom: 12 },
+  flourish: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 12,
+  },
   rule: { width: 46, height: 1, backgroundColor: INV_GOLD, opacity: 0.45 },
   diamond: {
     width: 6,
@@ -1411,11 +1591,23 @@ export const saveTheDateStyles = StyleSheet.create({
     overflow: 'hidden',
   },
   /* The celebration's colour, as a mark down the edge. */
-  edge: { position: 'absolute', top: 0, bottom: 0, left: 0, width: 3, opacity: 0.55 },
+  edge: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    width: 3,
+    opacity: 0.55,
+  },
 
   name: { fontSize: 21, lineHeight: 28, fontWeight: '600', marginBottom: 10 },
 
-  fact: { ...globalStyles.row, alignItems: 'flex-start', gap: 9, marginBottom: 7 },
+  fact: {
+    ...globalStyles.row,
+    alignItems: 'flex-start',
+    gap: 9,
+    marginBottom: 7,
+  },
   factText: { flex: 1 },
   factLabel: {
     color: colors.textMuted,
@@ -1431,7 +1623,13 @@ export const saveTheDateStyles = StyleSheet.create({
 
   hair: { width: 44, height: 1, opacity: 0.25, marginVertical: 11 },
 
-  note: { fontSize: 13.5, lineHeight: 20, fontStyle: 'italic', marginTop: 11, opacity: 0.9 },
+  note: {
+    fontSize: 13.5,
+    lineHeight: 20,
+    fontStyle: 'italic',
+    marginTop: 11,
+    opacity: 0.9,
+  },
 
   /* The one action, at a comfortable one-handed size. */
   add: {
@@ -1478,11 +1676,20 @@ export const liveStyles = StyleSheet.create({
   bloomTop: { position: 'absolute', top: -14, right: -12 },
   bloomBottom: { position: 'absolute', bottom: -10, left: -14 },
 
-  head: { ...globalStyles.row, alignItems: 'center', justifyContent: 'space-between' },
+  head: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   /* The platform serif, the same way the invitation's own font styles reach
      for one — Poppins is the only family bundled, and a wedding card is not
      set in a UI sans. */
-  heading: { color: INV_NAVY_DEEP, fontFamily: 'serif', fontSize: 19, fontWeight: '600' },
+  heading: {
+    color: INV_NAVY_DEEP,
+    fontFamily: 'serif',
+    fontSize: 19,
+    fontWeight: '600',
+  },
 
   state: { ...globalStyles.row, alignItems: 'center', gap: 10, marginTop: 12 },
   badge: {
@@ -1496,7 +1703,12 @@ export const liveStyles = StyleSheet.create({
        sits under a coral Approve button on the same screen. */
     backgroundColor: INV_ACCENT,
   },
-  pulse: { width: 6, height: 6, borderRadius: 999, backgroundColor: colors.onPrimary },
+  pulse: {
+    width: 6,
+    height: 6,
+    borderRadius: 999,
+    backgroundColor: colors.onPrimary,
+  },
   badgeText: {
     color: colors.onPrimary,
     fontSize: 10,
@@ -1513,7 +1725,12 @@ export const liveStyles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 10,
   },
-  lead: { color: colors.textMuted, fontSize: 12.5, lineHeight: 18, marginTop: 3 },
+  lead: {
+    color: colors.textMuted,
+    fontSize: 12.5,
+    lineHeight: 18,
+    marginTop: 3,
+  },
 
   /* Standard / 360° / VR. */
   modes: { ...globalStyles.row, gap: 8, marginTop: 14, flexWrap: 'wrap' },
@@ -1529,7 +1746,12 @@ export const liveStyles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   modeOn: { borderColor: 'transparent', backgroundColor: INV_ACCENT },
-  modeText: { color: colors.text, fontSize: 12.5, lineHeight: 17, fontWeight: '700' },
+  modeText: {
+    color: colors.text,
+    fontSize: 12.5,
+    lineHeight: 17,
+    fontWeight: '700',
+  },
   modeTextOn: { color: colors.onPrimary },
 
   /* The player: 16:9, clipped to the card's idiom, on near-black so a frame
@@ -1581,7 +1803,12 @@ export const liveStyles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 12,
   },
-  fact: { ...globalStyles.row, alignItems: 'flex-start', gap: 10, marginBottom: 12 },
+  fact: {
+    ...globalStyles.row,
+    alignItems: 'flex-start',
+    gap: 10,
+    marginBottom: 12,
+  },
   /* A tile rather than a bare glyph, so the rows read as a column of marks. */
   factTile: {
     width: 26,
@@ -1623,10 +1850,24 @@ export const memoriesStyles = StyleSheet.create({
   },
   bloom: { position: 'absolute', top: -14, right: -12 },
 
-  head: { ...globalStyles.row, alignItems: 'baseline', justifyContent: 'space-between' },
-  heading: { color: INV_NAVY_DEEP, fontFamily: 'serif', fontSize: 19, fontWeight: '600' },
+  head: {
+    ...globalStyles.row,
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+  },
+  heading: {
+    color: INV_NAVY_DEEP,
+    fontFamily: 'serif',
+    fontSize: 19,
+    fontWeight: '600',
+  },
   tally: { color: colors.textMuted, fontSize: 11.5 },
-  lead: { color: colors.textMuted, fontSize: 12.5, lineHeight: 18, marginTop: 4 },
+  lead: {
+    color: colors.textMuted,
+    fontSize: 12.5,
+    lineHeight: 18,
+    marginTop: 4,
+  },
 
   /* Both filter rows scroll rather than wrap: a wedding has four or five
      celebrations and a phone is 360px wide. */
@@ -1644,7 +1885,12 @@ export const memoriesStyles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   tabOn: { borderColor: 'transparent', backgroundColor: INV_ACCENT },
-  tabText: { color: colors.text, fontSize: 12.5, lineHeight: 17, fontWeight: '700' },
+  tabText: {
+    color: colors.text,
+    fontSize: 12.5,
+    lineHeight: 17,
+    fontWeight: '700',
+  },
   tabTextOn: { color: colors.onPrimary },
   filters: { marginTop: 8 },
   filter: {
@@ -1711,7 +1957,13 @@ export const memoriesStyles = StyleSheet.create({
   },
   cellNoteText: { color: colors.text, fontSize: 10.5, lineHeight: 14 },
 
-  empty: { color: colors.textMuted, fontSize: 13, lineHeight: 19, textAlign: 'center', marginTop: 18 },
+  empty: {
+    color: colors.textMuted,
+    fontSize: 13,
+    lineHeight: 19,
+    textAlign: 'center',
+    marginTop: 18,
+  },
   more: {
     marginTop: 12,
     paddingVertical: 11,
@@ -1749,8 +2001,18 @@ export const memoriesStyles = StyleSheet.create({
   sayTextWarn: { color: INV_ACCENT },
 
   /* ---- the sheets ---- */
-  sheetTitle: { color: INV_NAVY_DEEP, fontSize: 17, fontWeight: '700', marginBottom: 4 },
-  sheetLead: { color: colors.textMuted, fontSize: 12.5, lineHeight: 18, marginBottom: 14 },
+  sheetTitle: {
+    color: INV_NAVY_DEEP,
+    fontSize: 17,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  sheetLead: {
+    color: colors.textMuted,
+    fontSize: 12.5,
+    lineHeight: 18,
+    marginBottom: 14,
+  },
   option: {
     ...globalStyles.row,
     alignItems: 'center',
@@ -1772,7 +2034,12 @@ export const memoriesStyles = StyleSheet.create({
   },
   optionText: { flex: 1 },
   optionName: { color: INV_NAVY_DEEP, fontSize: 14, fontWeight: '700' },
-  optionNote: { color: colors.textMuted, fontSize: 11.5, lineHeight: 16, marginTop: 1 },
+  optionNote: {
+    color: colors.textMuted,
+    fontSize: 11.5,
+    lineHeight: 16,
+    marginTop: 1,
+  },
 
   preview: {
     width: '100%',
@@ -1801,7 +2068,12 @@ export const memoriesStyles = StyleSheet.create({
     fontSize: 13.5,
     textAlignVertical: 'top',
   },
-  counter: { color: colors.textMuted, fontSize: 11, textAlign: 'right', marginTop: 4 },
+  counter: {
+    color: colors.textMuted,
+    fontSize: 11,
+    textAlign: 'right',
+    marginTop: 4,
+  },
   counterOver: { color: INV_ACCENT },
 
   /* A bar rather than a spinner: an upload has a length, and saying so is the
@@ -1832,7 +2104,11 @@ export const memoriesStyles = StyleSheet.create({
     backgroundColor: INV_ACCENT,
     alignItems: 'center',
   },
-  sheetPrimaryText: { color: colors.onPrimary, fontSize: 13.5, fontWeight: '700' },
+  sheetPrimaryText: {
+    color: colors.onPrimary,
+    fontSize: 13.5,
+    fontWeight: '700',
+  },
 
   /* ---- the viewer ---- */
   viewerBar: {
@@ -1843,7 +2119,13 @@ export const memoriesStyles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 12,
   },
-  viewerCaption: { flex: 1, color: '#fff', fontSize: 13, lineHeight: 18, textAlign: 'center' },
+  viewerCaption: {
+    flex: 1,
+    color: '#fff',
+    fontSize: 13,
+    lineHeight: 18,
+    textAlign: 'center',
+  },
   viewerPill: {
     ...globalStyles.row,
     alignItems: 'center',
@@ -1854,4 +2136,211 @@ export const memoriesStyles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.14)',
   },
   viewerPillText: { color: '#fff', fontSize: 12.5, fontWeight: '700' },
+});
+
+/* Invitation · Live stream · Memories, and the note that ties them to one link. */
+export const switchStyles = StyleSheet.create({
+  row: {
+    ...globalStyles.row,
+    gap: 6,
+    marginHorizontal: spacing.md,
+    marginTop: 4,
+    marginBottom: 6,
+    padding: 4,
+    borderRadius: 999,
+    backgroundColor: '#f4f1fa',
+  },
+  tab: {
+    flex: 1,
+    ...globalStyles.row,
+    justifyContent: 'center',
+    gap: 5,
+    minHeight: 38,
+    borderRadius: 999,
+    overflow: 'hidden',
+    paddingHorizontal: 6,
+  },
+  tabActive: {
+    ...Platform.select({
+      ios: {
+        shadowColor: '#e2477a',
+        shadowOpacity: 0.25,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 3 },
+      },
+      android: { elevation: 3 },
+    }),
+  },
+  label: { color: '#6b6488', fontSize: 12.5, fontFamily: fontFor('600') },
+  labelActive: { color: '#ffffff' },
+  liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#e8433a' },
+  liveDotActive: { backgroundColor: '#ffffff' },
+
+  note: {
+    ...globalStyles.row,
+    alignItems: 'flex-start',
+    gap: 12,
+    marginHorizontal: spacing.md,
+    marginTop: 18,
+    padding: 14,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#e3dafb',
+    backgroundColor: '#f8f5ff',
+  },
+  noteIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#ece5ff',
+  },
+  noteText: { flex: 1 },
+  noteTitle: { color: INV_NAVY_DEEP, fontSize: 14.5 },
+  noteBody: { color: '#5d5873', marginTop: 3, lineHeight: 18 },
+  noteButton: {
+    ...globalStyles.row,
+    alignSelf: 'flex-start',
+    gap: 6,
+    marginTop: 10,
+    paddingVertical: 7,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: '#bfe8d0',
+    backgroundColor: '#ffffff',
+  },
+  noteButtonText: { color: '#128c4a', fontFamily: fontFor('600') },
+
+  empty: {
+    alignItems: 'center',
+    marginHorizontal: spacing.md,
+    marginTop: 18,
+    paddingVertical: 32,
+    paddingHorizontal: 24,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: INV_HAIRLINE,
+    backgroundColor: colors.background,
+  },
+  emptyIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff0f3',
+    marginBottom: 12,
+  },
+  emptyTitle: { color: INV_NAVY_DEEP, textAlign: 'center' },
+  emptyBody: {
+    color: '#6f6a85',
+    textAlign: 'center',
+    marginTop: 6,
+    lineHeight: 18,
+  },
+});
+
+/* The next-step card and the moment strip above the invitation. */
+export const nextStepStyles = StyleSheet.create({
+  card: {
+    marginHorizontal: spacing.md,
+    marginTop: 20,
+    borderRadius: 22,
+    borderWidth: 1,
+    overflow: 'hidden',
+    backgroundColor: colors.background,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#1b1438',
+        shadowOpacity: 0.07,
+        shadowRadius: 14,
+        shadowOffset: { width: 0, height: 6 },
+      },
+      android: { elevation: 2 },
+    }),
+  },
+  head: { ...globalStyles.row, alignItems: 'center', gap: 12, padding: 14 },
+  icon: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headText: { flex: 1 },
+  title: { fontSize: 16 },
+  note: { color: '#5d5873', marginTop: 2, lineHeight: 18 },
+  body: { paddingHorizontal: 14, paddingTop: 14, paddingBottom: 6 },
+  quote: {
+    borderLeftWidth: 3,
+    borderLeftColor: '#f0b35a',
+    backgroundColor: '#fffaf1',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginBottom: 6,
+  },
+  quoteLabel: { color: '#a8540a', fontFamily: fontFor('600') },
+  quoteText: { color: INV_NAVY_DEEP, marginTop: 3, lineHeight: 20 },
+  progress: { marginBottom: 14 },
+  progressRow: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    marginBottom: 7,
+  },
+  progressText: { color: INV_NAVY_DEEP, fontFamily: fontFor('600') },
+  progressSub: { color: '#6f6a85' },
+  track: {
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#e8f4ee',
+    overflow: 'hidden',
+  },
+  fill: { height: 6, borderRadius: 3, backgroundColor: '#1fae63' },
+  primary: {
+    ...globalStyles.row,
+    justifyContent: 'center',
+    gap: 8,
+    minHeight: 52,
+    borderRadius: 999,
+    overflow: 'hidden',
+  },
+  primaryBusy: { opacity: 0.75 },
+  primaryText: { color: colors.onPrimary, fontSize: 15.5 },
+  link: {
+    ...globalStyles.row,
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 12,
+  },
+  linkText: { color: '#5d5873', fontFamily: fontFor('600'), fontSize: 13.5 },
+  error: { color: '#c62828', textAlign: 'center', marginBottom: 8 },
+  sent: { color: '#0e8a68', textAlign: 'center', marginBottom: 8 },
+
+  strip: {
+    ...globalStyles.row,
+    gap: 8,
+    marginHorizontal: spacing.md,
+    marginTop: 8,
+    marginBottom: 4,
+    minHeight: 44,
+    paddingHorizontal: 14,
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+  stripDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#ffffff',
+  },
+  stripText: {
+    flex: 1,
+    color: '#ffffff',
+    fontFamily: fontFor('600'),
+    fontSize: 13.5,
+  },
 });

@@ -9,19 +9,9 @@ import {
   WORKSPACE_GREEN,
   relativeTime,
 } from '../constants';
-import { ideasCardStyles as c, sectionStyles, summaryRowStyles as s } from '../styles';
-import type { IdeaCounts, IdeaDTO, InvitationDTO } from '../types';
+import { ideasCardStyles as c } from '../styles';
+import type { IdeaCounts, IdeaDTO } from '../types';
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <View style={sectionStyles.section}>
-      <EventlyText variant="h2" style={sectionStyles.title}>
-        {title}
-      </EventlyText>
-      <View style={sectionStyles.card}>{children}</View>
-    </View>
-  );
-}
 
 interface IdeasSummaryProps {
   counts: IdeaCounts | null;
@@ -160,76 +150,5 @@ export function IdeasSummary({ counts, organizerName, latest, onPress }: IdeasSu
 
       {latest ? explore : null}
     </View>
-  );
-}
-
-interface InvitationSummaryProps {
-  /** null while the invitation is still the organizer's draft. */
-  invitation: InvitationDTO | null;
-  organizerName: string | null;
-  onPress: () => void;
-}
-
-/**
- * The guest invitation, summarised — in all three of its states, none of them
- * silently absent:
- *
- *   not shared   the organizer is still drafting it (the API 404s that case),
- *                so this reads as a pending step rather than an error
- *   sent         ready for the customer to review and sign off
- *   approved     signed off; the guest link is live
- *
- * Both live states open the invitation screen rather than acting from here:
- * approving is a decision made after reading the thing, not a button pressed
- * on a summary card.
- */
-export function InvitationSummary({ invitation, organizerName, onPress }: InvitationSummaryProps) {
-  const organizer = organizerName ?? 'Your organizer';
-
-  if (!invitation) {
-    return (
-      <Section title={WORKSPACE_COPY.invitation}>
-        <EventlyText variant="body" style={s.pendingText}>
-          {organizer} is still preparing your guest invitation. You'll be able to review and approve
-          it here as soon as they share it.
-        </EventlyText>
-      </Section>
-    );
-  }
-
-  const approved = invitation.status === 'approved';
-
-  return (
-    <Section title={WORKSPACE_COPY.invitation}>
-      <View style={s.row}>
-        <View style={[s.iconChip, s.iconChipInvite]}>
-          <EventlyIcon name="email-heart-outline" size={22} color={WORKSPACE_GREEN} />
-        </View>
-        <View style={s.text}>
-          <EventlyText variant="body" style={s.title}>
-            {approved ? 'Your invitation is approved' : 'Your invitation is ready to review'}
-          </EventlyText>
-          <EventlyText variant="caption" style={s.body}>
-            {organizer} prepared it · {approved ? 'the guest link is live' : 'awaiting your approval'}
-          </EventlyText>
-        </View>
-        <TouchableOpacity
-          style={[s.cta, approved && s.ctaGhost]}
-          activeOpacity={0.85}
-          onPress={onPress}
-          accessibilityRole="button"
-          accessibilityLabel={`${approved ? 'View' : 'Review'} your guest invitation`}
-        >
-          <EventlyText variant="caption" style={approved ? s.ctaGhostText : s.ctaText}>
-            {approved ? 'View' : 'Review'}
-          </EventlyText>
-          <EventlyIcon
-            name="chevron-right"
-            size={15}
-            color={approved ? colors.text : colors.onPrimary}
-          />
-        </TouchableOpacity>
-      </View>
-    </Section>
   );
 }

@@ -2,7 +2,6 @@ import { apiClient } from '../../services/apiClient';
 import { isNormalizedApiError } from '../../services/errors';
 import { MY_INVITATIONS_ENDPOINT } from './constants';
 import type {
-  BlockPatch,
   GuestDTO,
   InvitationDTO,
   InvitationSummaryDTO,
@@ -11,7 +10,9 @@ import type {
 
 /** Every invitation shared with the customer. Drafts are never included. */
 export async function fetchMyInvitations(): Promise<InvitationSummaryDTO[]> {
-  const { data } = await apiClient.get<InvitationSummaryDTO[]>(MY_INVITATIONS_ENDPOINT);
+  const { data } = await apiClient.get<InvitationSummaryDTO[]>(
+    MY_INVITATIONS_ENDPOINT,
+  );
   return data;
 }
 
@@ -19,9 +20,13 @@ export async function fetchMyInvitations(): Promise<InvitationSummaryDTO[]> {
  * One booking's invitation, or null while it is still the organizer's draft —
  * the endpoint 404s that case, which is a normal early state, not a failure.
  */
-export async function fetchInvitation(bookingId: string): Promise<InvitationDTO | null> {
+export async function fetchInvitation(
+  bookingId: string,
+): Promise<InvitationDTO | null> {
   try {
-    const { data } = await apiClient.get<InvitationDTO>(`${MY_INVITATIONS_ENDPOINT}/${bookingId}`);
+    const { data } = await apiClient.get<InvitationDTO>(
+      `${MY_INVITATIONS_ENDPOINT}/${bookingId}`,
+    );
     return data;
   } catch (error) {
     if (isNormalizedApiError(error) && error.status === 404) return null;
@@ -30,41 +35,11 @@ export async function fetchInvitation(bookingId: string): Promise<InvitationDTO 
 }
 
 /** Customer sign-off — this, and only this, makes the guest link live. */
-export async function approveInvitation(bookingId: string): Promise<InvitationDTO> {
+export async function approveInvitation(
+  bookingId: string,
+): Promise<InvitationDTO> {
   const { data } = await apiClient.post<InvitationDTO>(
     `${MY_INVITATIONS_ENDPOINT}/${bookingId}/approve`,
-  );
-  return data;
-}
-
-/**
- * Sign off one section.
- *
- * The guest link goes live when the last visible one is approved — the server
- * decides that, not this call, so the returned invitation is the only thing
- * that says whether it happened.
- */
-export async function approveBlock(
-  bookingId: string,
-  blockKey: string,
-): Promise<InvitationDTO> {
-  const { data } = await apiClient.post<InvitationDTO>(
-    `${MY_INVITATIONS_ENDPOINT}/${bookingId}/blocks/${encodeURIComponent(
-      blockKey,
-    )}/approve`,
-  );
-  return data;
-}
-
-/** Edit a section the customer owns. */
-export async function personalizeBlock(
-  bookingId: string,
-  blockKey: string,
-  patch: BlockPatch,
-): Promise<InvitationDTO> {
-  const { data } = await apiClient.patch<InvitationDTO>(
-    `${MY_INVITATIONS_ENDPOINT}/${bookingId}/blocks/${blockKey}`,
-    patch,
   );
   return data;
 }
@@ -75,15 +50,20 @@ export async function requestInvitationChange(
   note: string,
   blockKey?: string,
 ): Promise<void> {
-  await apiClient.post(`${MY_INVITATIONS_ENDPOINT}/${bookingId}/request-change`, {
-    note,
-    ...(blockKey ? { blockKey } : {}),
-  });
+  await apiClient.post(
+    `${MY_INVITATIONS_ENDPOINT}/${bookingId}/request-change`,
+    {
+      note,
+      ...(blockKey ? { blockKey } : {}),
+    },
+  );
 }
 
 /** The guest list for a published invitation. */
 export async function fetchGuests(bookingId: string): Promise<GuestDTO[]> {
-  const { data } = await apiClient.get<GuestDTO[]>(`${MY_INVITATIONS_ENDPOINT}/${bookingId}/guests`);
+  const { data } = await apiClient.get<GuestDTO[]>(
+    `${MY_INVITATIONS_ENDPOINT}/${bookingId}/guests`,
+  );
   return data;
 }
 
@@ -94,7 +74,11 @@ export async function fetchGuests(bookingId: string): Promise<GuestDTO[]> {
  */
 export async function shareInvitation(
   bookingId: string,
-  args: { section?: string; guestIds: string[]; newGuests: Array<{ name: string; phone: string }> },
+  args: {
+    section?: string;
+    guestIds: string[];
+    newGuests: Array<{ name: string; phone: string }>;
+  },
 ): Promise<ShareResultDTO> {
   const { data } = await apiClient.post<ShareResultDTO>(
     `${MY_INVITATIONS_ENDPOINT}/${bookingId}/share`,

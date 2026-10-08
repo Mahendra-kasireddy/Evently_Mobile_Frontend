@@ -16,7 +16,13 @@ export interface CountdownParts {
   passed: boolean;
 }
 
-const ZERO: CountdownParts = { days: 0, hours: 0, minutes: 0, seconds: 0, passed: true };
+const ZERO: CountdownParts = {
+  days: 0,
+  hours: 0,
+  minutes: 0,
+  seconds: 0,
+  passed: true,
+};
 
 /**
  * The gap between now and the target, split into days/hours/minutes/seconds.
@@ -26,7 +32,10 @@ const ZERO: CountdownParts = { days: 0, hours: 0, minutes: 0, seconds: 0, passed
  * drifts while this is correct the moment it wakes. Never negative — past the
  * moment it is zero, and the screen shows the organizer's message instead.
  */
-export function countdownFrom(targetMs: number | null, nowMs: number): CountdownParts {
+export function countdownFrom(
+  targetMs: number | null,
+  nowMs: number,
+): CountdownParts {
   if (targetMs === null) return { ...ZERO, passed: false };
   const remainingMs = targetMs - nowMs;
   if (remainingMs <= 0) return ZERO;

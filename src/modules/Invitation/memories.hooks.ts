@@ -14,7 +14,12 @@ import {
   saveMemorySettings,
   uploadMemory,
 } from './memories.service';
-import type { MemoryDTO, MemoryGalleryDTO, MemorySettingsDTO, UploadMemoryInput } from './types';
+import type {
+  MemoryDTO,
+  MemoryGalleryDTO,
+  MemorySettingsDTO,
+  UploadMemoryInput,
+} from './types';
 
 /**
  * Shared Memories, on the device.
@@ -36,10 +41,12 @@ export interface PickedMedia {
   reel: boolean;
 }
 
-const COPY_PICK_FAILED = 'We couldn’t open your camera. Check the app’s permissions and try again.';
+const COPY_PICK_FAILED =
+  'We couldn’t open your camera. Check the app’s permissions and try again.';
 const COPY_LIBRARY_FAILED =
   'We couldn’t open your photos. Check the app’s permissions and try again.';
-const COPY_UPLOAD_FAILED = 'That couldn’t be shared. Check your connection and try again.';
+const COPY_UPLOAD_FAILED =
+  'That couldn’t be shared. Check your connection and try again.';
 
 /** An asset from the picker, as the uploader needs it. */
 function toPicked(asset: Asset, reel: boolean): PickedMedia | null {
@@ -131,8 +138,12 @@ export function useMemories(bookingId: string) {
     if (!cursor || paging || !bookingId) return;
     setPaging(true);
     try {
-      const next = await fetchMemories(bookingId, { kind, subEvent, before: cursor });
-      setItems((current) => [...current, ...next.items]);
+      const next = await fetchMemories(bookingId, {
+        kind,
+        subEvent,
+        before: cursor,
+      });
+      setItems(current => [...current, ...next.items]);
       setGallery(next);
     } catch {
       /* Keeping what is on screen beats replacing it with an error. */
@@ -167,7 +178,9 @@ export function useMemories(bookingId: string) {
   }, [bookingId, load]);
 
   const canView = Boolean(settings?.enabled && settings.guestView);
-  const canUpload = Boolean(settings?.enabled && settings.guestUpload && settings.window.open);
+  const canUpload = Boolean(
+    settings?.enabled && settings.guestUpload && settings.window.open,
+  );
   const canDownload = Boolean(settings?.enabled && settings.guestDownload);
 
   return {
@@ -214,16 +227,19 @@ export function useMemoryUpload(bookingId: string) {
     [],
   );
 
-  const handle = useCallback((message: string, assets: Asset[] | undefined, reel: boolean) => {
-    const asset = assets?.[0];
-    const next = asset ? toPicked(asset, reel) : null;
-    if (!next) {
-      setError(message);
-      return;
-    }
-    setError('');
-    setPicked(next);
-  }, []);
+  const handle = useCallback(
+    (message: string, assets: Asset[] | undefined, reel: boolean) => {
+      const asset = assets?.[0];
+      const next = asset ? toPicked(asset, reel) : null;
+      if (!next) {
+        setError(message);
+        return;
+      }
+      setError('');
+      setPicked(next);
+    },
+    [],
+  );
 
   /** The camera, for a photograph. */
   const takePhoto = useCallback(async () => {
@@ -296,7 +312,9 @@ export function useMemoryUpload(bookingId: string) {
           mimeType: picked.mimeType,
           ...(subEventId ? { subEventId } : {}),
           ...(caption ? { caption } : {}),
-          ...(picked.isClip ? { durationSec: picked.durationSec, reel: picked.reel } : {}),
+          ...(picked.isClip
+            ? { durationSec: picked.durationSec, reel: picked.reel }
+            : {}),
         };
         const outcome = await uploadMemory(bookingId, input, setProgress);
         setPicked(null);

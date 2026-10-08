@@ -1,115 +1,65 @@
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Modal,
+  Pressable,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
 import { colors } from '../../../theme';
-import { INVITATION_COPY as COPY, INV_ACCENT, INV_GREEN, INV_NAVY } from '../constants';
 import {
-  approveStyles as ap,
+  INVITATION_COPY as COPY,
+  INV_ACCENT,
+  INV_GREEN,
+  INV_NAVY,
+} from '../constants';
+import {
   previewSheetStyles as p,
   sheetStyles as s,
   shellStyles as sh,
 } from '../styles';
-import type { BlockPatch, GuestDTO, InvitationBlockDTO, InvitationDTO, ShareOutcomeDTO } from '../types';
+import type { GuestDTO, InvitationDTO, ShareOutcomeDTO } from '../types';
 import { GuestPreview } from './InvitationParts';
-import { ApproveRow } from './ApproveRow';
 import { GroupFilter } from '../../GuestList/sections/GroupFilter';
-import { avatarColorFor, groupFilters, groupOf, initialsOf } from '../../GuestList/utils';
+import {
+  avatarColorFor,
+  groupFilters,
+  groupOf,
+  initialsOf,
+} from '../../GuestList/utils';
 import type { GuestGroup } from '../../GuestList/types';
 
-function Sheet({ visible, onClose, children }: { visible: boolean; onClose: () => void; children: React.ReactNode }) {
+function Sheet({
+  visible,
+  onClose,
+  children,
+}: {
+  visible: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+    >
       <Pressable style={s.backdrop} onPress={onClose}>
         <Pressable style={s.container} onPress={() => {}}>
           <View style={s.grabber} />
-          <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
             {children}
           </ScrollView>
         </Pressable>
       </Pressable>
     </Modal>
-  );
-}
-
-interface ApproveSheetProps {
-  visible: boolean;
-  blocks: InvitationBlockDTO[];
-  waiting: number;
-  canShare: boolean;
-  approvingKey: string | null;
-  isApprovingAll: boolean;
-  onAccept: (blockKey: string) => void;
-  onApproveAll: () => void;
-  onRequestChange: (blockKey: string) => void;
-  onShareBlock: (blockKey: string) => void;
-  onClose: () => void;
-}
-
-/**
- * The approval pass, on its own.
- *
- * Approving is a sitting, not a mode: the customer works down the invitation
- * once, accepting each section or asking for a change, and then they are
- * done. As a tab it was a second permanent view of the same page and the
- * screen had to explain which one you were in; as a sheet it opens from the
- * one button that asks for it and closes when the work is finished.
- */
-export function ApproveSheet({
-  visible,
-  blocks,
-  waiting,
-  canShare,
-  approvingKey,
-  isApprovingAll,
-  onAccept,
-  onApproveAll,
-  onRequestChange,
-  onShareBlock,
-  onClose,
-}: ApproveSheetProps) {
-  return (
-    <Sheet visible={visible} onClose={onClose}>
-      <EventlyText variant="h2" style={s.title}>
-        {COPY.approveSheetTitle}
-      </EventlyText>
-      <EventlyText variant="caption" style={s.subtitle}>
-        {COPY.approveAllNote}
-      </EventlyText>
-
-      {blocks.map((block) => (
-        <ApproveRow
-          key={block.key}
-          block={block}
-          isApproving={approvingKey === block.key}
-          canShare={canShare}
-          onAccept={() => onAccept(block.key)}
-          onRequestChange={() => onRequestChange(block.key)}
-          onShare={() => onShareBlock(block.key)}
-        />
-      ))}
-
-      {/* One tap for the lot, for a customer who has read it already. */}
-      {waiting > 0 ? (
-        <TouchableOpacity
-          style={[ap.all, isApprovingAll && ap.allBusy]}
-          activeOpacity={0.9}
-          disabled={isApprovingAll}
-          onPress={onApproveAll}
-          accessibilityRole="button"
-          accessibilityLabel={COPY.approveAll(waiting)}
-          testID="approve-all"
-        >
-          {isApprovingAll ? (
-            <ActivityIndicator size="small" color={colors.onPrimary} />
-          ) : (
-            <EventlyIcon name="check" size={17} color={colors.onPrimary} />
-          )}
-          <EventlyText variant="subtitle" style={ap.allText}>
-            {COPY.approveAll(waiting)}
-          </EventlyText>
-        </TouchableOpacity>
-      ) : null}
-    </Sheet>
   );
 }
 
@@ -222,7 +172,9 @@ export function PreviewSheet({
   onShare,
   onClose,
 }: PreviewSheetProps) {
-  const block = blockKey ? invitation.blocks.find((b) => b.key === blockKey) : undefined;
+  const block = blockKey
+    ? invitation.blocks.find(b => b.key === blockKey)
+    : undefined;
   const approved = invitation.status === 'approved';
   const hidden = block?.hidden ?? false;
   /* A hidden section is not part of the published invitation, and the API
@@ -240,13 +192,17 @@ export function PreviewSheet({
             {block ? (
               <EventlyText
                 variant="caption"
-                style={block.owner === 'customer' ? p.ownerCustomer : p.metaText}
+                style={
+                  block.owner === 'customer' ? p.ownerCustomer : p.metaText
+                }
               >
-                {block.owner === 'customer' ? COPY.previewOwnerCustomer : COPY.previewOwnerOrganizer}
+                {block.owner === 'customer'
+                  ? COPY.previewOwnerCustomer
+                  : COPY.previewOwnerOrganizer}
               </EventlyText>
             ) : (
               <EventlyText variant="caption" style={p.metaText}>
-                {invitation.blocks.filter((b) => !b.hidden).length} sections
+                {invitation.blocks.filter(b => !b.hidden).length} sections
               </EventlyText>
             )}
           </View>
@@ -270,7 +226,9 @@ export function PreviewSheet({
           activeOpacity={0.85}
           onPress={onShare}
           accessibilityRole="button"
-          accessibilityLabel={block ? COPY.previewShareSection : COPY.previewShareAll}
+          accessibilityLabel={
+            block ? COPY.previewShareSection : COPY.previewShareAll
+          }
         >
           <EventlyIcon name="whatsapp" size={18} color={colors.onPrimary} />
           <EventlyText variant="subtitle" style={p.shareText}>
@@ -279,117 +237,16 @@ export function PreviewSheet({
         </TouchableOpacity>
       ) : (
         <View style={p.blockedNote}>
-          <EventlyIcon name="information-outline" size={14} color={colors.textMuted} />
+          <EventlyIcon
+            name="information-outline"
+            size={14}
+            color={colors.textMuted}
+          />
           <EventlyText variant="caption" style={p.blockedText}>
             {hidden ? COPY.previewShareHidden : COPY.previewShareNotApproved}
           </EventlyText>
         </View>
       )}
-    </Sheet>
-  );
-}
-
-interface PersonalizeSheetProps {
-  block: InvitationBlockDTO | null;
-  isSaving: boolean;
-  errorMessage: string | null;
-  onSave: (patch: BlockPatch) => void;
-  onClose: () => void;
-}
-
-/**
- * Editing a section the customer owns.
- *
- * The heading is optional — left blank the section keeps its own name — and
- * hiding is offered here rather than as a separate control, because "I don't
- * want this section" and "I want it to say something else" are the same
- * decision made in the same place.
- */
-export function PersonalizeSheet({ block, isSaving, errorMessage, onSave, onClose }: PersonalizeSheetProps) {
-  const [heading, setHeading] = useState(block?.heading ?? '');
-  const [body, setBody] = useState(block?.body ?? '');
-  const [hidden, setHidden] = useState(block?.hidden ?? false);
-
-  return (
-    <Sheet visible={block !== null} onClose={onClose}>
-      <EventlyText variant="h2" style={s.title}>
-        {COPY.personalizeTitle}
-      </EventlyText>
-      <EventlyText variant="caption" style={s.subtitle}>
-        {block?.title ?? ''}
-      </EventlyText>
-
-      <EventlyText variant="body" style={s.label}>
-        {COPY.fieldHeading}
-      </EventlyText>
-      <EventlyText variant="caption" style={s.hint}>
-        {COPY.fieldHeadingHint}
-      </EventlyText>
-      <TextInput
-        style={s.input}
-        value={heading}
-        onChangeText={setHeading}
-        maxLength={120}
-        placeholder={block?.title ?? ''}
-        placeholderTextColor={colors.textMuted}
-        accessibilityLabel={COPY.fieldHeading}
-      />
-
-      <EventlyText variant="body" style={s.label}>
-        {COPY.fieldBody}
-      </EventlyText>
-      <TextInput
-        style={[s.input, s.inputMultiline]}
-        value={body}
-        onChangeText={setBody}
-        maxLength={2000}
-        multiline
-        accessibilityLabel={COPY.fieldBody}
-      />
-
-      <TouchableOpacity
-        style={s.toggleRow}
-        activeOpacity={0.7}
-        onPress={() => setHidden((v) => !v)}
-        accessibilityRole="checkbox"
-        accessibilityState={{ checked: hidden }}
-        accessibilityLabel={COPY.fieldHide}
-      >
-        <View style={[s.checkbox, hidden && s.checkboxOn]}>
-          {hidden ? <EventlyIcon name="check" size={14} color={colors.onPrimary} /> : null}
-        </View>
-        <EventlyText variant="body" style={s.toggleLabel}>
-          {COPY.fieldHide}
-        </EventlyText>
-      </TouchableOpacity>
-
-      {errorMessage ? (
-        <EventlyText variant="caption" style={s.errorText}>
-          {errorMessage}
-        </EventlyText>
-      ) : null}
-
-      <TouchableOpacity
-        style={[s.primary, isSaving && s.primaryDisabled]}
-        activeOpacity={0.85}
-        disabled={isSaving}
-        onPress={() => onSave({ heading: heading.trim(), body: body.trim(), hidden })}
-        accessibilityRole="button"
-        accessibilityLabel={COPY.save}
-      >
-        {isSaving ? (
-          <ActivityIndicator size="small" color={colors.onPrimary} />
-        ) : (
-          <EventlyText variant="subtitle" style={s.primaryText}>
-            {COPY.save}
-          </EventlyText>
-        )}
-      </TouchableOpacity>
-      <TouchableOpacity style={s.secondary} activeOpacity={0.8} onPress={onClose} accessibilityRole="button">
-        <EventlyText variant="subtitle" style={s.secondaryText}>
-          {COPY.cancel}
-        </EventlyText>
-      </TouchableOpacity>
     </Sheet>
   );
 }
@@ -476,7 +333,10 @@ interface ShareSheetProps {
   isSending: boolean;
   errorMessage: string | null;
   outcomes: ShareOutcomeDTO[] | null;
-  onSend: (guestIds: string[], newGuest: { name: string; phone: string } | null) => void;
+  onSend: (
+    guestIds: string[],
+    newGuest: { name: string; phone: string } | null,
+  ) => void;
   onOpenHandoff: (url: string) => void;
   /** Opens the guest-list screen, where guests are added and filed. */
   onManageGuests: () => void;
@@ -513,25 +373,31 @@ export function ShareSheet({
 
   const filters = useMemo(() => groupFilters(guests), [guests]);
   const shown = useMemo(
-    () => (activeGroup ? guests.filter((g) => groupOf(g) === activeGroup) : guests),
+    () =>
+      activeGroup ? guests.filter(g => groupOf(g) === activeGroup) : guests,
     [guests, activeGroup],
   );
-  const activeLabel = filters.find((f) => f.key === activeGroup)?.label ?? '';
+  const activeLabel = filters.find(f => f.key === activeGroup)?.label ?? '';
 
   /*
    * "Select all" means the chip that is showing, not the whole list. Ticking
    * Family and pressing it must not quietly select the sixty people the host
    * has just filtered out.
    */
-  const allShown = shown.length > 0 && shown.every((g) => selected.includes(g.id));
+  const allShown =
+    shown.length > 0 && shown.every(g => selected.includes(g.id));
 
   const toggle = (id: string) =>
-    setSelected((prev) => (prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id]));
+    setSelected(prev =>
+      prev.includes(id) ? prev.filter(g => g !== id) : [...prev, id],
+    );
 
   const toggleAll = () => {
-    const ids = shown.map((g) => g.id);
-    setSelected((prev) =>
-      allShown ? prev.filter((id) => !ids.includes(id)) : [...new Set([...prev, ...ids])],
+    const ids = shown.map(g => g.id);
+    setSelected(prev =>
+      allShown
+        ? prev.filter(id => !ids.includes(id))
+        : [...new Set([...prev, ...ids])],
     );
   };
 
@@ -560,28 +426,30 @@ export function ShareSheet({
           now is which of them actually went. */}
       {outcomes ? (
         <>
-          {outcomes.map((outcome) => (
+          {outcomes.map(outcome => (
             <View key={outcome.guest.id} style={s.outcomeRow}>
               <EventlyIcon
                 name={
                   outcome.status === 'sent'
                     ? 'check-circle'
                     : outcome.status === 'handoff'
-                      ? 'open-in-new'
-                      : 'alert-circle-outline'
+                    ? 'open-in-new'
+                    : 'alert-circle-outline'
                 }
                 size={18}
                 color={
                   outcome.status === 'failed'
                     ? colors.danger
                     : outcome.status === 'sent'
-                      ? INV_GREEN
-                      : INV_ACCENT
+                    ? INV_GREEN
+                    : INV_ACCENT
                 }
               />
               <EventlyText variant="body" style={s.outcomeText}>
                 {outcome.guest.name}
-                {outcome.status === 'failed' ? ` — ${outcome.error || COPY.shareFailed}` : ''}
+                {outcome.status === 'failed'
+                  ? ` — ${outcome.error || COPY.shareFailed}`
+                  : ''}
               </EventlyText>
               {outcome.status === 'handoff' && outcome.handoffUrl ? (
                 <TouchableOpacity
@@ -597,16 +465,25 @@ export function ShareSheet({
             </View>
           ))}
 
-          {outcomes.some((o) => o.status === 'handoff') ? (
+          {outcomes.some(o => o.status === 'handoff') ? (
             <View style={s.caveat}>
-              <EventlyIcon name="information-outline" size={14} color={colors.textMuted} />
+              <EventlyIcon
+                name="information-outline"
+                size={14}
+                color={colors.textMuted}
+              />
               <EventlyText variant="caption" style={s.caveatText}>
                 {COPY.shareHandoff}
               </EventlyText>
             </View>
           ) : null}
 
-          <TouchableOpacity style={s.primary} activeOpacity={0.85} onPress={onClose} accessibilityRole="button">
+          <TouchableOpacity
+            style={s.primary}
+            activeOpacity={0.85}
+            onPress={onClose}
+            accessibilityRole="button"
+          >
             <EventlyText variant="subtitle" style={s.primaryText}>
               {COPY.shareDone}
             </EventlyText>
@@ -616,7 +493,11 @@ export function ShareSheet({
         <>
           {/* The same chips as the guest-list screen, so a group means the
               same thing on both and the filter is not learnt twice. */}
-          <GroupFilter options={filters} active={activeGroup} onChange={setActiveGroup} />
+          <GroupFilter
+            options={filters}
+            active={activeGroup}
+            onChange={setActiveGroup}
+          />
 
           <View style={s.selectRow}>
             <EventlyText variant="caption" style={s.selectCount}>
@@ -626,7 +507,9 @@ export function ShareSheet({
               <TouchableOpacity
                 onPress={toggleAll}
                 accessibilityRole="button"
-                accessibilityLabel={allShown ? COPY.shareClearAll : COPY.shareSelectAll}
+                accessibilityLabel={
+                  allShown ? COPY.shareClearAll : COPY.shareSelectAll
+                }
               >
                 <EventlyText variant="caption" style={s.selectAll}>
                   {allShown ? COPY.shareClearAll : COPY.shareSelectAll}
@@ -636,14 +519,20 @@ export function ShareSheet({
           </View>
 
           {isLoadingGuests ? (
-            <ActivityIndicator size="small" color={colors.primary} style={s.guestsLoading} />
+            <ActivityIndicator
+              size="small"
+              color={colors.primary}
+              style={s.guestsLoading}
+            />
           ) : shown.length === 0 ? (
             <EventlyText variant="body" style={s.emptyGuests}>
               {/* Which empty is it — nobody at all, or nobody under this chip? */}
-              {guests.length === 0 ? COPY.shareNoGuests : COPY.shareEmptyGroup(activeLabel)}
+              {guests.length === 0
+                ? COPY.shareNoGuests
+                : COPY.shareEmptyGroup(activeLabel)}
             </EventlyText>
           ) : (
-            shown.map((guest) => {
+            shown.map(guest => {
               const on = selected.includes(guest.id);
               const already = sectionKey
                 ? guest.sharedSections.includes(sectionKey)
@@ -658,16 +547,29 @@ export function ShareSheet({
                   accessibilityState={{ checked: on }}
                   accessibilityLabel={`${guest.name}, ${guest.phoneDisplay}`}
                 >
-                  <View style={[s.guestAvatar, { backgroundColor: avatarColorFor(guest.name) }]}>
+                  <View
+                    style={[
+                      s.guestAvatar,
+                      { backgroundColor: avatarColorFor(guest.name) },
+                    ]}
+                  >
                     <EventlyText variant="caption" style={s.guestAvatarText}>
                       {initialsOf(guest.name)}
                     </EventlyText>
                   </View>
                   <View style={s.guestText}>
-                    <EventlyText variant="body" style={s.guestName} numberOfLines={1}>
+                    <EventlyText
+                      variant="body"
+                      style={s.guestName}
+                      numberOfLines={1}
+                    >
                       {guest.name}
                     </EventlyText>
-                    <EventlyText variant="caption" style={s.guestMeta} numberOfLines={1}>
+                    <EventlyText
+                      variant="caption"
+                      style={s.guestMeta}
+                      numberOfLines={1}
+                    >
                       {guest.phoneDisplay}
                     </EventlyText>
                   </View>
@@ -680,7 +582,13 @@ export function ShareSheet({
                     </EventlyText>
                   ) : null}
                   <View style={[s.checkbox, on && s.checkboxOn]}>
-                    {on ? <EventlyIcon name="check" size={13} color={colors.onPrimary} /> : null}
+                    {on ? (
+                      <EventlyIcon
+                        name="check"
+                        size={13}
+                        color={colors.onPrimary}
+                      />
+                    ) : null}
                   </View>
                 </TouchableOpacity>
               );
@@ -688,7 +596,11 @@ export function ShareSheet({
           )}
 
           <View style={s.caveat}>
-            <EventlyIcon name="information-outline" size={14} color={colors.textMuted} />
+            <EventlyIcon
+              name="information-outline"
+              size={14}
+              color={colors.textMuted}
+            />
             <EventlyText variant="caption" style={s.caveatText}>
               {COPY.shareWhatsappCaveat}
             </EventlyText>
@@ -715,7 +627,9 @@ export function ShareSheet({
             onPress={() => onSend(selected, null)}
             accessibilityRole="button"
             accessibilityLabel={
-              selected.length === 0 ? COPY.sharePickFirst : COPY.shareSendTo(selected.length)
+              selected.length === 0
+                ? COPY.sharePickFirst
+                : COPY.shareSendTo(selected.length)
             }
           >
             {isSending ? (
@@ -724,18 +638,23 @@ export function ShareSheet({
               <EventlyIcon
                 name={selected.length === 0 ? 'arrow-right' : 'whatsapp'}
                 size={18}
-                color={selected.length === 0 ? colors.textMuted : colors.onPrimary}
+                color={
+                  selected.length === 0 ? colors.textMuted : colors.onPrimary
+                }
               />
             )}
             <EventlyText
               variant="subtitle"
-              style={[s.primaryText, selected.length === 0 && s.primaryTextDisabled]}
+              style={[
+                s.primaryText,
+                selected.length === 0 && s.primaryTextDisabled,
+              ]}
             >
               {isSending
                 ? COPY.shareSending
                 : selected.length === 0
-                  ? COPY.sharePickFirst
-                  : COPY.shareSendTo(selected.length)}
+                ? COPY.sharePickFirst
+                : COPY.shareSendTo(selected.length)}
             </EventlyText>
           </TouchableOpacity>
 

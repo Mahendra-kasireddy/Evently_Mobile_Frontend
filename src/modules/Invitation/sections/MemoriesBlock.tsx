@@ -62,7 +62,11 @@ export function MemoriesOffCard({
         accessibilityRole="button"
         testID="memories-enable"
       >
-        <EventlyIcon name="image-multiple-outline" size={18} color={colors.onPrimary} />
+        <EventlyIcon
+          name="image-multiple-outline"
+          size={18}
+          color={colors.onPrimary}
+        />
         <EventlyText variant="subtitle" style={s.addText}>
           {busy ? COPY.memoryLoading : COPY.memoriesTurnOn}
         </EventlyText>
@@ -159,7 +163,10 @@ export function MemoriesBlock({
               accessibilityState={{ selected: on }}
               testID={`memory-tab-${id}`}
             >
-              <EventlyText variant="caption" style={[s.tabText, on && s.tabTextOn]}>
+              <EventlyText
+                variant="caption"
+                style={[s.tabText, on && s.tabTextOn]}
+              >
                 {label} {n}
               </EventlyText>
             </TouchableOpacity>
@@ -175,7 +182,10 @@ export function MemoriesBlock({
           style={s.filters}
           contentContainerStyle={s.tabsRow}
         >
-          {[{ id: 'all', name: COPY.memoryAllEvents }, ...gallery.subEvents].map((e) => {
+          {[
+            { id: 'all', name: COPY.memoryAllEvents },
+            ...gallery.subEvents,
+          ].map(e => {
             const on = subEvent === e.id;
             return (
               <TouchableOpacity
@@ -186,7 +196,10 @@ export function MemoriesBlock({
                 accessibilityRole="button"
                 accessibilityState={{ selected: on }}
               >
-                <EventlyText variant="caption" style={[s.filterText, on && s.filterTextOn]}>
+                <EventlyText
+                  variant="caption"
+                  style={[s.filterText, on && s.filterTextOn]}
+                >
                   {e.name}
                 </EventlyText>
               </TouchableOpacity>
@@ -224,7 +237,11 @@ export function MemoriesBlock({
                 {item.kind !== 'photo' ? (
                   <>
                     <View style={s.play} pointerEvents="none">
-                      <EventlyIcon name="play-circle" size={34} color="rgba(255,255,255,0.92)" />
+                      <EventlyIcon
+                        name="play-circle"
+                        size={34}
+                        color="rgba(255,255,255,0.92)"
+                      />
                     </View>
                     {item.kind === 'reel' ? (
                       <View style={s.reelMark}>
@@ -279,7 +296,11 @@ export function MemoriesBlock({
           accessibilityRole="button"
           testID="memory-add"
         >
-          <EventlyIcon name="camera-plus-outline" size={18} color={colors.onPrimary} />
+          <EventlyIcon
+            name="camera-plus-outline"
+            size={18}
+            color={colors.onPrimary}
+          />
           <EventlyText variant="subtitle" style={s.addText}>
             {COPY.memoryAdd}
           </EventlyText>
@@ -288,7 +309,10 @@ export function MemoriesBlock({
 
       {say ? (
         <View style={[s.say, sayWarn && s.sayWarn]}>
-          <EventlyText variant="caption" style={[s.sayText, sayWarn && s.sayTextWarn]}>
+          <EventlyText
+            variant="caption"
+            style={[s.sayText, sayWarn && s.sayTextWarn]}
+          >
             {say}
           </EventlyText>
         </View>

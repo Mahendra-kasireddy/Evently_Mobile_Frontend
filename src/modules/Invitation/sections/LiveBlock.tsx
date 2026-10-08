@@ -31,9 +31,13 @@ interface LiveMode {
  * switched on with no url is not live — a LIVE badge over nothing to watch is
  * worse than no badge at all.
  */
-export function liveOf(subEvents: InvitationSubEventDTO[]): InvitationSubEventDTO | null {
+export function liveOf(
+  subEvents: InvitationSubEventDTO[],
+): InvitationSubEventDTO | null {
   return (
-    subEvents.find((e) => e.liveEnabled === true && (e.liveUrl ?? '').trim() !== '') ?? null
+    subEvents.find(
+      e => e.liveEnabled === true && (e.liveUrl ?? '').trim() !== '',
+    ) ?? null
   );
 }
 
@@ -94,7 +98,7 @@ export function LiveBlock({ subEvents }: LiveBlockProps) {
   if (!sub) return null;
 
   const modes = modesOf(sub);
-  const current = modes.find((m) => m.id === mode) ?? modes[0];
+  const current = modes.find(m => m.id === mode) ?? modes[0];
   if (!current) return null;
 
   const when = cardDate(sub.eventDate);
@@ -138,7 +142,7 @@ export function LiveBlock({ subEvents }: LiveBlockProps) {
       {/* Only drawn when there is a choice to make. */}
       {modes.length > 1 ? (
         <View style={s.modes}>
-          {modes.map((m) => {
+          {modes.map(m => {
             const on = m.id === current.id;
             return (
               <TouchableOpacity
@@ -155,7 +159,10 @@ export function LiveBlock({ subEvents }: LiveBlockProps) {
                   size={15}
                   color={on ? colors.onPrimary : colors.text}
                 />
-                <EventlyText variant="caption" style={[s.modeText, on && s.modeTextOn]}>
+                <EventlyText
+                  variant="caption"
+                  style={[s.modeText, on && s.modeTextOn]}
+                >
                   {m.label}
                 </EventlyText>
               </TouchableOpacity>
@@ -182,7 +189,11 @@ export function LiveBlock({ subEvents }: LiveBlockProps) {
             accessibilityLabel={`${COPY.liveWatch} — ${sub.name}`}
             testID="live-watch"
           >
-            <EventlyIcon name="play-circle-outline" size={18} color={colors.onPrimary} />
+            <EventlyIcon
+              name="play-circle-outline"
+              size={18}
+              color={colors.onPrimary}
+            />
             <EventlyText variant="subtitle" style={s.watchText}>
               {COPY.liveWatch}
             </EventlyText>
@@ -203,11 +214,18 @@ export function LiveBlock({ subEvents }: LiveBlockProps) {
             {COPY.liveDetails}
           </EventlyText>
           {when ? (
-            <Fact icon="calendar-blank-outline" text={at ? `${when} · ${at}` : when} />
+            <Fact
+              icon="calendar-blank-outline"
+              text={at ? `${when} · ${at}` : when}
+            />
           ) : null}
           {where ? <Fact icon="map-marker-outline" text={where} /> : null}
           {sub.dressCode ? (
-            <Fact icon="tshirt-crew-outline" label={COPY.liveDress} text={sub.dressCode} />
+            <Fact
+              icon="tshirt-crew-outline"
+              label={COPY.liveDress}
+              text={sub.dressCode}
+            />
           ) : null}
         </View>
       ) : null}
@@ -216,7 +234,15 @@ export function LiveBlock({ subEvents }: LiveBlockProps) {
 }
 
 /** One line of the details card: an icon, an optional label, and the text. */
-function Fact({ icon, text, label }: { icon: string; text: string; label?: string }) {
+function Fact({
+  icon,
+  text,
+  label,
+}: {
+  icon: string;
+  text: string;
+  label?: string;
+}) {
   return (
     <View style={s.fact}>
       <View style={s.factTile}>
