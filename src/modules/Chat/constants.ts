@@ -52,7 +52,8 @@ export const CHAT_COPY = {
   errorTitle: "We couldn't load your messages",
   retry: 'Try again',
   emptyTitle: 'No messages yet',
-  emptyBody: 'Message an organizer from their profile and the conversation will be waiting here.',
+  emptyBody:
+    'Message an organizer from their profile and the conversation will be waiting here.',
   emptyCta: 'Find organizers',
 
   quote: 'Quote',

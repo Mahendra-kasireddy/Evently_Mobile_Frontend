@@ -12,7 +12,7 @@ import { Platform } from 'react-native';
  *  and WebView page reads `env` below.
  * ===========================================================================
  */
-const USE_PRODUCTION = false;
+const USE_PRODUCTION = true;
 
 type AppEnv = 'development' | 'qa' | 'production';
 

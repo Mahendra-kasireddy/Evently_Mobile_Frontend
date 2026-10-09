@@ -59,13 +59,6 @@ const TAB_LOOK: Record<
     off: 'ticket-confirmation-outline',
     label: 'Events',
   },
-  ProfileTab: {
-    gradient: ['#5b9bff', '#2554b8'],
-    ink: '#2b5aa8',
-    on: 'account-circle',
-    off: 'account-circle-outline',
-    label: 'Profile',
-  },
   Chat: {
     gradient: ['#5b9bff', '#2554b8'],
     ink: '#2b5aa8',
@@ -76,8 +69,8 @@ const TAB_LOOK: Record<
 };
 
 const FALLBACK = TAB_LOOK.Home;
-/** Tab screens with no button on the bar — reached another way (Plan and Chat: the + menu). */
-const OFF_BAR = new Set(['Plan', 'Chat']);
+/** Tab screens with no button on the bar — reached another way (Plan: the + menu). */
+const OFF_BAR = new Set(['Plan']);
 const MUTED = '#8a93a3';
 
 /* The bar and the raised button in its notch. */

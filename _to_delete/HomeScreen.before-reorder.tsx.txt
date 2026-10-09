@@ -118,7 +118,6 @@ export function HomeScreen() {
     toggleShareBudget,
     setHeroField,
     submitHeroDraft,
-    location,
     isRequestingQuotes,
     quotesRequested,
     quotesErrorMessage,
@@ -169,15 +168,17 @@ export function HomeScreen() {
   );
 
   const headerProps = {
-    /* Where events, organizers and prices are for — the delivery-app way:
-       the city big, the state under it. */
-    locationTitle: location?.title ?? '',
-    locationSubtitle: location?.subtitle ?? '',
-    locating: location?.locating ?? false,
+    initials: header.initials,
+    photoUrl: header.photoUrl,
+    displayName: header.displayName,
     unreadCount: header.unreadCount,
-    onPressLocation: () => navigation.navigate('Location'),
+    /* Profile is no longer a tab — this avatar is the way in, and it pushes,
+       so the back arrow returns to the feed the customer left. */
+    onPressProfile: () => navigation.navigate('Profile'),
     onPressNotifications: () => navigation.navigate('Notification'),
-    /* The same place the search field used to open. */
+    /* The same place the search field used to open. Saved packages are still
+       reachable from Profile, which is where the rest of the account's own
+       lists live. */
     onPressSearch: () => navigation.navigate('Search'),
   };
 
@@ -348,115 +349,8 @@ export function HomeScreen() {
               section — the colour a celebration app should carry. */}
           <GradientFill colors={HOME_PAGE_GRADIENT} direction="down" />
           {/*
-          The customer's own event first — quotes to compare, an advance to
-          pay, a day coming up. It is the reason a returning customer opened
-          the app, and the step that earns: it used to sit under the form, the
-          occasions and three sections of public events. Absent for a customer
-          with nothing in flight, so a new customer still opens on the form.
-        */}
-          {/*
-          The booked card replaces the hero for the booking itself — the two are
-          two renderings of one event, and stacking them would summarise it
-          twice. Any OTHER live event follows below on its own hero: a customer
-          with a confirmed booking in December and a brief still collecting
-          quotes for September has two events, and Home showed only the first.
-        */}
-          {bookedEvents.length === 1 ? (
-            renderBooked(bookedEvents[0])
-          ) : bookedEvents.length > 1 ? (
-            /*
-             * Two bookings and up, side by side.
-             *
-             * Stacked, a second confirmed booking pushed everything else on Home
-             * a full card down; demoted to a row it read like a draft. A swipe
-             * keeps both of them the same size as each other and costs the page
-             * the height of one.
-             */
-            <FlatList
-              style={bookedRowStyles.row}
-              contentContainerStyle={bookedRowStyles.rowContent}
-              data={bookedEvents}
-              keyExtractor={item => item.id}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              renderItem={({ item }) => renderBooked(item, true)}
-            />
-          ) : currentEvent ? (
-            renderHero(currentEvent)
-          ) : null}
-
-          {/*
-          Every other live event, as a swipeable banner carousel.
-
-          One card tall however many there are, with dots for the rest. Three
-          of them, then "See all" — the Events list is the full set.
-        */}
-          {visibleOtherEvents.length ? (
-            <FadeInUp delay={180} style={sectionStyles.block}>
-              {/*
-              "See all", always — the same head every other section on Home
-              uses.
-
-              It used to appear only once there were more events than the
-              three shown, and count them: "See all 11". So a customer with
-              exactly three had no link at all, and the one thing the section
-              could not do was take them to the full list. It opens the
-              events list now rather than the Events tab, which is the
-              screen this section is a preview of.
-            */}
-              <SectionHead
-                title="Other events"
-                tone={SECTION_TONE_GRADIENT.events}
-                icon="calendar-heart"
-                actionLabel="See all"
-                testID="see-all-events"
-                onPressAction={() =>
-                  navigation.navigate('SeeAll', { kind: 'events' })
-                }
-              />
-
-              <OtherEventsCarousel
-                events={visibleOtherEvents}
-                occasionTiles={occasions?.items ?? []}
-                onOpen={openEvent}
-                /* Only a brief nobody has been hired off yet: past acceptance
-                 there is a booking, and changing the terms is a conversation
-                 with the organizer rather than a form. */
-                editFor={event =>
-                  isBriefEditable(event)
-                    ? () =>
-                        navigation.navigate('Plan', { requestId: event.refId })
-                    : undefined
-                }
-              />
-            </FadeInUp>
-          ) : null}
-
-          {/* Events streaming this minute — straight under the customer's own
-              event, because it is the one thing on Home that will not be
-              there later. Gone entirely when nothing is live. */}
-          <FadeInUp delay={110}>
-            <LiveStreams
-              renderHeader={liveCount => (
-                <View style={sectionStyles.block}>
-                  <SectionHead
-                    title={LIVE_STREAMS_COPY.title}
-                    tone={LIVE_TONE}
-                    icon="broadcast"
-                    actionLabel={`${liveCount} live`}
-                  />
-                </View>
-              )}
-              onOpenStream={eventId =>
-                navigation.navigate('PublicEventLive', { eventId })
-              }
-            />
-          </FadeInUp>
-
-          {/*
           "Tell us the basics" — the four fields a brief needs, and the button
-          that sends it. The first thing a new customer sees, and the first
-          thing after their own event for a returning one.
+          that sends it.
 
           Always shown, whatever else the customer has. It was gated on having
           no live event, which sounded reasonable and meant that anyone with a
@@ -511,6 +405,150 @@ export function HomeScreen() {
               />
             </FadeInUp>
           )}
+
+          {/*
+            Public events, straight under the occasions.
+
+            The occasions are "plan something of your own"; this is the other
+            half of the same question — somebody else has already planned one,
+            and there are seats. It sits here rather than at the foot of the
+            page because a customer with nothing to plan has no reason to
+            scroll past the offers and the packages to find it.
+
+            A teaser, not a second catalogue: four events, and "See all" goes
+            to the Events tab, where the whole list and its filter sheet are.
+          */}
+          {/* The featured banner leads the events: the biggest nights out,
+              one at a time. It removes itself when there is nothing to feature. */}
+          <FadeInUp delay={100}>
+            <FeaturedEvents
+              style={sectionStyles.block}
+              onOpenEvent={eventId =>
+                navigation.navigate('PublicEventDetail', { eventId })
+              }
+            />
+          </FadeInUp>
+
+          {/* Events streaming this minute. Gone entirely when nothing is live. */}
+          <FadeInUp delay={110}>
+            <LiveStreams
+              renderHeader={liveCount => (
+                <View style={sectionStyles.block}>
+                  <SectionHead
+                    title={LIVE_STREAMS_COPY.title}
+                    tone={LIVE_TONE}
+                    icon="broadcast"
+                    actionLabel={`${liveCount} live`}
+                  />
+                </View>
+              )}
+              onOpenStream={eventId =>
+                navigation.navigate('PublicEventLive', { eventId })
+              }
+            />
+          </FadeInUp>
+
+          <FadeInUp delay={120} style={sectionStyles.block}>
+            {/*
+              The heading goes in rather than above: the section decides
+              whether it appears at all, and a title rendered out here stayed
+              behind when the body did not, over an empty gap.
+            */}
+            <EventsNearYou
+              header={
+                <SectionHead
+                  title={PUBLIC_EVENTS_COPY.sectionTitle}
+                  tone={SECTION_TONE_GRADIENT.events}
+                  actionLabel={PUBLIC_EVENTS_COPY.seeAll}
+                  /* The Events tab, which is where the catalogue lives. */
+                  onPressAction={() => navigation.navigate('Events')}
+                  testID="home-events-see-all"
+                />
+              }
+              coordinates={coordinates ?? null}
+              onOpenEvent={eventId =>
+                navigation.navigate('PublicEventDetail', { eventId })
+              }
+            />
+          </FadeInUp>
+
+          {/*
+          The booked card replaces the hero for the booking itself — the two are
+          two renderings of one event, and stacking them would summarise it
+          twice. Any OTHER live event follows below on its own hero: a customer
+          with a confirmed booking in December and a brief still collecting
+          quotes for September has two events, and Home showed only the first.
+        */}
+          {bookedEvents.length === 1 ? (
+            renderBooked(bookedEvents[0])
+          ) : bookedEvents.length > 1 ? (
+            /*
+             * Two bookings and up, side by side.
+             *
+             * Stacked, a second confirmed booking pushed everything else on Home
+             * a full card down; demoted to a row it read like a draft. A swipe
+             * keeps both of them the same size as each other and costs the page
+             * the height of one.
+             */
+            <FlatList
+              style={bookedRowStyles.row}
+              contentContainerStyle={bookedRowStyles.rowContent}
+              data={bookedEvents}
+              keyExtractor={item => item.id}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item }) => renderBooked(item, true)}
+            />
+          ) : currentEvent ? (
+            renderHero(currentEvent)
+          ) : null}
+
+          {/*
+          Every other live event, as a swipeable banner carousel.
+
+          One card tall however many there are, with dots for the rest. Three
+          of them, then "See all" — the Events list is the full set.
+        */}
+          {visibleOtherEvents.length ? (
+            <FadeInUp delay={180} style={sectionStyles.block}>
+              {/*
+              "See all", always — the same head every other section on Home
+              uses.
+
+              It used to appear only once there were more events than the
+              three shown, and count them: "See all 11". So a customer with
+              exactly three had no link at all, and the one thing the section
+              could not do was take them to the full list. It opens the
+              events list now rather than the Events tab, which is the
+              screen this section is a preview of.
+            */}
+              <SectionHead
+                title="Your other events"
+                tone={SECTION_TONE_GRADIENT.events}
+                icon="calendar-heart"
+                actionLabel="See all"
+                testID="see-all-events"
+                onPressAction={() =>
+                  navigation.navigate('SeeAll', { kind: 'events' })
+                }
+              />
+
+              <OtherEventsCarousel
+                events={visibleOtherEvents}
+                occasionTiles={occasions?.items ?? []}
+                onOpen={openEvent}
+                /* Only a brief nobody has been hired off yet: past acceptance
+                 there is a booking, and changing the terms is a conversation
+                 with the organizer rather than a form. */
+                editFor={event =>
+                  isBriefEditable(event)
+                    ? () =>
+                        navigation.navigate('Plan', { requestId: event.refId })
+                    : undefined
+                }
+              />
+            </FadeInUp>
+          ) : null}
 
           {packages && (
             <FadeInUp delay={240} style={sectionStyles.block}>
@@ -568,52 +606,6 @@ export function HomeScreen() {
               />
             </FadeInUp>
           )}
-
-          {/*
-            Public events — tickets to somebody else's night out.
-
-            Below the planning half of the page on purpose: a planned event
-            (quote → advance → booking) is what Home exists to start, and
-            tickets are the second line of business. Still above the trust
-            strip, so a customer with nothing to plan finds them.
-
-            A teaser, not a second catalogue: four events, and "See all" goes
-            to the Events tab, where the whole list and its filter sheet are.
-          */}
-          {/* The featured banner leads the events: the biggest nights out,
-              one at a time. It removes itself when there is nothing to feature. */}
-          <FadeInUp delay={100}>
-            <FeaturedEvents
-              style={sectionStyles.block}
-              onOpenEvent={eventId =>
-                navigation.navigate('PublicEventDetail', { eventId })
-              }
-            />
-          </FadeInUp>
-
-          <FadeInUp delay={120} style={sectionStyles.block}>
-            {/*
-              The heading goes in rather than above: the section decides
-              whether it appears at all, and a title rendered out here stayed
-              behind when the body did not, over an empty gap.
-            */}
-            <EventsNearYou
-              header={
-                <SectionHead
-                  title={PUBLIC_EVENTS_COPY.sectionTitle}
-                  tone={SECTION_TONE_GRADIENT.events}
-                  actionLabel={PUBLIC_EVENTS_COPY.seeAll}
-                  /* The Events tab, which is where the catalogue lives. */
-                  onPressAction={() => navigation.navigate('Events')}
-                  testID="home-events-see-all"
-                />
-              }
-              coordinates={coordinates ?? null}
-              onOpenEvent={eventId =>
-                navigation.navigate('PublicEventDetail', { eventId })
-              }
-            />
-          </FadeInUp>
 
           {/*
             The three promises, at the foot of the screen.

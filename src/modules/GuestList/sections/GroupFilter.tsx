@@ -1,4 +1,4 @@
-import { ScrollView, TouchableOpacity } from 'react-native';
+import { ScrollView, TouchableOpacity, View } from 'react-native';
 import { EventlyText } from '../../../Components';
 import { filterStyles as s } from '../styles';
 import type { GroupFilterOption, GuestGroup } from '../types';
@@ -25,7 +25,7 @@ export function GroupFilter({ options, active, onChange }: GroupFilterProps) {
       style={s.scroll}
       contentContainerStyle={s.row}
     >
-      {options.map((option) => {
+      {options.map(option => {
         const on = option.key === active;
         return (
           <TouchableOpacity
@@ -40,6 +40,11 @@ export function GroupFilter({ options, active, onChange }: GroupFilterProps) {
             <EventlyText variant="label" style={on ? s.chipTextOn : s.chipText}>
               {option.label}
             </EventlyText>
+            <View style={[s.count, on && s.countOn]}>
+              <EventlyText style={[s.countText, on && s.countTextOn]}>
+                {option.count}
+              </EventlyText>
+            </View>
           </TouchableOpacity>
         );
       })}

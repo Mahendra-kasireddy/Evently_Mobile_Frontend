@@ -17,12 +17,10 @@ import { NotificationScreen } from '../modules/Notification';
 import { OrganizerScreen, ReviewsScreen } from '../modules/Organizer';
 import { PaymentsScreen } from '../modules/Payments';
 import { OnboardingScreen } from '../modules/Onboarding';
-import { ProfileScreen } from '../modules/Profile';
 import { SavedPackagesScreen } from '../modules/SavedPackages';
 import { SearchScreen } from '../modules/Search';
 import { SettingsScreen } from '../modules/Settings';
 import { SplashScreen } from '../modules/Splash';
-import { BookingScreen } from '../modules/Booking';
 import { BusinessHomeScreen } from '../modules/BusinessHome';
 import { BusinessRegisterScreen } from '../modules/BusinessRegister';
 import { UseChoiceScreen } from '../modules/UseChoice';
@@ -75,14 +73,16 @@ export function RootNavigator() {
           <Stack.Screen name="BusinessHome" component={BusinessHomeScreen} />
           {/* Present in every branch so a registration in progress survives
               the branch swap when its role becomes the active view. */}
-          <Stack.Screen name="BusinessRegister" component={BusinessRegisterScreen} />
+          <Stack.Screen
+            name="BusinessRegister"
+            component={BusinessRegisterScreen}
+          />
         </>
       ) : token ? (
         <>
           <Stack.Screen name="Main" component={MainTabNavigator} />
           <Stack.Screen name="Location" component={LocationScreen} />
           <Stack.Screen name="Notification" component={NotificationScreen} />
-          <Stack.Screen name="Bookings" component={BookingScreen} />
           <Stack.Screen name="Workspace" component={WorkspaceScreen} />
           <Stack.Screen
             name="PublicEventDetail"
@@ -130,7 +130,6 @@ export function RootNavigator() {
           <Stack.Screen name="OrganizerReviews" component={ReviewsScreen} />
           <Stack.Screen name="Conversation" component={ConversationScreen} />
           <Stack.Screen name="Payments" component={PaymentsScreen} />
-          <Stack.Screen name="Profile" component={ProfileScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
           <Stack.Screen name="LegalSupport" component={LegalSupportScreen} />
           <Stack.Screen name="Contact" component={ContactScreen} />
@@ -138,7 +137,10 @@ export function RootNavigator() {
               signed-out visitor gets, then registration on this account. */}
           <Stack.Screen name="Join" component={JoinScreen} />
           {/* Also present in the other branches — see BusinessRegisterScreen. */}
-          <Stack.Screen name="BusinessRegister" component={BusinessRegisterScreen} />
+          <Stack.Screen
+            name="BusinessRegister"
+            component={BusinessRegisterScreen}
+          />
         </>
       ) : (
         <>
@@ -154,7 +156,10 @@ export function RootNavigator() {
               screen name is registered in the signed-in branches too, so React
               Navigation keeps this route's state when the in-flow OTP verify
               flips `token` and swaps which branch renders. */}
-          <Stack.Screen name="BusinessRegister" component={BusinessRegisterScreen} />
+          <Stack.Screen
+            name="BusinessRegister"
+            component={BusinessRegisterScreen}
+          />
         </>
       )}
     </Stack.Navigator>

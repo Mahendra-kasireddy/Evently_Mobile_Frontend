@@ -22,24 +22,79 @@ const LIVE_STATUSES = new Set(['sent', 'accepted']);
  * because that is the question the screen exists to answer — except once one
  * is accepted, when that one leads.
  */
-export function mapCompare(dto: QuoteRequestDTO, fallbackTitle: string): CompareViewModel {
-  const live = (dto.quotations ?? []).filter((q) => LIVE_STATUSES.has(q.status));
-  const accepted = live.find((q) => q.status === 'accepted') ?? null;
-  const priced = live.filter((q) => (q.grandTotal ?? 0) > 0);
-  const lowestTotal = priced.length > 0 ? Math.min(...priced.map((q) => q.grandTotal)) : 0;
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MONTHS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+/** "Fri, 9 Oct 2026" from "2026-10-09"; anything unparseable is shown as given. */
+export function prettyDate(value: string | null | undefined): string {
+  const raw = (value ?? '').trim();
+  if (!raw) return '';
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(raw);
+  // Date-only strings are read as local dates — `new Date('2026-10-09')` is
+  // UTC midnight, which is the 8th in some timezones.
+  const d = m
+    ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+    : new Date(raw);
+  if (Number.isNaN(d.getTime())) return raw;
+  // Built by hand: Intl output differs between engines ("9 Oct, 2026" here,
+  // "9 Oct 2026" there), and this line should read the same on every phone.
+  return `${DAYS[d.getDay()]}, ${d.getDate()} ${
+    MONTHS[d.getMonth()]
+  } ${d.getFullYear()}`;
+}
+
+/** "ME" from "MAHENDRA EVENTS", "M" from "Mahendra"; "?" from nothing. */
+export function initialsOf(name: string | null | undefined): string {
+  const words = (name ?? '').trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return '?';
+  return (
+    words[0][0] + (words.length > 1 ? words[words.length - 1][0] : '')
+  ).toUpperCase();
+}
+
+/** "100 guests" from "100"; "500+ guests" from "500+"; free text as given. */
+export function guestsLabel(value: string | null | undefined): string {
+  const raw = (value ?? '').trim();
+  if (!raw) return '';
+  return /^\d+\+?$/.test(raw) ? `${raw} guests` : raw;
+}
+
+export function mapCompare(
+  dto: QuoteRequestDTO,
+  fallbackTitle: string,
+): CompareViewModel {
+  const live = (dto.quotations ?? []).filter(q => LIVE_STATUSES.has(q.status));
+  const accepted = live.find(q => q.status === 'accepted') ?? null;
+  const priced = live.filter(q => (q.grandTotal ?? 0) > 0);
+  const lowestTotal =
+    priced.length > 0 ? Math.min(...priced.map(q => q.grandTotal)) : 0;
 
   /* LOWEST is a comparison. With one quote there is nothing to be lowest of,
      and the badge would read as a finding the screen has not made. */
   const comparable = priced.length > 1;
 
   const quotes = live
-    .map((q) => toCard(q, lowestTotal, !!accepted || !comparable))
+    .map(q => toCard(q, lowestTotal, !!accepted || !comparable))
     .sort((a, b) => {
       if (a.isAccepted !== b.isAccepted) return a.isAccepted ? -1 : 1;
       return a.total - b.total;
     });
 
-  const highestTotal = priced.length > 0 ? Math.max(...priced.map((q) => q.grandTotal)) : 0;
+  const highestTotal =
+    priced.length > 0 ? Math.max(...priced.map(q => q.grandTotal)) : 0;
 
   return {
     title: dto.occasion ? titleize(dto.occasion) : fallbackTitle,
@@ -48,22 +103,44 @@ export function mapCompare(dto: QuoteRequestDTO, fallbackTitle: string): Compare
      * not compared, and heading it "Compare quotes" tells a customer with one
      * reply that the others must be hidden somewhere.
      */
-    heading: quotes.length === 1 ? 'Your quote' : 'Compare quotes',
+    heading:
+      quotes.length === 0
+        ? 'Your request'
+        : quotes.length === 1
+        ? 'Your quote'
+        : 'Compare quotes',
     factsLine: [dto.when, dto.where, dto.guests]
-      .map((v) => (v ?? '').trim())
+      .map(v => (v ?? '').trim())
       .filter(Boolean)
       .join(' · '),
+    brief: {
+      date: prettyDate(dto.when),
+      place: (dto.where ?? '').trim(),
+      guests: guestsLabel(dto.guests),
+    },
+    sentToCount: dto.sentToCount ?? 0,
+    // Initials made here when the server sends none, so no avatar is blank.
+    awaiting: (dto.awaiting ?? []).map(r => ({
+      ...r,
+      initials: (r.initials ?? '').trim() || initialsOf(r.name),
+    })),
     quotes,
     // Only when there are two different prices to sit between.
     spreadLabel:
       priced.length > 1 && highestTotal > lowestTotal
-        ? `${formatINR(lowestTotal)} – ${formatINR(highestTotal)} across ${priced.length} quotes`
+        ? `${formatINR(lowestTotal)} – ${formatINR(highestTotal)} across ${
+            priced.length
+          } quotes`
         : '',
     isDecided: !!accepted,
   };
 }
 
-function toCard(q: QuotationDTO, lowestTotal: number, decided: boolean): QuoteCard {
+function toCard(
+  q: QuotationDTO,
+  lowestTotal: number,
+  decided: boolean,
+): QuoteCard {
   const total = q.grandTotal ?? 0;
   return {
     id: q.id,
@@ -81,8 +158,8 @@ function toCard(q: QuotationDTO, lowestTotal: number, decided: boolean): QuoteCa
     isLowest: !decided && total > 0 && total === lowestTotal,
     isAccepted: q.status === 'accepted',
     lines: (q.lineItems ?? [])
-      .filter((li) => !!li.title)
-      .map((li) => ({
+      .filter(li => !!li.title)
+      .map(li => ({
         key: li.key || li.title,
         title: li.title,
         subtitle: li.subtitle ?? '',
@@ -113,22 +190,22 @@ export function mapLineByLine(
   leftId: string,
   rightId: string,
 ): LineByLineViewModel | null {
-  const live = (dto.quotations ?? []).filter((q) => LIVE_STATUSES.has(q.status));
-  const left = live.find((q) => q.id === leftId);
-  const right = live.find((q) => q.id === rightId);
+  const live = (dto.quotations ?? []).filter(q => LIVE_STATUSES.has(q.status));
+  const left = live.find(q => q.id === leftId);
+  const right = live.find(q => q.id === rightId);
   if (!left || !right) return null;
 
-  const leftLines = new Map((left.lineItems ?? []).map((l) => [l.key, l]));
-  const rightLines = new Map((right.lineItems ?? []).map((l) => [l.key, l]));
+  const leftLines = new Map((left.lineItems ?? []).map(l => [l.key, l]));
+  const rightLines = new Map((right.lineItems ?? []).map(l => [l.key, l]));
   const keys = [
     ...leftLines.keys(),
-    ...[...rightLines.keys()].filter((key) => !leftLines.has(key)),
+    ...[...rightLines.keys()].filter(key => !leftLines.has(key)),
   ];
 
   return {
     left: toColumn(left),
     right: toColumn(right),
-    rows: keys.map((key) => {
+    rows: keys.map(key => {
       const a = leftLines.get(key);
       const b = rightLines.get(key);
       /* Only a comparison when both sides actually priced it. One of them not
@@ -138,8 +215,16 @@ export function mapLineByLine(
         key,
         title: a?.title ?? b?.title ?? key,
         subtitle: a?.subtitle ?? b?.subtitle ?? '',
-        left: toCell(a, comparable && (a as QuoteLineItemDTO).price < (b as QuoteLineItemDTO).price),
-        right: toCell(b, comparable && (b as QuoteLineItemDTO).price < (a as QuoteLineItemDTO).price),
+        left: toCell(
+          a,
+          comparable &&
+            (a as QuoteLineItemDTO).price < (b as QuoteLineItemDTO).price,
+        ),
+        right: toCell(
+          b,
+          comparable &&
+            (b as QuoteLineItemDTO).price < (a as QuoteLineItemDTO).price,
+        ),
       };
     }),
   };
@@ -159,7 +244,10 @@ function toColumn(q: QuotationDTO): CompareColumn {
   };
 }
 
-function toCell(line: QuoteLineItemDTO | undefined, isLower: boolean): CompareCell {
+function toCell(
+  line: QuoteLineItemDTO | undefined,
+  isLower: boolean,
+): CompareCell {
   if (!line || line.price <= 0) {
     return { included: false, priceLabel: 'Not included', isLower: false };
   }

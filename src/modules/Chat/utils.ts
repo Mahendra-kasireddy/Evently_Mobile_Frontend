@@ -1,12 +1,25 @@
-import { FOLLOW_UP_SUGGESTIONS, MIN_REPLY_SAMPLES, OPENING_SUGGESTIONS } from './constants';
-import type { ConversationDTO, ConversationItem, MessageDTO, MessageGroup } from './types';
+import {
+  FOLLOW_UP_SUGGESTIONS,
+  MIN_REPLY_SAMPLES,
+  OPENING_SUGGESTIONS,
+} from './constants';
+import type {
+  ConversationDTO,
+  ConversationItem,
+  MessageDTO,
+  MessageGroup,
+} from './types';
 
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 
 function startOfDay(date: Date): number {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+  return new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+  ).getTime();
 }
 
 /**
@@ -16,7 +29,10 @@ function startOfDay(date: Date): number {
  * beyond that. A clock time in the inbox ("14:32") answers a question nobody
  * asked — scanning the list is about how long ago, not about when.
  */
-export function whenLabel(iso: string | null | undefined, now = new Date()): string {
+export function whenLabel(
+  iso: string | null | undefined,
+  now = new Date(),
+): string {
   if (!iso) return '';
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return '';
@@ -34,7 +50,10 @@ export function whenLabel(iso: string | null | undefined, now = new Date()): str
 }
 
 /** The heading over a day's messages. */
-export function dayLabel(iso: string | null | undefined, now = new Date()): string {
+export function dayLabel(
+  iso: string | null | undefined,
+  now = new Date(),
+): string {
   if (!iso) return '';
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return '';
@@ -42,7 +61,11 @@ export function dayLabel(iso: string | null | undefined, now = new Date()): stri
   const days = Math.round((startOfDay(now) - startOfDay(date)) / DAY);
   if (days <= 0) return 'Today';
   if (days === 1) return 'Yesterday';
-  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  return date.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 }
 
 /**
@@ -64,7 +87,9 @@ export function replyLabel(medianMinutes = 0, samples = 0): string {
   if (hours < 24) return `Usually replies in ${hours}h`;
 
   const days = Math.round(hours / 24);
-  return days <= 1 ? 'Usually replies in a day' : `Usually replies in ${days} days`;
+  return days <= 1
+    ? 'Usually replies in a day'
+    : `Usually replies in ${days} days`;
 }
 
 /**
@@ -81,8 +106,11 @@ export function initialsOf(name: string): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-export function mapConversations(dtos: ConversationDTO[], now = new Date()): ConversationItem[] {
-  return (dtos ?? []).map((dto) => ({
+export function mapConversations(
+  dtos: ConversationDTO[],
+  now = new Date(),
+): ConversationItem[] {
+  return (dtos ?? []).map(dto => ({
     id: dto.id,
     withName: dto.withName,
     withInitials: dto.withInitials?.trim() || initialsOf(dto.withName),
@@ -103,12 +131,17 @@ export function mapConversations(dtos: ConversationDTO[], now = new Date()): Con
  * for everything under it. A thread that is all one day gets no heading at
  * all — see `showDayLabels`.
  */
-export function groupMessages(dtos: MessageDTO[], now = new Date()): MessageGroup[] {
+export function groupMessages(
+  dtos: MessageDTO[],
+  now = new Date(),
+): MessageGroup[] {
   const groups: MessageGroup[] = [];
 
   for (const dto of dtos ?? []) {
     const date = new Date(dto.createdAt);
-    const key = Number.isNaN(date.getTime()) ? 'unknown' : String(startOfDay(date));
+    const key = Number.isNaN(date.getTime())
+      ? 'unknown'
+      : String(startOfDay(date));
     const last = groups[groups.length - 1];
 
     const item = {
@@ -118,11 +151,19 @@ export function groupMessages(dtos: MessageDTO[], now = new Date()): MessageGrou
       // "9:41 AM" — the way a time is spoken here, not a 24-hour stamp.
       timeLabel: Number.isNaN(date.getTime())
         ? ''
-        : date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+        : date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+          }),
     };
 
     if (last && last.key === key) last.items.push(item);
-    else groups.push({ key, dayLabel: dayLabel(dto.createdAt, now), items: [item] });
+    else
+      groups.push({
+        key,
+        dayLabel: dayLabel(dto.createdAt, now),
+        items: [item],
+      });
   }
 
   return groups;

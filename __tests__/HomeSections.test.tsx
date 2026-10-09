@@ -47,6 +47,10 @@ import {
   mapPackages,
 } from '../src/modules/Home/utils';
 import type { HomeFeedDTO } from '../src/modules/Home/types';
+import { env } from '../src/services/env';
+
+/** The configured API's origin — whichever backend USE_PRODUCTION picks. */
+const API_ORIGIN = env.apiBaseUrl.replace(/\/api$/, '');
 
 declare const process: { env: Record<string, string | undefined> };
 const fs: {
@@ -216,7 +220,7 @@ describe('occasion tiles with and without a photo', () => {
       imageUrl: '/api/upload/file/categoryImage/x.png',
     }).items;
     expect(tile.photoUrl).toBe(
-      'http://localhost:3000/api/upload/file/categoryImage/x.png',
+      `${API_ORIGIN}/api/upload/file/categoryImage/x.png`,
     );
   });
 
@@ -871,21 +875,27 @@ describe('EventHero', () => {
 
 describe('HomeHeader', () => {
   const base = {
-    initials: 'HK',
-    displayName: 'Hem Kumar',
-    onPressProfile: noop,
+    locationTitle: 'Hyderabad',
+    locationSubtitle: 'Telangana',
+    onPressLocation: noop,
     onPressNotifications: noop,
     onPressSearch: noop,
   };
 
   it('badges the unread count, and nothing at zero', () => {
-    expect(textOf(render(<HomeHeader {...base} unreadCount={2} />))).toContain('2');
+    expect(textOf(render(<HomeHeader {...base} unreadCount={2} />))).toContain(
+      '2',
+    );
     // A badge reading "0" is noise.
-    expect(textOf(render(<HomeHeader {...base} unreadCount={0} />))).not.toContain('0');
+    expect(
+      textOf(render(<HomeHeader {...base} unreadCount={0} />)),
+    ).not.toContain('0');
   });
 
   it('caps a big count rather than stretching the dot', () => {
-    expect(textOf(render(<HomeHeader {...base} unreadCount={42} />))).toContain('9+');
+    expect(textOf(render(<HomeHeader {...base} unreadCount={42} />))).toContain(
+      '9+',
+    );
   });
 
   it('is one row: a search glyph, not a field pretending to be an input', () => {
@@ -899,43 +909,60 @@ describe('HomeHeader', () => {
     expect(textOf(tree)).not.toContain('Search packages, organizers, decor');
 
     const labels = tree.root
-      .findAll((n) => typeof n.props?.accessibilityLabel === 'string')
-      .map((n) => n.props.accessibilityLabel as string);
+      .findAll(n => typeof n.props?.accessibilityLabel === 'string')
+      .map(n => n.props.accessibilityLabel as string);
     expect(labels).toContain('Search');
     // The filter button went with the field; the search screen has its own.
     expect(labels).not.toContain('Filters');
   });
 
-  it('opens the account from the avatar, which is where Profile lives now', () => {
+  it('shows where the customer is, the delivery-app way, and opens Location', () => {
     /*
-     * Profile was a fifth tab for a screen nobody navigates between. The
-     * avatar is the one way in — and it carries the account's initials, not a
-     * photograph, because the customer feed has no avatar image to send.
+     * The corner shows the city and its state with a chevron; tapping it
+     * changes the area. Profile is on the bottom bar now, so no avatar here.
      */
     let opened = 0;
     const tree = render(
-      <HomeHeader {...base} unreadCount={0} onPressProfile={() => { opened += 1; }} />,
+      <HomeHeader
+        {...base}
+        unreadCount={0}
+        onPressLocation={() => {
+          opened += 1;
+        }}
+      />,
     );
-    expect(textOf(tree)).toContain('HK');
-    // The city picker went with it; the account's city is set in Profile.
-    expect(textOf(tree)).not.toContain('Hyderabad');
+    expect(textOf(tree)).toContain('Hyderabad');
+    expect(textOf(tree)).toContain('Telangana');
 
-    const avatar = tree.root.find(
-      (n) =>
-        typeof n.props?.accessibilityLabel === 'string' &&
-        n.props.accessibilityLabel.startsWith('Your profile'),
-    );
-    avatar.props.onPress();
+    const location = tree.root.find(n => n.props?.testID === 'home-location');
+    location.props.onPress();
     expect(opened).toBe(1);
+
+    const labels = tree.root
+      .findAll(n => typeof n.props?.accessibilityLabel === 'string')
+      .map(n => n.props.accessibilityLabel as string);
+    expect(labels.some(l => l.startsWith('Your profile'))).toBe(false);
+  });
+
+  it('asks for a location when there is none yet', () => {
+    const tree = render(
+      <HomeHeader
+        {...base}
+        locationTitle=""
+        locationSubtitle=""
+        unreadCount={0}
+      />,
+    );
+    expect(textOf(tree)).toContain('Set your location');
   });
 
   it('no longer offers saved packages from Home', () => {
     // Still reachable from Profile, where the account's own lists live.
     const tree = render(<HomeHeader {...base} unreadCount={0} />);
     const labels = tree.root
-      .findAll((n) => typeof n.props?.accessibilityLabel === 'string')
-      .map((n) => n.props.accessibilityLabel as string);
-    expect(labels.some((l) => l.includes('Saved packages'))).toBe(false);
+      .findAll(n => typeof n.props?.accessibilityLabel === 'string')
+      .map(n => n.props.accessibilityLabel as string);
+    expect(labels.some(l => l.includes('Saved packages'))).toBe(false);
   });
 });
 
@@ -947,7 +974,10 @@ describe('the occasion grid', () => {
      * sections under it lose — as half-width cards, which is what it used to
      * be, it was six. Anything past the eighth is one swipe away instead.
      */
-    const { OCCASION_ROWS, occasionGridStyles } = require('../src/modules/Home/styles');
+    const {
+      OCCASION_ROWS,
+      occasionGridStyles,
+    } = require('../src/modules/Home/styles');
     expect(OCCASION_ROWS).toBe(2);
 
     /* A horizontal scroll view with no height of its own claims the column's
@@ -958,9 +988,9 @@ describe('the occasion grid', () => {
 
     /* Points, not a percentage: inside a horizontal scroll view a percentage
        measures against the content, so every tile would collapse. */
-    expect(typeof (occasionGridStyles.tile as Record<string, unknown>).width).toBe(
-      'number',
-    );
+    expect(
+      typeof (occasionGridStyles.tile as Record<string, unknown>).width,
+    ).toBe('number');
   });
 
   it('lays each page out four across, in reading order', () => {
@@ -995,17 +1025,21 @@ describe('the occasion grid', () => {
     const tree = render(<OccasionGrid data={data} onPressOccasion={noop} />);
     // Host nodes only: findAll matches the composite View and its host twin.
     const pages = tree.root.findAll(
-      (n) => typeof n.type === 'string' && n.props?.style === occasionGridStyles.page,
+      n =>
+        typeof n.type === 'string' &&
+        n.props?.style === occasionGridStyles.page,
     );
     // Eleven is eight on screen and three a swipe away, never a third row.
-    expect(pages.map((node) => node.children.length)).toEqual([
+    expect(pages.map(node => node.children.length)).toEqual([
       OCCASIONS_PER_PAGE,
       3,
     ]);
 
     // Each page wraps at four, so the first four labels are the top row.
     const labels = textOf(tree);
-    expect(labels.indexOf('Occasion 0')).toBeLessThan(labels.indexOf('Occasion 1'));
+    expect(labels.indexOf('Occasion 0')).toBeLessThan(
+      labels.indexOf('Occasion 1'),
+    );
     expect(labels).toContain('Occasion 10');
   });
 
@@ -1025,7 +1059,9 @@ describe('the occasion grid', () => {
       ],
     } as unknown as React.ComponentProps<typeof OccasionGrid>['data'];
 
-    const text = textOf(render(<OccasionGrid data={data} onPressOccasion={noop} />));
+    const text = textOf(
+      render(<OccasionGrid data={data} onPressOccasion={noop} />),
+    );
     expect(text).toContain('Plan something new');
     expect(text).toContain('Wedding');
     // The strapline is gone, and so is the per-tile line that had no room.
@@ -1135,10 +1171,10 @@ describe('render dump', () => {
           render(
             <>
               <HomeHeader
-                initials="HK"
-                displayName="Hem Kumar"
+                locationTitle="Hyderabad"
+                locationSubtitle="Telangana"
                 unreadCount={2}
-                onPressProfile={noop}
+                onPressLocation={noop}
                 onPressNotifications={noop}
                 onPressSearch={noop}
               />

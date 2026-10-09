@@ -2,11 +2,20 @@ import { useMemo, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ActivityIndicator, ScrollView, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EventlyIcon, EventlyText } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
-import { COMPARE_ACCENT, COMPARE_NAVY, LINE_BY_LINE_COPY as COPY } from './constants';
+import {
+  COMPARE_ACCENT,
+  COMPARE_NAVY,
+  LINE_BY_LINE_COPY as COPY,
+} from './constants';
 import { useAcceptQuotation, useQuoteRequest } from './hooks';
 import { mapLineByLine } from './utils';
 import { lineByLineStyles as s } from './styles';
@@ -46,7 +55,10 @@ function Cell({ cell }: { cell: CompareCell }) {
 
   return (
     <View style={s.cell}>
-      <EventlyText variant="subtitle" style={[s.cellPrice, cell.isLower && s.cellLower]}>
+      <EventlyText
+        variant="subtitle"
+        style={[s.cellPrice, cell.isLower && s.cellLower]}
+      >
         {cell.priceLabel}
       </EventlyText>
       {/* Only where both sides priced the line — see `mapLineByLine`. */}
@@ -99,7 +111,9 @@ export function LineByLineScreen() {
           ...(organizerId ? { organizerId } : {}),
         }),
       )
-      .catch((cause: { message?: string }) => setError(cause?.message ?? COPY.failed))
+      .catch((cause: { message?: string }) =>
+        setError(cause?.message ?? COPY.failed),
+      )
       .finally(() => setAcceptingId(null));
   };
 
@@ -154,15 +168,26 @@ export function LineByLineScreen() {
         <ColumnHead column={model.right} />
       </View>
 
-      <ScrollView contentContainerStyle={s.list} showsVerticalScrollIndicator={false}>
-        {model.rows.map((row) => (
+      <ScrollView
+        contentContainerStyle={s.list}
+        showsVerticalScrollIndicator={false}
+      >
+        {model.rows.map(row => (
           <View key={row.key} style={s.row}>
             <View style={s.rowLabel}>
-              <EventlyText variant="subtitle" style={s.rowTitle} numberOfLines={2}>
+              <EventlyText
+                variant="subtitle"
+                style={s.rowTitle}
+                numberOfLines={2}
+              >
                 {row.title}
               </EventlyText>
               {row.subtitle ? (
-                <EventlyText variant="caption" style={s.rowSubtitle} numberOfLines={2}>
+                <EventlyText
+                  variant="caption"
+                  style={s.rowSubtitle}
+                  numberOfLines={2}
+                >
                   {row.subtitle}
                 </EventlyText>
               ) : null}
@@ -203,7 +228,11 @@ export function LineByLineScreen() {
             accessibilityRole="button"
             accessibilityLabel={`${COPY.accept} ${column.fullName}, ${column.totalLabel}`}
           >
-            <EventlyText variant="subtitle" style={s.acceptText} numberOfLines={1}>
+            <EventlyText
+              variant="subtitle"
+              style={s.acceptText}
+              numberOfLines={1}
+            >
               {acceptingId === column.id
                 ? COPY.accepting
                 : `${COPY.accept} ${column.shortName}`}

@@ -1,5 +1,9 @@
 import { apiClient } from '../../services/apiClient';
-import { GUESTS_BULK_ENDPOINT, GUESTS_ENDPOINT, GUEST_ENDPOINT } from './constants';
+import {
+  GUESTS_BULK_ENDPOINT,
+  GUESTS_ENDPOINT,
+  GUEST_ENDPOINT,
+} from './constants';
 import type { BulkAddResultDTO, GuestDTO, GuestDraft } from './types';
 
 export async function fetchGuests(bookingId: string): Promise<GuestDTO[]> {
@@ -7,8 +11,14 @@ export async function fetchGuests(bookingId: string): Promise<GuestDTO[]> {
   return Array.isArray(data) ? data : [];
 }
 
-export async function addGuest(bookingId: string, draft: GuestDraft): Promise<GuestDTO> {
-  const { data } = await apiClient.post<GuestDTO>(GUESTS_ENDPOINT(bookingId), draft);
+export async function addGuest(
+  bookingId: string,
+  draft: GuestDraft,
+): Promise<GuestDTO> {
+  const { data } = await apiClient.post<GuestDTO>(
+    GUESTS_ENDPOINT(bookingId),
+    draft,
+  );
   return data;
 }
 
@@ -23,7 +33,10 @@ export async function updateGuest(
   guestId: string,
   draft: GuestDraft,
 ): Promise<GuestDTO> {
-  const { data } = await apiClient.patch<GuestDTO>(GUEST_ENDPOINT(bookingId, guestId), draft);
+  const { data } = await apiClient.patch<GuestDTO>(
+    GUEST_ENDPOINT(bookingId, guestId),
+    draft,
+  );
   return data;
 }
 
@@ -37,8 +50,11 @@ export async function addGuests(
   bookingId: string,
   guests: GuestDraft[],
 ): Promise<BulkAddResultDTO> {
-  const { data } = await apiClient.post<BulkAddResultDTO>(GUESTS_BULK_ENDPOINT(bookingId), {
-    guests,
-  });
+  const { data } = await apiClient.post<BulkAddResultDTO>(
+    GUESTS_BULK_ENDPOINT(bookingId),
+    {
+      guests,
+    },
+  );
   return { added: data?.added ?? [], skipped: data?.skipped ?? [] };
 }

@@ -41,8 +41,23 @@ export interface GuestRowViewModel {
   /** "+91 98490 11234 · Family" — the group half dropped when unfiled. */
   metaLine: string;
   group: GuestGroup;
+  /** The phone alone, as the server formatted it. */
+  phone: string;
+  /** Where this guest is with the invitation. */
+  status: GuestStatus;
   /** The values the edit sheet opens with. */
   draft: GuestDraft;
+}
+
+/** Not sent yet, sent, or sent and opened. */
+export type GuestStatus = 'new' | 'invited' | 'opened';
+
+/** The numbers at the top of the list. */
+export interface GuestStats {
+  total: number;
+  invited: number;
+  opened: number;
+  notSent: number;
 }
 
 /** One chip on the filter row. `key` is null for "Everyone". */

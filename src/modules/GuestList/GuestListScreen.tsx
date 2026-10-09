@@ -1,19 +1,42 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ActivityIndicator, ScrollView, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
+import {
+  AppHeader,
+  EventlyIcon,
+  EventlyText,
+  EventlyTextInput,
+  FadeInUp,
+  GradientFill,
+  PopIn,
+  PressableScale,
+} from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
-import { GUEST_ACCENT, GUEST_COPY as COPY, GUEST_MUTED, GUEST_NAVY } from './constants';
+import {
+  GUEST_ACCENT,
+  GUEST_COPY as COPY,
+  GUEST_MUTED,
+  GUEST_NAVY,
+} from './constants';
 import { useGuestListContainer } from './container';
 import { GroupFilter } from './sections/GroupFilter';
 import { GuestRow } from './sections/GuestRow';
 import { ContactsSheet } from './sections/ContactsSheet';
 import { EventPicker } from './sections/EventPicker';
 import { GuestSheet } from './sections/GuestSheet';
+import { GuestStats } from './sections/GuestStats';
 import { useContactsImport } from './useContactsImport';
-import { footerStyles as f, styles as s } from './styles';
+import { emptyStyles as e, footerStyles as f, styles as s } from './styles';
+
+const ADD_GRADIENT: [string, string] = ['#f47b4d', '#e2477a'];
+const CONTACTS_GRADIENT: [string, string] = ['#5b9bff', '#2554b8'];
 
 type GuestListRouteProp = RouteProp<RootStackParamList, 'GuestList'>;
 type GuestListNavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -50,7 +73,10 @@ export function GuestListScreen() {
       */}
       <EventPicker
         onPick={(picked, pickedTitle) =>
-          navigation.push('GuestList', { bookingId: picked, title: pickedTitle })
+          navigation.push('GuestList', {
+            bookingId: picked,
+            title: pickedTitle,
+          })
         }
       />
     </SafeAreaView>
@@ -137,84 +163,211 @@ function GuestListForBooking({
 
   /* Which empty is it — no guests at all, or none under this chip? Telling a
      host with forty guests "No guests yet" because Work is empty is wrong. */
-  const activeLabel = c.filters.find((option) => option.key === c.activeGroup)?.label ?? '';
+  const activeLabel =
+    c.filters.find(option => option.key === c.activeGroup)?.label ?? '';
+  const importing = c.isImporting || contacts.isLoading;
 
   return (
     <SafeAreaView style={s.container} edges={['top']}>
-      {header}
+      <AppHeader title={title || COPY.title} onBackPress={onBack} />
 
-      <GroupFilter
-        options={c.filters}
-        active={c.activeGroup}
-        onChange={c.setActiveGroup}
-      />
-
-      {/* What the last import did, and what it could not take. */}
-      {c.notice ? (
-        <TouchableOpacity
-          style={s.notice}
-          activeOpacity={0.8}
-          onPress={c.dismissNotice}
-          accessibilityRole="button"
-          accessibilityLabel={c.notice}
+      {c.isEmpty ? (
+        /* No guests at all: the two ways in, side by side — not a bare
+           sentence above a button. */
+        <ScrollView
+          contentContainerStyle={s.content}
+          showsVerticalScrollIndicator={false}
         >
-          <EventlyIcon name="information-outline" size={16} color={GUEST_NAVY} />
-          <EventlyText variant="small" style={s.noticeText}>
-            {c.notice}
-          </EventlyText>
-        </TouchableOpacity>
-      ) : null}
-
-      <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-        {c.rows.length === 0 ? (
-          <View style={s.centered}>
-            <EventlyIcon name="account-multiple-outline" size={36} color={GUEST_MUTED} />
-            <EventlyText variant="sectionTitle" style={s.errorTitle}>
-              {c.isEmpty ? COPY.emptyTitle : activeLabel}
+          <View style={e.wrap}>
+            <PopIn>
+              <View style={e.art}>
+                <EventlyIcon
+                  name="account-multiple-plus-outline"
+                  size={40}
+                  color={GUEST_ACCENT}
+                />
+              </View>
+            </PopIn>
+            <EventlyText style={e.title}>{COPY.emptyLead}</EventlyText>
+            <EventlyText variant="body" style={e.body}>
+              {COPY.emptyHint}
             </EventlyText>
-            <EventlyText variant="body" style={s.centeredText}>
-              {c.isEmpty ? COPY.emptyBody : COPY.emptyGroup(activeLabel)}
-            </EventlyText>
+            <View style={e.actions}>
+              <PressableScale
+                style={e.action}
+                onPress={contacts.open}
+                disabled={importing}
+                accessibilityRole="button"
+                accessibilityLabel={COPY.fromContacts}
+              >
+                <View style={e.actionIcon}>
+                  <GradientFill
+                    colors={CONTACTS_GRADIENT}
+                    direction="diagonal"
+                  />
+                  {importing ? (
+                    <ActivityIndicator size="small" color="#ffffff" />
+                  ) : (
+                    <EventlyIcon
+                      name="contacts-outline"
+                      size={22}
+                      color="#ffffff"
+                    />
+                  )}
+                </View>
+                <EventlyText style={e.actionTitle}>
+                  {COPY.emptyContactsTitle}
+                </EventlyText>
+                <EventlyText style={e.actionBody}>
+                  {COPY.emptyContactsBody}
+                </EventlyText>
+              </PressableScale>
+              <PressableScale
+                style={e.action}
+                onPress={c.openAdd}
+                accessibilityRole="button"
+                accessibilityLabel={COPY.addGuest}
+              >
+                <View style={e.actionIcon}>
+                  <GradientFill colors={ADD_GRADIENT} direction="diagonal" />
+                  <EventlyIcon
+                    name="account-plus-outline"
+                    size={22}
+                    color="#ffffff"
+                  />
+                </View>
+                <EventlyText style={e.actionTitle}>
+                  {COPY.emptyManualTitle}
+                </EventlyText>
+                <EventlyText style={e.actionBody}>
+                  {COPY.emptyManualBody}
+                </EventlyText>
+              </PressableScale>
+            </View>
           </View>
-        ) : (
-          c.rows.map((guest) => (
-            <GuestRow key={guest.id} guest={guest} onEdit={() => c.openEdit(guest)} />
-          ))
-        )}
-      </ScrollView>
+        </ScrollView>
+      ) : (
+        <>
+          <ScrollView
+            contentContainerStyle={s.listScroll}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            stickyHeaderIndices={[2]}
+          >
+            <GuestStats stats={c.stats} />
 
-      <View style={f.bar}>
-        <TouchableOpacity
-          style={f.contacts}
-          activeOpacity={0.8}
-          disabled={c.isImporting || contacts.isLoading}
-          onPress={contacts.open}
-          accessibilityRole="button"
-          accessibilityLabel={COPY.fromContacts}
-        >
-          {c.isImporting || contacts.isLoading ? (
-            <ActivityIndicator size="small" color={GUEST_NAVY} />
-          ) : (
-            <EventlyIcon name="account-outline" size={22} color={GUEST_NAVY} />
-          )}
-        </TouchableOpacity>
+            <View style={s.search}>
+              <EventlyIcon name="magnify" size={20} color={GUEST_MUTED} />
+              <EventlyTextInput
+                style={s.searchInput}
+                value={c.query}
+                onChangeText={c.setQuery}
+                placeholder={COPY.searchPlaceholder}
+                autoCorrect={false}
+                returnKeyType="search"
+                accessibilityLabel={COPY.searchPlaceholder}
+              />
+              {c.query ? (
+                <TouchableOpacity
+                  onPress={() => c.setQuery('')}
+                  accessibilityRole="button"
+                  accessibilityLabel="Clear search"
+                >
+                  <EventlyIcon
+                    name="close-circle"
+                    size={18}
+                    color={GUEST_MUTED}
+                  />
+                </TouchableOpacity>
+              ) : null}
+            </View>
 
-        <TouchableOpacity
-          style={[f.cta, c.isImporting && f.ctaBusy]}
-          activeOpacity={0.85}
-          onPress={c.openAdd}
-          accessibilityRole="button"
-          accessibilityLabel={COPY.addGuest}
-        >
-          <EventlyIcon name="plus" size={20} color="#ffffff" />
-          <EventlyText style={f.ctaText}>{COPY.addGuest}</EventlyText>
-        </TouchableOpacity>
-      </View>
+            {/* Stays under the header while the list scrolls. */}
+            <View style={s.sticky}>
+              <GroupFilter
+                options={c.filters}
+                active={c.activeGroup}
+                onChange={c.setActiveGroup}
+              />
+            </View>
+
+            {/* What the last import did, and what it could not take. */}
+            {c.notice ? (
+              <TouchableOpacity
+                style={s.notice}
+                activeOpacity={0.8}
+                onPress={c.dismissNotice}
+                accessibilityRole="button"
+                accessibilityLabel={c.notice}
+              >
+                <EventlyIcon
+                  name="information-outline"
+                  size={16}
+                  color={GUEST_NAVY}
+                />
+                <EventlyText variant="small" style={s.noticeText}>
+                  {c.notice}
+                </EventlyText>
+              </TouchableOpacity>
+            ) : null}
+
+            <View style={s.content}>
+              {c.rows.length === 0 ? (
+                <EventlyText variant="body" style={s.noMatch}>
+                  {c.query
+                    ? COPY.noMatch(c.query)
+                    : COPY.emptyGroup(activeLabel)}
+                </EventlyText>
+              ) : (
+                c.rows.map((guest, i) => (
+                  <FadeInUp key={guest.id} delay={Math.min(i, 8) * 30}>
+                    <GuestRow guest={guest} onEdit={() => c.openEdit(guest)} />
+                  </FadeInUp>
+                ))
+              )}
+            </View>
+          </ScrollView>
+
+          <View style={f.bar}>
+            <PressableScale
+              style={f.contacts}
+              disabled={importing}
+              onPress={contacts.open}
+              accessibilityRole="button"
+              accessibilityLabel={COPY.fromContacts}
+            >
+              {importing ? (
+                <ActivityIndicator size="small" color={GUEST_NAVY} />
+              ) : (
+                <EventlyIcon
+                  name="contacts-outline"
+                  size={20}
+                  color={GUEST_NAVY}
+                />
+              )}
+              <EventlyText style={f.contactsText}>
+                {COPY.contactsShort}
+              </EventlyText>
+            </PressableScale>
+
+            <PressableScale
+              style={[f.cta, c.isImporting && f.ctaBusy]}
+              onPress={c.openAdd}
+              accessibilityRole="button"
+              accessibilityLabel={COPY.addGuest}
+            >
+              <GradientFill colors={ADD_GRADIENT} direction="across" />
+              <EventlyIcon name="plus" size={20} color="#ffffff" />
+              <EventlyText style={f.ctaText}>{COPY.addGuest}</EventlyText>
+            </PressableScale>
+          </View>
+        </>
+      )}
 
       <ContactsSheet
         candidates={contacts.candidates}
         isSaving={c.isImporting}
-        onAdd={(guests) => {
+        onAdd={guests => {
           contacts.close();
           c.importGuests(guests);
         }}
@@ -228,6 +381,8 @@ function GuestListForBooking({
         errorMessage={c.saveError}
         onSave={c.save}
         onClose={c.closeSheet}
+        addedName={c.addedName}
+        addedTick={c.addedTick}
       />
     </SafeAreaView>
   );

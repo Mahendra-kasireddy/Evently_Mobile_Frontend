@@ -38,8 +38,16 @@ function PulseDot({ active }: { active: boolean }) {
     if (!active || reduceMotion) return undefined;
     const loop = Animated.loop(
       Animated.sequence([
-        Animated.timing(pulse, { toValue: 0.3, duration: 700, useNativeDriver: true }),
-        Animated.timing(pulse, { toValue: 1, duration: 700, useNativeDriver: true }),
+        Animated.timing(pulse, {
+          toValue: 0.3,
+          duration: 700,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulse, {
+          toValue: 1,
+          duration: 700,
+          useNativeDriver: true,
+        }),
       ]),
     );
     loop.start();
@@ -120,12 +128,19 @@ function BriefJourney() {
                 />
               ) : current ? (
                 <View style={s.journeyMark}>
-                  <GradientFill colors={CURRENT_EVENT_STAGE_GRADIENT.submitted} direction="diagonal" />
+                  <GradientFill
+                    colors={CURRENT_EVENT_STAGE_GRADIENT.submitted}
+                    direction="diagonal"
+                  />
                   <PulseDot active />
                 </View>
               ) : (
                 <View style={[s.journeyMark, s.journeyMarkTodo]}>
-                  <EventlyIcon name="file-document-outline" size={12} color="#b4a9d6" />
+                  <EventlyIcon
+                    name="file-document-outline"
+                    size={12}
+                    color="#b4a9d6"
+                  />
                 </View>
               )}
               {i < BRIEF_JOURNEY_STEPS.length - 1 ? (
@@ -149,7 +164,13 @@ function BriefJourney() {
 }
 
 /** One organizer's reply, priced against the cheapest one. */
-function QuoteRowView({ quote, onPress }: { quote: QuoteRow; onPress?: () => void }) {
+function QuoteRowView({
+  quote,
+  onPress,
+}: {
+  quote: QuoteRow;
+  onPress?: () => void;
+}) {
   const body = (
     <>
       <View style={[s.quoteAvatar, { backgroundColor: quote.avatarColor }]}>
@@ -164,7 +185,10 @@ function QuoteRowView({ quote, onPress }: { quote: QuoteRow; onPress?: () => voi
           </EventlyText>
           {quote.isLowest ? (
             <View style={s.bestTag}>
-              <GradientFill colors={CURRENT_EVENT_STAGE_GRADIENT.quotes_received} direction="across" />
+              <GradientFill
+                colors={CURRENT_EVENT_STAGE_GRADIENT.quotes_received}
+                direction="across"
+              />
               <EventlyText variant="caption" style={s.bestTagText}>
                 Best price
               </EventlyText>
@@ -183,14 +207,20 @@ function QuoteRowView({ quote, onPress }: { quote: QuoteRow; onPress?: () => voi
         <EventlyText variant="subtitle" style={s.quoteTotal}>
           {quote.totalLabel}
         </EventlyText>
-        <EventlyText variant="caption" style={[s.quoteDelta, quote.isLowest && s.quoteDeltaLowest]}>
+        <EventlyText
+          variant="caption"
+          style={[s.quoteDelta, quote.isLowest && s.quoteDeltaLowest]}
+        >
           {quote.deltaLabel}
         </EventlyText>
       </View>
     </>
   );
 
-  if (!onPress) return <View style={[s.quoteRow, quote.isLowest && s.quoteRowBest]}>{body}</View>;
+  if (!onPress)
+    return (
+      <View style={[s.quoteRow, quote.isLowest && s.quoteRowBest]}>{body}</View>
+    );
 
   return (
     <TouchableOpacity
@@ -227,15 +257,22 @@ export function EventHero({
   onPressQuote,
 }: EventHeroProps) {
   const hasQuotes = event.quoteRows.length > 0;
-  const stageColors = CURRENT_EVENT_STAGE_GRADIENT[event.stage] ?? CURRENT_EVENT_STAGE_GRADIENT.draft;
+  const stageColors =
+    CURRENT_EVENT_STAGE_GRADIENT[event.stage] ??
+    CURRENT_EVENT_STAGE_GRADIENT.draft;
   const waitingOnReplies = event.stage === 'submitted' && !hasQuotes;
   const daysLabel =
     event.daysToGo != null && event.daysToGo > 0
       ? `${event.daysToGo} ${event.daysToGo === 1 ? 'day' : 'days'} to go`
       : event.daysToGo === 0
-        ? 'Today'
-        : '';
-  const spoken = [event.stageLabel, event.title, event.factsLine, event.reachLine]
+      ? 'Today'
+      : '';
+  const spoken = [
+    event.stageLabel,
+    event.title,
+    event.factsLine,
+    event.reachLine,
+  ]
     .filter(Boolean)
     .join('. ');
 
@@ -251,7 +288,9 @@ export function EventHero({
       <View style={s.topRow}>
         <View style={s.stagePill}>
           <GradientFill colors={stageColors} direction="across" />
-          <PulseDot active={waitingOnReplies || event.stage === 'in_progress'} />
+          <PulseDot
+            active={waitingOnReplies || event.stage === 'in_progress'}
+          />
           <EventlyText variant="caption" style={s.stageText} numberOfLines={1}>
             {event.stageLabel}
           </EventlyText>
@@ -268,7 +307,11 @@ export function EventHero({
       </View>
 
       <View style={s.titleWrap}>
-        <GradientText colors={EVENT_HERO_TITLE_GRADIENT} style={s.title} numberOfLines={2}>
+        <GradientText
+          colors={EVENT_HERO_TITLE_GRADIENT}
+          style={s.title}
+          numberOfLines={2}
+        >
           {event.title}
         </GradientText>
       </View>
@@ -276,10 +319,18 @@ export function EventHero({
       {event.when || event.where || event.guests ? (
         <View style={s.factRow}>
           {event.when ? (
-            <FactChip icon="calendar-blank-outline" colors={EVENT_FACT_GRADIENT.when} label={event.when} />
+            <FactChip
+              icon="calendar-blank-outline"
+              colors={EVENT_FACT_GRADIENT.when}
+              label={event.when}
+            />
           ) : null}
           {event.where ? (
-            <FactChip icon="map-marker-outline" colors={EVENT_FACT_GRADIENT.where} label={event.where} />
+            <FactChip
+              icon="map-marker-outline"
+              colors={EVENT_FACT_GRADIENT.where}
+              label={event.where}
+            />
           ) : null}
           {event.guests ? (
             <FactChip
@@ -298,16 +349,29 @@ export function EventHero({
             <View style={s.panelFoot}>
               {event.reachLine ? (
                 <View style={s.panelLine}>
-                  <GradientIcon name="send-check-outline" colors={EVENT_FACT_GRADIENT.where} />
-                  <EventlyText variant="caption" style={s.panelLineText} numberOfLines={2}>
+                  <GradientIcon
+                    name="send-check-outline"
+                    colors={EVENT_FACT_GRADIENT.where}
+                  />
+                  <EventlyText
+                    variant="caption"
+                    style={s.panelLineText}
+                    numberOfLines={2}
+                  >
                     {event.reachLine}
                   </EventlyText>
                 </View>
               ) : null}
               {event.closesLabel ? (
                 <View style={s.panelLine}>
-                  <GradientIcon name="clock-outline" colors={CURRENT_EVENT_STAGE_GRADIENT.submitted} />
-                  <EventlyText variant="caption" style={[s.panelLineText, s.panelLineStrong]}>
+                  <GradientIcon
+                    name="clock-outline"
+                    colors={CURRENT_EVENT_STAGE_GRADIENT.submitted}
+                  />
+                  <EventlyText
+                    variant="caption"
+                    style={[s.panelLineText, s.panelLineStrong]}
+                  >
                     {event.closesLabel}
                   </EventlyText>
                 </View>
@@ -325,7 +389,10 @@ export function EventHero({
           {/* Only while the brief is still taking quotes. */}
           {event.closesLabel ? (
             <View style={s.closesPill}>
-              <GradientFill colors={CURRENT_EVENT_STAGE_GRADIENT.submitted} direction="across" />
+              <GradientFill
+                colors={CURRENT_EVENT_STAGE_GRADIENT.submitted}
+                direction="across"
+              />
               <EventlyIcon name="clock-outline" size={14} color="#ffffff" />
               <EventlyText variant="caption" style={s.closesText}>
                 {event.closesLabel}
@@ -344,7 +411,11 @@ export function EventHero({
               <View style={s.awaitingSlot}>
                 <EventlyIcon name="dots-horizontal" size={15} color="#b4a9d6" />
               </View>
-              <EventlyText variant="body" style={s.awaitingText} numberOfLines={2}>
+              <EventlyText
+                variant="body"
+                style={s.awaitingText}
+                numberOfLines={2}
+              >
                 {event.awaitingLabel}
               </EventlyText>
             </View>
@@ -390,7 +461,12 @@ export function EventHero({
         </View>
       </TouchableOpacity>
 
-      <TouchableOpacity style={s.link} activeOpacity={0.7} onPress={onPressDetails} accessibilityRole="button">
+      <TouchableOpacity
+        style={s.link}
+        activeOpacity={0.7}
+        onPress={onPressDetails}
+        accessibilityRole="button"
+      >
         <EventlyText variant="body" style={s.linkText}>
           See all quotes & your brief
         </EventlyText>

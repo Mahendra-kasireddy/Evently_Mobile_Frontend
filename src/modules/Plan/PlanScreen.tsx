@@ -321,42 +321,46 @@ export function PlanScreen() {
               onToggle={container.toggleCategory}
             />
           ) : null}
-        </ScrollView>
 
-        {!isOrganizersStep && !isReviewStep ? (
-          <View style={styles.footerBar}>
-            {/*
-              No reason line above the button.
+          {!isOrganizersStep && !isReviewStep ? (
+            <View style={styles.inlineContinue}>
+              {/*
+                At the end of the page, after the last field, rather than pinned
+                over it: the customer reaches it once they have read the step,
+                and the form is not covered by a bar while they fill it in.
+
+                No reason line above the button.
               
-              `blockReason` is still computed by the container and still gates
-              `canContinue` — it simply is not printed here any more. The button
-              carries the state on its own: an outline while the step is
-              unanswered, a filled accent once it is.
+                `blockReason` is still computed by the container and still gates
+                `canContinue` — it simply is not printed here any more. The button
+                carries the state on its own: an outline while the step is
+                unanswered, a filled accent once it is.
 
-              Disabled keeps the muted text colour rather than EventlyButton's
-              usual 50% dim, because a label nobody can read cannot say the
-              control is waiting rather than broken. See `continueDisabled` in
-              ./styles.
-            */}
-            <EventlyButton
-              title={
-                isDetailsStep
-                  ? data.continueLabel || 'Continue'
-                  : 'Continue to organizers'
-              }
-              onPress={container.continueStep}
-              disabled={!container.canContinue}
-              variant={container.canContinue ? 'primary' : 'outline'}
-              accentColor={
-                container.canContinue ? PLAN_ACCENT : PLAN_TEXT_MUTED
-              }
-              style={[
-                styles.floatingButton,
-                !container.canContinue && styles.continueDisabled,
-              ]}
-            />
-          </View>
-        ) : null}
+                Disabled keeps the muted text colour rather than EventlyButton's
+                usual 50% dim, because a label nobody can read cannot say the
+                control is waiting rather than broken. See `continueDisabled` in
+                ./styles.
+              */}
+              <EventlyButton
+                title={
+                  isDetailsStep
+                    ? data.continueLabel || 'Continue'
+                    : 'Continue to organizers'
+                }
+                onPress={container.continueStep}
+                disabled={!container.canContinue}
+                variant={container.canContinue ? 'primary' : 'outline'}
+                accentColor={
+                  container.canContinue ? PLAN_ACCENT : PLAN_TEXT_MUTED
+                }
+                style={[
+                  styles.floatingButton,
+                  !container.canContinue && styles.continueDisabled,
+                ]}
+              />
+            </View>
+          ) : null}
+        </ScrollView>
 
         {/* One request, several organizers: the shortlist travels with the
             customer down the list, and sends to everyone ticked at once. */}

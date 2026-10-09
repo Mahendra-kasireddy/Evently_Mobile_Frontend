@@ -2,12 +2,21 @@ import { useNavigation } from '@react-navigation/native';
 import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ActivityIndicator, FlatList, RefreshControl, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EventlyIcon, EventlyText } from '../../Components';
 import { colors } from '../../theme';
-import type { MainTabParamList, RootStackParamList } from '../../navigation/types';
-import { CHAT_ACCENT, CHAT_COPY as COPY } from './constants';
+import type {
+  MainTabParamList,
+  RootStackParamList,
+} from '../../navigation/types';
+import { CHAT_ACCENT, CHAT_COPY as COPY, CHAT_NAVY_DEEP } from './constants';
 import { useInboxContainer } from './container';
 import { ConversationRow } from './sections/ConversationRow';
 import { styles as s } from './styles';
@@ -26,10 +35,25 @@ type ChatNavigationProp = CompositeNavigationProp<
  */
 export function ChatScreen() {
   const navigation = useNavigation<ChatNavigationProp>();
-  const { items, isLoading, isError, errorMessage, refetch } = useInboxContainer();
+  const { items, isLoading, isError, errorMessage, refetch } =
+    useInboxContainer();
+
+  /* Back to where the customer came from — another tab, or Home. */
+  const goBack = () =>
+    navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Home');
 
   const header = (
-    <View style={s.header}>
+    <View style={[s.header, s.headerRow]}>
+      <TouchableOpacity
+        style={s.back}
+        activeOpacity={0.6}
+        onPress={goBack}
+        accessibilityRole="button"
+        accessibilityLabel="Go back"
+        testID="chat-back"
+      >
+        <EventlyIcon name="chevron-left" size={26} color={CHAT_NAVY_DEEP} />
+      </TouchableOpacity>
       <EventlyText variant="h1" style={s.title}>
         {COPY.title}
       </EventlyText>
@@ -94,14 +118,20 @@ export function ChatScreen() {
           <TouchableOpacity
             style={s.emptyCta}
             activeOpacity={0.85}
-            onPress={() => navigation.navigate('Search', { kind: 'organizers' })}
+            onPress={() =>
+              navigation.navigate('Search', { kind: 'organizers' })
+            }
             accessibilityRole="button"
             accessibilityLabel={COPY.emptyCta}
           >
             <EventlyText variant="subtitle" style={s.emptyCtaText}>
               {COPY.emptyCta}
             </EventlyText>
-            <EventlyIcon name="chevron-right" size={18} color={colors.onPrimary} />
+            <EventlyIcon
+              name="chevron-right"
+              size={18}
+              color={colors.onPrimary}
+            />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -113,10 +143,12 @@ export function ChatScreen() {
       {header}
       <FlatList
         data={items}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         contentContainerStyle={s.list}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
+        refreshControl={
+          <RefreshControl refreshing={isLoading} onRefresh={refetch} />
+        }
         renderItem={({ item }) => (
           <ConversationRow
             item={item}

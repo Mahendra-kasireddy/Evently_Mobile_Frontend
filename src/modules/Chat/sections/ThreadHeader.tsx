@@ -23,7 +23,12 @@ interface ThreadHeaderProps {
  * than a reassuring default, because a default would be about the schema and
  * not about them.
  */
-export function ThreadHeader({ summary, fallbackName, onBack, onQuote }: ThreadHeaderProps) {
+export function ThreadHeader({
+  summary,
+  fallbackName,
+  onBack,
+  onQuote,
+}: ThreadHeaderProps) {
   const name = summary?.withName || fallbackName;
 
   return (
@@ -39,7 +44,9 @@ export function ThreadHeader({ summary, fallbackName, onBack, onQuote }: ThreadH
       </TouchableOpacity>
 
       {summary ? (
-        <View style={[s.headerAvatar, { backgroundColor: summary.withAvatarColor }]}>
+        <View
+          style={[s.headerAvatar, { backgroundColor: summary.withAvatarColor }]}
+        >
           <EventlyText variant="subtitle" style={s.headerAvatarText}>
             {summary.withInitials}
           </EventlyText>

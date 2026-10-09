@@ -19,7 +19,10 @@ export function useHomeFeed(): AsyncResult<HomeFeedDTO> {
   return useAsync(fetchHomeFeed, []);
 }
 
-export function useRequestQuotes(): AsyncCallbackResult<[HeroBrief], void> {
+export function useRequestQuotes(): AsyncCallbackResult<
+  [HeroBrief],
+  string | null
+> {
   return useAsyncCallback(requestQuotes);
 }
 

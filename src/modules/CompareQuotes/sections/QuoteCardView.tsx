@@ -45,11 +45,22 @@ export function QuoteCardView({
 }: QuoteCardViewProps) {
   const [open, setOpen] = useState(false);
   const acceptNote = isOnly ? COPY.acceptNoteOnly : COPY.acceptNote;
-  const badge = quote.isAccepted ? COPY.accepted : quote.isLowest ? COPY.lowest : '';
+  const badge = quote.isAccepted
+    ? COPY.accepted
+    : quote.isLowest
+    ? COPY.lowest
+    : '';
 
   return (
     <View
-      style={[s.card, quote.isAccepted ? s.cardAccepted : quote.isLowest ? s.cardLowest : null]}
+      style={[
+        s.card,
+        quote.isAccepted
+          ? s.cardAccepted
+          : quote.isLowest
+          ? s.cardLowest
+          : null,
+      ]}
     >
       <View style={s.head}>
         <View style={[s.avatar, { backgroundColor: quote.avatarColor }]}>
@@ -88,10 +99,15 @@ export function QuoteCardView({
         </View>
 
         {badge ? (
-          <View style={[s.chip, quote.isAccepted ? s.chipAccepted : s.chipLowest]}>
+          <View
+            style={[s.chip, quote.isAccepted ? s.chipAccepted : s.chipLowest]}
+          >
             <EventlyText
               variant="caption"
-              style={[s.chipText, quote.isAccepted ? s.chipTextAccepted : s.chipTextLowest]}
+              style={[
+                s.chipText,
+                quote.isAccepted ? s.chipTextAccepted : s.chipTextLowest,
+              ]}
             >
               {badge}
             </EventlyText>
@@ -120,7 +136,7 @@ export function QuoteCardView({
         <>
           <TouchableOpacity
             style={s.breakdownToggle}
-            onPress={() => setOpen((v) => !v)}
+            onPress={() => setOpen(v => !v)}
             accessibilityRole="button"
             accessibilityState={{ expanded: open }}
             accessibilityLabel={`${COPY.breakdown}, ${quote.organizerName}`}
@@ -128,18 +144,26 @@ export function QuoteCardView({
             <EventlyText variant="body" style={s.breakdownToggleText}>
               {COPY.breakdown}
             </EventlyText>
-            <EventlyIcon name={open ? 'chevron-up' : 'chevron-down'} size={18} color={COMPARE_ACCENT} />
+            <EventlyIcon
+              name={open ? 'chevron-up' : 'chevron-down'}
+              size={18}
+              color={COMPARE_ACCENT}
+            />
           </TouchableOpacity>
 
           {open
-            ? quote.lines.map((line) => (
+            ? quote.lines.map(line => (
                 <View key={line.key} style={s.line}>
                   <View style={s.lineText}>
                     <EventlyText variant="body" style={s.lineTitle}>
                       {line.title}
                     </EventlyText>
                     {line.subtitle ? (
-                      <EventlyText variant="caption" style={s.lineSubtitle} numberOfLines={2}>
+                      <EventlyText
+                        variant="caption"
+                        style={s.lineSubtitle}
+                        numberOfLines={2}
+                      >
                         {line.subtitle}
                       </EventlyText>
                     ) : null}
@@ -168,7 +192,9 @@ export function QuoteCardView({
             activeOpacity={0.85}
             onPress={onPay}
             accessibilityRole="button"
-            accessibilityLabel={`${COPY.payAdvance(quote.advanceLabel)} to ${quote.organizerName}`}
+            accessibilityLabel={`${COPY.payAdvance(quote.advanceLabel)} to ${
+              quote.organizerName
+            }`}
           >
             <EventlyText variant="subtitle" style={s.acceptText}>
               {COPY.payAdvance(quote.advanceLabel)}

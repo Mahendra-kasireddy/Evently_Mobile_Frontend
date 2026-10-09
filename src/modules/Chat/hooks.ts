@@ -1,15 +1,26 @@
 import { useCallback } from 'react';
 import { useAsync } from '../../hooks/useAsync';
 import { useAsyncCallback } from '../../hooks/useAsyncCallback';
-import { fetchConversations, fetchMessages, openWithOrganizer, sendMessage } from './services';
+import {
+  fetchConversations,
+  fetchMessages,
+  openWithOrganizer,
+  sendMessage,
+} from './services';
 
 export function useConversations(asOrganizer: boolean) {
-  const load = useCallback(() => fetchConversations(asOrganizer), [asOrganizer]);
+  const load = useCallback(
+    () => fetchConversations(asOrganizer),
+    [asOrganizer],
+  );
   return useAsync(load, [asOrganizer]);
 }
 
 export function useMessages(conversationId: string) {
-  const load = useCallback(() => fetchMessages(conversationId), [conversationId]);
+  const load = useCallback(
+    () => fetchMessages(conversationId),
+    [conversationId],
+  );
   return useAsync(load, [conversationId]);
 }
 

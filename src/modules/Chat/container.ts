@@ -3,7 +3,12 @@ import { useFocusEffect } from '@react-navigation/native';
 import { selectIsOrganizerView } from '../../store/authSlice';
 import { useAppSelector } from '../../store/hooks';
 import { useConversations, useMessages, useSendMessage } from './hooks';
-import { groupMessages, mapConversations, showDayLabels, suggestionsFor } from './utils';
+import {
+  groupMessages,
+  mapConversations,
+  showDayLabels,
+  suggestionsFor,
+} from './utils';
 import type { ConversationItem, MessageDTO, MessageGroup } from './types';
 
 export interface InboxContainerResult {
@@ -51,12 +56,16 @@ export function useInboxContainer(): InboxContainerResult {
  * route that returns one conversation: a thread opened from a notification
  * link carries nothing but an id, and this way that route works too.
  */
-export function useConversationSummary(conversationId: string): ConversationItem | null {
+export function useConversationSummary(
+  conversationId: string,
+): ConversationItem | null {
   const asOrganizer = useAppSelector(selectIsOrganizerView);
   const { data } = useConversations(asOrganizer);
 
   return useMemo(
-    () => mapConversations(data ?? []).find((item) => item.id === conversationId) ?? null,
+    () =>
+      mapConversations(data ?? []).find(item => item.id === conversationId) ??
+      null,
     [data, conversationId],
   );
 }
@@ -80,7 +89,9 @@ export interface ThreadContainerResult {
   refetch: () => void;
 }
 
-export function useThreadContainer(conversationId: string): ThreadContainerResult {
+export function useThreadContainer(
+  conversationId: string,
+): ThreadContainerResult {
   const { data, loading, error, refetch } = useMessages(conversationId);
   const sendCall = useSendMessage();
   const [draft, setDraft] = useState('');
@@ -108,7 +119,7 @@ export function useThreadContainer(conversationId: string): ThreadContainerResul
 
     sendCall
       .execute(conversationId, text)
-      .then((message) => setSent((current) => [...current, message]))
+      .then(message => setSent(current => [...current, message]))
       .catch(() => {
         // Put the words back in the box: losing what someone typed is worse
         // than making them press send again.

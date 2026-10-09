@@ -13,8 +13,12 @@ import type { QuoteRequestDTO } from './types';
  * checks ownership server-side — a request id belonging to somebody else is a
  * 404, not a leak.
  */
-export async function fetchQuoteRequest(requestId: string): Promise<QuoteRequestDTO> {
-  const { data } = await apiClient.get<QuoteRequestDTO>(`${QUOTE_REQUEST_ENDPOINT}/${requestId}`);
+export async function fetchQuoteRequest(
+  requestId: string,
+): Promise<QuoteRequestDTO> {
+  const { data } = await apiClient.get<QuoteRequestDTO>(
+    `${QUOTE_REQUEST_ENDPOINT}/${requestId}`,
+  );
   return data;
 }
 

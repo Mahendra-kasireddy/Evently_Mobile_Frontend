@@ -43,7 +43,10 @@ interface PackageCardProps {
  * A badge's colours, read off its words: a gradient for the pill and the
  * arrow, and an icon. Each kind of pick looks like itself across the row.
  */
-function badgeTone(badge: string): { gradient: [string, string]; icon: string } {
+function badgeTone(badge: string): {
+  gradient: [string, string];
+  icon: string;
+} {
   const b = badge.toLowerCase();
   if (/budget|save|afford/.test(b)) {
     return { gradient: ['#ff8a5c', '#e8433a'], icon: 'crown-outline' };
@@ -63,7 +66,8 @@ function badgeTone(badge: string): { gradient: [string, string]; icon: string } 
 /** A glyph for what a package includes, read off the tag's words. */
 function featureIcon(tag: string): string {
   const t = tag.toLowerCase();
-  if (/food|cater|dine|menu|buffet|cake/.test(t)) return 'silverware-fork-knife';
+  if (/food|cater|dine|menu|buffet|cake/.test(t))
+    return 'silverware-fork-knife';
   if (/decor|flower|stage|floral/.test(t)) return 'palette-outline';
   if (/photo|video|camera/.test(t)) return 'camera-outline';
   if (/music|dj|band|sound|entertain/.test(t)) return 'music-note-outline';
@@ -104,7 +108,9 @@ function PackageCard({
   /* What the package is like, or failing that who runs it. */
   const subtitle = item.bannerNote || item.organizer?.name || '';
   const features = [
-    ...item.tags.slice(0, 2).map(tag => ({ icon: featureIcon(tag), label: tag })),
+    ...item.tags
+      .slice(0, 2)
+      .map(tag => ({ icon: featureIcon(tag), label: tag })),
     ...(item.guests
       ? [{ icon: 'account-group-outline', label: guestsFeature(item.guests) }]
       : []),
@@ -185,7 +191,13 @@ function PackageCard({
                 <Stop offset="1" stopColor="#0b0f24" stopOpacity={0.78} />
               </LinearGradient>
             </Defs>
-            <Rect x={0} y={0} width="100%" height="100%" fill={`url(#${shadeId})`} />
+            <Rect
+              x={0}
+              y={0}
+              width="100%"
+              height="100%"
+              fill={`url(#${shadeId})`}
+            />
           </Svg>
         </View>
 
@@ -196,7 +208,11 @@ function PackageCard({
               <GradientFill colors={tone.gradient} direction="diagonal" />
               <EventlyIcon name={tone.icon} size={11} color="#ffffff" />
             </View>
-            <EventlyText variant="caption" style={s.badgeText} numberOfLines={1}>
+            <EventlyText
+              variant="caption"
+              style={s.badgeText}
+              numberOfLines={1}
+            >
               {item.badge}
             </EventlyText>
           </View>
@@ -323,57 +339,73 @@ export function Packages({
         onPressAction={onPressSeeAll}
       />
       <Animated.FlatList
-          data={data.items}
-          keyExtractor={pkg => pkg.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={[s.stackList, { paddingHorizontal: side }]}
-          snapToInterval={item}
-          initialScrollIndex={startIndex}
-          /* Every card is the same width, so where any of them sits is known
+        data={data.items}
+        keyExtractor={pkg => pkg.id}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={[s.stackList, { paddingHorizontal: side }]}
+        snapToInterval={item}
+        initialScrollIndex={startIndex}
+        /* Every card is the same width, so where any of them sits is known
              without measuring — which is what lets the row open mid-way. */
-          getItemLayout={(_, index) => ({ length: item, offset: item * index, index })}
-          decelerationRate="fast"
-          disableIntervalMomentum
-          onScroll={onScroll}
-          scrollEventThrottle={16}
-          renderItem={({ item: pkg, index }) => {
-            /* Where this card stands relative to the one in front: 0 in
+        getItemLayout={(_, index) => ({
+          length: item,
+          offset: item * index,
+          index,
+        })}
+        decelerationRate="fast"
+        disableIntervalMomentum
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        renderItem={({ item: pkg, index }) => {
+          /* Where this card stands relative to the one in front: 0 in
                front, ±1 beside it, ±2 behind that. */
-            const at = [index - 2, index - 1, index, index + 1, index + 2].map(n => n * item);
-            /* The neighbours step back — smaller and dimmer — and are drawn
+          const at = [index - 2, index - 1, index, index + 1, index + 2].map(
+            n => n * item,
+          );
+          /* The neighbours step back — smaller and dimmer — and are drawn
                a little toward the front card, but never over it: they meet
                it with a small gap, so no card has to be restacked. */
-            const scale = scrollX.interpolate({
-              inputRange: at,
-              outputRange: [0.82, 0.9, 1, 0.9, 0.82],
-              extrapolate: 'clamp',
-            });
-            const translateX = scrollX.interpolate({
-              inputRange: at,
-              outputRange: [-item * 0.1, -item * 0.03, 0, item * 0.03, item * 0.1],
-              extrapolate: 'clamp',
-            });
-            const opacity = scrollX.interpolate({
-              inputRange: at,
-              outputRange: [0.5, 0.8, 1, 0.8, 0.5],
-              extrapolate: 'clamp',
-            });
-            return (
-              <Animated.View
-                style={{ width: item, opacity, transform: [{ translateX }, { scale }] }}
-              >
-                <PackageCard
-                  item={pkg}
-                  width={item}
-                  onPress={() => onPressPackage(pkg)}
-                  saved={savedIds.includes(pkg.id)}
-                  onToggleSaved={() => onToggleSaved(pkg.id)}
-                />
-              </Animated.View>
-            );
-          }}
-        />
+          const scale = scrollX.interpolate({
+            inputRange: at,
+            outputRange: [0.82, 0.9, 1, 0.9, 0.82],
+            extrapolate: 'clamp',
+          });
+          const translateX = scrollX.interpolate({
+            inputRange: at,
+            outputRange: [
+              -item * 0.1,
+              -item * 0.03,
+              0,
+              item * 0.03,
+              item * 0.1,
+            ],
+            extrapolate: 'clamp',
+          });
+          const opacity = scrollX.interpolate({
+            inputRange: at,
+            outputRange: [0.5, 0.8, 1, 0.8, 0.5],
+            extrapolate: 'clamp',
+          });
+          return (
+            <Animated.View
+              style={{
+                width: item,
+                opacity,
+                transform: [{ translateX }, { scale }],
+              }}
+            >
+              <PackageCard
+                item={pkg}
+                width={item}
+                onPress={() => onPressPackage(pkg)}
+                saved={savedIds.includes(pkg.id)}
+                onToggleSaved={() => onToggleSaved(pkg.id)}
+              />
+            </Animated.View>
+          );
+        }}
+      />
     </View>
   );
 }

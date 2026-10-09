@@ -40,9 +40,8 @@ const TICKETS_TAB_GRADIENT: [string, string] = ['#ff8a5c', '#e8433a'];
  * The customer's bookings — their own events, and the public-event tickets
  * they hold.
  *
- * Reached from the menu as the `Bookings` route, and registered nowhere else
- * (the Events tab is the public events catalogue), so there is one copy of it
- * and it has a back arrow like any pushed screen.
+ * A tab on the bottom bar (`BookingsTab`) and registered nowhere else, so
+ * there is one copy of it; Profile's "Bookings" switches to that tab.
  *
  * Active and Past are split because the two are read for different reasons —
  * one is a to-do list, the other a record — and both pills are always shown so
@@ -94,7 +93,17 @@ export function BookingScreen() {
     }
   };
 
-  const header = <AppHeader title="Bookings" onBackPress={navigation.goBack} />;
+  /* Back to where the customer came from — another tab, or Home. */
+  const header = (
+    <AppHeader
+      title="Bookings"
+      onBackPress={() =>
+        navigation.canGoBack()
+          ? navigation.goBack()
+          : navigation.navigate('Main', { screen: 'Home' })
+      }
+    />
+  );
 
   /* Tickets bought for public events, still ahead — they are bookings too. */
   const myTickets = useMyTickets('all');
@@ -109,7 +118,9 @@ export function BookingScreen() {
         tickets={tickets}
         limit={tickets.length}
         showHead={false}
-        onOpen={t => navigation.navigate('DigitalTicket', { ticketId: t.ticketId })}
+        onOpen={t =>
+          navigation.navigate('DigitalTicket', { ticketId: t.ticketId })
+        }
         onSeeAll={() => navigation.navigate('MyTickets')}
       />
     </FadeInUp>
@@ -192,7 +203,10 @@ export function BookingScreen() {
                 onPress={exploreEvents}
                 accessibilityRole="button"
               >
-                <GradientFill colors={['#ff8a5c', '#e8433a']} direction="across" />
+                <GradientFill
+                  colors={['#ff8a5c', '#e8433a']}
+                  direction="across"
+                />
                 <EventlyIcon
                   name="ticket-confirmation-outline"
                   size={18}
@@ -280,7 +294,9 @@ export function BookingScreen() {
                 accessibilityRole="tab"
                 accessibilityState={{ selected: on }}
               >
-                {on ? <GradientFill colors={t.gradient} direction="across" /> : null}
+                {on ? (
+                  <GradientFill colors={t.gradient} direction="across" />
+                ) : null}
                 <EventlyIcon
                   name={t.icon}
                   size={15}
@@ -317,54 +333,54 @@ export function BookingScreen() {
           {allTickets}
         </ScrollView>
       ) : (
-      <FlatList
-        ListHeaderComponent={
-          /* Out to the screen edges, as they sat before they moved into the
+        <FlatList
+          ListHeaderComponent={
+            /* Out to the screen edges, as they sat before they moved into the
              list: the list's own side padding is for the cards below. */
-          <View style={styles.listBleed}>
-            <EventTabs
-              value={tab}
-              onChange={setTab}
-              counts={{ active: active.length, past: past.length }}
+            <View style={styles.listBleed}>
+              <EventTabs
+                value={tab}
+                onChange={setTab}
+                counts={{ active: active.length, past: past.length }}
+              />
+            </View>
+          }
+          data={visible}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={isLoading} onRefresh={refreshAll} />
+          }
+          renderItem={({ item }) => (
+            <EventCard
+              item={item}
+              focused={focus?.id === item.id}
+              onPress={() => openWorkspace(item)}
             />
-          </View>
-        }
-        data={visible}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={refreshAll} />
-        }
-        renderItem={({ item }) => (
-          <EventCard
-            item={item}
-            focused={focus?.id === item.id}
-            onPress={() => openWorkspace(item)}
-          />
-        )}
-        ListEmptyComponent={
-          <View style={styles.emptyPanel}>
-            <EventlyText variant="h2" style={styles.emptyTitle}>
-              {emptyForTab === 'emptyActive'
-                ? COPY.emptyActiveTitle
-                : COPY.emptyPastTitle}
-            </EventlyText>
-            <EventlyText variant="body" style={styles.emptySubtitle}>
-              {emptyForTab === 'emptyActive'
-                ? COPY.emptyActiveBody
-                : COPY.emptyPastBody}
-            </EventlyText>
-          </View>
-        }
-        /* The tiles act on one event — the soonest active one — so they belong
+          )}
+          ListEmptyComponent={
+            <View style={styles.emptyPanel}>
+              <EventlyText variant="h2" style={styles.emptyTitle}>
+                {emptyForTab === 'emptyActive'
+                  ? COPY.emptyActiveTitle
+                  : COPY.emptyPastTitle}
+              </EventlyText>
+              <EventlyText variant="body" style={styles.emptySubtitle}>
+                {emptyForTab === 'emptyActive'
+                  ? COPY.emptyActiveBody
+                  : COPY.emptyPastBody}
+              </EventlyText>
+            </View>
+          }
+          /* The tiles act on one event — the soonest active one — so they belong
            with the list that contains it, not over a page of finished events. */
-        ListFooterComponent={
-          tab === 'active' && focus ? (
-            <JumpToGrid tiles={tiles} onPress={jump} />
-          ) : null
-        }
-      />
+          ListFooterComponent={
+            tab === 'active' && focus ? (
+              <JumpToGrid tiles={tiles} onPress={jump} />
+            ) : null
+          }
+        />
       )}
     </SafeAreaView>
   );

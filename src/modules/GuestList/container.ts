@@ -1,17 +1,28 @@
 import { useCallback, useMemo, useState } from 'react';
 import { GUEST_COPY as COPY } from './constants';
 import { useAddGuest, useAddGuests, useGuests, useUpdateGuest } from './hooks';
-import { groupFilters, summaryLine, toRow } from './utils';
+import {
+  groupFilters,
+  guestStats,
+  matchesQuery,
+  summaryLine,
+  toRow,
+} from './utils';
 import type {
   GroupFilterOption,
   GuestDraft,
   GuestGroup,
   GuestRowViewModel,
+  GuestStats,
 } from './types';
 
 export interface GuestListContainerResult {
   /** "8 guests · 5 invited". */
   summary: string;
+  stats: GuestStats;
+  /** Search over the active chip's rows, by name or any spelling of a number. */
+  query: string;
+  setQuery: (query: string) => void;
   filters: GroupFilterOption[];
   activeGroup: GuestGroup | null;
   setActiveGroup: (group: GuestGroup | null) => void;
@@ -32,7 +43,11 @@ export interface GuestListContainerResult {
   closeSheet: () => void;
   isSaving: boolean;
   saveError: string | null;
-  save: (draft: GuestDraft) => void;
+  /** `another`: keep the sheet open for the next guest once this one saves. */
+  save: (draft: GuestDraft, another?: boolean) => void;
+  /** The last guest saved with "add another", and a tick per save. */
+  addedName: string | null;
+  addedTick: number;
 
   /** Importing from the phonebook. */
   isImporting: boolean;
@@ -52,7 +67,9 @@ export interface GuestListContainerResult {
  * them. Patching optimistically would show the host their own typing instead
  * of what was actually saved.
  */
-export function useGuestListContainer(bookingId: string): GuestListContainerResult {
+export function useGuestListContainer(
+  bookingId: string,
+): GuestListContainerResult {
   const { data, loading, error, refetch } = useGuests(bookingId);
   const addCall = useAddGuest();
   const updateCall = useUpdateGuest();
@@ -64,14 +81,21 @@ export function useGuestListContainer(bookingId: string): GuestListContainerResu
   const [editing, setEditing] = useState<GuestDraft | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
+  const [addedName, setAddedName] = useState<string | null>(null);
+  const [addedTick, setAddedTick] = useState(0);
 
   /* Memoised so every list derived from it is not rebuilt on each render. */
   const guests = useMemo(() => data ?? [], [data]);
   const allRows = useMemo(() => guests.map(toRow), [guests]);
 
   const rows = useMemo(
-    () => (activeGroup ? allRows.filter((row) => row.group === activeGroup) : allRows),
-    [allRows, activeGroup],
+    () =>
+      (activeGroup
+        ? allRows.filter(row => row.group === activeGroup)
+        : allRows
+      ).filter(row => matchesQuery(row, query)),
+    [allRows, activeGroup, query],
   );
 
   const openAdd = useCallback(() => {
@@ -79,6 +103,7 @@ export function useGuestListContainer(bookingId: string): GuestListContainerResu
     setEditing(null);
     setSaveError(null);
     setNotice(null);
+    setAddedName(null);
     setSheetOpen(true);
   }, []);
 
@@ -93,10 +118,11 @@ export function useGuestListContainer(bookingId: string): GuestListContainerResu
   const closeSheet = useCallback(() => {
     setSheetOpen(false);
     setSaveError(null);
+    setAddedName(null);
   }, []);
 
   const save = useCallback(
-    (draft: GuestDraft) => {
+    (draft: GuestDraft, another = false) => {
       setSaveError(null);
       const run = editingId
         ? updateCall.execute(bookingId, editingId, draft)
@@ -104,7 +130,14 @@ export function useGuestListContainer(bookingId: string): GuestListContainerResu
 
       run
         .then(() => {
-          setSheetOpen(false);
+          if (another && !editingId) {
+            // Stay open, cleared, and say who went in.
+            setAddedName(draft.name);
+            setAddedTick(t => t + 1);
+          } else {
+            setSheetOpen(false);
+            setAddedName(null);
+          }
           refetch();
         })
         /*
@@ -112,7 +145,9 @@ export function useGuestListContainer(bookingId: string): GuestListContainerResu
          * back names who already holds that number, which is the one thing
          * that would let the host fix it.
          */
-        .catch((err: { message?: string }) => setSaveError(err?.message ?? null));
+        .catch((err: { message?: string }) =>
+          setSaveError(err?.message ?? null),
+        );
     },
     [addCall, bookingId, editingId, refetch, updateCall],
   );
@@ -123,7 +158,7 @@ export function useGuestListContainer(bookingId: string): GuestListContainerResu
       setNotice(null);
       bulkCall
         .execute(bookingId, picked)
-        .then((result) => {
+        .then(result => {
           /*
            * Both halves are reported. An import that silently dropped four
            * landlines would leave the host believing everybody in their
@@ -132,20 +167,27 @@ export function useGuestListContainer(bookingId: string): GuestListContainerResu
           setNotice(
             [
               result.added.length > 0 ? COPY.imported(result.added.length) : '',
-              result.skipped.length > 0 ? COPY.importSkipped(result.skipped.length) : '',
+              result.skipped.length > 0
+                ? COPY.importSkipped(result.skipped.length)
+                : '',
             ]
               .filter(Boolean)
               .join(' ') || COPY.importedNone,
           );
           refetch();
         })
-        .catch((err: { message?: string }) => setNotice(err?.message ?? COPY.importedNone));
+        .catch((err: { message?: string }) =>
+          setNotice(err?.message ?? COPY.importedNone),
+        );
     },
     [bookingId, bulkCall, refetch],
   );
 
   return {
     summary: summaryLine(guests, COPY.count, COPY.invited),
+    stats: useMemo(() => guestStats(guests), [guests]),
+    query,
+    setQuery,
     filters: useMemo(() => groupFilters(guests), [guests]),
     activeGroup,
     setActiveGroup,
@@ -164,6 +206,8 @@ export function useGuestListContainer(bookingId: string): GuestListContainerResu
     isSaving: addCall.loading || updateCall.loading,
     saveError,
     save,
+    addedName,
+    addedTick,
 
     isImporting: bulkCall.loading,
     importGuests,

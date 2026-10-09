@@ -2,13 +2,23 @@ import { useCallback } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ActivityIndicator, ScrollView, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
-import { COMPARE_ACCENT, COMPARE_COPY as COPY, LINE_BY_LINE_ENTRY } from './constants';
+import {
+  COMPARE_ACCENT,
+  COMPARE_COPY as COPY,
+  LINE_BY_LINE_ENTRY,
+} from './constants';
 import { useCompareContainer } from './container';
 import { QuoteCardView } from './sections/QuoteCardView';
+import { RequestWaiting } from './sections/RequestWaiting';
 import { compareEntryStyles as entry, styles as s } from './styles';
 
 type CompareRouteProp = RouteProp<RootStackParamList, 'CompareQuotes'>;
@@ -46,11 +56,23 @@ export function CompareQuotesScreen() {
     [navigation],
   );
 
-  const { model, isLoading, isError, errorMessage, acceptingId, acceptError, accept, refetch } =
-    useCompareContainer(params.requestId, params.title ?? COPY.title, (quotationId) => {
-      const quote = model?.quotes.find((q) => q.id === quotationId);
+  const {
+    model,
+    isLoading,
+    isError,
+    errorMessage,
+    acceptingId,
+    acceptError,
+    accept,
+    refetch,
+  } = useCompareContainer(
+    params.requestId,
+    params.title ?? COPY.title,
+    quotationId => {
+      const quote = model?.quotes.find(q => q.id === quotationId);
       openAdvance(quotationId, quote?.organizerId);
-    });
+    },
+  );
 
   /* Named for what the customer actually has: one reply is theirs to read,
      not to compare. Falls back to the static title before anything loads. */
@@ -99,19 +121,15 @@ export function CompareQuotesScreen() {
 
   if (!model || model.quotes.length === 0) {
     return (
-      <SafeAreaView style={s.container} edges={['top']}>
-        {header}
-        <View style={s.centered}>
-          <View style={s.centeredIcon}>
-            <EventlyIcon name="file-document-outline" size={28} color={COMPARE_ACCENT} />
-          </View>
-          <EventlyText variant="h2" style={s.emptyTitle}>
-            {COPY.emptyTitle}
-          </EventlyText>
-          <EventlyText variant="body" style={s.emptyBody}>
-            {COPY.emptyBody}
-          </EventlyText>
-        </View>
+      <SafeAreaView style={s.container} edges={['top', 'bottom']}>
+        {/* Just sent: no header — "Back to Home" at the bottom is the way
+            out, and a back arrow would only reopen the form it came from. */}
+        {params.justSent ? null : header}
+        <RequestWaiting
+          model={model}
+          justSent={params.justSent === true}
+          onHome={() => navigation.navigate('Main', { screen: 'Home' })}
+        />
       </SafeAreaView>
     );
   }
@@ -143,11 +161,11 @@ export function CompareQuotesScreen() {
       </View>
 
       {/*
-        * Offered once there are two live quotes to put side by side, and not
-        * after the customer has decided — there is nothing left to compare.
-        * The two cheapest, because that is the comparison worth opening by
-        * default; the rest are still on this screen.
-        */}
+       * Offered once there are two live quotes to put side by side, and not
+       * after the customer has decided — there is nothing left to compare.
+       * The two cheapest, because that is the comparison worth opening by
+       * default; the rest are still on this screen.
+       */}
       {!model.isDecided && model.quotes.length >= 2 ? (
         <TouchableOpacity
           style={entry.button}
@@ -176,8 +194,11 @@ export function CompareQuotesScreen() {
         </EventlyText>
       ) : null}
 
-      <ScrollView contentContainerStyle={s.list} showsVerticalScrollIndicator={false}>
-        {model.quotes.map((quote) => (
+      <ScrollView
+        contentContainerStyle={s.list}
+        showsVerticalScrollIndicator={false}
+      >
+        {model.quotes.map(quote => (
           <QuoteCardView
             key={quote.id}
             quote={quote}

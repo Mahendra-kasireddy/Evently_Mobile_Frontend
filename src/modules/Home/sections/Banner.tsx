@@ -21,7 +21,7 @@ interface BannerProps {
   budget: string;
   onToggleBudget: (enabled: boolean) => void;
   onPressBudgetRange: () => void;
-  onSubmit: () => void;
+  onSubmit: () => void | Promise<unknown>;
   isSubmitting: boolean;
   quotesRequested: boolean;
   quotesErrorMessage: string | null;

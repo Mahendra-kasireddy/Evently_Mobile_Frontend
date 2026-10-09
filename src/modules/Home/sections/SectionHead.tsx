@@ -1,20 +1,12 @@
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText, GradientFill } from '../../../Components';
-import { SECTION_TONE_GRADIENT, SECTION_TONE_ICON } from '../constants';
+import { EventlyText } from '../../../Components';
 import { sectionStyles as s } from '../styles';
 
 interface SectionHeadProps {
   title: string;
-  /**
-   * The section's colour.
-   *
-   * Drawn as a small gradient badge with the section's own icon before the
-   * title. Home stacks five or six headings in one scroll, and a colour and a
-   * picture apiece is what lets somebody find the section they came for
-   * without reading every title on the way down.
-   */
+  /** The section's colour — used for its "See all" link. */
   tone?: readonly [string, string];
-  /** The badge's glyph. Defaults to the icon for the section `tone` names. */
+  /** No longer drawn: headings carry no icon badge. Accepted so callers need not change. */
   icon?: string;
   subtitle?: string;
   /** The right-hand link — "See all", "3 live". Omitted when there is none. */
@@ -22,16 +14,6 @@ interface SectionHeadProps {
   onPressAction?: () => void;
   /** On the action, so a section's link can be found without its label. */
   testID?: string;
-}
-
-/** The icon of whichever section owns this colour pair. */
-function iconForTone(tone: readonly [string, string]): string {
-  const key = (
-    Object.keys(SECTION_TONE_GRADIENT) as Array<
-      keyof typeof SECTION_TONE_GRADIENT
-    >
-  ).find(k => SECTION_TONE_GRADIENT[k] === tone);
-  return key ? SECTION_TONE_ICON[key] : 'star-four-points';
 }
 
 /**
@@ -46,7 +28,6 @@ function iconForTone(tone: readonly [string, string]): string {
 export function SectionHead({
   title,
   tone,
-  icon,
   subtitle,
   actionLabel,
   onPressAction,
@@ -55,19 +36,9 @@ export function SectionHead({
   return (
     <View>
       <View style={s.headRow}>
-        {/* Badge and title as one group on the left, so the title sits right
-            beside its icon whether or not there is a "See all" on the right. */}
+        {/* The title on its own — no icon badge. The section's colour lives
+            on in its "See all". */}
         <View style={s.headLeft}>
-          {tone ? (
-            <View style={s.toneBadge}>
-              <GradientFill colors={tone} direction="diagonal" />
-              <EventlyIcon
-                name={icon ?? iconForTone(tone)}
-                size={15}
-                color="#ffffff"
-              />
-            </View>
-          ) : null}
           <EventlyText variant="h2" style={s.title} numberOfLines={1}>
             {title}
           </EventlyText>

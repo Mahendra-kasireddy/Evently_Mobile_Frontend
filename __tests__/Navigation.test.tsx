@@ -50,21 +50,21 @@ describe('one screen, one route', () => {
   /*
    * BookingScreen was once registered twice: as the Events tab, and as a
    * pushed `Bookings` route. Two routes rendering the same screen is what made
-   * the loop possible. It is now the pushed route only — the Events tab is the
-   * public events catalogue.
+   * the loop possible. It is now one route again — the Bookings tab — and the
+   * Events tab is the public events catalogue.
    */
-  it('registers the bookings list once, as a pushed route', () => {
-    expect(routeNamesIn(read('navigation', 'RootNavigator.tsx'))).toContain(
-      'Bookings',
+  it('registers the bookings list once, as the Bookings tab', () => {
+    expect(read('navigation', 'MainTabNavigator.tsx')).toMatch(
+      /name="BookingsTab" component=\{BookingScreen\}/,
     );
-    expect(read('navigation', 'MainTabNavigator.tsx')).not.toMatch(
+    expect(read('navigation', 'RootNavigator.tsx')).not.toMatch(
       /component=\{BookingScreen\}/,
     );
   });
 
   it('reaches Bookings from the menu', () => {
     expect(read('modules/Profile', 'ProfileScreen.tsx')).toMatch(
-      /navigate\('Bookings'\)/,
+      /navigate\('Main', \{ screen: 'BookingsTab' \}\)/,
     );
   });
 
@@ -97,7 +97,9 @@ describe('one screen, one route', () => {
    */
   it('puts public events on the bottom bar, where a customer can find them', () => {
     const tabs = read('navigation', 'MainTabNavigator.tsx');
-    expect(tabs).toMatch(/name="Events"[\s\S]*?component=\{PublicEventsScreen\}/);
+    expect(tabs).toMatch(
+      /name="Events"[\s\S]*?component=\{PublicEventsScreen\}/,
+    );
     // One tab for it — the old Discover tab is gone.
     expect(routeNamesIn(tabs)).not.toContain('Discover');
     expect(read('navigation', 'types.ts')).not.toMatch(/^\s*Discover:/m);
@@ -110,14 +112,16 @@ describe('one screen, one route', () => {
     expect(screen).toMatch(/navigate\('MyTickets'\)/);
   });
 
-  it('declares the Bookings route it registers', () => {
+  it('declares the Bookings tab it registers', () => {
     // A route the navigator registers but the param list does not know is a
     // navigate() call that will not type-check — and the reverse is a crash.
-    expect(read('navigation', 'types.ts')).toMatch(/^\s*Bookings:/m);
+    expect(read('navigation', 'types.ts')).toMatch(/^\s*BookingsTab:/m);
   });
 
   it('shows public-event tickets on the Bookings screen', () => {
-    expect(read('modules/Booking', 'BookingScreen.tsx')).toMatch(/EventTicketsSection/);
+    expect(read('modules/Booking', 'BookingScreen.tsx')).toMatch(
+      /EventTicketsSection/,
+    );
   });
 });
 
@@ -154,7 +158,9 @@ describe('where an event opens', () => {
     // CompareQuotes loads one request and every quote on it. None is still a
     // number of quotes, and the brief is on that screen either way.
     const source = home();
-    expect(source).toMatch(/source === 'quote'[\s\S]{0,1400}navigate\('CompareQuotes'/);
+    expect(source).toMatch(
+      /source === 'quote'[\s\S]{0,1400}navigate\('CompareQuotes'/,
+    );
   });
 
   it('sends an accepted quote to the advance, not back to the comparison', () => {
@@ -181,7 +187,9 @@ describe('where an event opens', () => {
      * decision, and making it for them would bury a quote they never saw.
      */
     const source = home();
-    expect(source).toMatch(/quoteRows\.length === 2[\s\S]{0,200}navigate\('LineByLine'/);
+    expect(source).toMatch(
+      /quoteRows\.length === 2[\s\S]{0,200}navigate\('LineByLine'/,
+    );
     expect(source).not.toContain('quoteRows.length >= 2');
   });
 
@@ -226,10 +234,10 @@ describe('where an event opens', () => {
 });
 
 describe('the bookings header', () => {
-  it('has a back arrow, because Bookings is opened from the menu', () => {
-    // A pushed screen with no way back strands the customer on it.
+  it('has a back arrow, to the previous tab or Home', () => {
     const source = read('modules', 'Booking', 'BookingScreen.tsx');
-    expect(source).toMatch(/<AppHeader[\s\S]{0,80}onBackPress=\{navigation\.goBack\}/);
+    expect(source).toMatch(/<AppHeader[\s\S]{0,60}onBackPress=/);
+    expect(source).not.toMatch(/showBackButton=\{false\}/);
   });
 });
 

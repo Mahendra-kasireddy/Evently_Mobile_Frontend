@@ -1,21 +1,21 @@
-import { useEffect, useState } from 'react';
-import { Image, TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
 import { colors } from '../../../theme';
 import { HERO_ACCENT_COLOR, HOME_NAVY } from '../constants';
 import { homeHeaderStyles as s } from '../styles';
 
 interface HomeHeaderProps {
-  /** The monogram on the avatar — the account's own, never an organizer's. */
-  initials: string;
-  /** The account's own photo, absolute; '' (or one that fails to load) shows the monogram. */
-  photoUrl?: string;
-  /** Only for the avatar's label, so it names who it opens. */
-  displayName: string;
+  /** The area, big — "Kukatpally". '' while there is no place yet. */
+  locationTitle: string;
+  /** The rest of the place, small — "Hyderabad, Telangana". */
+  locationSubtitle: string;
+  /** True while the phone is still finding where it is. */
+  locating?: boolean;
   unreadCount: number;
   /** True when the header is drawn over the hero photograph. */
   onPhoto?: boolean;
-  onPressProfile: () => void;
+  /** Opens the location screen, to change or refresh the area. */
+  onPressLocation: () => void;
   onPressNotifications: () => void;
   /** Opens the search screen, where the results and the filters live. */
   onPressSearch: () => void;
@@ -34,29 +34,25 @@ function Badge({ count }: { count: number }) {
 }
 
 /**
- * The bar above everything: whose account this is, what is waiting for them,
+ * The bar above everything: where the customer is, what is waiting for them,
  * and the way into search.
  *
- * The avatar on the left is the way into Profile, which is no longer a tab:
- * the account is one destination reached from one place, not a peer of the
- * feed. It shows the photo the customer added at first sign-in, and their
- * initials when there is none or it will not load — never a stock face, which
- * would be somebody else's. The badge on the
- * bell is a real count and disappears at zero.
+ * Where, on the left, the way delivery apps do it — the area big, the city
+ * small, a chevron that says it changes. Events, organizers and prices on
+ * Home all depend on it, so it earns the corner. Profile moved to the bottom
+ * bar, where the account belongs.
  *
  * One row, not two. Search is an icon here rather than a field drawn to look
  * like an input: typing happens on the search screen, where the results and
- * the filters live, so the field on Home was a button pretending to be
- * something it was not — and it cost a whole row of the fold to say what a
- * glyph says.
+ * the filters live.
  */
 export function HomeHeader({
-  initials,
-  photoUrl = '',
-  displayName,
+  locationTitle,
+  locationSubtitle,
+  locating = false,
   unreadCount,
   onPhoto = false,
-  onPressProfile,
+  onPressLocation,
   onPressNotifications,
   onPressSearch,
 }: HomeHeaderProps) {
@@ -64,33 +60,46 @@ export function HomeHeader({
      disc; on the canvas it is navy and unadorned. */
   const tint = onPhoto ? colors.onPrimary : HOME_NAVY;
   const iconButton = [s.iconButton, onPhoto && s.iconButtonOnPhoto];
-  // A photo that fails to load falls back to the monogram, not a blank disc.
-  const [photoFailed, setPhotoFailed] = useState(false);
-  useEffect(() => setPhotoFailed(false), [photoUrl]);
-  const showPhoto = photoUrl !== '' && !photoFailed;
+  const title = locationTitle || (locating ? 'Locating…' : 'Set your location');
   return (
     <View style={s.container}>
       <View style={s.topRow}>
         <TouchableOpacity
-          style={[s.avatar, onPhoto && s.avatarOnPhoto]}
-          onPress={onPressProfile}
+          style={s.location}
+          activeOpacity={0.75}
+          onPress={onPressLocation}
           accessibilityRole="button"
           accessibilityLabel={
-            displayName ? `Your profile, ${displayName}` : 'Your profile'
+            locationTitle
+              ? `Location: ${[locationTitle, locationSubtitle]
+                  .filter(Boolean)
+                  .join(', ')}. Change`
+              : 'Set your location'
           }
+          testID="home-location"
         >
-          {showPhoto ? (
-            <Image
-              source={{ uri: photoUrl }}
-              style={s.avatarImage}
-              onError={() => setPhotoFailed(true)}
-              accessibilityIgnoresInvertColors
+          <View style={s.locationRow}>
+            <EventlyIcon
+              name="map-marker"
+              size={18}
+              color={onPhoto ? '#ffffff' : HERO_ACCENT_COLOR}
             />
-          ) : (
-            <EventlyText variant="subtitle" style={s.avatarText}>
-              {initials}
+            <EventlyText
+              style={[s.locationTitle, onPhoto && s.onPhotoText]}
+              numberOfLines={1}
+            >
+              {title}
             </EventlyText>
-          )}
+            <EventlyIcon name="chevron-down" size={20} color={tint} />
+          </View>
+          {locationSubtitle ? (
+            <EventlyText
+              style={[s.locationSub, onPhoto && s.onPhotoSub]}
+              numberOfLines={1}
+            >
+              {locationSubtitle}
+            </EventlyText>
+          ) : null}
         </TouchableOpacity>
 
         <View style={s.actions}>

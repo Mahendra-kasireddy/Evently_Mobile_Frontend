@@ -58,7 +58,9 @@ export function useOpenEvent(): (event: CurrentEventViewModel) => void {
          * quotes and only one of them was accepted.
          */
         if (event.stage === 'quote_accepted' && event.quotationId) {
-          return navigation.navigate('Payment', { quotationId: event.quotationId });
+          return navigation.navigate('Payment', {
+            quotationId: event.quotationId,
+          });
         }
 
         /*

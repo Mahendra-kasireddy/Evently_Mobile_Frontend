@@ -23,6 +23,10 @@ jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
 import { Image } from 'react-native';
 import { EventlyImage } from '../src/Components/EventlyImage';
 import { absoluteFileUrl } from '../src/services/urls';
+import { env } from '../src/services/env';
+
+/** The configured API's origin — whichever backend USE_PRODUCTION picks. */
+const API_ORIGIN = env.apiBaseUrl.replace(/\/api$/, '');
 
 interface Stats {
   isDirectory(): boolean;
@@ -35,7 +39,9 @@ const fs: {
 const path: { join(...parts: string[]): string } = require('path');
 declare const __dirname: string;
 
-const render = (node: React.ReactElement): ReactTestRenderer.ReactTestRenderer => {
+const render = (
+  node: React.ReactElement,
+): ReactTestRenderer.ReactTestRenderer => {
   let tree!: ReactTestRenderer.ReactTestRenderer;
   ReactTestRenderer.act(() => {
     tree = ReactTestRenderer.create(node);
@@ -44,7 +50,8 @@ const render = (node: React.ReactElement): ReactTestRenderer.ReactTestRenderer =
 };
 
 /** How many real <Image> elements the component decided to mount. */
-const images = (node: React.ReactElement): number => render(node).root.findAllByType(Image).length;
+const images = (node: React.ReactElement): number =>
+  render(node).root.findAllByType(Image).length;
 
 describe('absoluteFileUrl', () => {
   it('makes the local driver’s root-relative path fetchable', () => {
@@ -54,13 +61,15 @@ describe('absoluteFileUrl', () => {
      * page, so a relative URI simply fails.
      */
     expect(absoluteFileUrl('/api/upload/file/gallery/x.png')).toBe(
-      'http://localhost:3000/api/upload/file/gallery/x.png',
+      `${API_ORIGIN}/api/upload/file/gallery/x.png`,
     );
   });
 
   it('leaves an already-absolute URL alone', () => {
     // The S3 driver returns these, and double-prefixing would break them.
-    expect(absoluteFileUrl('https://cdn.example.com/x.png')).toBe('https://cdn.example.com/x.png');
+    expect(absoluteFileUrl('https://cdn.example.com/x.png')).toBe(
+      'https://cdn.example.com/x.png',
+    );
   });
 
   it('gives nothing back for nothing', () => {
@@ -82,7 +91,9 @@ describe('EventlyImage', () => {
   });
 
   it('still mounts an image for a real url', () => {
-    expect(images(<EventlyImage source={{ uri: 'http://localhost:3000/a.png' }} />)).toBe(1);
+    expect(
+      images(<EventlyImage source={{ uri: 'http://localhost:3000/a.png' }} />),
+    ).toBe(1);
   });
 
   it('mounts nothing when there is no source at all', () => {
@@ -111,9 +122,13 @@ describe('every stored file is absolutised before it is rendered', () => {
       });
 
     const offenders: string[] = [];
-    for (const file of walk(path.join(__dirname, '..', 'src')).filter((f) => f.endsWith('.tsx'))) {
+    for (const file of walk(path.join(__dirname, '..', 'src')).filter(f =>
+      f.endsWith('.tsx'),
+    )) {
       const text = fs.readFileSync(file, 'utf8');
-      for (const m of text.matchAll(/source=\{\{\s*uri:\s*([A-Za-z][\w.?]*)\s*\}\}/g)) {
+      for (const m of text.matchAll(
+        /source=\{\{\s*uri:\s*([A-Za-z][\w.?]*)\s*\}\}/g,
+      )) {
         const expression = m[1];
         if (expression.endsWith('.url') && !LOCAL_PICKER.test(expression)) {
           offenders.push(`${file.split('/src/')[1]}: ${m[0]}`);
@@ -137,7 +152,13 @@ describe('iOS will actually fetch them', () => {
      * wrong in the JavaScript, which is why it took so long to find.
      */
     const plist = fs.readFileSync(
-      path.join(__dirname, '..', 'ios', 'Evently_Mobile_Frontend', 'Info.plist'),
+      path.join(
+        __dirname,
+        '..',
+        'ios',
+        'Evently_Mobile_Frontend',
+        'Info.plist',
+      ),
       'utf8',
     );
 
@@ -150,7 +171,13 @@ describe('iOS will actually fetch them', () => {
     // The exemption is loopback only; a release build must still refuse
     // cleartext to a real host.
     const plist = fs.readFileSync(
-      path.join(__dirname, '..', 'ios', 'Evently_Mobile_Frontend', 'Info.plist'),
+      path.join(
+        __dirname,
+        '..',
+        'ios',
+        'Evently_Mobile_Frontend',
+        'Info.plist',
+      ),
       'utf8',
     );
 

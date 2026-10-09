@@ -1,5 +1,10 @@
 import { Pressable, ScrollView, View } from 'react-native';
-import { artFor, EventlyIcon, EventlyText, GradientFill } from '../../../Components';
+import {
+  artFor,
+  EventlyIcon,
+  EventlyText,
+  GradientFill,
+} from '../../../Components';
 import { colors } from '../../../theme';
 import {
   CHIP_SELECTED_GRADIENT,
@@ -28,7 +33,10 @@ interface BasicsCardProps {
  * that one borrows the chosen occasion's colour, which is the same colour that
  * occasion wears on the grid below and on every card about it afterwards.
  */
-function fieldGradient(field: keyof HeroDraft, value: string): [string, string] {
+function fieldGradient(
+  field: keyof HeroDraft,
+  value: string,
+): [string, string] {
   if (field === 'occasion' && value) {
     const tint = OCCASION_TINT[artFor(value)];
     if (tint) return [tint.ink, tint.ink];
@@ -145,7 +153,12 @@ export function BasicsCard({
               >
                 {/* Filled, not outlined. A pale wash behind a coral word was
                     hard to tell from an unchosen chip at arm's length. */}
-                {active ? <GradientFill colors={CHIP_SELECTED_GRADIENT} direction="across" /> : null}
+                {active ? (
+                  <GradientFill
+                    colors={CHIP_SELECTED_GRADIENT}
+                    direction="across"
+                  />
+                ) : null}
                 <EventlyText style={[s.chipText, active && s.chipTextActive]}>
                   {quick.label}
                 </EventlyText>

@@ -49,7 +49,9 @@ export function useCompareContainer(
           refetch();
           onAccepted?.(quotationId);
         })
-        .catch((err: { message?: string }) => setAcceptError(err?.message ?? null))
+        .catch((err: { message?: string }) =>
+          setAcceptError(err?.message ?? null),
+        )
         .finally(() => setAcceptingId(null));
     },
     [acceptCall, onAccepted, refetch],

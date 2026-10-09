@@ -28,7 +28,8 @@ export const COMPARE_COPY = {
    * organizer has replied — and a customer who is told their other quotes were
    * declined will go looking for quotes that never existed.
    */
-  acceptNote: 'Accepting picks this organizer and declines the rest. The advance confirms it.',
+  acceptNote:
+    'Accepting picks this organizer and declines the rest. The advance confirms it.',
   acceptNoteOnly: 'Accepting picks this organizer. The advance confirms it.',
   /*
    * What is actually true between accepting and paying.
@@ -41,7 +42,8 @@ export const COMPARE_COPY = {
   decidedNote:
     'You have accepted this quote and the others are closed. Pay the advance to confirm the booking.',
   /** On the accepted card, in place of the accept button. */
-  payAdvance: (advance: string) => (advance ? `Pay ${advance} advance` : 'Pay the advance'),
+  payAdvance: (advance: string) =>
+    advance ? `Pay ${advance} advance` : 'Pay the advance',
   payAdvanceNote: 'Your organizer is asked to confirm once the advance is in.',
   acceptFailed: "We couldn't accept that quote. Please try again.",
 
@@ -75,3 +77,37 @@ export const LINE_BY_LINE_COPY = {
   empty: 'These two quotes have no priced lines to compare.',
   failed: "That didn't go through. Please try again.",
 } as const;
+
+/** A request with no quotes yet — just sent, or still waiting. */
+export const WAITING_COPY = {
+  sentTitle: 'Request sent!',
+  waitingTitle: 'Waiting for quotes',
+  lead: (occasion: string) =>
+    `Organizers who match your ${occasion.toLowerCase()} are preparing their quotes.`,
+  leadSent: (count: number, occasion: string) =>
+    `Sent to ${count} ${
+      count === 1 ? 'organizer' : 'organizers'
+    } who match your ${occasion.toLowerCase()}. They are preparing their quotes.`,
+  sentToLabel: 'SENT TO',
+  sentToCount: (count: number) =>
+    `${count} ${count === 1 ? 'organizer' : 'organizers'}`,
+  sentToMore: (count: number) => `+ ${count} more`,
+  awaitingQuote: 'Preparing quote',
+  sentToOpen: 'Organizers near you',
+  sentToOpenBody:
+    'No organizer matched every detail, so your brief is open to organizers in your area. Quotes still land here.',
+  leadPlain: 'Organizers who match your event are preparing their quotes.',
+  briefLabel: 'YOUR BRIEF',
+  statusOpen: 'Open',
+  factDate: 'Date',
+  factPlace: 'Where',
+  factGuests: 'Guests',
+  nextLabel: 'WHAT HAPPENS NEXT',
+  step1Title: 'Brief sent',
+  step1Body: 'Matching organizers have your event details.',
+  step2Title: 'Quotes arrive',
+  step2Body: 'Usually within a day. You get a notification for each one.',
+  step3Title: 'Compare & book',
+  step3Body: 'See them side by side, pick one, and pay the advance to confirm.',
+  home: 'Back to Home',
+};

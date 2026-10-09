@@ -1,7 +1,12 @@
 import { useState } from 'react';
 import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
-import { EventlyIcon, EventlyText, GradientFill, PressableScale } from '../../../Components';
+import {
+  EventlyIcon,
+  EventlyText,
+  GradientFill,
+  PressableScale,
+} from '../../../Components';
 import { SECTION_TONE_GRADIENT } from '../constants';
 import { organizerRowStyles as s } from '../styles';
 import { SectionHead } from './SectionHead';
@@ -24,11 +29,38 @@ interface TopOrganizersProps {
  * The colours an organizer card can wear, in turn along the row: a gradient
  * for the logo ring and the button, and tints for the tags.
  */
-const ORGANIZER_ACCENTS: Array<{ gradient: [string, string]; tags: string[][] }> = [
-  { gradient: ['#5b9bff', '#2554b8'], tags: [['#e9f0fd', '#2b5aa8'], ['#f1ecff', '#6d4df2']] },
-  { gradient: ['#ff8a5c', '#e8433a'], tags: [['#fff0e8', '#d24a24'], ['#fdeef3', '#c2416b']] },
-  { gradient: ['#a084ff', '#5a35e0'], tags: [['#f1ecff', '#6d4df2'], ['#e6f7f1', '#0f8a68']] },
-  { gradient: ['#3cc9a1', '#0e8a68'], tags: [['#e6f7f1', '#0f8a68'], ['#fff4e2', '#b8650b']] },
+const ORGANIZER_ACCENTS: Array<{
+  gradient: [string, string];
+  tags: string[][];
+}> = [
+  {
+    gradient: ['#5b9bff', '#2554b8'],
+    tags: [
+      ['#e9f0fd', '#2b5aa8'],
+      ['#f1ecff', '#6d4df2'],
+    ],
+  },
+  {
+    gradient: ['#ff8a5c', '#e8433a'],
+    tags: [
+      ['#fff0e8', '#d24a24'],
+      ['#fdeef3', '#c2416b'],
+    ],
+  },
+  {
+    gradient: ['#a084ff', '#5a35e0'],
+    tags: [
+      ['#f1ecff', '#6d4df2'],
+      ['#e6f7f1', '#0f8a68'],
+    ],
+  },
+  {
+    gradient: ['#3cc9a1', '#0e8a68'],
+    tags: [
+      ['#e6f7f1', '#0f8a68'],
+      ['#fff4e2', '#b8650b'],
+    ],
+  },
 ];
 
 function OrganizerCard({
@@ -94,7 +126,13 @@ function OrganizerCard({
                 <Stop offset="1" stopColor="#0b0f24" stopOpacity={0.45} />
               </LinearGradient>
             </Defs>
-            <Rect x={0} y={0} width="100%" height="100%" fill={`url(#${shadeId})`} />
+            <Rect
+              x={0}
+              y={0}
+              width="100%"
+              height="100%"
+              fill={`url(#${shadeId})`}
+            />
           </Svg>
         </View>
 
@@ -146,7 +184,11 @@ function OrganizerCard({
             repeat it. */}
         {item.locationLabel ? (
           <View style={s.locationRow}>
-            <EventlyIcon name="map-marker" size={13} color={accent.gradient[1]} />
+            <EventlyIcon
+              name="map-marker"
+              size={13}
+              color={accent.gradient[1]}
+            />
             <EventlyText variant="caption" style={s.location} numberOfLines={1}>
               {item.locationLabel}
             </EventlyText>
@@ -190,7 +232,6 @@ function OrganizerCard({
             })}
           </View>
         ) : null}
-
       </View>
     </PressableScale>
   );

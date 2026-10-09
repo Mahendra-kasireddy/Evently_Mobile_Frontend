@@ -45,19 +45,25 @@ function usableNumber(raw: string): string | null {
  * clean up. De-duplicated by number, because the same person saved twice under
  * two names is the normal state of a real phonebook.
  */
-function toCandidates(contacts: Array<Record<string, unknown>>): ContactCandidate[] {
+function toCandidates(
+  contacts: Array<Record<string, unknown>>,
+): ContactCandidate[] {
   const seen = new Set<string>();
   const out: ContactCandidate[] = [];
 
   for (const contact of contacts) {
-    const numbers = ((contact.phoneNumbers as Array<{ number?: string }> | undefined) ?? [])
-      .map((entry) => usableNumber(entry?.number ?? ''))
+    const numbers = (
+      (contact.phoneNumbers as Array<{ number?: string }> | undefined) ?? []
+    )
+      .map(entry => usableNumber(entry?.number ?? ''))
       .filter((value): value is string => value !== null);
     if (numbers.length === 0) continue;
 
     const name =
       [contact.givenName, contact.familyName]
-        .filter((part): part is string => typeof part === 'string' && part.length > 0)
+        .filter(
+          (part): part is string => typeof part === 'string' && part.length > 0,
+        )
         .join(' ')
         .trim() ||
       (typeof contact.displayName === 'string' ? contact.displayName : '') ||
@@ -100,8 +106,10 @@ export function useContactsImport(): ContactsImportResult {
   const load = useCallback(() => {
     setIsLoading(true);
     Contacts.getAllWithoutPhotos()
-      .then((all) => {
-        const usable = toCandidates(all as unknown as Array<Record<string, unknown>>);
+      .then(all => {
+        const usable = toCandidates(
+          all as unknown as Array<Record<string, unknown>>,
+        );
         if (usable.length === 0) {
           Alert.alert(
             'No mobile numbers found',
@@ -142,8 +150,11 @@ export function useContactsImport(): ContactsImportResult {
 
   const open = useCallback(() => {
     if (Platform.OS === 'android') {
-      PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_CONTACTS, RATIONALE)
-        .then((result) => {
+      PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+        RATIONALE,
+      )
+        .then(result => {
           if (result === PermissionsAndroid.RESULTS.GRANTED) return load();
           return denied(result === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN);
         })
@@ -157,7 +168,7 @@ export function useContactsImport(): ContactsImportResult {
      * ignore a choice they deliberately made.
      */
     Contacts.requestPermission()
-      .then((status) => {
+      .then(status => {
         if (status === 'authorized' || status === 'limited') return load();
         return denied(status === 'denied');
       })

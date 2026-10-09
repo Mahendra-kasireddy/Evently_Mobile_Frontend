@@ -81,9 +81,46 @@ export const GUEST_COPY = {
   /** Shown when a filter, not the list, is what is empty. */
   emptyGroup: (label: string) => `Nobody is filed under ${label} yet.`,
 
+  /* The redesigned screens. */
+  pickLead: 'Pick an event to see and add its guests.',
+  pickTitle: 'Your events',
+  statusLive: 'Invitation live',
+  statusReview: 'Invitation to review',
+  statusDraft: 'Invitation being prepared',
+  statTotal: 'Guests',
+  statInvited: 'Invited',
+  statOpened: 'Opened',
+  statNotSent: 'Not sent',
+  statsNote: (n: number) =>
+    n === 0
+      ? 'Everyone on the list has the invitation.'
+      : `${n} ${
+          n === 1 ? 'guest has' : 'guests have'
+        } not been sent the invitation yet.`,
+  searchPlaceholder: 'Search by name or number',
+  noMatch: (q: string) => `Nobody matches “${q}”.`,
+  statusNew: 'Not sent',
+  statusInvited: 'Invited',
+  statusOpened: 'Opened',
+  emptyLead: 'Start your guest list',
+  emptyHint:
+    'Add people one by one, or bring several in from your phone’s contacts at once.',
+  emptyContactsTitle: 'From contacts',
+  emptyContactsBody: 'Pick many at once',
+  emptyManualTitle: 'Type them in',
+  emptyManualBody: 'Name and number',
+  contactsShort: 'Contacts',
+  sheetAddSub: 'They get the invitation when you share it — not before.',
+  sheetEditSub: 'Their invitation link keeps working after you edit.',
+  saveAnother: 'Save & add another',
+  saveChanges: 'Save changes',
+  added: (name: string) => `${name} added. Add the next one.`,
+
   /** Said after an import, naming what could not be taken. */
   importedNone: 'None of those contacts had a usable mobile number.',
   imported: (n: number) => `${n} ${n === 1 ? 'guest' : 'guests'} added.`,
   importSkipped: (n: number) =>
-    `${n} ${n === 1 ? 'contact was' : 'contacts were'} skipped — no usable mobile number.`,
+    `${n} ${
+      n === 1 ? 'contact was' : 'contacts were'
+    } skipped — no usable mobile number.`,
 } as const;

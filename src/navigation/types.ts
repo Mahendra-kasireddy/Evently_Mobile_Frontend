@@ -27,6 +27,10 @@ export type MainTabParamList = {
    */
   Events: undefined;
   Chat: undefined;
+  /** The customer's bookings — their events and tickets. A tab, and only a tab. */
+  BookingsTab: undefined;
+  /** The account, and everything reached from it. A tab, and only a tab. */
+  ProfileTab: undefined;
 };
 
 export type JoinRole = 'organizer' | 'subvendor';
@@ -64,7 +68,6 @@ export type RootStackParamList = {
    * it in both navigators would be one screen with two routes.
    */
   /** The customer's own bookings, and the event tickets they hold. */
-  Bookings: undefined;
   PublicEventDetail: { eventId: string };
   /** Choosing a ticket type and how many, before the checkout. */
   EventTicketSelection: { eventId: string; ticketTypeId?: string };
@@ -147,7 +150,11 @@ export type RootStackParamList = {
     | { kind?: 'packages' | 'organizers'; openFilters?: boolean }
     | undefined;
   /** Every quote on one request, side by side. */
-  CompareQuotes: { requestId: string; title?: string };
+  /**
+   * One request's quotes. `justSent` is the moment straight after sending it
+   * from Home: the screen says so rather than opening on "No quotes yet".
+   */
+  CompareQuotes: { requestId: string; title?: string; justSent?: boolean };
   /**
    * Two quotes on one request, matched line against line.
    *
@@ -197,14 +204,6 @@ export type RootStackParamList = {
   Conversation: { conversationId: string; withName?: string };
   /** Every event's agreed amount, what has been paid and what is still owed. */
   Payments: undefined;
-  /**
-   * The account, and everything reached from it.
-   *
-   * On the root stack, not the tab bar: it is opened from the avatar at the
-   * top of Home, so it pushes with a back arrow like every other screen the
-   * customer visits and comes back from.
-   */
-  Profile: undefined;
   Settings: undefined;
   LegalSupport: undefined;
   /** Contact the Evently team — a real message, not a mailto. */

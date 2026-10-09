@@ -24,7 +24,7 @@ export function SuggestionBar({ suggestions, onPick }: SuggestionBarProps) {
       contentContainerStyle={s.suggestions}
       keyboardShouldPersistTaps="handled"
     >
-      {suggestions.map((text) => (
+      {suggestions.map(text => (
         <TouchableOpacity
           key={text}
           style={s.chip}

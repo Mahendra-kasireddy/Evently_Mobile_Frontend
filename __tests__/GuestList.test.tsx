@@ -37,12 +37,17 @@ import {
   summaryLine,
   toRow,
 } from '../src/modules/GuestList/utils';
-import { GUEST_AVATAR_COLORS, GUEST_COPY } from '../src/modules/GuestList/constants';
+import {
+  GUEST_AVATAR_COLORS,
+  GUEST_COPY,
+} from '../src/modules/GuestList/constants';
 import type { GuestDTO } from '../src/modules/GuestList/types';
 
 declare const process: { env: Record<string, string | undefined> };
-const fs: { writeFileSync(p: string, d: string, e: string): void; existsSync(p: string): boolean } =
-  require('fs');
+const fs: {
+  writeFileSync(p: string, d: string, e: string): void;
+  existsSync(p: string): boolean;
+} = require('fs');
 
 const guest = (over: Partial<GuestDTO> = {}): GuestDTO => ({
   id: 'g1',
@@ -58,13 +63,48 @@ const guest = (over: Partial<GuestDTO> = {}): GuestDTO => ({
 
 const LIST: GuestDTO[] = [
   guest(),
-  guest({ id: 'g2', name: 'Venkat Rao', phoneDisplay: '+91 99590 44821', group: 'family' }),
-  guest({ id: 'g3', name: 'Anitha Naidu', phoneDisplay: '+91 90000 77231', group: 'family' }),
-  guest({ id: 'g4', name: 'Ravi Kumar', phoneDisplay: '+91 97010 22187', group: 'friends' }),
-  guest({ id: 'g5', name: 'Deepa Shetty', phoneDisplay: '+91 98861 55490', group: 'friends' }),
-  guest({ id: 'g6', name: 'Karthik Menon', phoneDisplay: '+91 96760 30012', group: 'friends' }),
-  guest({ id: 'g7', name: 'Priya Varma', phoneDisplay: '+91 93470 88123', group: 'work' }),
-  guest({ id: 'g8', name: 'Sandhya Pillai', phoneDisplay: '+91 90300 41120', group: 'other' }),
+  guest({
+    id: 'g2',
+    name: 'Venkat Rao',
+    phoneDisplay: '+91 99590 44821',
+    group: 'family',
+  }),
+  guest({
+    id: 'g3',
+    name: 'Anitha Naidu',
+    phoneDisplay: '+91 90000 77231',
+    group: 'family',
+  }),
+  guest({
+    id: 'g4',
+    name: 'Ravi Kumar',
+    phoneDisplay: '+91 97010 22187',
+    group: 'friends',
+  }),
+  guest({
+    id: 'g5',
+    name: 'Deepa Shetty',
+    phoneDisplay: '+91 98861 55490',
+    group: 'friends',
+  }),
+  guest({
+    id: 'g6',
+    name: 'Karthik Menon',
+    phoneDisplay: '+91 96760 30012',
+    group: 'friends',
+  }),
+  guest({
+    id: 'g7',
+    name: 'Priya Varma',
+    phoneDisplay: '+91 93470 88123',
+    group: 'work',
+  }),
+  guest({
+    id: 'g8',
+    name: 'Sandhya Pillai',
+    phoneDisplay: '+91 90300 41120',
+    group: 'other',
+  }),
 ];
 
 function render(node: React.ReactElement) {
@@ -150,7 +190,7 @@ describe('a row', () => {
 describe('the filter chips', () => {
   it('counts each group, and everyone', () => {
     const chips = groupFilters(LIST);
-    expect(chips.map((c) => [c.label, c.count])).toEqual([
+    expect(chips.map(c => [c.label, c.count])).toEqual([
       ['Everyone', 8],
       ['Family', 3],
       ['Friends', 3],
@@ -166,7 +206,7 @@ describe('the filter chips', () => {
      */
     const chips = groupFilters([guest()]);
     expect(chips).toHaveLength(4);
-    expect(chips.find((c) => c.label === 'Work')?.count).toBe(0);
+    expect(chips.find(c => c.label === 'Work')?.count).toBe(0);
   });
 
   it('leaves unfiled guests out of every group but Everyone', () => {
@@ -179,10 +219,14 @@ describe('the filter chips', () => {
 
   it('draws every chip, with the active one marked', () => {
     const tree = render(
-      <GroupFilter options={groupFilters(LIST)} active={null} onChange={noop} />,
+      <GroupFilter
+        options={groupFilters(LIST)}
+        active={null}
+        onChange={noop}
+      />,
     );
     const text = textOf(tree);
-    ['Everyone', 'Family', 'Friends', 'Work'].forEach((label) =>
+    ['Everyone', 'Family', 'Friends', 'Work'].forEach(label =>
       expect(text).toContain(label),
     );
   });
@@ -201,13 +245,17 @@ describe('the chip row’s own height', () => {
      */
     const { filterStyles } = require('../src/modules/GuestList/styles');
     expect((filterStyles.scroll as Record<string, unknown>).flexGrow).toBe(0);
-    expect((filterStyles.row as Record<string, unknown>).alignItems).toBe('center');
+    expect((filterStyles.row as Record<string, unknown>).alignItems).toBe(
+      'center',
+    );
   });
 
-  it('draws a monogram as a squircle, matching the edit button beside it', () => {
-    // A circle next to the square edit control reads as two design systems.
+  it('draws a monogram as a circle, matching the round status pill beside it', () => {
+    // The square edit button is gone — the whole row edits — so the avatar
+    // follows the pill's round shapes rather than a control that left.
     const { rowStyles } = require('../src/modules/GuestList/styles');
-    expect((rowStyles.avatar as Record<string, unknown>).borderRadius).toBe(14);
+    const avatar = rowStyles.avatar as Record<string, number>;
+    expect(avatar.borderRadius).toBe(avatar.width / 2);
   });
 });
 
@@ -218,13 +266,22 @@ describe('the header count', () => {
      * been invited. Saying "8 invited" would be the screen taking credit for
      * work the share sheet does.
      */
-    expect(summaryLine(LIST, GUEST_COPY.count, GUEST_COPY.invited)).toBe('8 guests');
-    const sent = [guest({ lastSharedAt: '2026-09-01T00:00:00.000Z' }), guest({ id: 'g2' })];
-    expect(summaryLine(sent, GUEST_COPY.count, GUEST_COPY.invited)).toBe('2 guests · 1 invited');
+    expect(summaryLine(LIST, GUEST_COPY.count, GUEST_COPY.invited)).toBe(
+      '8 guests',
+    );
+    const sent = [
+      guest({ lastSharedAt: '2026-09-01T00:00:00.000Z' }),
+      guest({ id: 'g2' }),
+    ];
+    expect(summaryLine(sent, GUEST_COPY.count, GUEST_COPY.invited)).toBe(
+      '2 guests · 1 invited',
+    );
   });
 
   it('says "1 guest", not "1 guests"', () => {
-    expect(summaryLine([guest()], GUEST_COPY.count, GUEST_COPY.invited)).toBe('1 guest');
+    expect(summaryLine([guest()], GUEST_COPY.count, GUEST_COPY.invited)).toBe(
+      '1 guest',
+    );
   });
 });
 
@@ -250,7 +307,7 @@ describe('the add sheet', () => {
     );
     const text = textOf(tree);
     expect(text).toContain('Add a guest');
-    ['Name', 'Phone', 'Group', 'Family', 'Friends', 'Work'].forEach((label) =>
+    ['Name', 'Phone', 'Group', 'Family', 'Friends', 'Work'].forEach(label =>
       expect(text).toContain(label),
     );
     // Not "Other": the host is filing this person, so they pick a real group.
@@ -279,12 +336,12 @@ describe('the add sheet', () => {
         initial={null}
         isSaving={false}
         errorMessage={null}
-        onSave={(draft) => saved.push(draft)}
+        onSave={draft => saved.push(draft)}
         onClose={noop}
       />,
     );
     const save = tree.root
-      .findAll((n) => n.props?.accessibilityLabel === GUEST_COPY.save)
+      .findAll(n => n.props?.accessibilityLabel === GUEST_COPY.save)
       .at(0);
     ReactTestRenderer.act(() => save?.props?.onPress?.());
     expect(saved).toHaveLength(0);
@@ -320,15 +377,29 @@ describe('render dump', () => {
 
     const list = (
       <View style={[styles.container, { paddingTop: 12 }]}>
-        <EventlyText style={{ color: '#101a31', fontSize: 20, fontWeight: '700', paddingHorizontal: 16 }}>
+        <EventlyText
+          style={{
+            color: '#101a31',
+            fontSize: 20,
+            fontWeight: '700',
+            paddingHorizontal: 16,
+          }}
+        >
           Guest list
         </EventlyText>
-        <EventlyText variant="small" style={[styles.subtitle, { marginTop: 4 }]}>
+        <EventlyText
+          variant="small"
+          style={[styles.subtitle, { marginTop: 4 }]}
+        >
           {summaryLine(LIST, GUEST_COPY.count, GUEST_COPY.invited)}
         </EventlyText>
-        <GroupFilter options={groupFilters(LIST)} active={null} onChange={noop} />
+        <GroupFilter
+          options={groupFilters(LIST)}
+          active={null}
+          onChange={noop}
+        />
         <View style={styles.content}>
-          {LIST.map((g) => (
+          {LIST.map(g => (
             <GuestRow key={g.id} guest={toRow(g)} onEdit={noop} />
           ))}
         </View>
@@ -338,7 +409,9 @@ describe('render dump', () => {
           </View>
           <View style={footerStyles.cta}>
             <EventlyIcon name="plus" size={20} color="#ffffff" />
-            <EventlyText style={footerStyles.ctaText}>{GUEST_COPY.addGuest}</EventlyText>
+            <EventlyText style={footerStyles.ctaText}>
+              {GUEST_COPY.addGuest}
+            </EventlyText>
           </View>
         </View>
       </View>

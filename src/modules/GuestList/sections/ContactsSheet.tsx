@@ -1,6 +1,16 @@
 import { useMemo, useState } from 'react';
-import { Modal, Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText, EventlyTextInput } from '../../../Components';
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {
+  EventlyIcon,
+  EventlyText,
+  EventlyTextInput,
+} from '../../../Components';
 import { GUEST_MUTED } from '../constants';
 import { contactsSheetStyles as s, sheetStyles as base } from '../styles';
 import type { ContactCandidate } from '../useContactsImport';
@@ -26,7 +36,12 @@ interface ContactsSheetProps {
  * whether somebody is family, and guessing would put a label on the row that
  * the host never chose — they file it from the edit sheet afterwards.
  */
-export function ContactsSheet({ candidates, isSaving, onAdd, onClose }: ContactsSheetProps) {
+export function ContactsSheet({
+  candidates,
+  isSaving,
+  onAdd,
+  onClose,
+}: ContactsSheetProps) {
   const [query, setQuery] = useState('');
   const [picked, setPicked] = useState<string[]>([]);
 
@@ -39,20 +54,29 @@ export function ContactsSheet({ candidates, isSaving, onAdd, onClose }: Contacts
     const q = query.trim().toLowerCase();
     if (!q) return all;
     return all.filter(
-      (contact) =>
-        contact.name.toLowerCase().includes(q) || contact.phone.replace(/\s/g, '').includes(q),
+      contact =>
+        contact.name.toLowerCase().includes(q) ||
+        contact.phone.replace(/\s/g, '').includes(q),
     );
   }, [all, query]);
 
   const toggle = (key: string) =>
-    setPicked((current) =>
-      current.includes(key) ? current.filter((k) => k !== key) : [...current, key],
+    setPicked(current =>
+      current.includes(key)
+        ? current.filter(k => k !== key)
+        : [...current, key],
     );
 
   const submit = () => {
-    const chosen = all.filter((contact) => picked.includes(contact.key));
+    const chosen = all.filter(contact => picked.includes(contact.key));
     if (chosen.length === 0) return;
-    onAdd(chosen.map((contact) => ({ name: contact.name, phone: contact.phone, group: 'other' })));
+    onAdd(
+      chosen.map(contact => ({
+        name: contact.name,
+        phone: contact.phone,
+        group: 'other',
+      })),
+    );
     setPicked([]);
     setQuery('');
   };
@@ -64,7 +88,12 @@ export function ContactsSheet({ candidates, isSaving, onAdd, onClose }: Contacts
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={close}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={close}
+    >
       <Pressable style={base.overlay} onPress={close}>
         <Pressable style={[base.card, s.card]} onPress={() => undefined}>
           <View style={base.grabber} />
@@ -82,7 +111,7 @@ export function ContactsSheet({ candidates, isSaving, onAdd, onClose }: Contacts
           </View>
 
           <EventlyTextInput
-            style={base.field}
+            style={s.search}
             value={query}
             onChangeText={setQuery}
             placeholder="Search your contacts"
@@ -96,7 +125,7 @@ export function ContactsSheet({ candidates, isSaving, onAdd, onClose }: Contacts
                 No contacts match that.
               </EventlyText>
             ) : (
-              shown.map((contact) => {
+              shown.map(contact => {
                 const on = picked.includes(contact.key);
                 return (
                   <TouchableOpacity
@@ -109,13 +138,23 @@ export function ContactsSheet({ candidates, isSaving, onAdd, onClose }: Contacts
                     accessibilityLabel={`${contact.name}, ${contact.phone}`}
                   >
                     <View style={[s.check, on && s.checkOn]}>
-                      {on ? <EventlyIcon name="check" size={13} color="#ffffff" /> : null}
+                      {on ? (
+                        <EventlyIcon name="check" size={13} color="#ffffff" />
+                      ) : null}
                     </View>
                     <View style={s.rowText}>
-                      <EventlyText variant="cardTitle" style={s.name} numberOfLines={1}>
+                      <EventlyText
+                        variant="cardTitle"
+                        style={s.name}
+                        numberOfLines={1}
+                      >
                         {contact.name}
                       </EventlyText>
-                      <EventlyText variant="small" style={s.phone} numberOfLines={1}>
+                      <EventlyText
+                        variant="small"
+                        style={s.phone}
+                        numberOfLines={1}
+                      >
                         {contact.phone}
                       </EventlyText>
                     </View>
@@ -126,7 +165,10 @@ export function ContactsSheet({ candidates, isSaving, onAdd, onClose }: Contacts
           </ScrollView>
 
           <TouchableOpacity
-            style={[base.save, (isSaving || picked.length === 0) && base.saveBusy]}
+            style={[
+              base.save,
+              (isSaving || picked.length === 0) && base.saveBusy,
+            ]}
             activeOpacity={0.85}
             disabled={isSaving || picked.length === 0}
             onPress={submit}
@@ -134,15 +176,19 @@ export function ContactsSheet({ candidates, isSaving, onAdd, onClose }: Contacts
             accessibilityLabel={
               picked.length === 0
                 ? 'Pick contacts to add'
-                : `Add ${picked.length} ${picked.length === 1 ? 'guest' : 'guests'}`
+                : `Add ${picked.length} ${
+                    picked.length === 1 ? 'guest' : 'guests'
+                  }`
             }
           >
             <EventlyText style={base.saveText}>
               {isSaving
                 ? 'Adding…'
                 : picked.length === 0
-                  ? 'Pick contacts to add'
-                  : `Add ${picked.length} ${picked.length === 1 ? 'guest' : 'guests'}`}
+                ? 'Pick contacts to add'
+                : `Add ${picked.length} ${
+                    picked.length === 1 ? 'guest' : 'guests'
+                  }`}
             </EventlyText>
           </TouchableOpacity>
         </Pressable>

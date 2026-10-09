@@ -17,11 +17,24 @@ const GUTTER = 20;
 export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   /*
-   * A page title, not a bar: no back button, no border, nothing to the right
-   * of it. This is the tab's own screen, and a header chrome around a word
-   * would only take height away from the list.
+   * A page title with a back arrow before it — no border, nothing to the
+   * right. A header chrome around a word would only take height away from
+   * the list.
    */
-  header: { paddingHorizontal: GUTTER, paddingTop: spacing.sm, paddingBottom: spacing.sm + 2 },
+  header: {
+    paddingHorizontal: GUTTER,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.sm + 2,
+  },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  /* A 44pt target, nudged left so the chevron lines up with the gutter. */
+  back: {
+    width: 44,
+    height: 44,
+    marginLeft: -12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   /*
    * 26 with its own line height.
    *
@@ -42,7 +55,12 @@ export const styles = StyleSheet.create({
      avatar while the list itself runs to the edge. */
   list: { paddingLeft: GUTTER, paddingBottom: spacing.xl },
 
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.lg,
+  },
   centeredIcon: {
     width: 64,
     height: 64,
@@ -53,8 +71,17 @@ export const styles = StyleSheet.create({
   },
   loadingText: { color: colors.textMuted, marginTop: spacing.md },
   emptyTitle: { color: CHAT_NAVY, marginTop: spacing.md, textAlign: 'center' },
-  emptyBody: { color: colors.textMuted, marginTop: spacing.sm, textAlign: 'center', lineHeight: 20 },
-  errorText: { color: colors.danger, textAlign: 'center', marginTop: spacing.sm },
+  emptyBody: {
+    color: colors.textMuted,
+    marginTop: spacing.sm,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  errorText: {
+    color: colors.danger,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+  },
   retryButton: {
     ...globalStyles.row,
     gap: spacing.xs,
@@ -103,7 +130,12 @@ export const rowStyles = StyleSheet.create({
     justifyContent: 'center',
     flexShrink: 0,
   },
-  avatarText: { color: colors.onPrimary, fontSize: 15, fontWeight: '700', letterSpacing: 0.3 },
+  avatarText: {
+    color: colors.onPrimary,
+    fontSize: 15,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+  },
   text: { flex: 1 },
   headRow: { ...globalStyles.row, alignItems: 'center', gap: 10 },
   /* Set in caps: it is the name of a business, and it keeps a one-line name
@@ -117,8 +149,18 @@ export const rowStyles = StyleSheet.create({
     textTransform: 'uppercase',
     flexShrink: 1,
   },
-  when: { color: colors.textMuted, fontSize: 12.5, flexShrink: 0, marginLeft: 'auto' },
-  preview: { color: colors.textMuted, fontSize: 14, marginTop: 2, lineHeight: 19 },
+  when: {
+    color: colors.textMuted,
+    fontSize: 12.5,
+    flexShrink: 0,
+    marginLeft: 'auto',
+  },
+  preview: {
+    color: colors.textMuted,
+    fontSize: 14,
+    marginTop: 2,
+    lineHeight: 19,
+  },
   /* A thread nobody has written in yet. Set apart from a real message, so the
      row never reads as a message that failed to load. */
   previewEmpty: { color: colors.textMuted, fontStyle: 'italic' },
@@ -171,16 +213,20 @@ export const threadStyles = StyleSheet.create({
     justifyContent: 'center',
     flexShrink: 0,
   },
-  headerAvatarText: { color: colors.onPrimary, fontSize: 13, fontWeight: '700' },
+  headerAvatarText: {
+    color: colors.onPrimary,
+    fontSize: 13,
+    fontWeight: '700',
+  },
   headerText: { flex: 1 },
   /*
-    * Every size on this screen is a step down from where it was.
-    *
-    * The thread was set at reading sizes — a 17.5 name over 15.5 bubbles —
-    * which on a phone left four lines of a three-line message and pushed the
-    * composer's suggestions off the fold. A conversation is scanned, not read
-    * like a page.
-    */
+   * Every size on this screen is a step down from where it was.
+   *
+   * The thread was set at reading sizes — a 17.5 name over 15.5 bubbles —
+   * which on a phone left four lines of a three-line message and pushed the
+   * composer's suggestions off the fold. A conversation is scanned, not read
+   * like a page.
+   */
   headerName: {
     color: CHAT_NAVY_DEEP,
     fontSize: 15.5,
@@ -190,7 +236,12 @@ export const threadStyles = StyleSheet.create({
   },
   /* Green because it is a reassurance, and only rendered when it is measured —
      see `replyLabel`. */
-  headerReply: { color: CHAT_GREEN, fontSize: 12.5, lineHeight: 16, marginTop: 1 },
+  headerReply: {
+    color: CHAT_GREEN,
+    fontSize: 12.5,
+    lineHeight: 16,
+    marginTop: 1,
+  },
   quote: {
     borderRadius: 999,
     borderWidth: 1,
@@ -212,7 +263,13 @@ export const threadStyles = StyleSheet.create({
     marginTop: spacing.md,
     marginBottom: spacing.sm,
   },
-  bubble: { maxWidth: '78%', borderRadius: 16, paddingHorizontal: 14, paddingVertical: 10, marginTop: 8 },
+  bubble: {
+    maxWidth: '78%',
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    marginTop: 8,
+  },
   mine: { alignSelf: 'flex-end', backgroundColor: CHAT_NAVY_DEEP },
   theirs: { alignSelf: 'flex-start', backgroundColor: CHAT_THEIRS },
   mineText: { color: colors.onPrimary, fontSize: 14.5, lineHeight: 20 },
@@ -312,5 +369,10 @@ export const threadStyles = StyleSheet.create({
     flexShrink: 0,
   },
   sendDisabled: { opacity: 0.4 },
-  sendError: { color: colors.danger, fontSize: 12, paddingHorizontal: spacing.md, paddingBottom: 6 },
+  sendError: {
+    color: colors.danger,
+    fontSize: 12,
+    paddingHorizontal: spacing.md,
+    paddingBottom: 6,
+  },
 });

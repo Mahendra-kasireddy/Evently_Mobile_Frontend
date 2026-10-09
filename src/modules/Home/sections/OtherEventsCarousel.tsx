@@ -8,7 +8,12 @@ import {
 } from 'react-native';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
-import { EventlyIcon, EventlyText, OccasionArt } from '../../../Components';
+import {
+  EventlyIcon,
+  EventlyText,
+  GradientFill,
+  OccasionArt,
+} from '../../../Components';
 import { CATEGORY_GRADIENT, HERO_ACCENT_COLOR } from '../constants';
 import {
   OTHER_EVENT_CARD_BG,
@@ -45,6 +50,28 @@ function guestsLabel(guests: string): string {
   return /guest/i.test(g) ? g : `${g} guests`;
 }
 
+const CTA_GRADIENT: [string, string] = ['#f47b4d', '#e2477a'];
+
+/** Each stage's dot and ink — waiting is amber, a decision is coral, booked is green. */
+const STAGE_LOOK: Record<string, { dot: string; ink: string }> = {
+  draft: { dot: '#9a93a8', ink: '#5d5873' },
+  submitted: { dot: '#f0a020', ink: '#a86400' },
+  quotes_received: { dot: '#e8633a', ink: '#c94a24' },
+  quote_accepted: { dot: '#7c5bd6', ink: '#5a35e0' },
+  booking_created: { dot: '#7c5bd6', ink: '#5a35e0' },
+  booking_confirmed: { dot: '#13a06f', ink: '#0e8a68' },
+  in_progress: { dot: '#13a06f', ink: '#0e8a68' },
+  completed: { dot: '#2f6fe0', ink: '#2554b8' },
+};
+
+/** "Today", "Tomorrow", "In 12 days" — or '' when there is no date or it has passed. */
+function countdownLabel(days: number | null): string {
+  if (days === null || days < 0) return '';
+  if (days === 0) return 'Today';
+  if (days === 1) return 'Tomorrow';
+  return `In ${days} days`;
+}
+
 function Separator() {
   return <View style={s.separator} />;
 }
@@ -75,6 +102,12 @@ function EventCard({
   onEdit?: () => void;
 }) {
   const art = eventArtFor(event.occasion);
+  const look = STAGE_LOOK[event.stage] ?? STAGE_LOOK.submitted;
+  const countdown = countdownLabel(event.daysToGo);
+  const progressPct = Math.max(
+    4,
+    Math.min(100, Math.round(event.progress || 0)),
+  );
   const [start, end] = CATEGORY_GRADIENT[art];
   const useFloral = !photoUrl && FLORAL_OCCASIONS.has(art);
   /* SVG ids resolve per document, so each card needs its own. */
@@ -160,15 +193,26 @@ function EventCard({
       </View>
 
       <View style={s.content}>
-        <View style={s.pill}>
-          <EventlyIcon
-            name="calendar-heart"
-            size={13}
-            color={HERO_ACCENT_COLOR}
-          />
-          <EventlyText variant="caption" style={s.pillText}>
-            Upcoming Event
-          </EventlyText>
+        {/* Where it stands, in its own colour, and how soon — the two
+            things that say whether this card needs the customer today. */}
+        <View style={s.pillRow}>
+          <View style={s.pill}>
+            <View style={[s.pillDot, { backgroundColor: look.dot }]} />
+            <EventlyText
+              variant="caption"
+              style={[s.pillText, { color: look.ink }]}
+              numberOfLines={1}
+            >
+              {event.stageLabel || 'Upcoming'}
+            </EventlyText>
+          </View>
+          {countdown ? (
+            <View style={s.countdown}>
+              <EventlyText variant="caption" style={s.countdownText}>
+                {countdown}
+              </EventlyText>
+            </View>
+          ) : null}
         </View>
 
         <EventlyText variant="h2" style={s.title} numberOfLines={1}>
@@ -187,11 +231,22 @@ function EventCard({
         {/* Drawn as a button, pressed as part of the card: it opens what the
             card opens. */}
         <View style={s.cta}>
+          <GradientFill colors={CTA_GRADIENT} direction="across" />
           <EventlyText variant="caption" style={s.ctaText}>
-            View plan
+            {event.ctaLabel || 'View plan'}
           </EventlyText>
-          <EventlyIcon name="arrow-right" size={14} color={s.ctaText.color} />
+          <EventlyIcon name="arrow-right" size={14} color="#ffffff" />
         </View>
+      </View>
+
+      {/* How far along the event is, as a hairline along the foot. */}
+      <View style={s.progressTrack} pointerEvents="none">
+        <View
+          style={[
+            s.progressFill,
+            { width: `${progressPct}%`, backgroundColor: look.dot },
+          ]}
+        />
       </View>
 
       {/* Its own target: the card opens the event, the pencil the brief. */}

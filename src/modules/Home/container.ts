@@ -2,13 +2,18 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { useEnsureLocation } from '../../hooks/useEnsureLocation';
 import {
+  resetHeroDraft,
   seedHeroDraft,
   selectHeroDraft,
   setHeroDraftField,
   setShareBudget,
   type HeroDraftTextField,
 } from '../../store/heroDraftSlice';
-import { selectLocationCoordinates } from '../../store/locationSlice';
+import {
+  selectLocationCoordinates,
+  selectLocationPlace,
+  selectLocationStatus,
+} from '../../store/locationSlice';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { todayIso } from '../../Components';
 import { DEFAULT_GUESTS } from '../Pickers/constants';
@@ -56,7 +61,10 @@ export interface HomeContainerResult extends HomeViewModel {
   shareBudget: boolean;
   toggleShareBudget: (enabled: boolean) => void;
   setHeroField: (field: HeroDraftTextField, value: string) => void;
-  submitHeroDraft: () => void;
+  /** Sends the brief; resolves with the new request's id (null if the server sent none). */
+  submitHeroDraft: () => Promise<string | null>;
+  /** Where the customer is, for the header: the city, its state, and whether it is still being found. */
+  location: { title: string; subtitle: string; locating: boolean };
   isRequestingQuotes: boolean;
   quotesRequested: boolean;
   quotesErrorMessage: string | null;
@@ -128,6 +136,8 @@ export function useHomeContainer(): HomeContainerResult {
    * and that is the whole point of it holding every read.
    */
   const coordinates = useAppSelector(selectLocationCoordinates);
+  const place = useAppSelector(selectLocationPlace);
+  const locationStatus = useAppSelector(selectLocationStatus);
   const [quotesRequested, setQuotesRequested] = useState(false);
   const requestQuotesCall = useRequestQuotes();
 
@@ -137,7 +147,7 @@ export function useHomeContainer(): HomeContainerResult {
    * opens answerable rather than blank. `seedHeroDraft` ignores a second call,
    * so a refetch never resets what the customer has since chosen.
    */
-  useEffect(() => {
+  const seedDefaults = useCallback(() => {
     dispatch(
       seedHeroDraft({
         ...(viewModel.banner?.defaultDraft ?? {}),
@@ -145,8 +155,11 @@ export function useHomeContainer(): HomeContainerResult {
         guests: DEFAULT_GUESTS,
       }),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [viewModel.banner]);
+  }, [dispatch, viewModel.banner]);
+
+  useEffect(() => {
+    seedDefaults();
+  }, [seedDefaults]);
 
   /* Memoised because it is a dependency of the two submit callbacks, and a
      fresh object each render would rebuild both on every keystroke elsewhere
@@ -183,29 +196,56 @@ export function useHomeContainer(): HomeContainerResult {
   );
 
   const submitHeroDraft = useCallback(() => {
-    requestQuotesCall
-      /* The budget rides along only while sharing is on — the slice clears it
+    return (
+      requestQuotesCall
+        /* The budget rides along only while sharing is on — the slice clears it
          when the switch goes off, so this cannot send a withdrawn value. */
-      .execute({ ...heroDraft, budget: storedDraft.budget || undefined })
-      .then(() => {
-        setQuotesRequested(true);
-        /*
-         * Re-read the feed, so the brief the customer just sent replaces the
-         * hero they sent it from.
-         *
-         * Without this the request exists on the server and nothing on screen
-         * says so until Home happens to lose and regain focus — which, since
-         * Home is the tab they are already on, may not happen for a long time.
-         * The single-organizer path below has always done this; the broadcast
-         * path had not, which is why a brief sent from the hero appeared to
-         * vanish.
-         */
-        refetch();
-      })
-      .catch(() => {
-        // error already captured in requestQuotesCall.error
-      });
-  }, [heroDraft, storedDraft.budget, refetch, requestQuotesCall]);
+        .execute({ ...heroDraft, budget: storedDraft.budget || undefined })
+        .then(requestId => {
+          /*
+           * With the request's id, the screen opens it (see HomeScreen) and the
+           * form stays a form. The inline "sent" card is only the fallback for a
+           * server that returned no id — there is nothing to open then.
+           */
+          if (!requestId) {
+            setQuotesRequested(true);
+          } else {
+            /*
+             * Sent and confirmed: the form starts over, so coming back to Home
+             * offers a fresh brief rather than the one already sent (budget
+             * switch off, today's date, default guests). Only after the server
+             * has said yes — a failed send keeps everything the customer typed.
+             */
+            dispatch(resetHeroDraft());
+            seedDefaults();
+          }
+          /*
+           * Re-read the feed, so the brief the customer just sent replaces the
+           * hero they sent it from.
+           *
+           * Without this the request exists on the server and nothing on screen
+           * says so until Home happens to lose and regain focus — which, since
+           * Home is the tab they are already on, may not happen for a long time.
+           * The single-organizer path below has always done this; the broadcast
+           * path had not, which is why a brief sent from the hero appeared to
+           * vanish.
+           */
+          refetch();
+          return requestId;
+        })
+        .catch(() => {
+          // error already captured in requestQuotesCall.error
+          return null;
+        })
+    );
+  }, [
+    heroDraft,
+    storedDraft.budget,
+    refetch,
+    requestQuotesCall,
+    dispatch,
+    seedDefaults,
+  ]);
 
   const resetQuotesRequest = useCallback(() => setQuotesRequested(false), []);
 
@@ -265,7 +305,8 @@ export function useHomeContainer(): HomeContainerResult {
        * picked out of nothing. The feed sends both fields, but a fresh account
        * that has not been named still has to draw something.
        */
-      initials: data?.user?.initials?.trim() || initialsOf(data?.user?.name ?? ''),
+      initials:
+        data?.user?.initials?.trim() || initialsOf(data?.user?.name ?? ''),
       photoUrl: absoluteFileUrl(data?.user?.photoUrl),
       displayName: data?.user?.name?.trim() ?? '',
     }),
@@ -285,6 +326,11 @@ export function useHomeContainer(): HomeContainerResult {
     toggleShareBudget,
     setHeroField,
     submitHeroDraft,
+    location: {
+      title: place?.locality ?? place?.label ?? '',
+      subtitle: place?.locality ? place?.region ?? '' : '',
+      locating: locationStatus === 'loading' && !place,
+    },
     isRequestingQuotes: requestQuotesCall.loading,
     quotesRequested,
     quotesErrorMessage: requestQuotesCall.error?.message ?? null,

@@ -1,4 +1,9 @@
-export type QuotationStatus = 'draft' | 'sent' | 'accepted' | 'rejected' | 'withdrawn';
+export type QuotationStatus =
+  | 'draft'
+  | 'sent'
+  | 'accepted'
+  | 'rejected'
+  | 'withdrawn';
 
 export interface QuoteLineItemDTO {
   key: string;
@@ -41,6 +46,19 @@ export interface QuoteRequestDTO {
   guests: string;
   status: string;
   quotations: QuotationDTO[];
+  /** How many organizers the request went to (0 on an unaddressed broadcast). */
+  sentToCount?: number;
+  /** Recipients who have not quoted yet, named. With no quotes: everyone it went to. */
+  awaiting?: RecipientDTO[];
+}
+
+export interface RecipientDTO {
+  id: string;
+  name: string;
+  initials: string;
+  avatarColor: string;
+  tier: string;
+  rating: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -79,6 +97,11 @@ export interface CompareViewModel {
   /** The screen's own heading: "Your quote" for one, "Compare quotes" for more. */
   heading: string;
   factsLine: string;
+  /** The brief, one fact at a time, for the waiting screen. '' when not given. */
+  brief: { date: string; place: string; guests: string };
+  /** Who the request went to, and who has not answered yet. */
+  sentToCount: number;
+  awaiting: RecipientDTO[];
   quotes: QuoteCard[];
   /** '' when fewer than two quotes are priced — there is no spread to state. */
   spreadLabel: string;

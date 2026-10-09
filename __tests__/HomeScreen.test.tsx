@@ -113,7 +113,12 @@ const result = (over: Partial<HomeContainerResult> = {}): HomeContainerResult =>
     topOrganizers: null,
     howItWorks: null,
     tools: null,
-    header: { initials: 'HK', displayName: 'Hem Kumar', unreadCount: 0, savedCount: 0 },
+    header: {
+      initials: 'HK',
+      displayName: 'Hem Kumar',
+      unreadCount: 0,
+      savedCount: 0,
+    },
     isLoading: false,
     isError: false,
     errorMessage: null,
@@ -261,7 +266,9 @@ describe('the basics form', () => {
      * flex-growing sheet over everything below are what keep "the picture is
      * at the top" true rather than nearly true.
      */
-    expect((homeHeroPhotoStyles.wrap as Record<string, unknown>).height).toBe(268);
+    expect((homeHeroPhotoStyles.wrap as Record<string, unknown>).height).toBe(
+      268,
+    );
     expect(sheet.backgroundColor).toBeTruthy();
     expect(sheet.flexGrow).toBe(1);
   });
@@ -399,7 +406,10 @@ describe('the event cards Home draws', () => {
      */
     const brief = event({ title: 'Housewarming' });
     mockContainer.mockReturnValue(
-      result({ currentEvent: event({ title: 'Leading' }), otherEvents: [brief] }),
+      result({
+        currentEvent: event({ title: 'Leading' }),
+        otherEvents: [brief],
+      }),
     );
     const pencil = renderTree().root.findAll(
       node =>
@@ -419,7 +429,10 @@ describe('the event cards Home draws', () => {
       stage: 'booking_confirmed',
     } as typeof brief;
     mockContainer.mockReturnValue(
-      result({ currentEvent: event({ title: 'Leading' }), otherEvents: [booked] }),
+      result({
+        currentEvent: event({ title: 'Leading' }),
+        otherEvents: [booked],
+      }),
     );
     expect(
       renderTree().root.findAll(
@@ -458,21 +471,33 @@ describe('the event cards Home draws', () => {
   });
 
   /*
-   * Public events on Home.
+   * Home's order, by what earns and what is urgent:
    *
-   * It belongs under the occasions: those are "plan something of your own",
-   * this is the other half of the same question — somebody else already
-   * planned one and there are seats. At the foot of the page a customer with
-   * nothing to plan never reached it.
+   *   the customer's own event   quotes to compare, an advance to pay
+   *   live now                   the one thing that will not be there later
+   *   the brief + occasions      starting a planned event — the core business
+   *   packages, offers           priced ideas, and the codes that close them
+   *   top organizers             who would do it — trust before a deposit
+   *   public events              tickets, the second line of business
+   *   trust strip                the promises, last
    */
-  it('puts events near you under the occasions, not at the foot of the page', () => {
+  it('orders Home by business priority', () => {
     const screen = read('modules/Home', 'HomeScreen.tsx');
-    const occasions = screen.indexOf('<OccasionGrid');
-    const near = screen.indexOf('<EventsNearYou');
-    const offers = screen.indexOf('<Offers');
+    const order = [
+      'renderBooked(bookedEvents[0])',
+      '<LiveStreams',
+      '<Banner',
+      '<OccasionGrid',
+      '<Packages',
+      '<Offers',
+      '<TopOrganizers',
+      '<FeaturedEvents',
+      '<EventsNearYou',
+      '<TrustStrip',
+    ].map(marker => screen.indexOf(marker));
 
-    expect(near).toBeGreaterThan(occasions);
-    expect(near).toBeLessThan(offers);
+    order.forEach(at => expect(at).toBeGreaterThan(-1));
+    expect([...order].sort((x, y) => x - y)).toEqual(order);
   });
 
   it('sends See all to the tab that holds the whole catalogue', () => {
@@ -513,5 +538,4 @@ describe('the event cards Home draws', () => {
     link.props.onPress();
     expect(mockNavigate).toHaveBeenCalledWith('SeeAll', { kind: 'events' });
   });
-
 });

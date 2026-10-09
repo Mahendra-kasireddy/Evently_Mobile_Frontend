@@ -41,6 +41,8 @@ export const styles = StyleSheet.create({
   loadingText: { color: PLAN_TEXT_MUTED, marginTop: spacing.md },
   errorText: { color: colors.danger, textAlign: 'center' },
   retryButton: { marginTop: spacing.lg },
+  /* The continue button, as the last thing on the page. */
+  inlineContinue: { marginTop: spacing.lg },
   footerBar: {
     paddingHorizontal: spacing.md,
     paddingTop: spacing.sm,
@@ -58,10 +60,14 @@ export const styles = StyleSheet.create({
    * out at all four corners of the pill, most visible once the button turned
    * orange. The separation the shadow was for is now the footer's top rule,
    * which is honest about being a straight line.
+   *
+   * No `overflow: 'hidden'` either. On Android it made the label vanish the
+   * moment the button turned from outline to filled (seen on a Pixel
+   * emulator) — an orange pill with no words on it. Nothing inside the
+   * button needs clipping, so the pill shape comes from the radius alone.
    */
   floatingButton: {
     borderRadius: 999,
-    overflow: 'hidden',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -848,7 +854,11 @@ export const organizersStyles = StyleSheet.create({
     backgroundColor: PLAN_ACCENT_SOFT,
   },
   multiHintText: { flex: 1, color: PLAN_NAVY, fontWeight: '500' },
-  loading: { alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.xl },
+  loading: {
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.xl,
+  },
   list: { gap: spacing.s12 },
   /* Photo left, details middle, heart / price / request right — as in the
      design. */
@@ -927,8 +937,16 @@ export const organizersStyles = StyleSheet.create({
   quoteButtonOn: { backgroundColor: PLAN_ACCENT },
   quoteButtonBlocked: { opacity: 0.45 },
   quoteButtonText: { color: PLAN_ACCENT, fontWeight: '700', fontSize: 11 },
-  quoteButtonTextOn: { color: colors.onPrimary, fontWeight: '700', fontSize: 11 },
-  emptyState: { alignItems: 'center', paddingVertical: spacing.xl, gap: spacing.sm },
+  quoteButtonTextOn: {
+    color: colors.onPrimary,
+    fontWeight: '700',
+    fontSize: 11,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: spacing.xl,
+    gap: spacing.sm,
+  },
   emptyTitle: { color: PLAN_NAVY, textAlign: 'center' },
   emptyMessage: { color: PLAN_TEXT_MUTED, textAlign: 'center' },
   emptyButton: { marginTop: spacing.sm },

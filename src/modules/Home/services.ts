@@ -12,9 +12,16 @@ export async function fetchHomeFeed(): Promise<HomeFeedDTO> {
   return data;
 }
 
-/** Hero "Get quotes" — opens a quote request from the draft fields. */
-export async function requestQuotes(draft: HeroBrief): Promise<void> {
-  await apiClient.post(REQUEST_QUOTES_ENDPOINT, draft);
+/**
+ * Hero "Get quotes" — opens a quote request from the draft fields, and
+ * returns the new request's id so the app can open it.
+ */
+export async function requestQuotes(draft: HeroBrief): Promise<string | null> {
+  const { data } = await apiClient.post<{ _id?: string; id?: string }>(
+    REQUEST_QUOTES_ENDPOINT,
+    draft,
+  );
+  return data?._id ?? data?.id ?? null;
 }
 
 /** "View Profile" — the organizer's sanitized public profile. */

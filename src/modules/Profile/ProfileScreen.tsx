@@ -1,8 +1,18 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ActivityIndicator, ScrollView, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyIcon, EventlyText, FadeInUp } from '../../Components';
+import {
+  AppHeader,
+  EventlyIcon,
+  EventlyText,
+  FadeInUp,
+} from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
 import { PROFILE_ACCENT, PROFILE_COPY as COPY } from './constants';
 import { useProfileContainer } from './container';
@@ -43,7 +53,7 @@ export function ProfileScreen() {
   const go = (action: ProfileAction) => {
     switch (action) {
       case 'bookings':
-        return navigation.navigate('Bookings');
+        return navigation.navigate('Main', { screen: 'BookingsTab' });
       case 'savedPackages':
         return navigation.navigate('SavedPackages');
       case 'invitations':
@@ -87,8 +97,10 @@ export function ProfileScreen() {
       return COPY.approveBadge(badges.invitationsToApprove);
     }
     if (action === 'signOut' && isLoggingOut) return COPY.signingOut;
-    if (action === 'switchOrganizer' && switchingTo === 'organizer') return COPY.switching;
-    if (action === 'switchVendor' && switchingTo === 'vendor') return COPY.switching;
+    if (action === 'switchOrganizer' && switchingTo === 'organizer')
+      return COPY.switching;
+    if (action === 'switchVendor' && switchingTo === 'vendor')
+      return COPY.switching;
     return '';
   };
 
@@ -131,14 +143,18 @@ export function ProfileScreen() {
     );
   }
 
-  if (!profile) return <SafeAreaView style={styles.container} edges={['top']} />;
+  if (!profile)
+    return <SafeAreaView style={styles.container} edges={['top']} />;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Pushed from Home's avatar rather than selected in the tab bar, so it
           needs the back arrow every other pushed screen has. */}
       <AppHeader title={COPY.title} />
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         <FadeInUp>
           <ProfileIdentity profile={profile} onEdit={openSettings} />
         </FadeInUp>
