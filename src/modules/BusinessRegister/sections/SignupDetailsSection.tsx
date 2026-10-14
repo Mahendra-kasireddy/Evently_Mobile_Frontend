@@ -7,8 +7,13 @@ import {
   EventlyTextInput,
   KeyboardAvoider,
 } from '../../../Components';
-import { REG_ACCENT, REG_GREEN_DARK, REGISTER_COPY, SIGNUP_COPY as COPY } from '../constants';
-import { screenStyles, signupStyles as s } from '../styles';
+import {
+  REG_ACCENT,
+  REG_GREEN_DARK,
+  REGISTER_COPY,
+  SIGNUP_COPY as COPY,
+} from '../constants';
+import { authGateStyles, screenStyles, signupStyles as s } from '../styles';
 import type { OnboardingConfigDTO, OrganizerSignupDetails } from '../types';
 
 interface SignupDetailsSectionProps {
@@ -89,14 +94,26 @@ export function SignupDetailsSection({
         <EventlyText variant="body" style={screenStyles.centerText}>
           {REGISTER_COPY.configFailed}
         </EventlyText>
-        <EventlyButton title={REGISTER_COPY.retry} onPress={onRetryConfig} accentColor={REG_ACCENT} />
+        <EventlyButton
+          title={REGISTER_COPY.retry}
+          onPress={onRetryConfig}
+          accentColor={REG_ACCENT}
+        />
       </View>
     );
   }
 
   return (
     <KeyboardAvoider style={s.flex}>
-      <ScrollView contentContainerStyle={s.content} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={s.content}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={authGateStyles.stepChip}>
+          <EventlyText style={authGateStyles.stepText}>
+            STEP 2 OF 2 · YOUR BUSINESS
+          </EventlyText>
+        </View>
         <EventlyText variant="h1" style={s.title}>
           {COPY.title}
         </EventlyText>
@@ -150,7 +167,10 @@ export function SignupDetailsSection({
 
         <ChipGroup
           label={COPY.category}
-          options={(config?.categories ?? []).map(c => ({ key: c.key, label: c.label }))}
+          options={(config?.categories ?? []).map(c => ({
+            key: c.key,
+            label: c.label,
+          }))}
           value={details.primaryCategory}
           onChange={set('primaryCategory')}
         />
@@ -203,7 +223,11 @@ function ChipGroup({
       <EventlyText variant="subtitle" style={s.label}>
         {label}
       </EventlyText>
-      <View style={s.chips} accessibilityRole="radiogroup" accessibilityLabel={label}>
+      <View
+        style={s.chips}
+        accessibilityRole="radiogroup"
+        accessibilityLabel={label}
+      >
         {options.map(option => {
           const on = option.key === value;
           return (
@@ -214,7 +238,10 @@ function ChipGroup({
               accessibilityRole="radio"
               accessibilityState={{ selected: on }}
             >
-              <EventlyText variant="caption" style={[s.chipText, on && s.chipTextOn]}>
+              <EventlyText
+                variant="caption"
+                style={[s.chipText, on && s.chipTextOn]}
+              >
                 {option.label}
               </EventlyText>
             </Pressable>

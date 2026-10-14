@@ -1,12 +1,7 @@
 import { Alert, Pressable, Switch, View } from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
-import { colors } from '../../../theme';
-import {
-  BUDGET_TOGGLE_COPY,
-  HERO_ACCENT_COLOR,
-  HOME_HAIRLINE,
-  HOME_NAVY,
-} from '../constants';
+import { BUDGET_TOGGLE_COPY } from '../constants';
+import { HOME_ACCENT, HOME_INK, HOME_PAPER } from '../design';
 import { basicsStyles as s } from '../styles';
 
 interface BudgetToggleCardProps {
@@ -23,11 +18,10 @@ interface BudgetToggleCardProps {
  * Off by default, and off means nothing is sent. A range makes the replies
  * comparable, which is worth asking for, but a customer who does not want to
  * anchor the price should be able to get quotes without inventing a number —
- * so this is a switch rather than a fifth required row.
+ * so this is a switch rather than a fifth required question.
  *
- * Both rows live in one card. The range used to be a second bordered box
- * stacked under this one, which met it edge to edge: two hairlines against
- * each other and four rounded corners notching into the seam.
+ * A section of the brief composer rather than a card of its own: one surface,
+ * divided by hairlines, so the brief reads as one object.
  */
 export function BudgetToggleCard({
   enabled,
@@ -36,11 +30,17 @@ export function BudgetToggleCard({
   onPressRange,
 }: BudgetToggleCardProps) {
   return (
-    <View style={[s.budgetCard, enabled && s.budgetOn]}>
+    <View style={s.budgetCard}>
       <View style={s.budgetRow}>
-        <EventlyIcon name="currency-inr" size={22} color={HERO_ACCENT_COLOR} />
+        <View style={s.budgetIcon}>
+          <EventlyIcon
+            name="currency-inr"
+            size={16}
+            color={HOME_ACCENT.saffron}
+          />
+        </View>
         <View style={s.budgetText}>
-          <EventlyText variant="subtitle" style={s.budgetTitle}>
+          <EventlyText style={s.budgetTitle}>
             {BUDGET_TOGGLE_COPY.title}
           </EventlyText>
           <Pressable
@@ -52,9 +52,9 @@ export function BudgetToggleCard({
             }
             accessibilityRole="button"
             accessibilityLabel={BUDGET_TOGGLE_COPY.link}
-            hitSlop={6}
+            hitSlop={8}
           >
-            <EventlyText variant="caption" style={s.budgetLink}>
+            <EventlyText style={s.budgetLink}>
               {BUDGET_TOGGLE_COPY.link}
             </EventlyText>
           </Pressable>
@@ -62,8 +62,12 @@ export function BudgetToggleCard({
         <Switch
           value={enabled}
           onValueChange={onToggle}
-          trackColor={{ false: HOME_HAIRLINE, true: HERO_ACCENT_COLOR }}
-          thumbColor={colors.background}
+          trackColor={{
+            false: HOME_PAPER.hairline,
+            true: HOME_ACCENT.marigold,
+          }}
+          thumbColor="#ffffff"
+          ios_backgroundColor={HOME_PAPER.hairline}
           accessibilityLabel={BUDGET_TOGGLE_COPY.title}
           testID="budget-toggle"
         />
@@ -73,29 +77,31 @@ export function BudgetToggleCard({
           for something the customer has just said not to send. */}
       {enabled ? (
         <Pressable
-          style={({ pressed }) => [
-            s.budgetRow,
-            s.budgetRowDivided,
-            pressed && s.rowPressed,
-          ]}
+          style={({ pressed }) => [s.rangeRow, pressed && s.rangeRowPressed]}
           onPress={onPressRange}
           accessibilityRole="button"
           accessibilityLabel={`Budget range, ${value || 'not set'}`}
           testID="budget-range"
         >
-          <EventlyIcon name="wallet-outline" size={22} color={HOME_NAVY} />
+          <EventlyIcon
+            name="wallet-outline"
+            size={18}
+            color={HOME_INK.inkSoft}
+          />
           <View style={s.budgetText}>
-            <EventlyText variant="caption" style={s.rowLabel}>
-              Budget
-            </EventlyText>
+            <EventlyText style={s.tileLabel}>Budget</EventlyText>
             <EventlyText
-              style={[s.rowValue, !value && s.rowValueEmpty]}
+              style={[s.tileValue, !value && s.tileValueEmpty]}
               numberOfLines={1}
             >
               {value || BUDGET_TOGGLE_COPY.placeholder}
             </EventlyText>
           </View>
-          <EventlyIcon name="chevron-down" size={20} color={colors.textMuted} />
+          <EventlyIcon
+            name="chevron-down"
+            size={20}
+            color={HOME_INK.inkFaint}
+          />
         </Pressable>
       ) : null}
     </View>

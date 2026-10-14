@@ -1,9 +1,10 @@
-import { Image, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import {
   EventlyText,
   GradientFill,
   OccasionArt,
   PressableScale,
+  RevealImage,
 } from '../../../Components';
 import {
   OCCASION_TILE_GRADIENT,
@@ -50,25 +51,30 @@ function Tile({ tile, onPress }: { tile: OccasionTile; onPress: () => void }) {
           s.tileArt,
           /* The photograph, when the organizer has one, keeps its own colours —
              a wash under a picture only muddies it. */
-          tile.photoUrl
-            ? null
-            : { backgroundColor: tint.bg, borderColor: tint.edge },
+          tile.photoUrl ? null : { backgroundColor: tint.bg },
         ]}
       >
         {tile.photoUrl ? (
-          <Image
+          /* An organizer's upload: it develops in rather than popping. */
+          <RevealImage
             source={{ uri: tile.photoUrl }}
             style={s.tilePhoto}
-            resizeMode="cover"
+            tint={tint.bg}
+            fallback={
+              <OccasionArt
+                art={tile.art}
+                width={OCCASION_TILE_ART}
+                height={OCCASION_TILE_ART}
+              />
+            }
           />
         ) : (
           <>
-            {/* A two-tone wash behind the drawing: a celebration app's
-                occasions should look like them. */}
             <GradientFill
               colors={OCCASION_TILE_GRADIENT[tile.art]}
               direction="diagonal"
             />
+            <View style={s.tileShine} pointerEvents="none" />
             <OccasionArt
               art={tile.art}
               width={OCCASION_TILE_ART}
@@ -82,11 +88,7 @@ function Tile({ tile, onPress }: { tile: OccasionTile; onPress: () => void }) {
         quarter of a phone on one line, and ellipsising them to "Naming…"
         leaves the customer guessing at half the grid.
       */}
-      <EventlyText
-        variant="small"
-        style={[s.tileLabel, { color: tint.ink }]}
-        numberOfLines={2}
-      >
+      <EventlyText variant="small" style={s.tileLabel} numberOfLines={2}>
         {tile.label}
       </EventlyText>
     </PressableScale>

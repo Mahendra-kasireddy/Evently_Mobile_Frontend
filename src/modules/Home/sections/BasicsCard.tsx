@@ -1,14 +1,15 @@
-import { Pressable, ScrollView, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Animated, Pressable, ScrollView, View } from 'react-native';
 import {
   artFor,
   EventlyIcon,
   EventlyText,
   GradientFill,
+  PressableScale,
+  todayIso,
+  useReducedMotion,
 } from '../../../Components';
-import { colors } from '../../../theme';
 import {
-  CHIP_SELECTED_GRADIENT,
-  HERO_FIELD_GRADIENT,
   HERO_FIELD_ICON_NAME,
   HERO_FIELD_LABEL,
   HERO_FIELD_ORDER,
@@ -16,6 +17,7 @@ import {
   QUICK_DATES,
   QUICK_DATES_LABEL,
 } from '../constants';
+import { HOME_ACCENT } from '../design';
 import { basicsStyles as s } from '../styles';
 import { formatWhen, quickDateIso } from '../utils';
 import type { HeroDraft } from '../types';
@@ -27,35 +29,262 @@ interface BasicsCardProps {
 }
 
 /**
- * The gradient a row's icon tile wears.
- *
- * Every row has its own, except the occasion row once it has been answered —
- * that one borrows the chosen occasion's colour, which is the same colour that
- * occasion wears on the grid below and on every card about it afterwards.
+ * Each question's own colour — marigold for what, rose for when, jade for
+ * where, lapis for who — drawn from the one Home palette rather than four
+ * unrelated gradients.
  */
-function fieldGradient(
-  field: keyof HeroDraft,
-  value: string,
-): [string, string] {
+const FIELD_ACCENT: Record<keyof HeroDraft, [string, string]> = {
+  occasion: [HOME_ACCENT.marigold, HOME_ACCENT.saffron],
+  when: ['#ec8fab', HOME_ACCENT.rose],
+  where: ['#43b493', HOME_ACCENT.jade],
+  guests: ['#7493dd', HOME_ACCENT.lapis],
+};
+
+/**
+ * The accent a tile wears. Once an occasion is chosen its tile takes that
+ * occasion's own colour — the same one it wears on the grid and on every
+ * card about it afterwards — so the brief starts wearing what it is about.
+ */
+function accentFor(field: keyof HeroDraft, value: string): [string, string] {
   if (field === 'occasion' && value) {
     const tint = OCCASION_TINT[artFor(value)];
     if (tint) return [tint.ink, tint.ink];
   }
-  return HERO_FIELD_GRADIENT[field];
+  return FIELD_ACCENT[field];
 }
 
-/** What each row shows when the customer has not answered it yet. */
+/** What each tile shows when the customer has not answered it yet. */
 const EMPTY_VALUE: Record<keyof HeroDraft, string> = {
   occasion: 'Pick an occasion',
   when: 'Pick a date',
-  where: 'Pick a city or area',
+  where: 'City or area',
   guests: 'How many?',
 };
 
 /**
- * The four questions a brief needs, one row each.
+ * One question, as a tile.
  *
- * Every row is a button rather than a field: none of the four is typed. Two
+ * Unanswered it is a recessed well with a quiet outline icon; answered it
+ * lifts to white and its icon fills with colour — so a glance across the four
+ * says how much of the brief is done without reading any of it.
+ */
+function SelectorTile({
+  field,
+  raw,
+  onPress,
+}: {
+  field: keyof HeroDraft;
+  raw: string;
+  onPress: () => void;
+}) {
+  const value = field === 'when' && raw ? formatWhen(raw) : raw;
+  const answered = Boolean(value);
+  const accent = accentFor(field, value);
+
+  return (
+    <PressableScale
+      containerStyle={s.tileSlot}
+      style={[s.tile, answered && s.tileAnswered]}
+      scaleTo={0.96}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${HERO_FIELD_LABEL[field]}, ${value || 'not set'}`}
+      accessibilityHint="Opens the picker"
+      testID={`basics-${field}`}
+    >
+      <View style={s.tileTop}>
+        <View style={[s.tileIcon, !answered && s.tileIconIdle]}>
+          {answered ? <GradientFill colors={accent} /> : null}
+          <EventlyIcon
+            name={HERO_FIELD_ICON_NAME[field]}
+            size={16}
+            color={answered ? '#ffffff' : accent[1]}
+          />
+        </View>
+        <EventlyText style={s.tileLabel}>{HERO_FIELD_LABEL[field]}</EventlyText>
+      </View>
+      <EventlyText
+        style={[s.tileValue, !answered && s.tileValueEmpty]}
+        numberOfLines={1}
+      >
+        {value || EMPTY_VALUE[field]}
+      </EventlyText>
+    </PressableScale>
+  );
+}
+
+/** The pill's own width before it is stretched onto a chip. */
+const PILL_BASE = 100;
+
+type ChipBox = { x: number; w: number; h: number };
+
+/**
+ * Quick dates, with a liquid selection.
+ *
+ * The chosen chip is marked by one pill that flows from chip to chip: its
+ * position springs quickly and its width follows more slowly, so it stretches
+ * as it travels and squashes as it lands — the gooey feel, on two native-
+ * driver transforms. Shortcuts, not a second date control: each sets a real
+ * day, and the When tile above shows exactly which.
+ */
+function QuickDates({
+  when,
+  onPickDate,
+}: {
+  when: string;
+  onPickDate: (iso: string) => void;
+}) {
+  const reduced = useReducedMotion();
+  const [boxes, setBoxes] = useState<Record<string, ChipBox>>({});
+  const x = useRef(new Animated.Value(0)).current;
+  const sx = useRef(new Animated.Value(1)).current;
+  const sy = useRef(new Animated.Value(1)).current;
+  const shown = useRef(new Animated.Value(0)).current;
+  const placed = useRef(false);
+  /* The date the customer had before they reached for a shortcut — from the
+     calendar, or the seeded default — so taking the shortcut back restores
+     it rather than leaving When empty. */
+  const beforeQuick = useRef<string | null>(null);
+
+  const chips = QUICK_DATES.map(quick => ({
+    ...quick,
+    iso: quickDateIso(quick.kind, quick.months ?? 0),
+  }));
+  const active = chips.find(chip => chip.iso === when)?.label ?? null;
+  const box = active ? boxes[active] : undefined;
+
+  useEffect(() => {
+    if (!box) {
+      placed.current = false;
+      Animated.timing(shown, {
+        toValue: 0,
+        duration: 160,
+        useNativeDriver: true,
+      }).start();
+      return;
+    }
+    const toX = box.x + box.w / 2 - PILL_BASE / 2;
+    const toS = box.w / PILL_BASE;
+    if (!placed.current || reduced) {
+      x.setValue(toX);
+      sx.setValue(toS);
+      placed.current = true;
+      Animated.timing(shown, {
+        toValue: 1,
+        duration: reduced ? 0 : 200,
+        useNativeDriver: true,
+      }).start();
+      return;
+    }
+    Animated.parallel([
+      Animated.spring(x, {
+        toValue: toX,
+        tension: 170,
+        friction: 17,
+        useNativeDriver: true,
+      }),
+      Animated.spring(sx, {
+        toValue: toS,
+        tension: 90,
+        friction: 11,
+        useNativeDriver: true,
+      }),
+      Animated.sequence([
+        Animated.timing(sy, {
+          toValue: 0.8,
+          duration: 110,
+          useNativeDriver: true,
+        }),
+        Animated.spring(sy, {
+          toValue: 1,
+          tension: 220,
+          friction: 6,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+  }, [box, reduced, shown, sx, sy, x]);
+
+  return (
+    <View style={s.quickRow}>
+      <EventlyText style={s.quickLabel} numberOfLines={1}>
+        {QUICK_DATES_LABEL}
+      </EventlyText>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={s.quickScroll}
+        contentContainerStyle={s.quickChips}
+      >
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            s.pill,
+            {
+              width: PILL_BASE,
+              height: box?.h ?? 34,
+              opacity: shown,
+              transform: [{ translateX: x }, { scaleX: sx }, { scaleY: sy }],
+            },
+          ]}
+        />
+        {chips.map(chip => {
+          const isActive = chip.label === active;
+          return (
+            <Pressable
+              key={chip.label}
+              style={[s.chip, isActive && s.chipActive]}
+              onLayout={e => {
+                const { x: cx, width, height } = e.nativeEvent.layout;
+                setBoxes(prev => {
+                  const was = prev[chip.label];
+                  if (was && was.x === cx && was.w === width) return prev;
+                  return {
+                    ...prev,
+                    [chip.label]: { x: cx, w: width, h: height },
+                  };
+                });
+              }}
+              /* A second tap on the chosen chip takes the shortcut back:
+                 When returns to the date it held before (or today). */
+              onPress={() => {
+                if (isActive) {
+                  onPickDate(beforeQuick.current || todayIso());
+                  beforeQuick.current = null;
+                  return;
+                }
+                if (!active) beforeQuick.current = when;
+                onPickDate(chip.iso);
+              }}
+              accessibilityHint={
+                isActive
+                  ? 'Tap again to go back to your earlier date'
+                  : undefined
+              }
+              accessibilityRole="button"
+              accessibilityState={{ selected: isActive }}
+              accessibilityLabel={`${chip.label}, ${formatWhen(chip.iso)}`}
+              testID={`quick-date-${chip.label}`}
+            >
+              <EventlyText
+                style={[s.chipText, isActive && s.chipTextActive]}
+                numberOfLines={1}
+              >
+                {chip.label}
+              </EventlyText>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+    </View>
+  );
+}
+
+/**
+ * The four questions a brief needs, as a two-by-two of selector tiles, and
+ * the quick-date shortcuts under them.
+ *
+ * Every tile is a button rather than a field: none of the four is typed. Two
  * open their own search screen, two open a sheet, and which is which is the
  * screen's business — this only reports the tap.
  */
@@ -65,110 +294,25 @@ export function BasicsCard({
   onPickDate,
 }: BasicsCardProps) {
   return (
-    <View style={s.card}>
-      {HERO_FIELD_ORDER.map((field, index) => {
-        const raw = draft[field];
-        const value = field === 'when' && raw ? formatWhen(raw) : raw;
-        const shown = value || EMPTY_VALUE[field];
-
-        return (
-          <Pressable
+    <View>
+      <View style={s.grid}>
+        {HERO_FIELD_ORDER.map(field => (
+          <SelectorTile
             key={field}
-            style={({ pressed }) => [
-              s.row,
-              index > 0 && s.rowDivided,
-              pressed && s.rowPressed,
-            ]}
+            field={field}
+            raw={draft[field]}
             onPress={() => onEditField(field)}
-            accessibilityRole="button"
-            accessibilityLabel={`${HERO_FIELD_LABEL[field]}, ${
-              value || 'not set'
-            }`}
-            accessibilityHint="Opens the picker"
-            testID={`basics-${field}`}
-          >
-            {/*
-              The question's own colour, on a tile rather than a bare glyph.
-              Four identical navy marks made the brief a list to read; four
-              colours make it a form you can find your place in.
-
-              The occasion row is the exception that proves it: once an
-              occasion is chosen the tile takes *that* occasion's colour, so
-              the brief starts wearing the thing it is about.
-            */}
-            <View style={s.rowIcon}>
-              <GradientFill colors={fieldGradient(field, value)} />
-              <EventlyIcon
-                name={HERO_FIELD_ICON_NAME[field]}
-                size={19}
-                color={colors.onPrimary}
-              />
-            </View>
-            <View style={s.rowText}>
-              <EventlyText variant="caption" style={s.rowLabel}>
-                {HERO_FIELD_LABEL[field]}
-              </EventlyText>
-              <EventlyText
-                style={[s.rowValue, !value && s.rowValueEmpty]}
-                numberOfLines={1}
-              >
-                {shown}
-              </EventlyText>
-            </View>
-            <EventlyIcon
-              name="chevron-down"
-              size={20}
-              color={colors.textMuted}
-            />
-          </Pressable>
-        );
-      })}
-
-      {/*
-        Shortcuts, not a second date control. Each one sets a real day, so the
-        When row above updates to the date it chose — a customer who taps "This
-        weekend" can still see which weekend that turned out to be.
-      */}
-      <View style={s.quickRow}>
-        <EventlyText variant="caption" style={s.quickLabel}>
-          {QUICK_DATES_LABEL}
-        </EventlyText>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={s.quickChips}
-        >
-          {QUICK_DATES.map(quick => {
-            const iso = quickDateIso(quick.kind, quick.months ?? 0);
-            const active = draft.when === iso;
-            return (
-              <Pressable
-                key={quick.label}
-                style={[s.chip, active && s.chipActive]}
-                onPress={() => onPickDate(iso)}
-                accessibilityRole="button"
-                accessibilityState={{ selected: active }}
-                accessibilityLabel={`${quick.label}, ${formatWhen(iso)}`}
-                testID={`quick-date-${quick.label}`}
-              >
-                {/* Filled, not outlined. A pale wash behind a coral word was
-                    hard to tell from an unchosen chip at arm's length. */}
-                {active ? (
-                  <GradientFill
-                    colors={CHIP_SELECTED_GRADIENT}
-                    direction="across"
-                  />
-                ) : null}
-                <EventlyText style={[s.chipText, active && s.chipTextActive]}>
-                  {quick.label}
-                </EventlyText>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
+          />
+        ))}
       </View>
+      <QuickDates when={draft.when} onPickDate={onPickDate} />
     </View>
   );
+}
+
+/** For the composer's progress line. */
+export function answeredCount(draft: HeroDraft): number {
+  return HERO_FIELD_ORDER.filter(field => Boolean(draft[field])).length;
 }
 
 export default BasicsCard;

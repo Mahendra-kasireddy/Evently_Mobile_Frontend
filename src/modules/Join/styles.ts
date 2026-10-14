@@ -3,96 +3,190 @@ import { globalStyles } from '../../styles/globalStyles';
 import { brand, spacing } from '../../theme';
 
 /** Same curve as the login hero — the two screens are one flow. */
-export const HEADER_RADIUS = 28;
+export const HEADER_RADIUS = 32;
+
+const CARD_SHADOW = Platform.select({
+  ios: {
+    shadowColor: brand.navy,
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 6 },
+  },
+  android: { elevation: 3 },
+});
 
 export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: brand.bg },
-  /* Same as the sign-in hero: full-bleed to the top edge, with the status bar
-     inset applied as padding by the screen. */
   header: {
-    backgroundColor: brand.navy,
     borderBottomLeftRadius: HEADER_RADIUS,
     borderBottomRightRadius: HEADER_RADIUS,
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: spacing.lg,
     paddingBottom: spacing.lg,
     overflow: 'hidden',
+    backgroundColor: brand.navy,
   },
-  glow: {
-    position: 'absolute',
-    top: -120,
-    right: -90,
-    width: 260,
-    height: 260,
-    borderRadius: 999,
-    backgroundColor: brand.navyPlum,
+  glow: { position: 'absolute', borderRadius: 999 },
+  glowCoral: {
+    top: -60,
+    right: -70,
+    width: 220,
+    height: 220,
+    backgroundColor: 'rgba(244,123,77,0.16)',
+  },
+  glowViolet: {
+    bottom: -90,
+    left: -60,
+    width: 200,
+    height: 200,
+    backgroundColor: 'rgba(124,140,255,0.14)',
   },
   closeButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 11,
-    backgroundColor: brand.navySoft,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: { color: brand.onNavy, marginTop: spacing.md },
-  subtitle: { color: brand.onNavyMuted, marginTop: spacing.sm },
-  content: { padding: spacing.md, paddingBottom: spacing.xl, gap: spacing.md },
+  eyebrow: {
+    color: '#ffb59a',
+    fontSize: 11.5,
+    fontWeight: '800',
+    letterSpacing: 1.8,
+    marginTop: spacing.md,
+  },
+  title: { color: brand.onNavy, marginTop: 4, fontSize: 30, lineHeight: 36 },
+  subtitle: {
+    color: 'rgba(255,255,255,0.78)',
+    marginTop: spacing.sm,
+    lineHeight: 20,
+    fontSize: 14,
+  },
+  chips: {
+    ...globalStyles.row,
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: spacing.md,
+  },
+  chip: {
+    ...globalStyles.row,
+    gap: 5,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.14)',
+  },
+  chipText: { color: '#ffffff', fontSize: 11, fontWeight: '600' },
+  content: { padding: spacing.md, paddingTop: spacing.lg, gap: spacing.s12 },
+  pick: { color: brand.navy, fontWeight: '800', fontSize: 17, marginBottom: 2 },
+  sameNumber: {
+    color: brand.textMuted,
+    textAlign: 'center',
+    fontSize: 12.5,
+    marginTop: 4,
+  },
 });
 
 export const roleCardStyles = StyleSheet.create({
-  /* Outlined in accent rather than shadowed: both cards are choices, and a
-     shadow would rank one above the other by depth alone. */
   card: {
-    flexDirection: 'row',
-    gap: spacing.sm,
+    ...globalStyles.row,
+    gap: spacing.s12,
     backgroundColor: brand.surface,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: brand.accentBorder,
-    padding: spacing.md,
-    ...Platform.select({
-      ios: {
-        shadowColor: brand.navy,
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 4 },
-      },
-      android: { elevation: 1 },
-    }),
+    borderRadius: 22,
+    padding: spacing.s12,
+    paddingRight: spacing.sm,
+    ...CARD_SHADOW,
   },
-  cardPressed: { backgroundColor: brand.accentSoft },
   iconTile: {
-    width: 40,
-    height: 40,
-    borderRadius: 13,
+    width: 60,
+    height: 60,
+    borderRadius: 18,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
   },
   body: { flex: 1 },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.sm,
+  title: { color: brand.navy, fontSize: 17, lineHeight: 22, fontWeight: '800' },
+  description: {
+    color: brand.textMuted,
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: 2,
   },
-  title: { color: brand.navy, flexShrink: 1 },
-  description: { color: brand.textMuted, marginTop: 2 },
-  requirement: {
-    color: brand.accentDeep,
-    fontWeight: '600',
-    marginTop: spacing.sm,
+  tag: {
+    ...globalStyles.row,
+    alignSelf: 'flex-start',
+    gap: 4,
+    marginTop: 8,
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 999,
   },
+  tagText: { fontSize: 11.5, fontWeight: '700' },
+  go: { width: 32, alignItems: 'center', justifyContent: 'center' },
 });
 
+/* How it works — three steps in one row, on a dotted thread. */
 export const footnoteStyles = StyleSheet.create({
   card: {
-    ...globalStyles.row,
-    gap: spacing.sm,
+    marginTop: spacing.sm,
     backgroundColor: brand.surface,
-    borderRadius: 16,
+    borderRadius: 22,
+    padding: spacing.md,
     borderWidth: 1,
     borderColor: brand.border,
-    padding: spacing.md,
   },
+  title: {
+    color: brand.navy,
+    fontWeight: '800',
+    fontSize: 15,
+    marginBottom: spacing.s12,
+  },
+  row: { flexDirection: 'row', justifyContent: 'space-between' },
+  step: { flex: 1, alignItems: 'center', zIndex: 1 },
+  iconWrap: { width: 48, height: 48 },
+  icon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: brand.bg,
+    borderWidth: 1,
+    borderColor: brand.border,
+  },
+  num: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#e8633a',
+    borderWidth: 2,
+    borderColor: brand.surface,
+  },
+  numText: { color: '#ffffff', fontSize: 10.5, fontWeight: '800' },
+  stepTitle: {
+    color: brand.navy,
+    fontSize: 13,
+    fontWeight: '700',
+    marginTop: 8,
+  },
+  stepBody: { color: brand.textMuted, fontSize: 11.5, marginTop: 1 },
+  thread: {
+    position: 'absolute',
+    top: 24,
+    left: '18%',
+    right: '18%',
+    borderTopWidth: 1.5,
+    borderStyle: 'dashed',
+    borderColor: '#d9d4e0',
+  },
+  /* Kept for anything still reading the old single-line note. */
   text: { flex: 1, color: brand.textMuted },
 });

@@ -1,5 +1,11 @@
 import { colors } from '../../theme';
-import type { BookingItem, BookingStatus, BookingTab, JumpTile, PaymentStatus } from './types';
+import type {
+  BookingItem,
+  BookingStatus,
+  BookingTab,
+  JumpTile,
+  PaymentStatus,
+} from './types';
 
 export const MY_BOOKINGS_ENDPOINT = '/booking/my-bookings';
 
@@ -61,7 +67,12 @@ export const PAYMENT_STATUS_LABEL: Record<PaymentStatus, string> = {
 };
 
 /** A booking stops being active once it can no longer change. */
-export const PAST_STATUSES: BookingStatus[] = ['completed', 'cancelled', 'rejected', 'expired'];
+export const PAST_STATUSES: BookingStatus[] = [
+  'completed',
+  'cancelled',
+  'rejected',
+  'expired',
+];
 
 export const OCCASION_ICON: Record<string, string> = {
   wedding: 'heart-outline',
@@ -119,7 +130,10 @@ export const JUMP_TILES: JumpTile[] = [
   },
 ];
 
-export const JUMP_TONE_COLOR: Record<JumpTile['tone'], { fg: string; bg: string }> = {
+export const JUMP_TONE_COLOR: Record<
+  JumpTile['tone'],
+  { fg: string; bg: string }
+> = {
   coral: { fg: BOOKING_ACCENT, bg: BOOKING_ACCENT_SOFT },
   violet: { fg: BOOKING_VIOLET, bg: BOOKING_VIOLET_SOFT },
   green: { fg: BOOKING_GREEN, bg: BOOKING_GREEN_SOFT },
@@ -159,9 +173,11 @@ export const BOOKING_COPY = {
     'When you accept an organizer’s quote, the event shows up here — with its plan, payments and guest invitation.',
   emptyCta: 'Plan an event',
   emptyActiveTitle: 'Nothing active',
-  emptyActiveBody: 'Every event you have is finished, cancelled or expired. Start a new one any time.',
+  emptyActiveBody:
+    'Every event you have is finished, cancelled or expired. Start a new one any time.',
   emptyPastTitle: 'Nothing here yet',
-  emptyPastBody: 'Events move here once they are completed, cancelled or declined.',
+  emptyPastBody:
+    'Events move here once they are completed, cancelled or declined.',
   daysToGo: (n: number) => (n === 1 ? '1 day to go' : `${n} days to go`),
   today: 'Today',
   organizerTbd: 'Organizer to be confirmed',

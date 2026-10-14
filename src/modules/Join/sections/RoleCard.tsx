@@ -1,7 +1,11 @@
-import { Pressable, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
-import { brand } from '../../../theme';
-import { roleCardStyles } from '../styles';
+import { View } from 'react-native';
+import {
+  EventlyIcon,
+  EventlyText,
+  GradientFill,
+  PressableScale,
+} from '../../../Components';
+import { roleCardStyles as s } from '../styles';
 import type { RoleCardData } from '../types';
 
 interface RoleCardProps {
@@ -9,44 +13,46 @@ interface RoleCardProps {
   onPress: (key: RoleCardData['key']) => void;
 }
 
+/**
+ * One way to work with Evently, as one tap: who it is for in a line, and how
+ * long it takes to start. The detail of what each role gets belongs on the
+ * next screens, not stacked in a list here.
+ */
 export function RoleCard({ data, onPress }: RoleCardProps) {
   return (
-    <Pressable
-      style={({ pressed }) => [
-        roleCardStyles.card,
-        pressed && roleCardStyles.cardPressed,
-      ]}
+    <PressableScale
+      style={s.card}
       onPress={() => onPress(data.key)}
       accessibilityRole="button"
-      accessibilityLabel={`${data.title}. ${data.description} ${data.requirement}.`}
+      accessibilityLabel={`${data.title}. ${
+        data.description
+      }. ${data.perks.join('. ')}. ${data.requirement}.`}
       testID={`role-card-${data.key}`}
     >
-      <View
-        style={[
-          roleCardStyles.iconTile,
-          { backgroundColor: data.iconBackground },
-        ]}
-      >
-        <EventlyIcon name={data.icon} size={20} color={data.iconColor} />
+      <View style={s.iconTile}>
+        <GradientFill colors={data.gradient} direction="diagonal" />
+        <EventlyIcon name={data.icon} size={26} color={data.iconColor} />
       </View>
 
-      <View style={roleCardStyles.body}>
-        <View style={roleCardStyles.titleRow}>
-          <EventlyText variant="subtitle" style={roleCardStyles.title}>
-            {data.title}
-          </EventlyText>
-          <EventlyIcon name="chevron-right" size={20} color={brand.accent} />
-        </View>
-
-        <EventlyText variant="caption" style={roleCardStyles.description}>
+      <View style={s.body}>
+        <EventlyText style={s.title} numberOfLines={1}>
+          {data.title}
+        </EventlyText>
+        <EventlyText style={s.description} numberOfLines={2}>
           {data.description}
         </EventlyText>
-
-        <EventlyText variant="caption" style={roleCardStyles.requirement}>
-          {data.requirement}
-        </EventlyText>
+        <View style={[s.tag, { backgroundColor: `${data.gradient[1]}14` }]}>
+          <EventlyIcon name="clock-fast" size={13} color={data.gradient[1]} />
+          <EventlyText style={[s.tagText, { color: data.gradient[1] }]}>
+            {data.requirement}
+          </EventlyText>
+        </View>
       </View>
-    </Pressable>
+
+      <View style={s.go}>
+        <EventlyIcon name="chevron-right" size={22} color={data.gradient[1]} />
+      </View>
+    </PressableScale>
   );
 }
 

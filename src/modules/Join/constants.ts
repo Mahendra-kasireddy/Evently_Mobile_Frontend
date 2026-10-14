@@ -2,43 +2,74 @@ import { brand } from '../../theme';
 import type { RoleCardData } from './types';
 
 /**
- * The business side of Evently, in the words a business owner uses.
+ * The business side of Evently, in the words a business owner uses — and
+ * only what is true of the sign-up as it is built:
  *
- * The first line of the description is the one that matters: the customer app
- * has no sign-up, so people arriving here have often come looking for one.
- * Saying outright that a business profile sits on the same number is what
- * stops an organizer registering twice.
+ *   organizer   mobile → name, business, category, city → dashboard.
+ *               Services, portfolio and ID (Aadhaar + PAN) come later, from
+ *               the dashboard, before going live. GST is optional. Bank
+ *               details only before the first payout.
+ *   sub-vendor  mobile → your service and rate → dashboard. No documents.
+ *
+ * The old copy said "Needs GST and one ID proof" on both — wrong for both,
+ * and the kind of line that sends somebody without a GSTIN away.
  */
 export const JOIN_COPY = {
-  title: 'Register a business profile',
+  eyebrow: 'FOR BUSINESSES',
+  title: 'Work with Evently',
   subtitle:
-    'Customers sign in with their number alone. Organizers and sub-vendors register a business profile on the same number.',
+    'Get booked for events near you. Sign in with the same number you already use — one account, both sides.',
+  chips: [
+    { icon: 'lightning-bolt', label: '2-min signup' },
+    { icon: 'file-clock-outline', label: 'Docs later' },
+    { icon: 'account-sync-outline', label: 'One account' },
+  ],
+  pick: 'I am a…',
+  howTitle: 'How it works',
+  steps: [
+    { icon: 'cellphone-check', title: 'Verify mobile', body: 'A 6-digit code' },
+    { icon: 'form-textbox', title: 'Add basics', body: 'About 2 minutes' },
+    {
+      icon: 'view-dashboard-outline',
+      title: 'Start working',
+      body: 'Your dashboard',
+    },
+  ],
+  sameNumber: 'Already a customer? Use the same number.',
+  /** Kept for the render dump and anything that still reads it. */
   footnote:
-    'Business roles need GST and one ID proof. Takes about five minutes.',
+    'No documents needed to start. ID is asked only before you go live.',
 } as const;
-
-/** Stated on both cards rather than only in the footnote — people tap before they read to the end. */
-export const REQUIREMENT_NOTE = 'Needs GST and one ID proof';
 
 export const ROLE_CARDS: RoleCardData[] = [
   {
     key: 'organizer',
-    icon: 'briefcase-outline',
-    iconColor: brand.accentDeep,
+    icon: 'briefcase-variant-outline',
+    iconColor: '#ffffff',
     iconBackground: brand.accentSoft,
+    gradient: ['#f47b4d', '#e2477a'],
     title: 'Event organizer',
-    description:
-      'Receive customer briefs, send itemised quotes, assign sub-vendors and manage payouts.',
-    requirement: REQUIREMENT_NOTE,
+    description: 'Plan and run whole events — weddings, birthdays, corporate',
+    perks: [
+      'Get customer requests in your city',
+      'Send itemised quotes and get booked',
+      'Assign sub-vendors and track payouts',
+    ],
+    requirement: '2 min · ID later',
   },
   {
     key: 'subvendor',
-    icon: 'account-switch-outline',
-    iconColor: brand.navy,
+    icon: 'room-service-outline',
+    iconColor: '#ffffff',
     iconBackground: brand.coolSoft,
+    gradient: ['#7c8cff', '#4b3bd6'],
     title: 'Sub-vendor',
-    description:
-      'Catering, decor, photography, sound and more. Take jobs from organizers on the platform.',
-    requirement: REQUIREMENT_NOTE,
+    description: 'One service — catering, decor, photos, sound, mehendi',
+    perks: [
+      'Take jobs from organizers on Evently',
+      'Set your own rate per plate, day or event',
+      'Link to an organizer you already work with',
+    ],
+    requirement: '1 min · No documents',
   },
 ];

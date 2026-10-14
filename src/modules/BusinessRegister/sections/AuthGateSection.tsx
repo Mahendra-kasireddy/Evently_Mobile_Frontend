@@ -5,14 +5,19 @@ import {
   EventlyIcon,
   EventlyText,
   EventlyTextInput,
+  GradientFill,
   KeyboardAvoider,
 } from '../../../Components';
 import { isValidMobile, isValidOtpCode } from '../../Login/utils';
 import { useSendOtp, useVerifyOtp } from '../../Login/hooks';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { setSession } from '../../../store/authSlice';
 import { useAppDispatch } from '../../../store/hooks';
 import { setHasSeenOnboarding } from '../../../store/onboardingSlice';
 import { REG_ACCENT, REG_GREEN, type AuthGateCopy } from '../constants';
+import { TermsNote } from '../../Login/sections/TermsNote';
+
+const HERO_GRADIENT: [string, string] = ['#141d3a', '#3a1f5c'];
 import { authGateStyles } from '../styles';
 
 /**
@@ -21,7 +26,15 @@ import { authGateStyles } from '../styles';
  * module (no separate auth system), so a signed-out visitor verifies their
  * mobile in place and the registration continues on the same screen.
  */
-export function AuthGateSection({ copy }: { copy: AuthGateCopy }) {
+export function AuthGateSection({
+  copy,
+  onBack,
+}: {
+  copy: AuthGateCopy;
+  /** Leaves the sign-up — the hero carries the back arrow now. */
+  onBack: () => void;
+}) {
+  const insets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
   const sendOtpCall = useSendOtp();
   const verifyOtpCall = useVerifyOtp();
@@ -113,129 +126,157 @@ export function AuthGateSection({ copy }: { copy: AuthGateCopy }) {
         contentContainerStyle={authGateStyles.content}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={authGateStyles.badge}>
-          <EventlyIcon
-            name="shield-check-outline"
-            size={26}
-            color={REG_ACCENT}
-          />
-        </View>
-        <EventlyText variant="h1" style={authGateStyles.title}>
-          {copy.title}
-        </EventlyText>
-        <EventlyText variant="body" style={authGateStyles.subtitle}>
-          {copy.subtitle}
-        </EventlyText>
-
-        {step === 'phone' ? (
-          <View style={authGateStyles.form}>
-            <EventlyText variant="subtitle" style={authGateStyles.label}>
-              Mobile number
+        {/* The same night-sky hero as the business picker — one flow. */}
+        <View style={[authGateStyles.hero, { paddingTop: insets.top + 8 }]}>
+          <GradientFill colors={HERO_GRADIENT} direction="diagonal" />
+          <View style={authGateStyles.heroGlow} pointerEvents="none" />
+          <TouchableOpacity
+            style={authGateStyles.heroBack}
+            onPress={step === 'otp' ? changeNumber : onBack}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <EventlyIcon name="arrow-left" size={20} color="#ffffff" />
+          </TouchableOpacity>
+          <View style={authGateStyles.heroStepChip}>
+            <EventlyText style={authGateStyles.heroStepText}>
+              {copy.step}
             </EventlyText>
-            <View style={authGateStyles.phoneRow}>
-              <EventlyText variant="subtitle" style={authGateStyles.dialCode}>
-                +91
-              </EventlyText>
-              <EventlyTextInput
-                style={authGateStyles.phoneInput}
-                placeholder="98765 43210"
-                keyboardType="number-pad"
-                maxLength={10}
-                value={phone}
-                onChangeText={setPhone}
-                autoFocus
-              />
-            </View>
-            {errorMessage ? (
-              <EventlyText variant="body" style={authGateStyles.error}>
-                {errorMessage}
-              </EventlyText>
-            ) : null}
-            <EventlyButton
-              title="Send code"
-              onPress={submitPhone}
-              disabled={!isPhoneValid}
-              loading={sendOtpCall.loading}
-              accentColor={REG_ACCENT}
-              style={authGateStyles.button}
-            />
           </View>
-        ) : (
-          <View style={authGateStyles.form}>
-            <TouchableOpacity
-              onPress={changeNumber}
-              style={authGateStyles.backRow}
-              accessibilityLabel="Change mobile number"
-            >
-              <EventlyIcon name="arrow-left" size={15} color={REG_ACCENT} />
-              <EventlyText variant="body" style={authGateStyles.backText}>
-                Change number
-              </EventlyText>
-            </TouchableOpacity>
-            <EventlyText variant="body" style={authGateStyles.sentTo}>
-              Code sent to {sentTo ?? 'your phone'}
-            </EventlyText>
+          <EventlyText variant="h1" style={authGateStyles.title}>
+            {step === 'phone' ? copy.title : 'Enter the 6-digit code'}
+          </EventlyText>
+          <EventlyText variant="body" style={authGateStyles.subtitle}>
+            {step === 'phone'
+              ? copy.subtitle
+              : `We sent it by SMS to ${sentTo ?? 'your phone'}.`}
+          </EventlyText>
+        </View>
 
-            <View style={authGateStyles.otpRow}>
-              {digits.map((digit, index) => (
-                <EventlyTextInput
-                  key={index}
-                  ref={el => {
-                    boxRefs.current[index] = el;
-                  }}
-                  style={[
-                    authGateStyles.otpBox,
-                    digit ? authGateStyles.otpBoxFilled : null,
-                  ]}
-                  keyboardType="number-pad"
-                  maxLength={1}
-                  value={digit}
-                  onChangeText={value => setDigit(index, value)}
-                  autoFocus={index === 0}
-                />
-              ))}
+        <View style={authGateStyles.sheet}>
+          {step === 'phone' ? (
+            <View style={authGateStyles.infoCard}>
+              <EventlyIcon
+                name="account-sync-outline"
+                size={18}
+                color="#4b3bd6"
+              />
+              <EventlyText variant="caption" style={authGateStyles.infoText}>
+                {copy.sameNumber}
+              </EventlyText>
             </View>
+          ) : null}
 
-            {devCode ? (
-              <EventlyText variant="caption" style={authGateStyles.devHint}>
-                Dev code: {devCode}
+          {step === 'phone' ? (
+            <View style={authGateStyles.form}>
+              <EventlyText variant="subtitle" style={authGateStyles.label}>
+                Mobile number
               </EventlyText>
-            ) : null}
-
-            {errorMessage ? (
-              <EventlyText variant="body" style={authGateStyles.error}>
-                {errorMessage}
-              </EventlyText>
-            ) : null}
-
-            <EventlyButton
-              title="Verify & continue"
-              onPress={submitCode}
-              disabled={!isCodeValid}
-              loading={verifyOtpCall.loading}
-              accentColor={REG_ACCENT}
-              style={authGateStyles.button}
-            />
-
-            {resendSeconds > 0 ? (
-              <EventlyText variant="body" style={authGateStyles.resendMuted}>
-                Resend code in 0:{String(resendSeconds).padStart(2, '0')}
-              </EventlyText>
-            ) : (
+              <View style={authGateStyles.phoneRow}>
+                <EventlyText variant="subtitle" style={authGateStyles.dialCode}>
+                  🇮🇳 +91
+                </EventlyText>
+                <EventlyTextInput
+                  style={authGateStyles.phoneInput}
+                  placeholder="98765 43210"
+                  keyboardType="number-pad"
+                  maxLength={10}
+                  value={phone}
+                  onChangeText={setPhone}
+                  autoFocus
+                />
+              </View>
+              {errorMessage ? (
+                <EventlyText variant="body" style={authGateStyles.error}>
+                  {errorMessage}
+                </EventlyText>
+              ) : null}
+              <EventlyButton
+                title={
+                  isPhoneValid ? 'Send code' : 'Enter your 10-digit number'
+                }
+                onPress={submitPhone}
+                disabled={!isPhoneValid}
+                loading={sendOtpCall.loading}
+                accentColor={REG_ACCENT}
+                style={authGateStyles.button}
+              />
+              <TermsNote />
+            </View>
+          ) : (
+            <View style={authGateStyles.form}>
               <TouchableOpacity
-                onPress={resendCode}
-                accessibilityLabel="Resend code"
+                onPress={changeNumber}
+                style={authGateStyles.backRow}
+                accessibilityLabel="Change mobile number"
               >
-                <EventlyText
-                  variant="body"
-                  style={[authGateStyles.resendActive, { color: REG_GREEN }]}
-                >
-                  Resend code
+                <EventlyIcon name="arrow-left" size={15} color={REG_ACCENT} />
+                <EventlyText variant="body" style={authGateStyles.backText}>
+                  Change number
                 </EventlyText>
               </TouchableOpacity>
-            )}
-          </View>
-        )}
+
+              <View style={authGateStyles.otpRow}>
+                {digits.map((digit, index) => (
+                  <EventlyTextInput
+                    key={index}
+                    ref={el => {
+                      boxRefs.current[index] = el;
+                    }}
+                    style={[
+                      authGateStyles.otpBox,
+                      digit ? authGateStyles.otpBoxFilled : null,
+                    ]}
+                    keyboardType="number-pad"
+                    maxLength={1}
+                    value={digit}
+                    onChangeText={value => setDigit(index, value)}
+                    autoFocus={index === 0}
+                  />
+                ))}
+              </View>
+
+              {devCode ? (
+                <EventlyText variant="caption" style={authGateStyles.devHint}>
+                  Dev code: {devCode}
+                </EventlyText>
+              ) : null}
+
+              {errorMessage ? (
+                <EventlyText variant="body" style={authGateStyles.error}>
+                  {errorMessage}
+                </EventlyText>
+              ) : null}
+
+              <EventlyButton
+                title="Verify & continue"
+                onPress={submitCode}
+                disabled={!isCodeValid}
+                loading={verifyOtpCall.loading}
+                accentColor={REG_ACCENT}
+                style={authGateStyles.button}
+              />
+
+              {resendSeconds > 0 ? (
+                <EventlyText variant="body" style={authGateStyles.resendMuted}>
+                  Resend code in 0:{String(resendSeconds).padStart(2, '0')}
+                </EventlyText>
+              ) : (
+                <TouchableOpacity
+                  onPress={resendCode}
+                  accessibilityLabel="Resend code"
+                >
+                  <EventlyText
+                    variant="body"
+                    style={[authGateStyles.resendActive, { color: REG_GREEN }]}
+                  >
+                    Resend code
+                  </EventlyText>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+        </View>
       </ScrollView>
     </KeyboardAvoider>
   );

@@ -23,6 +23,7 @@ import { BOOKING_ACCENT, BOOKING_COPY as COPY } from './constants';
 import { useBookingContainer } from './container';
 import { EventCard } from './sections/EventCard';
 import { EventTicketsSection } from './sections/EventTicketsSection';
+import { WhatNext } from './sections/WhatNext';
 import { useMyTickets } from '../PublicEvents/hooks';
 import { EventTabs } from './sections/EventTabs';
 import { JumpToGrid } from './sections/JumpToGrid';
@@ -122,6 +123,9 @@ export function BookingScreen() {
           navigation.navigate('DigitalTicket', { ticketId: t.ticketId })
         }
         onSeeAll={() => navigation.navigate('MyTickets')}
+        onDetails={t =>
+          navigation.navigate('PublicEventDetail', { eventId: t.eventId })
+        }
       />
     </FadeInUp>
   );
@@ -250,6 +254,7 @@ export function BookingScreen() {
           }
         >
           {allTickets}
+          <WhatNext onEvents={exploreEvents} onPlan={planEvent} />
         </ScrollView>
       </SafeAreaView>
     );
@@ -331,6 +336,7 @@ export function BookingScreen() {
           }
         >
           {allTickets}
+          <WhatNext onEvents={exploreEvents} onPlan={planEvent} />
         </ScrollView>
       ) : (
         <FlatList
@@ -376,9 +382,15 @@ export function BookingScreen() {
           /* The tiles act on one event — the soonest active one — so they belong
            with the list that contains it, not over a page of finished events. */
           ListFooterComponent={
-            tab === 'active' && focus ? (
-              <JumpToGrid tiles={tiles} onPress={jump} />
-            ) : null
+            <>
+              {tab === 'active' && focus ? (
+                <JumpToGrid tiles={tiles} onPress={jump} />
+              ) : null}
+              {/* Out to the screen edges: the cards carry their own inset. */}
+              <View style={styles.listBleed}>
+                <WhatNext onEvents={exploreEvents} onPlan={planEvent} />
+              </View>
+            </>
           }
         />
       )}

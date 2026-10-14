@@ -1,7 +1,13 @@
 import { Dimensions, Platform, StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { brand } from '../../theme';
-import { colors, spacing } from '../../theme';
+import { colors, fontFamilies, spacing } from '../../theme';
+import {
+  EYEBROW,
+  HOME_ACCENT,
+  HOME_INK,
+  HOME_PAPER,
+  displayType,
+} from './design';
 import {
   BOOKED_CARD_PHOTO_BG,
   BOOKED_STEP_DONE_COLOR,
@@ -15,7 +21,6 @@ import {
   HOME_ACCENT_SOFT,
   HOME_CANVAS,
   HOME_GREEN,
-  HOME_GREEN_SOFT,
   HOME_HAIRLINE,
   HOME_NAVY,
   HOME_NAVY_DEEP,
@@ -29,28 +34,29 @@ import {
  * margin and the test that pins the lift — and a number typed twice is a
  * number that drifts.
  */
-export const HERO_PHOTO_OVERLAP = 34;
+export const HERO_PHOTO_OVERLAP = 30;
+
+/** The hero band's fixed height: photograph, header and headline. */
+export const HERO_PHOTO_HEIGHT = 318;
 
 export const styles = StyleSheet.create({
   /** Holds whichever state Home is in, plus the one name prompt. */
-  root: { flex: 1, backgroundColor: HOME_CANVAS },
-  container: { flex: 1, backgroundColor: HOME_CANVAS },
+  root: { flex: 1, backgroundColor: HOME_PAPER.canvas },
+  container: { flex: 1, backgroundColor: HOME_PAPER.canvas },
   scroll: { flex: 1 },
   content: { paddingBottom: spacing.xl },
   /*
-   * The opaque sheet every row below the photograph sits on, pulled up over
-   * the picture's bottom edge. `flexGrow` so a short feed still covers the
-   * fold rather than leaving the photo showing under it.
+   * The opaque ivory sheet every row below the photograph sits on, pulled up
+   * over the picture's bottom edge. `flexGrow` so a short feed still covers
+   * the fold rather than leaving the photo showing under it.
    */
   sheet: {
     flexGrow: 1,
     marginTop: -HERO_PHOTO_OVERLAP,
-    paddingTop: spacing.sm,
-    backgroundColor: HOME_CANVAS,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    /* Clips the page gradient to the sheet's rounded top. */
-    overflow: 'hidden',
+    paddingTop: spacing.xs,
+    backgroundColor: HOME_PAPER.canvas,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
   },
   centered: {
     flex: 1,
@@ -58,34 +64,63 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: spacing.lg,
   },
-  loadingText: { color: colors.textMuted, marginTop: spacing.md },
+  loadingTitle: {
+    ...displayType(22),
+    color: HOME_INK.ink,
+    marginTop: spacing.lg,
+    textAlign: 'center',
+  },
+  loadingText: {
+    color: HOME_INK.inkSoft,
+    marginTop: spacing.xs,
+    textAlign: 'center',
+  },
   errorText: { color: colors.danger, textAlign: 'center' },
 });
 
 export const homeHeroPhotoStyles = StyleSheet.create({
   wrap: {
-    /* Deep enough for the sign in the photograph to read as a picture rather
-       than as a texture behind the controls, and no deeper: this is a header,
-       not a cover. */
-    height: 268,
-    backgroundColor: HOME_NAVY_DEEP,
+    /* A fixed band, not a backdrop: the picture is at the top and nowhere
+       else. Deep enough for a two-line editorial headline under the header. */
+    height: HERO_PHOTO_HEIGHT,
+    backgroundColor: HOME_INK.night,
     overflow: 'hidden',
   },
-  /* Real dimensions, not absolute insets: an Image with nothing but
-     top/left/right/bottom has no size to resize against, and `cover` then
-     enlarges a corner of the source instead of fitting the whole frame. */
-  photo: { width: '100%', height: '100%' },
-  scrim: {
+  /* The header and the headline float over the picture; the safe-area inset
+     pads them clear of the notch without insetting the image itself. */
+  overlay: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(16,26,49,0.18)',
   },
-  /* The header floats over the picture; the safe-area inset pads the controls
-     clear of the notch without insetting the image itself. */
-  overlay: { position: 'absolute', top: 0, left: 0, right: 0 },
+  copy: {
+    marginTop: 'auto',
+    paddingHorizontal: spacing.md + 4,
+    paddingBottom: HERO_PHOTO_OVERLAP + 22,
+  },
+  eyebrow: {
+    ...EYEBROW,
+    fontFamily: fontFamilies.semibold,
+    fontWeight: undefined,
+    color: HOME_ACCENT.marigold,
+    marginBottom: 8,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 6,
+  },
+  headline: {
+    ...displayType(31),
+    color: '#ffffff',
+    textShadowColor: 'rgba(0,0,0,0.35)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 10,
+  },
+  headlineAccent: {
+    fontStyle: 'italic',
+    color: '#ffd28a',
+  },
 });
 
 export const homeHeaderStyles = StyleSheet.create({
@@ -99,289 +134,340 @@ export const homeHeaderStyles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: spacing.sm,
   },
-  /* A circle, not the rounded square Profile uses for the same monogram: on
-     the photograph it is a face's shape, and it is the only round control in
-     the row apart from the two icon discs it is balanced against. */
-  avatar: {
-    width: 42,
-    height: 42,
-    borderRadius: 999,
-    /* The brand's soft blush, not a solid navy disc: the header sits on a
-       photograph and on a near-white canvas, and a dark plug in the corner
-       read as a hole in both. Light fill, coral monogram — the same pairing
-       the rest of Home uses for a tile. */
-    backgroundColor: HOME_ACCENT_SOFT,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  avatarImage: { width: '100%', height: '100%' },
-  /* On the photo it needs an edge of its own, so a pale disc on a pale part
-     of the picture still reads as a control. */
-  avatarOnPhoto: {
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.92)',
-  },
-  avatarText: {
-    color: HERO_ACCENT_COLOR,
-    fontSize: 15,
-    fontWeight: '700',
-    letterSpacing: 0.3,
-  },
   /* Where the customer is — the area big, the city under it. */
   location: { flex: 1, paddingVertical: 2 },
-  locationRow: { ...globalStyles.row, gap: 4 },
+  locationRow: { ...globalStyles.row, gap: 6 },
+  pin: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: HOME_ACCENT.marigoldSoft,
+  },
+  pinOnPhoto: { backgroundColor: 'rgba(255,255,255,0.16)' },
   locationTitle: {
     flexShrink: 1,
-    color: HOME_NAVY,
-    fontSize: 18,
-    lineHeight: 23,
-    fontWeight: '800',
+    color: HOME_INK.ink,
+    fontSize: 17,
+    lineHeight: 22,
+    fontWeight: '700',
+    letterSpacing: -0.2,
   },
   locationSub: {
-    color: '#5d5873',
-    fontSize: 12.5,
+    color: HOME_INK.inkSoft,
+    fontSize: 12,
+    lineHeight: 16,
     marginTop: 1,
-    marginLeft: 22,
+    marginLeft: 28,
   },
   /* Over the photograph: white, with a soft shadow so it reads on any picture. */
   onPhotoText: {
     color: '#ffffff',
-    textShadowColor: 'rgba(0,0,0,0.45)',
+    textShadowColor: 'rgba(0,0,0,0.4)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 6,
   },
   onPhotoSub: {
-    color: 'rgba(255,255,255,0.92)',
-    textShadowColor: 'rgba(0,0,0,0.45)',
+    color: 'rgba(255,255,255,0.82)',
+    textShadowColor: 'rgba(0,0,0,0.4)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 6,
   },
-  actions: { ...globalStyles.row, gap: spacing.md },
-  iconButton: { padding: 2 },
-  iconButtonOnPhoto: {
-    width: 40,
-    height: 40,
-    borderRadius: 999,
-    padding: 0,
+  actions: { ...globalStyles.row, gap: 10 },
+  iconButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     alignItems: 'center',
     justifyContent: 'center',
-    /* White discs with coloured glyphs: brighter than a dark smoke over a
-       wedding photo, and each control has its own colour. */
-    backgroundColor: 'rgba(255,255,255,0.94)',
+    backgroundColor: HOME_PAPER.card,
+    borderWidth: 1,
+    borderColor: HOME_PAPER.hairline,
+  },
+  /* Frosted glass on the photograph: a white wash and a bright hairline. */
+  iconButtonOnPhoto: {
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    borderColor: 'rgba(255,255,255,0.32)',
   },
   badge: {
     position: 'absolute',
-    top: -6,
-    right: -8,
-    minWidth: 17,
-    height: 17,
-    borderRadius: 999,
-    backgroundColor: HERO_ACCENT_COLOR,
+    top: -3,
+    right: -3,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: HOME_ACCENT.sindoor,
+    /* A soft frosted ring rather than a dark one — on the photo a black
+       outline read as a hole around the count. */
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.7)',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 4,
+    paddingHorizontal: 3,
   },
   badgeText: {
-    color: colors.onPrimary,
-    fontSize: 10,
+    color: '#ffffff',
+    fontSize: 9.5,
     fontWeight: '700',
-    lineHeight: 13,
+    lineHeight: 12,
   },
 });
 
 /**
- * Home's "tell us the basics" block.
+ * Home's brief composer — the card lifted over the hero.
  *
- * On the page, not on a navy card. It used to be a dark hero with confetti and
- * a garland behind it, which put four form rows on top of a decorated
- * background — the form is the point of the block, and the decoration was
- * competing with it for the only thing the customer is meant to look at.
+ * One surface: a small progress head, a two-by-two of selector tiles, the
+ * quick dates, the budget switch and the send button, divided by hairlines
+ * rather than stacked as separate boxes.
  */
 export const basicsStyles = StyleSheet.create({
-  wrap: { paddingHorizontal: spacing.md, paddingTop: spacing.sm },
-  /* Measured off the mockup: a 25pt face set solid-ish at 30, not the 26/34
-     it was. The extra four points of leading were what made a two-line
-     heading read as three. */
-  heading: {
-    color: HOME_NAVY,
-    fontSize: 25,
-    lineHeight: 30,
-    fontWeight: '700',
-    letterSpacing: -0.5,
-  },
-  headingAccent: { color: HERO_ACCENT_COLOR, fontStyle: 'italic' },
-  subtitle: {
-    color: colors.textMuted,
-    fontSize: 13,
-    lineHeight: 19,
-    marginTop: spacing.sm,
-  },
-
-  dividerRow: {
+  wrap: { paddingHorizontal: spacing.md, paddingTop: spacing.s12 },
+  composerShadow: Platform.select({
+    ios: {
+      shadowColor: HOME_INK.night,
+      shadowOpacity: 0.12,
+      shadowRadius: 24,
+      shadowOffset: { width: 0, height: 12 },
+    },
+    android: { elevation: 6 },
+    default: {},
+  }) as object,
+  composerHead: {
     ...globalStyles.row,
-    gap: spacing.sm,
-    marginTop: spacing.lg,
-    marginBottom: spacing.md,
-  },
-  dividerLine: { flex: 1, height: 1, backgroundColor: HOME_HAIRLINE },
-  dividerText: { color: colors.textMuted },
-
-  card: {
-    backgroundColor: colors.background,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: HOME_HAIRLINE,
-    overflow: 'hidden',
-  },
-  row: {
-    ...globalStyles.row,
-    gap: spacing.md,
+    justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
-    paddingVertical: 12,
+    paddingTop: 14,
+    paddingBottom: 10,
   },
-  /* The question's colour, on a tile. `overflow: hidden` is what lets the
-     gradient inside take the tile's own corner radius. */
-  rowIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
+  composerEyebrow: { ...EYEBROW, color: HOME_INK.inkSoft },
+  progress: { ...globalStyles.row, gap: 4 },
+  progressDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: HOME_PAPER.hairline,
+  },
+  progressDotOn: { backgroundColor: HOME_ACCENT.marigold, width: 14 },
+  progressText: {
+    marginLeft: 4,
+    color: HOME_INK.inkSoft,
+    fontSize: 11,
+    lineHeight: 14,
+    fontWeight: '600',
+  },
+
+  /* The four selectors, two by two. */
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: 10,
+    paddingHorizontal: 12,
+  },
+  tileSlot: { width: '48.6%' },
+  tile: {
+    minHeight: 78,
+    borderRadius: 18,
+    paddingHorizontal: 12,
+    paddingVertical: 11,
+    justifyContent: 'space-between',
+    backgroundColor: HOME_PAPER.well,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  tileAnswered: {
+    backgroundColor: HOME_PAPER.card,
+    borderColor: HOME_PAPER.hairline,
+  },
+  tileTop: { ...globalStyles.row, gap: 8 },
+  tileIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
   },
-  rowDivided: { borderTopWidth: 1, borderTopColor: HOME_HAIRLINE },
-  rowPressed: { backgroundColor: HOME_ACCENT_SOFT },
-  rowText: { flex: 1 },
-  rowLabel: { color: colors.textMuted, fontSize: 13, lineHeight: 17 },
-  /* The value is the answer, so it carries the weight — the label above it is
-     only there to say what the answer is to. */
-  rowValue: {
-    color: HOME_NAVY,
-    fontSize: 16,
-    lineHeight: 22,
+  tileIconIdle: { backgroundColor: HOME_PAPER.card },
+  tileLabel: { ...EYEBROW, color: HOME_INK.inkSoft, letterSpacing: 1.2 },
+  tileValue: {
+    marginTop: 8,
+    color: HOME_INK.ink,
+    fontSize: 15,
+    lineHeight: 20,
     fontWeight: '700',
+    letterSpacing: -0.2,
   },
-  rowValueEmpty: { color: brand.textPlaceholder, fontWeight: '400' },
+  tileValueEmpty: { color: HOME_INK.inkFaint, fontWeight: '500' },
 
+  /* Quick dates, under the tiles. */
   quickRow: {
     ...globalStyles.row,
-    gap: spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: HOME_HAIRLINE,
+    gap: 10,
     paddingLeft: spacing.md,
-    paddingVertical: 10,
+    paddingTop: 14,
+    paddingBottom: 12,
   },
-  quickLabel: { color: colors.textMuted },
-  quickChips: { gap: spacing.sm, paddingRight: spacing.md },
+  quickLabel: {
+    color: HOME_INK.inkSoft,
+    fontSize: 11.5,
+    lineHeight: 15,
+    fontWeight: '500',
+  },
+  quickScroll: { flex: 1 },
+  quickChips: { gap: 6, paddingRight: spacing.md, alignItems: 'center' },
+  /* The liquid selection behind the chips. */
+  pill: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    borderRadius: 999,
+    backgroundColor: HOME_ACCENT.marigoldSoft,
+    borderWidth: 1,
+    borderColor: 'rgba(242,166,59,0.55)',
+  },
   chip: {
+    flexShrink: 0,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: HOME_HAIRLINE,
-    backgroundColor: colors.background,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    borderColor: HOME_PAPER.hairline,
+    paddingHorizontal: 13,
+    paddingVertical: 7,
   },
-  chipActive: {
-    borderColor: 'transparent',
-    /* The sweep is drawn inside; the radius has to clip it. */
-    overflow: 'hidden',
-  },
+  chipActive: { borderColor: 'transparent' },
   chipText: {
-    color: HOME_NAVY,
+    color: HOME_INK.inkSoft,
     fontSize: 12,
     lineHeight: 17,
-    fontWeight: '600',
+    fontWeight: '500',
   },
-  chipTextActive: { color: colors.onPrimary, fontWeight: '700' },
+  chipTextActive: { color: HOME_INK.ink, fontWeight: '700' },
 
-  /*
-   * One card, not two.
-   *
-   * The budget row used to be its own bordered box stacked under the toggle's,
-   * which met it edge to edge — two hairlines against each other and four
-   * rounded corners notching into the seam. It is a row inside the same card
-   * now, divided the way the four basics rows are.
-   */
-  budgetCard: {
-    backgroundColor: colors.background,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: HOME_HAIRLINE,
-    marginTop: spacing.md,
-    overflow: 'hidden',
-  },
-  budgetOn: { borderColor: HERO_ACCENT_COLOR },
+  /* Budget: a section of the composer, not a box of its own. */
+  budgetCard: { borderTopWidth: 1, borderTopColor: HOME_PAPER.hairline },
   budgetRow: {
     ...globalStyles.row,
-    gap: spacing.md,
+    gap: 12,
     paddingHorizontal: spacing.md,
     paddingVertical: 12,
   },
-  budgetRowDivided: { borderTopWidth: 1, borderTopColor: HOME_HAIRLINE },
+  budgetIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: HOME_ACCENT.marigoldSoft,
+  },
   budgetText: { flex: 1 },
   budgetTitle: {
-    color: HOME_NAVY,
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: '700',
+    color: HOME_INK.ink,
+    fontSize: 13.5,
+    lineHeight: 19,
+    fontWeight: '600',
   },
   budgetLink: {
-    color: HOME_NAVY,
+    color: HOME_INK.inkSoft,
+    fontSize: 11.5,
+    lineHeight: 16,
     textDecorationLine: 'underline',
-    marginTop: 1,
   },
+  rangeRow: {
+    ...globalStyles.row,
+    gap: 12,
+    marginHorizontal: 12,
+    marginBottom: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 16,
+    backgroundColor: HOME_PAPER.well,
+  },
+  rangeRowPressed: { opacity: 0.85 },
 
+  /* The send button and the line under it. */
+  ctaWrap: {
+    paddingHorizontal: 12,
+    paddingBottom: 12,
+    paddingTop: 4,
+  },
   cta: {
     ...globalStyles.row,
     justifyContent: 'center',
-    gap: spacing.sm,
+    gap: 10,
     height: 54,
     borderRadius: 999,
-    /* Under the gradient, and the whole of the button on a platform that
-       cannot draw it — never a bare rectangle. */
-    backgroundColor: HERO_ACCENT_COLOR,
-    marginTop: spacing.md,
+    /* Under the gradient, and the whole button where it cannot be drawn. */
+    backgroundColor: HOME_ACCENT.sindoor,
     overflow: 'hidden',
   },
-  /* Behind the label, not around it: the icon and the text are siblings that
-     follow this layer, so they paint over it. */
-  ctaGradient: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  /*
-   * Faded, not grey.
-   *
-   * An unanswered form used to turn this into a grey track — which meant the
-   * button a customer sees on a fresh Home was the one piece of the screen
-   * carrying none of the brand at all, and the warm sweep only appeared after
-   * four taps. Half opacity says "not yet" just as plainly and keeps the
-   * colour on the page.
-   */
-  /* Still plainly not-yet-ready, but no longer washed out to near-cream: at
-     0.45 a fresh Home's main button read as broken rather than as waiting. */
-  ctaIdle: { opacity: 0.72 },
+  /* Not-yet: the same warm sweep, softened — never a grey slab. */
+  ctaIdle: { opacity: 0.55 },
+  ctaPressed: { opacity: 0.9 },
   ctaText: {
-    color: colors.onPrimary,
+    color: '#ffffff',
     fontSize: 16,
-    lineHeight: 22,
+    lineHeight: 21,
     fontWeight: '700',
+    letterSpacing: 0.2,
+  },
+  ctaArrow: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ctaNote: {
+    marginTop: 8,
+    textAlign: 'center',
+    color: HOME_INK.inkSoft,
+    fontSize: 11.5,
+    lineHeight: 15,
   },
 
-  errorText: { color: colors.danger, marginTop: spacing.sm },
-  successCard: {
-    backgroundColor: HOME_GREEN_SOFT,
-    borderRadius: 16,
-    padding: spacing.md,
-    alignItems: 'center',
-    gap: spacing.xs,
+  errorText: {
+    color: colors.danger,
+    marginTop: spacing.sm,
+    paddingHorizontal: spacing.xs,
+    fontSize: 12.5,
+    lineHeight: 17,
   },
-  successText: { color: HOME_NAVY, textAlign: 'center' },
-  successEdit: { color: HERO_ACCENT_COLOR, fontWeight: '700' },
+  successCard: {
+    backgroundColor: HOME_PAPER.card,
+    borderRadius: 26,
+    borderWidth: 1,
+    borderColor: HOME_PAPER.hairline,
+    padding: spacing.lg,
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  successMark: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: HOME_ACCENT.jade,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  successTitle: {
+    ...displayType(22),
+    color: HOME_INK.ink,
+    textAlign: 'center',
+  },
+  successText: {
+    color: HOME_INK.inkSoft,
+    textAlign: 'center',
+    fontSize: 13.5,
+    lineHeight: 19,
+  },
+  successEdit: {
+    color: HOME_ACCENT.sindoor,
+    fontWeight: '700',
+    fontSize: 13,
+    lineHeight: 18,
+  },
 });
 
 export const bannerStyles = StyleSheet.create({
@@ -968,14 +1054,6 @@ export const packagesStyles = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   list: { paddingHorizontal: spacing.md, paddingTop: spacing.md },
-  dots: {
-    ...globalStyles.row,
-    justifyContent: 'center',
-    gap: 6,
-    marginTop: spacing.md,
-  },
-  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.border },
-  dotOn: { width: 18, backgroundColor: HERO_ACCENT_COLOR },
   headText: { flex: 1, paddingRight: spacing.sm },
   title: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 20, fontWeight: '700' },
   subtitle: { color: colors.textMuted, marginTop: spacing.xs, lineHeight: 20 },
@@ -1393,34 +1471,34 @@ export const planSmarterStyles = StyleSheet.create({
 // ---------------------------------------------------------------------------
 
 export const sectionStyles = StyleSheet.create({
-  block: { marginTop: spacing.lg },
+  block: { marginTop: spacing.xl },
   headRow: {
     ...globalStyles.row,
     justifyContent: 'space-between',
+    alignItems: 'flex-end',
     gap: spacing.sm,
     paddingHorizontal: spacing.md,
   },
-  /* The badge and the title, kept together on the left. */
-  headLeft: { flexDirection: 'row', alignItems: 'center', flexShrink: 1 },
+  headLeft: { flexShrink: 1 },
+  /* A short marigold rule above every title — the page's editorial mark. */
+  rule: {
+    width: 18,
+    height: 2,
+    borderRadius: 1,
+    backgroundColor: HOME_ACCENT.marigold,
+    marginBottom: 8,
+  },
   /*
-   * One size for every heading on Home, a step under the design system's
-   * `sectionTitle`.
-   *
-   * Home stacks six of these — the occasions, the events, the offers, the
-   * packages, the organizers — and at 18 they competed with the titles inside
-   * the cards under them. Set here rather than on the token, because the token
-   * is shared with screens that have one heading and room for it. It is the
-   * one place all six are drawn, so they cannot drift apart.
+   * One heading style for every section on Home: the editorial serif, a step
+   * larger than the cards' own titles so the page reads in chapters.
    */
   title: {
-    color: HOME_NAVY,
-    fontSize: 16.5,
-    lineHeight: 21,
-    letterSpacing: -0.3,
+    ...displayType(17.5),
+    letterSpacing: -0.2,
+    color: HOME_INK.ink,
     flexShrink: 1,
   },
-  /* The section's colour and icon, as a small badge in front of its name.
-     A mark to find the section by, not a banner. */
+  /** Kept for the review dump; headings carry no badge any more. */
   toneBadge: {
     width: 28,
     height: 28,
@@ -1430,13 +1508,33 @@ export const sectionStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  /** The trailing "See all" — the design system's button token. */
-  action: { color: HERO_ACCENT_COLOR },
-  /** The line under a section heading. Size from the `body` token. */
+  /** The trailing "See all", as a small outlined pill with an arrow. */
+  actionPill: {
+    ...globalStyles.row,
+    gap: 2,
+    paddingLeft: 11,
+    paddingRight: 7,
+    paddingVertical: 5,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: HOME_PAPER.hairline,
+    backgroundColor: HOME_PAPER.card,
+  },
+  action: {
+    color: HOME_ACCENT.sindoor,
+    fontSize: 13,
+    lineHeight: 17,
+    fontWeight: '600',
+  },
+  /** A label that is a fact, not a control ("3 live"). */
+  actionStatic: { color: HOME_ACCENT.sindoor },
+  /** The line under a section heading. */
   subtitle: {
-    color: colors.textMuted,
+    color: HOME_INK.inkSoft,
     marginTop: spacing.xs,
     paddingHorizontal: spacing.md,
+    fontSize: 13,
+    lineHeight: 19,
   },
 });
 
@@ -2071,7 +2169,7 @@ export const couponSheetStyles = StyleSheet.create({
 });
 
 /** The illustration inside an occasion tile. */
-export const OCCASION_TILE_ART = 34;
+export const OCCASION_TILE_ART = 38;
 
 /** Four across, two down — the most this section may ever be tall. */
 export const OCCASION_COLUMNS = 4;
@@ -2091,14 +2189,9 @@ const OCCASION_PAGE_WIDTH = Dimensions.get('window').width - spacing.md * 2;
 const OCCASION_COLUMN_WIDTH = OCCASION_PAGE_WIDTH / OCCASION_COLUMNS;
 
 export const occasionGridStyles = StyleSheet.create({
-  /*
-   * Four to a row, wrapping. Each tile takes a fixed share of the width
-   * rather than a fixed number of points, so the columns stay even on a small
-   * phone and a large one without a second breakpoint to maintain.
-   */
   /* Without flexGrow: 0 the scroll view claims the column's leftover height
      and stretches its tiles down the page. */
-  scroll: { flexGrow: 0, marginTop: 14 },
+  scroll: { flexGrow: 0, marginTop: 16 },
   scrollContent: { paddingHorizontal: spacing.md },
   /*
    * One page is exactly the usable width, so four tiles fill a row and the
@@ -2110,30 +2203,46 @@ export const occasionGridStyles = StyleSheet.create({
     flexWrap: 'wrap',
     rowGap: spacing.md,
   },
-  tile: { width: OCCASION_COLUMN_WIDTH, alignItems: 'center', gap: spacing.sm },
+  tile: { width: OCCASION_COLUMN_WIDTH, alignItems: 'center', gap: 8 },
+  /* A rounded square of the occasion's own colour, lit from the top corner. */
   tileArt: {
-    width: 58,
-    height: 58,
-    borderRadius: 16,
+    width: 66,
+    height: 66,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
-    /* A warm near-white on a warm canvas: the tile should read as a raised
-       square, not as a panel cut out of the page. */
-    backgroundColor: '#fffdf7',
     borderWidth: 1,
-    borderColor: '#f3e7d2',
+    borderColor: 'rgba(255,255,255,0.7)',
+    ...Platform.select({
+      ios: {
+        shadowColor: HOME_INK.night,
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 4 },
+      },
+      android: {},
+    }),
   },
   tilePhoto: { width: '100%', height: '100%' },
+  /* The soft light in the tile's top-left corner. */
+  tileShine: {
+    position: 'absolute',
+    top: -18,
+    left: -18,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.55)',
+  },
   tileLabel: {
-    color: HOME_NAVY,
+    color: HOME_INK.ink,
     textAlign: 'center',
     /* A quarter of a phone is about 85pt of text. "Housewarming" fits that at
-       11 and breaks mid-word at 12, which reads as a typo rather than a wrap. */
-    fontSize: 11,
+       11.5 and breaks mid-word at 12.5. */
+    fontSize: 11.5,
     lineHeight: 15,
-    /* Room for two lines at every tile, so a one-line neighbour does not sit
-       at a different height from a two-line one. */
+    fontWeight: '500',
     minHeight: 30,
     paddingHorizontal: 1,
   },
@@ -2320,12 +2429,12 @@ export const organizerRowStyles = StyleSheet.create({
   },
   card: {
     width: ORGANIZER_CARD_WIDTH,
-    borderRadius: 20,
+    borderRadius: 22,
     backgroundColor: colors.background,
     overflow: 'hidden',
     ...Platform.select({
       ios: {
-        shadowColor: HOME_NAVY,
+        shadowColor: HOME_INK.night,
         shadowOpacity: 0.08,
         shadowRadius: 12,
         shadowOffset: { width: 0, height: 5 },
@@ -2344,6 +2453,7 @@ export const organizerRowStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   coverShade: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
+  tier: { position: 'absolute', top: 10, left: 10 },
   /* Frosted, so it reads on a light photo and a dark one. */
   heart: {
     position: 'absolute',
@@ -2390,7 +2500,7 @@ export const organizerRowStyles = StyleSheet.create({
   },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   name: {
-    color: HOME_NAVY,
+    color: HOME_INK.ink,
     fontWeight: '800',
     fontSize: 14,
     lineHeight: 19,
@@ -2441,17 +2551,31 @@ export const trustStripStyles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
     paddingHorizontal: spacing.md,
-    marginTop: spacing.lg,
+    marginTop: spacing.xl,
   },
   card: {
     flex: 1,
-    borderRadius: 14,
+    borderRadius: 18,
     borderWidth: 1,
-    borderColor: HOME_HAIRLINE,
-    backgroundColor: colors.background,
+    borderColor: HOME_PAPER.hairline,
+    backgroundColor: HOME_PAPER.card,
     padding: 12,
   },
-  label: { color: '#414b5c', fontSize: 12.5, marginTop: 10, lineHeight: 17 },
+  icon: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: HOME_ACCENT.jadeSoft,
+  },
+  label: {
+    color: HOME_INK.ink,
+    fontSize: 12,
+    marginTop: 10,
+    lineHeight: 16,
+    fontWeight: '500',
+  },
 });
 
 /** The warm cream the "other events" banner's photo fades into. */

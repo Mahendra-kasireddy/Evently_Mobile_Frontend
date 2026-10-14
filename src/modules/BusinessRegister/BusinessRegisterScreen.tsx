@@ -1,6 +1,10 @@
 import { useCallback, useEffect } from 'react';
-import { ActivityIndicator, View } from 'react-native';
-import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import { ActivityIndicator, StatusBar, View } from 'react-native';
+import {
+  useNavigation,
+  useRoute,
+  type RouteProp,
+} from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppHeader, EventlyButton, EventlyText } from '../../Components';
@@ -61,13 +65,15 @@ export function BusinessRegisterScreen() {
 
   // Registered: the dashboard and its go-live checklist take it from here.
   useEffect(() => {
-    if (role === 'organizer' && organizer.done && view === 'organizer') openDashboard();
+    if (role === 'organizer' && organizer.done && view === 'organizer')
+      openDashboard();
   }, [role, organizer.done, view, openDashboard]);
 
   // A number that is already a sub-vendor signs in rather than signs up.
   const isVendor = roles.includes('vendor');
   useEffect(() => {
-    if (role !== 'subvendor' || !token || !isVendor || view === 'vendor') return;
+    if (role !== 'subvendor' || !token || !isVendor || view === 'vendor')
+      return;
     saveDefaultRole('vendor').catch(() => undefined);
     dispatch(setActiveView('vendor'));
   }, [role, token, isVendor, view, dispatch]);
@@ -80,10 +86,14 @@ export function BusinessRegisterScreen() {
 
   if (!token) {
     return (
-      <SafeAreaView style={s.container} edges={['top']}>
-        <AppHeader title={copy.header} />
-        <AuthGateSection copy={copy} />
-      </SafeAreaView>
+      <View style={s.container}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="transparent"
+          translucent
+        />
+        <AuthGateSection copy={copy} onBack={() => navigation.goBack()} />
+      </View>
     );
   }
 

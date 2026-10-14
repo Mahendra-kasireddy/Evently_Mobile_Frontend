@@ -5,8 +5,11 @@ import {
   EventlyIcon,
   EventlyText,
   GradientFill,
+  MetalBadge,
   PressableScale,
+  RevealImage,
 } from '../../../Components';
+import { HOME_ACCENT } from '../design';
 import { SECTION_TONE_GRADIENT } from '../constants';
 import { organizerRowStyles as s } from '../styles';
 import { SectionHead } from './SectionHead';
@@ -34,31 +37,31 @@ const ORGANIZER_ACCENTS: Array<{
   tags: string[][];
 }> = [
   {
-    gradient: ['#5b9bff', '#2554b8'],
+    gradient: [HOME_ACCENT.marigold, HOME_ACCENT.sindoor],
     tags: [
-      ['#e9f0fd', '#2b5aa8'],
-      ['#f1ecff', '#6d4df2'],
+      [HOME_ACCENT.marigoldSoft, '#9a5a12'],
+      [HOME_ACCENT.roseSoft, '#a83c5c'],
     ],
   },
   {
-    gradient: ['#ff8a5c', '#e8433a'],
+    gradient: ['#ec8fab', HOME_ACCENT.rose],
     tags: [
-      ['#fff0e8', '#d24a24'],
-      ['#fdeef3', '#c2416b'],
+      [HOME_ACCENT.roseSoft, '#a83c5c'],
+      [HOME_ACCENT.jadeSoft, '#176b56'],
     ],
   },
   {
-    gradient: ['#a084ff', '#5a35e0'],
+    gradient: ['#43b493', HOME_ACCENT.jade],
     tags: [
-      ['#f1ecff', '#6d4df2'],
-      ['#e6f7f1', '#0f8a68'],
+      [HOME_ACCENT.jadeSoft, '#176b56'],
+      [HOME_ACCENT.marigoldSoft, '#9a5a12'],
     ],
   },
   {
-    gradient: ['#3cc9a1', '#0e8a68'],
+    gradient: ['#7493dd', HOME_ACCENT.lapis],
     tags: [
-      ['#e6f7f1', '#0f8a68'],
-      ['#fff4e2', '#b8650b'],
+      ['#e6ecf8', '#2d4a8f'],
+      [HOME_ACCENT.roseSoft, '#a83c5c'],
     ],
   },
 ];
@@ -102,10 +105,10 @@ function OrganizerCard({
     >
       <View style={s.cover}>
         {item.coverUrl ? (
-          <Image
+          <RevealImage
             source={{ uri: item.coverUrl }}
             style={s.coverImage}
-            resizeMode="cover"
+            tint={item.avatarColor}
           />
         ) : (
           /* No photo yet: their own colour, never somebody else's picture. */
@@ -135,6 +138,16 @@ function OrganizerCard({
             />
           </Svg>
         </View>
+
+        {/* An earned tier, in metal — the one place on Home that shines. */}
+        {item.tier === 'Gold' || item.tier === 'Platinum' ? (
+          <View style={s.tier}>
+            <MetalBadge
+              label={item.tier}
+              tone={item.tier === 'Gold' ? 'gold' : 'platinum'}
+            />
+          </View>
+        ) : null}
 
         {/* Session-only for now: there is no saved-organizers API yet. */}
         <TouchableOpacity
@@ -175,7 +188,11 @@ function OrganizerCard({
             {item.name}
           </EventlyText>
           {item.verified ? (
-            <EventlyIcon name="check-decagram" size={15} color="#3b82f6" />
+            <EventlyIcon
+              name="check-decagram"
+              size={15}
+              color={HOME_ACCENT.jade}
+            />
           ) : null}
         </View>
 

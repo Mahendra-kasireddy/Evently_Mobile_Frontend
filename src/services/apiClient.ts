@@ -14,7 +14,9 @@ import { store } from '../store';
  */
 export const apiClient: AxiosInstance = axios.create({
   baseURL: env.apiBaseUrl,
-  timeout: 15_000,
+  // 60 s: the API host sleeps when idle and takes up to ~50 s to wake; at
+  // 15 s the first request after a quiet spell always failed.
+  timeout: 60_000,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -28,14 +30,19 @@ interface RetriableConfig extends InternalAxiosRequestConfig {
  * the request ("wrong OTP", "refresh token rejected"), not an expired session,
  * so it must never trigger a refresh.
  */
-const AUTH_ENDPOINTS = ['/auth/sendOtp', '/auth/verifyOtp', '/auth/loginUser', REFRESH_ENDPOINT];
+const AUTH_ENDPOINTS = [
+  '/auth/sendOtp',
+  '/auth/verifyOtp',
+  '/auth/loginUser',
+  REFRESH_ENDPOINT,
+];
 
 function isAuthEndpoint(url: string | undefined): boolean {
   if (!url) return false;
-  return AUTH_ENDPOINTS.some((endpoint) => url.includes(endpoint));
+  return AUTH_ENDPOINTS.some(endpoint => url.includes(endpoint));
 }
 
-apiClient.interceptors.request.use((config) => {
+apiClient.interceptors.request.use(config => {
   const token = store.getState().auth.token;
   if (token) {
     config.headers.set('Authorization', `Bearer ${token}`);
@@ -44,12 +51,14 @@ apiClient.interceptors.request.use((config) => {
 });
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  response => response,
   async (error: unknown) => {
     const config = axios.isAxiosError(error)
       ? (error.config as RetriableConfig | undefined)
       : undefined;
-    const status = axios.isAxiosError(error) ? error.response?.status : undefined;
+    const status = axios.isAxiosError(error)
+      ? error.response?.status
+      : undefined;
 
     /*
      * An expired access token is an ordinary fact of life here — the backend
@@ -58,7 +67,12 @@ apiClient.interceptors.response.use(
      * server actually rejects ends the session (refreshSession clears it),
      * which is what makes "stay signed in until I tap logout" hold.
      */
-    if (status === 401 && config && !config._hasRetriedAfterRefresh && !isAuthEndpoint(config.url)) {
+    if (
+      status === 401 &&
+      config &&
+      !config._hasRetriedAfterRefresh &&
+      !isAuthEndpoint(config.url)
+    ) {
       config._hasRetriedAfterRefresh = true;
       const token = await refreshSession();
       if (token) {

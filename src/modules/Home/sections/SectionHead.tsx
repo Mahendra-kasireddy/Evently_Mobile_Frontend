@@ -1,10 +1,10 @@
-import { TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { EventlyText } from '../../../Components';
 import { sectionStyles as s } from '../styles';
 
 interface SectionHeadProps {
   title: string;
-  /** The section's colour — used for its "See all" link. */
+  /** No longer drawn: Home's headings share one palette now. Accepted so callers need not change. */
   tone?: readonly [string, string];
   /** No longer drawn: headings carry no icon badge. Accepted so callers need not change. */
   icon?: string;
@@ -19,15 +19,14 @@ interface SectionHeadProps {
 /**
  * A section's title and its one optional action.
  *
- * Shared so every section on this screen sets its heading identically — the
- * alternative is six near-copies that drift a point apart from each other.
- * The action is a plain label when nothing is passed to press: "3 live" is a
- * fact about the section, not a control, and making it tappable would promise
- * a screen that does not exist.
+ * Editorial: the title in the serif, so Home
+ * reads as chapters rather than as a stack of identical rows. Shared so every
+ * section sets its heading identically. The action is a plain label when
+ * nothing is passed to press: "3 live" is a fact about the section, not a
+ * control, and making it tappable would promise a screen that does not exist.
  */
 export function SectionHead({
   title,
-  tone,
   subtitle,
   actionLabel,
   onPressAction,
@@ -36,12 +35,10 @@ export function SectionHead({
   return (
     <View>
       <View style={s.headRow}>
-        {/* The title on its own — no icon badge. The section's colour lives
-            on in its "See all". */}
         <View style={s.headLeft}>
-          <EventlyText variant="h2" style={s.title} numberOfLines={1}>
+          <Text style={s.title} numberOfLines={1} accessibilityRole="header">
             {title}
-          </EventlyText>
+          </Text>
         </View>
         {actionLabel ? (
           onPressAction ? (
@@ -52,17 +49,10 @@ export function SectionHead({
               accessibilityLabel={`${actionLabel}: ${title}`}
               testID={testID}
             >
-              {/* Plain text, in the section's own colour — the deeper end of
-                  its gradient, so it reads on the light page. */}
-              <EventlyText
-                variant="button"
-                style={[s.action, tone ? { color: tone[1] } : null]}
-              >
-                {actionLabel}
-              </EventlyText>
+              <EventlyText style={s.action}>{actionLabel}</EventlyText>
             </TouchableOpacity>
           ) : (
-            <EventlyText variant="button" style={s.action}>
+            <EventlyText style={[s.action, s.actionStatic]}>
               {actionLabel}
             </EventlyText>
           )

@@ -99,77 +99,140 @@ export const styles = StyleSheet.create({
 export const eventTabsStyles = StyleSheet.create({
   row: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: spacing.sm,
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.md,
   },
   tab: {
     borderRadius: 999,
-    backgroundColor: TRACK,
-    paddingHorizontal: 20,
-    paddingVertical: 9,
+    backgroundColor: '#f1edf0',
+    paddingHorizontal: 24,
+    paddingVertical: 10,
   },
-  tabOn: { backgroundColor: BOOKING_NAVY },
+  tabOn: {
+    backgroundColor: '#1b2550',
+    shadowColor: '#1b2550',
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
+  spark: { position: 'absolute', top: 5, right: 9 },
   // SemiBold: Poppins Bold inside a small pill closes up the counters.
-  tabText: { color: '#6f6a66', fontSize: 14, fontWeight: '600' },
+  tabText: { color: '#8a8590', fontSize: 14, fontWeight: '600' },
   tabTextOn: { color: colors.onPrimary },
+  sprig: { marginLeft: 'auto', transform: [{ rotate: '-20deg' }] },
 });
 
 export const eventCardStyles = StyleSheet.create({
   card: {
-    backgroundColor: colors.background,
-    borderRadius: 16,
+    borderRadius: 24,
     borderWidth: 1,
-    borderColor: HAIRLINE,
-    padding: spacing.md,
-    marginBottom: 14,
+    borderColor: '#f3e6ec',
+    backgroundColor: colors.background,
+    marginBottom: 16,
+    overflow: 'hidden',
+    shadowColor: '#c25a7a',
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 2,
   },
   /**
-   * The event being worked on right now wears the accent as its edge. One at a
-   * time, and only ever the soonest — a list where every card is highlighted
-   * highlights nothing.
+   * The event being worked on right now wears a soft pink-to-lilac ring. One
+   * at a time, and only ever the soonest — a list where every card is
+   * highlighted highlights nothing.
    */
-  cardFocus: { borderColor: BOOKING_ACCENT, borderWidth: 1.5 },
+  cardFocus: { padding: 3, borderWidth: 0 },
+  surface: {
+    backgroundColor: colors.background,
+    borderRadius: 21,
+    padding: 10,
+  },
+  inner: { flexDirection: 'row', gap: 12 },
 
-  head: { flexDirection: 'row', gap: 12 },
-  iconChip: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: BOOKING_ACCENT_SOFT,
+  photoWrap: {
+    width: 112,
+    height: 132,
+    borderRadius: 18,
+    overflow: 'hidden',
+    backgroundColor: '#f6e6ee',
+  },
+  photo: { width: '100%', height: '100%' },
+  dateBadge: {
+    position: 'absolute',
+    left: 8,
+    bottom: 8,
+    minWidth: 42,
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.95)',
     alignItems: 'center',
-    justifyContent: 'center',
   },
-  headText: { flex: 1 },
-  titleRow: { ...globalStyles.row, gap: spacing.sm },
-  title: {
-    color: BOOKING_NAVY,
+  dateDay: {
+    color: '#c42f6a',
     fontSize: 17,
-    fontWeight: '700',
-    lineHeight: 23,
-    flex: 1,
+    fontWeight: '800',
+    lineHeight: 20,
   },
+  dateMonth: {
+    color: '#c42f6a',
+    fontSize: 9.5,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+    lineHeight: 12,
+  },
+
+  body: { flex: 1, justifyContent: 'center', paddingVertical: 2 },
+  kindChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    backgroundColor: '#f1ecff',
+  },
+  kindText: { color: '#6d4df2', fontSize: 10.5, fontWeight: '700' },
+  chipRow: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    gap: 6,
+    marginBottom: 6,
+  },
+  title: {
+    color: '#1b1438',
+    fontSize: 15.5,
+    fontWeight: '800',
+    lineHeight: 20,
+  },
+  metaRow: { ...globalStyles.row, gap: 5, marginTop: 6 },
   subtitle: {
-    color: colors.textMuted,
-    fontSize: 12.5,
-    marginTop: 2,
-    lineHeight: 18,
+    color: '#6b7385',
+    fontSize: 11.5,
+    lineHeight: 16,
+    flexShrink: 1,
   },
 
   statusChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
     borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
     flexShrink: 0,
   },
   /*
    * The longest label this can hold is "EXPIRED — NO RESPONSE". Poppins sets
-   * wide, and at 10/ExtraBold with half a point of tracking that pill crowds
-   * the title off its own line, so the caps run a shade smaller and lighter.
+   * wide, so the caps run small and a little tracked.
    */
-  statusText: { fontSize: 9.5, fontWeight: '700', letterSpacing: 0.4 },
+  statusText: { fontSize: 8.5, fontWeight: '700', letterSpacing: 0.4 },
 
-  progressRow: { ...globalStyles.row, gap: 12, marginTop: 14 },
+  progressRow: { ...globalStyles.row, gap: 10, marginTop: 12 },
   progressTrack: {
     flex: 1,
     height: 6,
@@ -177,80 +240,103 @@ export const eventCardStyles = StyleSheet.create({
     backgroundColor: TRACK,
     overflow: 'hidden',
   },
-  progressFill: {
-    height: '100%',
-    borderRadius: 3,
-    backgroundColor: BOOKING_ACCENT,
-  },
-  daysLabel: { color: '#5b6470', fontSize: 13, fontWeight: '600' },
+  progressFill: { height: '100%', borderRadius: 3, overflow: 'hidden' },
+  daysLabel: { color: '#1b1438', fontSize: 12.5, fontWeight: '700' },
 
-  /** Edge to edge, so the footer reads as its own band rather than a stray rule. */
-  divider: {
-    height: 1,
-    backgroundColor: HAIRLINE,
-    marginTop: 14,
-    marginHorizontal: -spacing.md,
+  next: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 14,
+    backgroundColor: '#f6f3ff',
   },
-  nextText: { color: '#414b5c', fontSize: 13, marginTop: 12, lineHeight: 19 },
+  nextIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: 8,
+    backgroundColor: '#e9e2ff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  nextText: { flex: 1, color: '#3a3550', fontSize: 12, lineHeight: 17 },
 });
 
 export const jumpToStyles = StyleSheet.create({
-  /*
-   * A section label, not a title.
-   *
-   * At 17/Bold navy this line was set exactly like the event card titles above
-   * it, so "Jump to" and "Naming ceremony" read as the same rank and the group
-   * heading stopped doing its one job — saying that what follows belongs
-   * together and sits below what came before.
-   *
-   * It now wears the label treatment Profile and Settings already use for the
-   * same purpose: small, muted, letterspaced caps. Three signals move at once
-   * — size, weight against a lighter colour, and case — so the two levels
-   * cannot be confused at a glance or by someone who reads the screen through
-   * a magnifier. A shade darker and a point larger than those screens' labels,
-   * because this one has to hold its own against much bigger cards.
-   */
+  /* A centred section label between two fading rules. */
+  headRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 14,
+    marginBottom: 14,
+  },
+  headLine: {
+    flex: 1,
+    maxWidth: 70,
+    height: 1.5,
+    borderRadius: 1,
+    backgroundColor: '#f6c9d6',
+  },
   heading: {
-    color: '#7b8595',
+    color: '#c2476d',
     fontSize: 12.5,
     fontWeight: '700',
-    letterSpacing: 0.9,
+    letterSpacing: 2.2,
     textTransform: 'uppercase',
     lineHeight: 17,
-    marginTop: 14,
-    marginBottom: 10,
   },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   tile: {
     // Two per row: half the space, minus half the 12pt gap between them.
-    // No flexGrow — see the occasion grid: a lone or trailing tile would
-    // otherwise stretch to the full row and read as a different component.
     width: '48%',
-    backgroundColor: colors.background,
-    borderRadius: 16,
+    minHeight: 132,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: HAIRLINE,
+    borderColor: 'rgba(255,255,255,0.9)',
     padding: 14,
+    overflow: 'hidden',
+    backgroundColor: colors.background,
+  },
+  sprig: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    transform: [{ rotate: '25deg' }],
   },
   tileIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 11,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
+    transform: [{ rotate: '-8deg' }],
   },
   tileTitle: {
-    color: BOOKING_NAVY,
-    fontSize: 14.5,
-    fontWeight: '600',
+    color: '#1b1438',
+    fontSize: 15,
+    fontWeight: '800',
     lineHeight: 20,
-    marginTop: 12,
+    marginTop: 14,
   },
+  tileFoot: { ...globalStyles.row, gap: 8, marginTop: 2 },
   tileSubtitle: {
-    color: colors.textMuted,
-    fontSize: 12.5,
-    marginTop: 3,
+    flex: 1,
+    color: '#6b7385',
+    fontSize: 12,
     lineHeight: 17,
+  },
+  tileGo: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
@@ -272,7 +358,13 @@ export const sectionHeadStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: { color: BOOKING_NAVY, fontWeight: '800', fontSize: 16, lineHeight: 21, flexShrink: 1 },
+  title: {
+    color: BOOKING_NAVY,
+    fontWeight: '800',
+    fontSize: 16,
+    lineHeight: 21,
+    flexShrink: 1,
+  },
   count: {
     minWidth: 22,
     height: 22,
@@ -288,15 +380,21 @@ export const sectionHeadStyles = StyleSheet.create({
 
 /* The event tickets: each a little ticket, with a perforation and a stub. */
 export const ticketSectionStyles = StyleSheet.create({
-  section: { paddingHorizontal: spacing.md, marginBottom: spacing.lg },
-  list: { gap: spacing.s12 },
+  section: {
+    paddingHorizontal: spacing.md,
+    paddingTop: 6,
+    marginBottom: spacing.lg,
+  },
+  list: { gap: spacing.md },
   ticket: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.background,
-    borderRadius: 18,
-    padding: 10,
+    borderRadius: 22,
+    padding: 12,
     paddingRight: 0,
+    borderWidth: 1,
+    borderColor: '#f6e3ea',
     overflow: 'hidden',
     ...Platform.select({
       ios: {
@@ -308,47 +406,158 @@ export const ticketSectionStyles = StyleSheet.create({
       android: { elevation: 2 },
     }),
   },
-  thumbWrap: { width: 76, height: 84, borderRadius: 14, overflow: 'hidden', backgroundColor: '#e9edf5' },
+  thumbWrap: {
+    width: 108,
+    height: 128,
+    borderRadius: 18,
+    overflow: 'hidden',
+    backgroundColor: '#e9edf5',
+  },
   thumb: { width: '100%', height: '100%' },
+  thumbFallback: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
   thumbDate: {
     position: 'absolute',
-    left: 5,
-    bottom: 5,
+    left: 8,
+    bottom: 8,
     alignItems: 'center',
-    borderRadius: 8,
-    backgroundColor: 'rgba(255,255,255,0.94)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
-  thumbDay: { color: BOOKING_NAVY, fontWeight: '800', fontSize: 13, lineHeight: 15 },
-  thumbMonth: { color: BOOKING_ACCENT, fontWeight: '800', fontSize: 8.5, lineHeight: 10, letterSpacing: 0.5 },
-  body: { flex: 1, gap: 4, paddingLeft: spacing.s12, paddingRight: 6 },
-  rowTitle: { color: BOOKING_NAVY, fontWeight: '800', fontSize: 14, lineHeight: 19 },
-  line: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  lineText: { color: '#6b7385', fontSize: 11.5, lineHeight: 16, flexShrink: 1 },
-  pills: { flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginTop: 2 },
-  pill: { borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
-  pillText: { fontWeight: '700', fontSize: 10.5, lineHeight: 15 },
+  thumbDay: {
+    color: BOOKING_NAVY,
+    fontWeight: '800',
+    fontSize: 17,
+    lineHeight: 19,
+  },
+  thumbMonth: {
+    color: BOOKING_ACCENT,
+    fontWeight: '800',
+    fontSize: 10,
+    lineHeight: 12,
+    letterSpacing: 0.5,
+  },
+  body: { flex: 1, gap: 7, paddingLeft: spacing.md, paddingRight: 8 },
+  rowTitle: {
+    color: BOOKING_NAVY,
+    fontWeight: '800',
+    fontSize: 15.5,
+    lineHeight: 20,
+  },
+  line: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  lineText: { color: '#6b7385', fontSize: 13, lineHeight: 18, flexShrink: 1 },
+  pillsScroll: { flexGrow: 0, marginTop: 4 },
+  pills: { flexDirection: 'row', gap: 6 },
+  pill: { borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 },
+  pillText: { fontWeight: '700', fontSize: 12, lineHeight: 16 },
   typePill: { backgroundColor: BOOKING_ACCENT_SOFT },
   typePillText: { color: BOOKING_ACCENT },
   /* The perforation: notches cut from the top and bottom edges in the page's
      colour, and a dashed line between them. */
-  perf: { width: 16, alignSelf: 'stretch', alignItems: 'center', marginVertical: -10 },
-  perfNotch: { width: 16, height: 16, borderRadius: 8, backgroundColor: BOOKING_CANVAS },
+  perf: {
+    width: 16,
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    marginVertical: -12,
+  },
+  perfNotch: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: BOOKING_CANVAS,
+  },
   perfNotchTop: { marginTop: -8 },
   perfNotchBottom: { marginBottom: -8 },
   perfLine: { flex: 1, justifyContent: 'space-evenly', paddingVertical: 4 },
-  perfDash: { width: 1.5, height: 5, borderRadius: 1, backgroundColor: '#dfe3ea' },
-  stub: { width: 64, alignItems: 'center', justifyContent: 'center', gap: 4 },
-  qr: {
-    width: 42,
-    height: 42,
+  perfDash: {
+    width: 1.5,
+    height: 5,
+    borderRadius: 1,
+    backgroundColor: '#dfe3ea',
+  },
+  stub: {
+    width: 78,
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  glow: {
+    position: 'absolute',
+    top: -70,
+    right: -50,
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    backgroundColor: 'rgba(255,214,228,0.55)',
+  },
+  kindChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
+    backgroundColor: '#fde8ef',
+  },
+  kindChipText: { color: '#c2335f', fontSize: 11, fontWeight: '700' },
+  more: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    zIndex: 3,
+  },
+  moreHit: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  menu: {
+    position: 'absolute',
+    top: 38,
+    right: 12,
+    paddingVertical: 4,
     borderRadius: 14,
+    backgroundColor: '#ffffff',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#1b1438',
+        shadowOpacity: 0.16,
+        shadowRadius: 14,
+        shadowOffset: { width: 0, height: 6 },
+      },
+      android: { elevation: 8 },
+    }),
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+  },
+  menuText: { color: '#1b1438', fontSize: 13.5, fontWeight: '600' },
+  qr: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  stubText: { color: '#6b7385', fontWeight: '700', fontSize: 10.5, lineHeight: 13 },
+  stubText: {
+    color: '#6b7385',
+    fontWeight: '700',
+    fontSize: 12,
+    lineHeight: 15,
+  },
 });
 
 export const bookingStateStyles = StyleSheet.create({
@@ -379,7 +588,12 @@ export const bookingStateStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   inlineText: { flex: 1, gap: 2 },
-  inlineTitle: { color: BOOKING_NAVY, fontWeight: '800', fontSize: 14, lineHeight: 19 },
+  inlineTitle: {
+    color: BOOKING_NAVY,
+    fontWeight: '800',
+    fontSize: 14,
+    lineHeight: 19,
+  },
   inlineBody: { color: colors.textMuted, fontSize: 12, lineHeight: 17 },
   inlineCta: {
     flexDirection: 'row',
@@ -391,7 +605,12 @@ export const bookingStateStyles = StyleSheet.create({
     paddingRight: 9,
     paddingVertical: 8,
   },
-  inlineCtaText: { color: '#ffffff', fontWeight: '800', fontSize: 12.5, lineHeight: 16 },
+  inlineCtaText: {
+    color: '#ffffff',
+    fontWeight: '800',
+    fontSize: 12.5,
+    lineHeight: 16,
+  },
   /* Nothing booked at all. */
   empty: {
     flex: 1,
@@ -478,7 +697,13 @@ export const bookingStateStyles = StyleSheet.create({
     gap: 5,
     paddingHorizontal: 6,
   },
-  segText: { color: colors.textMuted, fontWeight: '700', fontSize: 12.5, lineHeight: 16, flexShrink: 1 },
+  segText: {
+    color: colors.textMuted,
+    fontWeight: '700',
+    fontSize: 12.5,
+    lineHeight: 16,
+    flexShrink: 1,
+  },
   segTextOn: { color: '#ffffff' },
   segCount: {
     minWidth: 20,
@@ -490,6 +715,99 @@ export const bookingStateStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   segCountOn: { backgroundColor: 'rgba(255,255,255,0.28)' },
-  segCountText: { color: colors.textMuted, fontWeight: '800', fontSize: 10.5, lineHeight: 13 },
+  segCountText: {
+    color: colors.textMuted,
+    fontWeight: '800',
+    fontSize: 10.5,
+    lineHeight: 13,
+  },
   segCountTextOn: { color: '#ffffff' },
+});
+
+/* "What next" — illustrated cards below a short list of bookings. */
+export const nextStyles = StyleSheet.create({
+  wrap: { marginTop: 26, paddingHorizontal: spacing.md, gap: 14 },
+  head: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
+  title: { color: '#1b1438', fontSize: 19, fontWeight: '800', lineHeight: 24 },
+  squiggle: { marginTop: -2 },
+  sub: { color: '#6f6a85', fontSize: 13, marginTop: -8, marginLeft: 30 },
+  card: {
+    minHeight: 150,
+    padding: 16,
+    paddingRight: 140,
+    borderRadius: 24,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(26,46,90,0.05)',
+  },
+  icon: {
+    width: 48,
+    height: 48,
+    borderRadius: 15,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  /* Runs past the card's art padding so the title fits on one line. */
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginRight: -120,
+  },
+  cardTitle: {
+    flexShrink: 1,
+    color: '#1b1438',
+    fontSize: 16,
+    fontWeight: '800',
+    lineHeight: 21,
+  },
+  cardBody: { color: '#5d5873', fontSize: 12.5, marginTop: 6, lineHeight: 18 },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 6,
+    marginTop: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    borderRadius: 999,
+    overflow: 'hidden',
+  },
+  buttonText: { color: '#ffffff', fontSize: 13, fontWeight: '700' },
+  /* The illustration, pinned to the card's right side. */
+  art: { position: 'absolute', right: 0, bottom: 0, width: 160, height: 150 },
+  blob: {
+    position: 'absolute',
+    right: -20,
+    bottom: -30,
+    width: 170,
+    height: 170,
+    borderRadius: 85,
+  },
+  blobPink: { backgroundColor: 'rgba(255,170,190,0.35)' },
+  blobViolet: { backgroundColor: 'rgba(190,170,255,0.35)' },
+  artSpot: {
+    position: 'absolute',
+    left: 6,
+    top: 22,
+    transform: [{ rotate: '-20deg' }],
+  },
+  artTicket: {
+    position: 'absolute',
+    right: 30,
+    top: 34,
+    transform: [{ rotate: '-24deg' }],
+  },
+  artMic: {
+    position: 'absolute',
+    right: 70,
+    bottom: 14,
+    transform: [{ rotate: '-14deg' }],
+  },
+  artStar1: { position: 'absolute', right: 26, top: 22 },
+  artStar2: { position: 'absolute', right: 118, top: 46 },
+  artTable: { position: 'absolute', right: 26, bottom: 6 },
+  artFlower: { position: 'absolute', right: 60, bottom: 52 },
+  artGlass: { position: 'absolute', right: 30, bottom: 58 },
 });

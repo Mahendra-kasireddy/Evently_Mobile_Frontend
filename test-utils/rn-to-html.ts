@@ -40,6 +40,22 @@ const ESCAPES: Record<string, string> = { '<': '&lt;', '>': '&gt;', '&': '&amp;'
 
 /** MaterialCommunityIcons stand-ins, by glyph name. */
 const ICONS: Record<string, string> = {
+  // Added for the Marigold Hour Home preview.
+  magnify: 'M10.5 4a6.5 6.5 0 104.6 11.1L20 20M10.5 4a6.5 6.5 0 010 13',
+  'bell-outline': 'M6 16V11a6 6 0 0112 0v5l2 2H4zM10 20a2 2 0 004 0',
+  'map-marker': 'M12 21s6-5.7 6-10a6 6 0 10-12 0c0 4.3 6 10 6 10zM12 11h.01',
+  'currency-inr': 'M7 5h10M7 9h10M9 5c4 0 4 8 0 8H7l7 7',
+  'arrow-right': 'M5 12h14M13 6l6 6-6 6',
+  medal: 'M8 3l2 5M16 3l-2 5M12 9a5 5 0 100 10 5 5 0 000-10',
+  'check-decagram': 'M12 3l2.2 1.6 2.7-.2.8 2.6 2.2 1.6-1 2.4 1 2.4-2.2 1.6-.8 2.6-2.7-.2L12 21l-2.2-1.6-2.7.2-.8-2.6L4.1 15.4l1-2.4-1-2.4 2.2-1.6.8-2.6 2.7.2zM9 12l2 2 4-4',
+  'wallet-outline': 'M4 7h15v12H4zM4 7l11-3v3M15 13h2',
+  'lightning-bolt-outline': 'M13 3L5 14h6l-1 7 8-11h-6z',
+  'party-popper': 'M4 20l5-13 8 8zM14 4l1 2M19 9l2-1M17 3l-1 3',
+  'home-variant': 'M4 11l8-7 8 7v9h-5v-6H9v6H4z',
+  'home-variant-outline': 'M4 11l8-7 8 7v9h-5v-6H9v6H4z',
+  'calendar-check-outline': 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4M9 15l2 2 4-4',
+  'ticket-confirmation-outline': 'M3 8a2 2 0 002-2h14a2 2 0 002 2v8a2 2 0 00-2 2H5a2 2 0 00-2-2z',
+  'account-circle-outline': 'M12 3a9 9 0 100 18 9 9 0 000-18zM12 7a3 3 0 100 6 3 3 0 000-6M6.5 18a6 6 0 0111 0',
   'chevron-right': 'M9 6l6 6-6 6',
   'chevron-down': 'M6 9l6 6 6-6',
   check: 'M5 13l4 4L19 7',
@@ -109,6 +125,18 @@ function css(style: Record<string, Json>): string {
 
   Object.entries(style).forEach(([key, value]) => {
     if (value == null || key.startsWith('shadow') || key === 'elevation') {
+      return;
+    }
+    if (key === 'transform' && Array.isArray(value)) {
+      const parts = value
+        .map((t: Record<string, Json>) => {
+          const [k, v] = Object.entries(t)[0] ?? [];
+          if (k == null) return '';
+          if (k.startsWith('translate')) return `${k}(${v}px)`;
+          return `${k}(${v})`;
+        })
+        .filter(Boolean);
+      if (parts.length) decls.push(`transform:${parts.join(' ')}`);
       return;
     }
     const px = typeof value === 'number' ? `${value}px` : String(value);
@@ -213,7 +241,7 @@ function svgNode(node: Json): string {
 
   switch (node.type) {
     case 'RNSVGSvgView':
-      return `<svg width="${p.width}" height="${p.height}" viewBox="${p.minX != null ? `${p.minX} ${p.minY} ${p.vbWidth} ${p.vbHeight}` : `0 0 ${p.bbWidth ?? p.width} ${p.bbHeight ?? p.height}`}" preserveAspectRatio="${aspect(p)}">${kids}</svg>`;
+      return `<svg width="${p.width ?? '100%'}" height="${p.height ?? '100%'}" viewBox="${p.minX != null ? `${p.minX} ${p.minY} ${p.vbWidth} ${p.vbHeight}` : `0 0 ${p.bbWidth ?? p.width} ${p.bbHeight ?? p.height}`}" preserveAspectRatio="${aspect(p)}">${kids}</svg>`;
     case 'RNSVGGroup':
       // Carries through whatever transform react-native-svg resolved.
       return p.matrix ? `<g${a} transform="matrix(${p.matrix.join(',')})">${kids}</g>` : `<g${a}>${kids}</g>`;
@@ -266,7 +294,7 @@ export function toHtml(node: Json): string {
     const d = ICONS[name] ?? 'M6 12h12';
     const color = style.color ?? '#111827';
     const fill = FILLED_ICONS.has(name) ? color : 'none';
-    return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="${fill}" stroke="${color}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="${d}"/></svg>`;
+    return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="${fill}" stroke="${color}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;position:relative"><path d="${d}"/></svg>`;
   }
 
   /*
@@ -321,8 +349,10 @@ export function toHtml(node: Json): string {
     isText && node.props?.numberOfLines === 1
       ? 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0'
       : '';
+  /* position:relative on everything, so a later sibling paints over an
+     earlier absolutely-positioned one — React Native's order, not CSS's. */
   const box = isText
-    ? 'display:block'
+    ? 'display:block;position:relative'
     : 'display:flex;flex-direction:column;align-items:stretch;min-width:0;position:relative';
   const inner = (Array.isArray(kids) ? kids : [kids])
     .map(toHtml)

@@ -1,7 +1,6 @@
 import { TouchableOpacity, View } from 'react-native';
 import { EventlyIcon, EventlyText } from '../../../Components';
-import { colors } from '../../../theme';
-import { HERO_ACCENT_COLOR, HOME_NAVY } from '../constants';
+import { HOME_ACCENT, HOME_INK } from '../design';
 import { homeHeaderStyles as s } from '../styles';
 
 interface HomeHeaderProps {
@@ -39,12 +38,10 @@ function Badge({ count }: { count: number }) {
  *
  * Where, on the left, the way delivery apps do it — the area big, the city
  * small, a chevron that says it changes. Events, organizers and prices on
- * Home all depend on it, so it earns the corner. Profile moved to the bottom
- * bar, where the account belongs.
+ * Home all depend on it, so it earns the corner.
  *
- * One row, not two. Search is an icon here rather than a field drawn to look
- * like an input: typing happens on the search screen, where the results and
- * the filters live.
+ * On the photograph the controls are frosted glass discs with white glyphs;
+ * on the canvas (loading and error states) they are plain ink.
  */
 export function HomeHeader({
   locationTitle,
@@ -56,9 +53,7 @@ export function HomeHeader({
   onPressNotifications,
   onPressSearch,
 }: HomeHeaderProps) {
-  /* On the photo everything is white and each control gets its own tinted
-     disc; on the canvas it is navy and unadorned. */
-  const tint = onPhoto ? colors.onPrimary : HOME_NAVY;
+  const tint = onPhoto ? '#ffffff' : HOME_INK.ink;
   const iconButton = [s.iconButton, onPhoto && s.iconButtonOnPhoto];
   const title = locationTitle || (locating ? 'Locating…' : 'Set your location');
   return (
@@ -79,18 +74,20 @@ export function HomeHeader({
           testID="home-location"
         >
           <View style={s.locationRow}>
-            <EventlyIcon
-              name="map-marker"
-              size={18}
-              color={onPhoto ? '#ffffff' : HERO_ACCENT_COLOR}
-            />
+            <View style={[s.pin, onPhoto && s.pinOnPhoto]}>
+              <EventlyIcon
+                name="map-marker"
+                size={14}
+                color={onPhoto ? HOME_ACCENT.marigold : HOME_ACCENT.saffron}
+              />
+            </View>
             <EventlyText
               style={[s.locationTitle, onPhoto && s.onPhotoText]}
               numberOfLines={1}
             >
               {title}
             </EventlyText>
-            <EventlyIcon name="chevron-down" size={20} color={tint} />
+            <EventlyIcon name="chevron-down" size={18} color={tint} />
           </View>
           {locationSubtitle ? (
             <EventlyText
@@ -108,12 +105,9 @@ export function HomeHeader({
             onPress={onPressSearch}
             accessibilityRole="button"
             accessibilityLabel="Search"
+            hitSlop={4}
           >
-            <EventlyIcon
-              name="magnify"
-              size={22}
-              color={onPhoto ? HERO_ACCENT_COLOR : tint}
-            />
+            <EventlyIcon name="magnify" size={21} color={tint} />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -125,12 +119,9 @@ export function HomeHeader({
                 ? `Notifications, ${unreadCount} unread`
                 : 'Notifications'
             }
+            hitSlop={4}
           >
-            <EventlyIcon
-              name="bell-outline"
-              size={22}
-              color={onPhoto ? '#7c5cdb' : tint}
-            />
+            <EventlyIcon name="bell-outline" size={21} color={tint} />
             <Badge count={unreadCount} />
           </TouchableOpacity>
         </View>

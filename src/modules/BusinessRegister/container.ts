@@ -44,9 +44,12 @@ export function useOrganizerSignup(enabled: boolean): OrganizerSignupResult {
    * live it would flip to true the moment this sign-up's own register call
    * added the role.
    */
-  const [alreadyOrganizer, setAlreadyOrganizer] = useState<boolean | null>(null);
+  const [alreadyOrganizer, setAlreadyOrganizer] = useState<boolean | null>(
+    null,
+  );
   useEffect(() => {
-    if (token && alreadyOrganizer === null) setAlreadyOrganizer(roles.includes('organizer'));
+    if (token && alreadyOrganizer === null)
+      setAlreadyOrganizer(roles.includes('organizer'));
   }, [token, roles, alreadyOrganizer]);
 
   const [submitting, setSubmitting] = useState(false);
@@ -65,12 +68,20 @@ export function useOrganizerSignup(enabled: boolean): OrganizerSignupResult {
       setError(null);
       registerOrganizer(details)
         .then(res => {
-          dispatch(setSession({ token: res.token, refreshToken: res.refreshToken ?? null }));
+          dispatch(
+            setSession({
+              token: res.token,
+              refreshToken: res.refreshToken ?? null,
+            }),
+          );
           dispatch(setActiveView('organizer'));
           setDone(true);
         })
         .catch((err: unknown) => {
-          setError((err as { message?: string })?.message ?? REGISTER_COPY.registerFailed);
+          setError(
+            (err as { message?: string })?.message ??
+              REGISTER_COPY.registerFailed,
+          );
         })
         .finally(() => setSubmitting(false));
     },
@@ -80,7 +91,8 @@ export function useOrganizerSignup(enabled: boolean): OrganizerSignupResult {
   // A returning organizer has nothing to fill in.
   const resumed = useRef(false);
   useEffect(() => {
-    if (!enabled || !token || alreadyOrganizer !== true || resumed.current) return;
+    if (!enabled || !token || alreadyOrganizer !== true || resumed.current)
+      return;
     resumed.current = true;
     register();
   }, [enabled, token, alreadyOrganizer, register]);

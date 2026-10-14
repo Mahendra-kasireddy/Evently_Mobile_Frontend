@@ -48,9 +48,8 @@ const ENVIRONMENTS: Record<AppEnv, EnvConfig> = {
   },
   production: {
     apiBaseUrl: 'https://evently-backend-ti68.onrender.com/api',
-    // Placeholder until the web app is deployed — the dashboards will not
-    // open in a production build until this is the real URL.
-    webAppUrl: 'https://evently.example.com',
+    // The deployed web app (Vercel) — the organizer and sub-vendor dashboards.
+    webAppUrl: 'https://evently-frontend-five.vercel.app',
   },
 };
 

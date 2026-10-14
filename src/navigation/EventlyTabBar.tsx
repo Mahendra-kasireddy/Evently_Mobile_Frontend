@@ -20,6 +20,13 @@ import {
   useReducedMotion,
 } from '../Components';
 
+/*
+ * Each tab in its own colour — Home coral, Bookings violet, Events teal,
+ * Profile blue — so the bar is read by colour before it is read by label.
+ * The current tab sits in a glass drop of that colour; the others show their
+ * colour softly on the icon alone.
+ */
+
 /** Each tab's look: its gradient, and its icon filled and outlined. */
 const TAB_LOOK: Record<
   string,
@@ -78,7 +85,7 @@ const TAB_LOOK: Record<
 const FALLBACK = TAB_LOOK.Home;
 /** Tab screens with no button on the bar — reached another way (Plan and Chat: the + menu). */
 const OFF_BAR = new Set(['Plan', 'Chat']);
-const MUTED = '#8a93a3';
+const MUTED = '#9a909f';
 
 /* The bar and the raised button in its notch. */
 const BAR_HEIGHT = 66;
@@ -88,7 +95,7 @@ const FAB_SIZE = 60;
 const NOTCH_R = FAB_SIZE / 2 + 7;
 /** How far the button rises above the bar's top edge. */
 const FAB_RISE = 22;
-const FAB_GRADIENT: [string, string] = ['#ff7eb3', '#e8433a'];
+const FAB_GRADIENT: [string, string] = ['#ff6f91', '#e8433a'];
 
 /** What the + offers, and where each bubble lands relative to the button. */
 type QuickAction = {
@@ -192,12 +199,21 @@ function TabButton({
           ]}
           pointerEvents="none"
         >
-          <GradientFill colors={look.gradient} direction="diagonal" />
+          {/* A drop of the tab's colour: a translucent wash, light pooling
+              at the top, a fine rim, and a glint — glass, not paint. */}
+          <GradientFill
+            colors={look.gradient}
+            direction="down"
+            opacities={[0.28, 0.14]}
+          />
+          <View style={[s.dropRim, { borderColor: `${look.gradient[1]}47` }]} />
+          <View style={s.dropSheen} />
+          <View style={s.dropGlint} />
         </Animated.View>
         <EventlyIcon
           name={focused ? look.on : look.off}
           size={22}
-          color={focused ? '#ffffff' : MUTED}
+          color={focused ? look.ink : `${look.ink}99`}
         />
       </View>
       <EventlyText
@@ -439,7 +455,7 @@ export function EventlyTabBar({
               <Path
                 d={barPath(barWidth)}
                 fill="#ffffff"
-                stroke="#ece8f3"
+                stroke="#eee5d8"
                 strokeWidth={Platform.OS === 'android' ? 1 : 0}
               />
             </Svg>
@@ -454,6 +470,9 @@ export function EventlyTabBar({
 
       {/* A child of the strip, not of the bar: Android delivers no touches
           outside a parent's box, and the button rises above the bar's. */}
+      {/* A soft pink glow pooled behind the +, so it sits in a light of its
+          own colour rather than on bare white. */}
+      {open ? null : <View style={s.fabHalo} pointerEvents="none" />}
       <Pressable
         ref={fabRef}
         /* Hidden while the menu is open — its copy in the Modal, with no
@@ -523,7 +542,7 @@ export function EventlyTabBar({
 const s = StyleSheet.create({
   /* The strip under the card matches the app's canvas, so the card floats. */
   wrap: {
-    backgroundColor: '#faf8f7',
+    backgroundColor: '#faf6f0',
     paddingHorizontal: 14,
     paddingTop: FAB_RISE + 4,
   },
@@ -536,8 +555,8 @@ const s = StyleSheet.create({
     bottom: 0,
     ...Platform.select({
       ios: {
-        shadowColor: '#1a2e5a',
-        shadowOpacity: 0.1,
+        shadowColor: '#1c1326',
+        shadowOpacity: 0.12,
         shadowRadius: 16,
         shadowOffset: { width: 0, height: 6 },
       },
@@ -567,6 +586,37 @@ const s = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
   },
+  dropRim: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  /* Light pooled across the top half, like the curve of a drop. */
+  dropSheen: {
+    position: 'absolute',
+    top: 1,
+    left: 6,
+    right: 6,
+    height: '45%',
+    borderTopLeftRadius: 14,
+    borderTopRightRadius: 14,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.55)',
+  },
+  dropGlint: {
+    position: 'absolute',
+    top: 5,
+    left: 9,
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+  },
   label: { color: MUTED, fontSize: 11, lineHeight: 14, fontWeight: '500' },
   labelOn: { fontWeight: '700' },
 
@@ -584,13 +634,22 @@ const s = StyleSheet.create({
     backgroundColor: '#e8433a',
     ...Platform.select({
       ios: {
-        shadowColor: '#e2477a',
-        shadowOpacity: 0.4,
+        shadowColor: '#ff4f7a',
+        shadowOpacity: 0.55,
         shadowRadius: 12,
         shadowOffset: { width: 0, height: 6 },
       },
       android: { elevation: 8 },
     }),
+  },
+  fabHalo: {
+    position: 'absolute',
+    top: 2 - 9,
+    alignSelf: 'center',
+    width: FAB_SIZE + 18,
+    height: FAB_SIZE + 18,
+    borderRadius: (FAB_SIZE + 18) / 2,
+    backgroundColor: 'rgba(255,111,145,0.18)',
   },
   fabFloating: { alignSelf: 'auto' },
   fabHidden: { opacity: 0 },
@@ -610,7 +669,7 @@ const s = StyleSheet.create({
     overflow: 'hidden',
   },
 
-  backdrop: { backgroundColor: 'rgba(20, 14, 40, 0.72)' },
+  backdrop: { backgroundColor: 'rgba(28, 19, 38, 0.76)' },
 });
 
 export default EventlyTabBar;

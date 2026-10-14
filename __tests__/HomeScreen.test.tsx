@@ -250,6 +250,7 @@ describe('the basics form', () => {
      */
     const {
       HERO_PHOTO_OVERLAP,
+      HERO_PHOTO_HEIGHT,
       styles: homeStyles,
       homeHeroPhotoStyles,
     } = require('../src/modules/Home/styles');
@@ -266,8 +267,12 @@ describe('the basics form', () => {
      * flex-growing sheet over everything below are what keep "the picture is
      * at the top" true rather than nearly true.
      */
+    /* A fixed number of points — the Marigold Hour hero carries a headline
+       under the header, so the band is taller than the old 268, but it is
+       still one constant rather than a flexible backdrop. */
+    expect(typeof HERO_PHOTO_HEIGHT).toBe('number');
     expect((homeHeroPhotoStyles.wrap as Record<string, unknown>).height).toBe(
-      268,
+      HERO_PHOTO_HEIGHT,
     );
     expect(sheet.backgroundColor).toBeTruthy();
     expect(sheet.flexGrow).toBe(1);

@@ -1,5 +1,8 @@
 import { apiClient } from '../../services/apiClient';
-import { ONBOARDING_CONFIG_ENDPOINT, REGISTER_ORGANIZER_ENDPOINT } from './constants';
+import {
+  ONBOARDING_CONFIG_ENDPOINT,
+  REGISTER_ORGANIZER_ENDPOINT,
+} from './constants';
 import type {
   OnboardingConfigDTO,
   OrganizerSignupDetails,
@@ -23,6 +26,8 @@ export async function registerOrganizer(
 
 /** The categories and cities the admin has configured. */
 export async function fetchOnboardingConfig(): Promise<OnboardingConfigDTO> {
-  const { data } = await apiClient.get<OnboardingConfigDTO>(ONBOARDING_CONFIG_ENDPOINT);
+  const { data } = await apiClient.get<OnboardingConfigDTO>(
+    ONBOARDING_CONFIG_ENDPOINT,
+  );
   return data;
 }

@@ -1,5 +1,5 @@
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyText } from '../../../Components';
+import { EventlyIcon, EventlyText } from '../../../Components';
 import { BOOKING_TAB_LABEL } from '../constants';
 import { eventTabsStyles as s } from '../styles';
 import type { BookingTab } from '../types';
@@ -24,7 +24,7 @@ const TABS: BookingTab[] = ['active', 'past'];
 export function EventTabs({ value, onChange, counts }: EventTabsProps) {
   return (
     <View style={s.row} accessibilityRole="tablist">
-      {TABS.map((tab) => {
+      {TABS.map(tab => {
         const on = value === tab;
         return (
           <TouchableOpacity
@@ -36,12 +36,24 @@ export function EventTabs({ value, onChange, counts }: EventTabsProps) {
             accessibilityState={{ selected: on }}
             accessibilityLabel={`${BOOKING_TAB_LABEL[tab]}, ${counts[tab]}`}
           >
-            <EventlyText variant="caption" style={[s.tabText, on && s.tabTextOn]}>
+            {on ? (
+              <View style={s.spark} pointerEvents="none">
+                <EventlyIcon name="star-four-points" size={8} color="#ffd38a" />
+              </View>
+            ) : null}
+            <EventlyText
+              variant="caption"
+              style={[s.tabText, on && s.tabTextOn]}
+            >
               {BOOKING_TAB_LABEL[tab]}
             </EventlyText>
           </TouchableOpacity>
         );
       })}
+      {/* A light sprig at the row's end, as on the rest of the screen. */}
+      <View style={s.sprig} pointerEvents="none">
+        <EventlyIcon name="leaf" size={22} color="rgba(240,150,110,0.35)" />
+      </View>
     </View>
   );
 }

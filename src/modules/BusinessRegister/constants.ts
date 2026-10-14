@@ -16,23 +16,31 @@ export const REG_GREEN_DARK = '#0f6b4f';
 
 export interface AuthGateCopy {
   header: string;
+  /** "Step 1 of 2" — the whole sign-up is two screens, and saying so keeps people going. */
+  step: string;
   title: string;
   subtitle: string;
+  /** The one-account rule, said where it matters: before the number is typed. */
+  sameNumber: string;
 }
 
 /** The OTP step, per role. Same sign-in as customers — said outright so nobody registers twice. */
 export const AUTH_COPY: Record<JoinRole, AuthGateCopy> = {
   organizer: {
     header: 'Become an organizer',
-    title: 'Verify your mobile to continue',
-    subtitle:
-      'Use the number you want customers to reach you on. Already using Evently? Use that same number — your organizer profile joins your account.',
+    step: 'STEP 1 OF 2 · VERIFY',
+    title: 'Verify your mobile',
+    subtitle: 'Use the number customers should reach your business on.',
+    sameNumber:
+      'Already use Evently as a customer? Use that same number — your organizer profile is added to the same account.',
   },
   subvendor: {
     header: 'Become a sub-vendor',
-    title: 'Verify your mobile to continue',
-    subtitle:
-      'Use the number organizers know you by. Already using Evently? Use that same number — your sub-vendor profile joins your account.',
+    step: 'STEP 1 OF 2 · VERIFY',
+    title: 'Verify your mobile',
+    subtitle: 'Use the number organizers already know you by.',
+    sameNumber:
+      'Already use Evently as a customer? Use that same number — your sub-vendor profile is added to the same account.',
   },
 };
 
@@ -48,7 +56,8 @@ export const REGISTER_COPY = {
 export const SIGNUP_COPY = {
   header: 'Become an organizer',
   title: 'Tell us about your business',
-  subtitle: 'Just the basics to open your dashboard. Documents and bank details can wait.',
+  subtitle:
+    'Just the basics to open your dashboard. Documents and bank details can wait.',
   firstName: 'First name',
   lastName: 'Last name',
   businessName: 'Business name',

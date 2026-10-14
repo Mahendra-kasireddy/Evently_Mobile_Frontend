@@ -14,25 +14,119 @@ import {
 
 export const screenStyles = StyleSheet.create({
   container: { flex: 1, backgroundColor: REG_BG },
-  centerFill: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.sm, padding: spacing.xl },
+  centerFill: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    padding: spacing.xl,
+  },
   centerText: { color: REG_TEXT_MUTED, textAlign: 'center' },
   web: { flex: 1 },
 });
 
 export const authGateStyles = StyleSheet.create({
   flex: { flex: 1 },
-  content: { flexGrow: 1, padding: spacing.lg, paddingTop: spacing.xl * 1.2 },
+  content: { flexGrow: 1, paddingBottom: spacing.xl },
+  hero: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl * 2,
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+    overflow: 'hidden',
+    backgroundColor: REG_NAVY,
+  },
+  heroGlow: {
+    position: 'absolute',
+    top: -60,
+    right: -70,
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    backgroundColor: 'rgba(244,123,77,0.16)',
+  },
+  heroBack: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    marginBottom: spacing.md,
+  },
+  /* The form, on a white card lifted over the hero's foot. */
+  sheet: {
+    marginTop: -spacing.xl,
+    marginHorizontal: spacing.md,
+    padding: spacing.lg,
+    paddingTop: spacing.lg,
+    borderRadius: 26,
+    backgroundColor: colors.background,
+    ...Platform.select({
+      ios: {
+        shadowColor: REG_NAVY,
+        shadowOpacity: 0.1,
+        shadowRadius: 18,
+        shadowOffset: { width: 0, height: 8 },
+      },
+      android: { elevation: 4 },
+    }),
+  },
+  stepChip: {
+    alignSelf: 'flex-start',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+    backgroundColor: '#fdeee7',
+    marginBottom: spacing.md,
+  },
+  stepText: {
+    color: REG_ACCENT,
+    fontSize: 11.5,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+  },
+  /* On the hero: light chip, white title. */
+  heroStepChip: {
+    alignSelf: 'flex-start',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    marginBottom: spacing.sm,
+  },
+  heroStepText: {
+    color: '#ffb59a',
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1.4,
+  },
+  /* At the head of the card, beside its first line. */
   badge: {
     width: 52,
     height: 52,
-    borderRadius: 26,
-    backgroundColor: '#fdeee7',
+    borderRadius: 16,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.md,
   },
-  title: { color: REG_NAVY },
-  subtitle: { color: REG_TEXT_MUTED, marginTop: spacing.xs, marginBottom: spacing.lg },
+  title: { color: '#ffffff', fontSize: 28, lineHeight: 34 },
+  subtitle: {
+    color: 'rgba(255,255,255,0.78)',
+    marginTop: spacing.xs,
+    lineHeight: 21,
+  },
+  infoCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    padding: spacing.s12,
+    marginBottom: spacing.lg,
+    borderRadius: 14,
+    backgroundColor: '#f1efff',
+  },
+  infoText: { flex: 1, color: '#3b2f8f', lineHeight: 18 },
   form: { gap: spacing.md },
   label: { color: REG_NAVY },
   phoneRow: {
@@ -46,12 +140,30 @@ export const authGateStyles = StyleSheet.create({
     gap: spacing.sm,
     backgroundColor: colors.surface,
   },
-  dialCode: { color: REG_NAVY, paddingRight: spacing.sm, borderRightWidth: 1, borderRightColor: REG_BORDER },
-  phoneInput: { flex: 1, color: REG_NAVY, fontSize: 17, fontWeight: '600', letterSpacing: 0.5, borderWidth: 0, backgroundColor: 'transparent', paddingHorizontal: 0 },
+  dialCode: {
+    color: REG_NAVY,
+    paddingRight: spacing.sm,
+    borderRightWidth: 1,
+    borderRightColor: REG_BORDER,
+  },
+  phoneInput: {
+    flex: 1,
+    color: REG_NAVY,
+    fontSize: 17,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    borderWidth: 0,
+    backgroundColor: 'transparent',
+    paddingHorizontal: 0,
+  },
   backRow: { ...globalStyles.row, gap: spacing.xs, marginBottom: spacing.xs },
   backText: { color: REG_ACCENT },
   sentTo: { color: REG_TEXT_MUTED, marginBottom: spacing.xs },
-  otpRow: { flexDirection: 'row', gap: spacing.sm, justifyContent: 'space-between' },
+  otpRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    justifyContent: 'space-between',
+  },
   otpBox: {
     flex: 1,
     height: 54,
@@ -70,7 +182,12 @@ export const authGateStyles = StyleSheet.create({
   button: {
     borderRadius: 999,
     ...Platform.select({
-      ios: { shadowColor: REG_ACCENT, shadowOpacity: 0.3, shadowRadius: 10, shadowOffset: { width: 0, height: 5 } },
+      ios: {
+        shadowColor: REG_ACCENT,
+        shadowOpacity: 0.3,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 5 },
+      },
       android: { elevation: 3 },
     }),
   },
@@ -80,14 +197,22 @@ export const authGateStyles = StyleSheet.create({
 
 export const signupStyles = StyleSheet.create({
   flex: { flex: 1 },
-  content: { padding: spacing.lg, paddingBottom: spacing.xl * 1.5, gap: spacing.lg },
+  content: {
+    padding: spacing.lg,
+    paddingBottom: spacing.xl * 1.5,
+    gap: spacing.lg,
+  },
   title: { color: REG_NAVY },
   subtitle: { color: REG_TEXT_MUTED, marginTop: -spacing.sm },
   row: { flexDirection: 'row', gap: spacing.sm },
   half: { flex: 1 },
   field: { gap: spacing.xs },
   label: { color: REG_NAVY },
-  input: { borderColor: REG_BORDER, backgroundColor: colors.surface, borderRadius: 14 },
+  input: {
+    borderColor: REG_BORDER,
+    backgroundColor: colors.surface,
+    borderRadius: 14,
+  },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   chip: {
     paddingVertical: 9,

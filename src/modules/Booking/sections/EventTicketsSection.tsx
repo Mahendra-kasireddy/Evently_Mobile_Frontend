@@ -1,7 +1,17 @@
-import { Image, View } from 'react-native';
-import { EventlyIcon, EventlyText, GradientFill, PressableScale } from '../../../Components';
+import { useState } from 'react';
+import { Image, ScrollView, View } from 'react-native';
+import {
+  EventlyIcon,
+  EventlyText,
+  GradientFill,
+  PressableScale,
+} from '../../../Components';
 import { absoluteFileUrl } from '../../../services/urls';
-import { TICKET_STATE_LABEL, dateBlock, formatEventWhen } from '../../PublicEvents/constants';
+import {
+  TICKET_STATE_LABEL,
+  dateBlock,
+  formatEventWhen,
+} from '../../PublicEvents/constants';
 import type { MyTicket } from '../../PublicEvents/types';
 import { ticketSectionStyles as s } from '../styles';
 import { BookingSectionHead } from './BookingSectionHead';
@@ -25,6 +35,8 @@ const STATE_TINT: Record<string, { bg: string; fg: string }> = {
 
 interface EventTicketsSectionProps {
   tickets: MyTicket[];
+  /** The ⋮ menu's "Event details" — the public event page. */
+  onDetails?: (ticket: MyTicket) => void;
   /** How many to list; the rest are behind "See all". */
   limit?: number;
   /** Off inside a tab, where the tab already names the section. */
@@ -37,13 +49,50 @@ interface EventTicketsSectionProps {
  * The public-event tickets this customer holds, as little tickets: the
  * poster and the details, a perforation, and a stub that opens the QR.
  */
+/**
+ * The event's cover — or, when there is none or it will not load, the
+ * ticket's own colour with a ticket mark, never an empty grey box.
+ */
+function TicketCover({
+  uri,
+  colors,
+}: {
+  uri: string;
+  colors: readonly [string, string];
+}) {
+  const [failed, setFailed] = useState(false);
+  if (!uri || failed) {
+    return (
+      <View style={[s.thumb, s.thumbFallback]}>
+        <GradientFill colors={[colors[0], colors[1]]} direction="diagonal" />
+        <EventlyIcon
+          name="ticket-confirmation"
+          size={34}
+          color="rgba(255,255,255,0.92)"
+        />
+      </View>
+    );
+  }
+  return (
+    <Image
+      source={{ uri }}
+      style={s.thumb}
+      resizeMode="cover"
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
 export function EventTicketsSection({
   tickets,
   limit = SHOWN,
   showHead = true,
   onOpen,
   onSeeAll,
+  onDetails,
 }: EventTicketsSectionProps) {
+  /* Which ticket's ⋮ menu is open, if any. */
+  const [menuFor, setMenuFor] = useState<string | null>(null);
   if (tickets.length === 0) return null;
   const shown = tickets.slice(0, limit);
 
@@ -64,18 +113,27 @@ export function EventTicketsSection({
           const tint = STATE_TINT[ticket.state] ?? STATE_TINT.upcoming;
           const stub = STUB_GRADIENTS[index % STUB_GRADIENTS.length];
           const date = dateBlock(ticket.startDateTime, ticket.timezone);
-          const where = [ticket.venueName, ticket.city].filter(Boolean).join(', ');
+          const where = [ticket.venueName, ticket.city]
+            .filter(Boolean)
+            .join(', ');
           return (
             <PressableScale
               key={ticket.ticketId}
               style={s.ticket}
               onPress={() => onOpen(ticket)}
               accessibilityRole="button"
-              accessibilityLabel={`${ticket.eventTitle}, ${TICKET_STATE_LABEL[ticket.state]}. Open ticket.`}
+              accessibilityLabel={`${ticket.eventTitle}, ${
+                TICKET_STATE_LABEL[ticket.state]
+              }. Open ticket.`}
               testID={`booking-ticket-${ticket.ticketId}`}
             >
+              {/* A soft blush in the corner, as on the design. */}
+              <View style={s.glow} pointerEvents="none" />
               <View style={s.thumbWrap}>
-                <Image source={{ uri: absoluteFileUrl(ticket.coverUrl) }} style={s.thumb} resizeMode="cover" />
+                <TicketCover
+                  uri={absoluteFileUrl(ticket.coverUrl)}
+                  colors={stub}
+                />
                 {date ? (
                   <View style={s.thumbDate}>
                     <EventlyText variant="caption" style={s.thumbDay}>
@@ -89,37 +147,70 @@ export function EventTicketsSection({
               </View>
 
               <View style={s.body}>
-                <EventlyText variant="body" style={s.rowTitle} numberOfLines={1}>
+                <View style={s.kindChip}>
+                  <EventlyIcon
+                    name="star-four-points"
+                    size={11}
+                    color="#e2477a"
+                  />
+                  <EventlyText variant="caption" style={s.kindChipText}>
+                    Event ticket
+                  </EventlyText>
+                </View>
+                <EventlyText
+                  variant="body"
+                  style={s.rowTitle}
+                  numberOfLines={1}
+                >
                   {ticket.eventTitle}
                 </EventlyText>
                 <View style={s.line}>
-                  <EventlyIcon name="clock-outline" size={12} color="#e2552f" />
-                  <EventlyText variant="caption" style={s.lineText} numberOfLines={1}>
+                  <EventlyIcon name="clock-outline" size={15} color="#e2552f" />
+                  <EventlyText
+                    variant="caption"
+                    style={s.lineText}
+                    numberOfLines={1}
+                  >
                     {formatEventWhen(ticket.startDateTime, ticket.timezone)}
                   </EventlyText>
                 </View>
                 {where ? (
                   <View style={s.line}>
-                    <EventlyIcon name="map-marker" size={12} color="#6d4df2" />
-                    <EventlyText variant="caption" style={s.lineText} numberOfLines={1}>
+                    <EventlyIcon name="map-marker" size={15} color="#6d4df2" />
+                    <EventlyText
+                      variant="caption"
+                      style={s.lineText}
+                      numberOfLines={2}
+                    >
                       {where}
                     </EventlyText>
                   </View>
                 ) : null}
-                <View style={s.pills}>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  style={s.pillsScroll}
+                  contentContainerStyle={s.pills}
+                >
                   {ticket.ticketTypeName ? (
                     <View style={[s.pill, s.typePill]}>
-                      <EventlyText variant="caption" style={[s.pillText, s.typePillText]}>
+                      <EventlyText
+                        variant="caption"
+                        style={[s.pillText, s.typePillText]}
+                      >
                         {ticket.ticketTypeName}
                       </EventlyText>
                     </View>
                   ) : null}
                   <View style={[s.pill, { backgroundColor: tint.bg }]}>
-                    <EventlyText variant="caption" style={[s.pillText, { color: tint.fg }]}>
+                    <EventlyText
+                      variant="caption"
+                      style={[s.pillText, { color: tint.fg }]}
+                    >
                       {TICKET_STATE_LABEL[ticket.state]}
                     </EventlyText>
                   </View>
-                </View>
+                </ScrollView>
               </View>
 
               {/* The perforation, cut top and bottom, then the stub. */}
@@ -135,12 +226,63 @@ export function EventTicketsSection({
               <View style={s.stub}>
                 <View style={s.qr}>
                   <GradientFill colors={stub} direction="diagonal" />
-                  <EventlyIcon name="qrcode" size={20} color="#ffffff" />
+                  <EventlyIcon name="qrcode" size={26} color="#ffffff" />
                 </View>
                 <EventlyText variant="caption" style={s.stubText}>
                   QR
                 </EventlyText>
               </View>
+
+              <View style={s.more}>
+                <PressableScale
+                  style={s.moreHit}
+                  onPress={() =>
+                    setMenuFor(
+                      menuFor === ticket.ticketId ? null : ticket.ticketId,
+                    )
+                  }
+                  accessibilityRole="button"
+                  accessibilityLabel={`More for ${ticket.eventTitle}`}
+                  testID={`booking-ticket-more-${ticket.ticketId}`}
+                >
+                  <EventlyIcon name="dots-vertical" size={18} color="#8a8fa0" />
+                </PressableScale>
+              </View>
+
+              {menuFor === ticket.ticketId ? (
+                <View style={s.menu}>
+                  <PressableScale
+                    style={s.menuItem}
+                    onPress={() => {
+                      setMenuFor(null);
+                      onOpen(ticket);
+                    }}
+                    accessibilityRole="button"
+                  >
+                    <EventlyIcon name="qrcode" size={16} color="#1b1438" />
+                    <EventlyText style={s.menuText}>Open ticket</EventlyText>
+                  </PressableScale>
+                  {onDetails ? (
+                    <PressableScale
+                      style={s.menuItem}
+                      onPress={() => {
+                        setMenuFor(null);
+                        onDetails(ticket);
+                      }}
+                      accessibilityRole="button"
+                    >
+                      <EventlyIcon
+                        name="information-outline"
+                        size={16}
+                        color="#1b1438"
+                      />
+                      <EventlyText style={s.menuText}>
+                        Event details
+                      </EventlyText>
+                    </PressableScale>
+                  ) : null}
+                </View>
+              ) : null}
             </PressableScale>
           );
         })}

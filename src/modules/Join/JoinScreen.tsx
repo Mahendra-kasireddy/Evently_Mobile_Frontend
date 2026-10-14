@@ -2,7 +2,12 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Pressable, ScrollView, StatusBar, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText } from '../../Components';
+import {
+  EventlyIcon,
+  EventlyText,
+  FadeInUp,
+  GradientFill,
+} from '../../Components';
 import type { JoinRole, RootStackParamList } from '../../navigation/types';
 import { selectAuthToken } from '../../store/authSlice';
 import { useAppSelector } from '../../store/hooks';
@@ -11,6 +16,8 @@ import { JOIN_COPY, ROLE_CARDS } from './constants';
 import { RequirementNote } from './sections/RequirementNote';
 import { RoleCard } from './sections/RoleCard';
 import { styles } from './styles';
+
+const HERO_GRADIENT: [string, string] = ['#141d3a', '#3a1f5c'];
 
 type JoinNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -37,7 +44,10 @@ export function JoinScreen() {
     }
     // Nothing underneath: a registration that verified the OTP and was then
     // abandoned leaves this as the first screen of the signed-in stack.
-    navigation.reset({ index: 0, routes: [{ name: isSignedIn ? 'Main' : 'Login' }] });
+    navigation.reset({
+      index: 0,
+      routes: [{ name: isSignedIn ? 'Main' : 'Login' }],
+    });
   };
 
   const handleSelectRole = (role: JoinRole) => {
@@ -53,7 +63,10 @@ export function JoinScreen() {
       />
 
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <View style={styles.glow} pointerEvents="none" />
+        <GradientFill colors={HERO_GRADIENT} direction="diagonal" />
+        {/* Two soft glows — the warmth of an event at night. */}
+        <View style={[styles.glow, styles.glowCoral]} pointerEvents="none" />
+        <View style={[styles.glow, styles.glowViolet]} pointerEvents="none" />
 
         <Pressable
           style={styles.closeButton}
@@ -65,26 +78,44 @@ export function JoinScreen() {
           <EventlyIcon name="close" size={18} color={brand.onNavy} />
         </Pressable>
 
+        <EventlyText style={styles.eyebrow}>{JOIN_COPY.eyebrow}</EventlyText>
         <EventlyText variant="h1" style={styles.title}>
           {JOIN_COPY.title}
         </EventlyText>
         <EventlyText variant="caption" style={styles.subtitle}>
           {JOIN_COPY.subtitle}
         </EventlyText>
+
+        <View style={styles.chips}>
+          {JOIN_COPY.chips.map(chip => (
+            <View key={chip.label} style={styles.chip}>
+              <EventlyIcon name={chip.icon} size={12} color="#ffd2c2" />
+              <EventlyText style={styles.chipText}>{chip.label}</EventlyText>
+            </View>
+          ))}
+        </View>
       </View>
 
       <ScrollView
         contentContainerStyle={[
           styles.content,
-          { paddingBottom: insets.bottom + 32 },
+          { paddingBottom: insets.bottom + 24 },
         ]}
         showsVerticalScrollIndicator={false}
       >
-        {ROLE_CARDS.map(role => (
-          <RoleCard key={role.key} data={role} onPress={handleSelectRole} />
+        <EventlyText style={styles.pick}>{JOIN_COPY.pick}</EventlyText>
+        {ROLE_CARDS.map((role, i) => (
+          <FadeInUp key={role.key} delay={80 + i * 80}>
+            <RoleCard data={role} onPress={handleSelectRole} />
+          </FadeInUp>
         ))}
 
-        <RequirementNote />
+        <FadeInUp delay={260}>
+          <RequirementNote />
+        </FadeInUp>
+        <EventlyText style={styles.sameNumber}>
+          {JOIN_COPY.sameNumber}
+        </EventlyText>
       </ScrollView>
     </View>
   );

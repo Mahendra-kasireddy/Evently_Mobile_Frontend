@@ -31,9 +31,12 @@ export function useBookingContainer(): BookingContainerResult {
   const { data, loading, error, refetch } = useMyBookings();
   const [tab, setTab] = useState<BookingTab>('active');
 
-  const items = useMemo<BookingItem[]>(() => (data ? mapBookings(data) : []), [data]);
-  const active = useMemo(() => items.filter((i) => i.tab === 'active'), [items]);
-  const past = useMemo(() => items.filter((i) => i.tab === 'past'), [items]);
+  const items = useMemo<BookingItem[]>(
+    () => (data ? mapBookings(data) : []),
+    [data],
+  );
+  const active = useMemo(() => items.filter(i => i.tab === 'active'), [items]);
+  const past = useMemo(() => items.filter(i => i.tab === 'past'), [items]);
   const focus = useMemo(() => focusEvent(active), [active]);
 
   const extras = useEventExtras(focus?.id ?? null);

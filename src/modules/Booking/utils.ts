@@ -17,7 +17,7 @@ function titleizeStatus(status: string): string {
   return status
     .split('_')
     .filter(Boolean)
-    .map((word) => word[0].toUpperCase() + word.slice(1))
+    .map(word => word[0].toUpperCase() + word.slice(1))
     .join(' ');
 }
 
@@ -26,7 +26,7 @@ export function initials(name: string): string {
   const parts = (name ?? '').trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return '·';
   const first = parts[0]?.[0] ?? '';
-  const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? '') : '';
+  const last = parts.length > 1 ? parts[parts.length - 1]?.[0] ?? '' : '';
   return (first + last).toUpperCase();
 }
 
@@ -34,7 +34,27 @@ function dateLabel(value: string | null | undefined): string {
   if (!value) return '';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  return date.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+/** The day and short month for a date badge; both '' without a usable date. */
+function dateBadge(value: string | null | undefined): {
+  eventDay: string;
+  eventMonth: string;
+} {
+  const date = value ? new Date(value) : null;
+  if (!date || Number.isNaN(date.getTime()))
+    return { eventDay: '', eventMonth: '' };
+  return {
+    eventDay: String(date.getDate()),
+    eventMonth: date
+      .toLocaleDateString('en-GB', { month: 'short' })
+      .toUpperCase(),
+  };
 }
 
 /** Indian-format currency; '' for an amount nobody has set. */
@@ -66,7 +86,7 @@ export function compactDays(days: number | null): string {
  * inventing a task for it.
  */
 export function nextStepOf(steps: BookingStepDTO[] | undefined): string {
-  const pending = (steps ?? []).find((s) => !s.done && !!s.label);
+  const pending = (steps ?? []).find(s => !s.done && !!s.label);
   if (!pending) return '';
   const label = pending.label.trim();
   // A known milestone is said as the thing still to come; anything else is
@@ -75,7 +95,7 @@ export function nextStepOf(steps: BookingStepDTO[] | undefined): string {
 }
 
 export function mapBookings(dtos: BookingDTO[]): BookingItem[] {
-  return (dtos ?? []).map((b) => {
+  return (dtos ?? []).map(b => {
     const copy = BOOKING_STATUS_COPY[b.status] ?? {
       label: titleizeStatus(b.status ?? 'unknown'),
       tone: 'muted' as const,
@@ -89,7 +109,9 @@ export function mapBookings(dtos: BookingDTO[]): BookingItem[] {
      * answer, though: the event is today.
      */
     const daysToGo =
-      isPast(b.status) || !b.eventDate ? null : Math.max(0, Math.trunc(b.daysToGo ?? 0));
+      isPast(b.status) || !b.eventDate
+        ? null
+        : Math.max(0, Math.trunc(b.daysToGo ?? 0));
 
     return {
       id: b.id,
@@ -105,6 +127,7 @@ export function mapBookings(dtos: BookingDTO[]): BookingItem[] {
       daysToGo,
       daysLabel: compactDays(daysToGo),
       eventDateLabel: dateLabel(b.eventDate),
+      ...dateBadge(b.eventDate),
       organizerName,
       organizerInitials: initials(organizerName ?? ''),
       organizerColor: b.organizer?.avatarColor || '#1a2e5a',
@@ -114,7 +137,10 @@ export function mapBookings(dtos: BookingDTO[]): BookingItem[] {
       paymentStatus: b.paymentStatus,
       amount: b.amount ?? 0,
       amountPaid: b.amountPaid ?? 0,
-      balanceAmount: Math.max(0, b.balanceAmount ?? (b.amount ?? 0) - (b.amountPaid ?? 0)),
+      balanceAmount: Math.max(
+        0,
+        b.balanceAmount ?? (b.amount ?? 0) - (b.amountPaid ?? 0),
+      ),
       nextStep: nextStepOf(b.steps),
       tab: isPast(b.status) ? 'past' : 'active',
     };
@@ -164,15 +190,22 @@ function invitationSubtitle(guests: EventExtras['guests']): string | null {
   if (!guests) return null;
   if (guests.shared === 0) return 'Ready to share';
   const people = guests.shared === 1 ? '1 guest' : `${guests.shared} guests`;
-  return guests.opened > 0 ? `${people} · ${guests.opened} opened` : `${people} · none opened yet`;
+  return guests.opened > 0
+    ? `${people} · ${guests.opened} opened`
+    : `${people} · none opened yet`;
 }
 
 function ideasSubtitle(ideas: EventExtras['ideas']): string | null {
   if (!ideas) return null;
   if (ideas.awaitingApproval > 0) {
-    return ideas.awaitingApproval === 1 ? '1 awaiting you' : `${ideas.awaitingApproval} awaiting you`;
+    return ideas.awaitingApproval === 1
+      ? '1 awaiting you'
+      : `${ideas.awaitingApproval} awaiting you`;
   }
-  if (ideas.shared > 0) return ideas.shared === 1 ? '1 idea shared' : `${ideas.shared} ideas shared`;
+  if (ideas.shared > 0)
+    return ideas.shared === 1
+      ? '1 idea shared'
+      : `${ideas.shared} ideas shared`;
   return 'Share your first idea';
 }
 
@@ -186,8 +219,9 @@ export function jumpTilesFor(
   item: BookingItem | null,
   extras: EventExtras,
 ): JumpTile[] {
-  return tiles.map((tile) => {
-    if (tile.key === 'payments' && item) return { ...tile, subtitle: paymentsSubtitle(item) };
+  return tiles.map(tile => {
+    if (tile.key === 'payments' && item)
+      return { ...tile, subtitle: paymentsSubtitle(item) };
     if (tile.key === 'invitation') {
       const subtitle = invitationSubtitle(extras.guests);
       return subtitle ? { ...tile, subtitle } : tile;

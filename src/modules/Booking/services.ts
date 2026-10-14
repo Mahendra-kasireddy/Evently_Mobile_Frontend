@@ -24,17 +24,19 @@ const NO_EXTRAS: EventExtras = { ideas: null, guests: null };
  * wording. A screen that fell over because a count was missing would be worse
  * than one that says "Ready to share".
  */
-export async function fetchEventExtras(bookingId: string | null): Promise<EventExtras> {
+export async function fetchEventExtras(
+  bookingId: string | null,
+): Promise<EventExtras> {
   if (!bookingId) return NO_EXTRAS;
 
   const [ideas, guests] = await Promise.all([
     fetchIdeaBoard(bookingId)
-      .then((board) => board.counts)
+      .then(board => board.counts)
       .catch(() => null),
     fetchGuests(bookingId)
-      .then((list) => ({
+      .then(list => ({
         shared: list.length,
-        opened: list.filter((g) => g.viewed).length,
+        opened: list.filter(g => g.viewed).length,
       }))
       .catch(() => null),
   ]);

@@ -31,7 +31,9 @@ interface RefreshResponse {
  */
 export const refreshClient = axios.create({
   baseURL: env.apiBaseUrl,
-  timeout: 15_000,
+  // 60 s: the API host sleeps when idle and takes up to ~50 s to wake; at
+  // 15 s the first request after a quiet spell always failed.
+  timeout: 60_000,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -55,7 +57,9 @@ async function requestNewSession(refreshToken: string): Promise<string | null> {
       store.dispatch(clearSession());
       return null;
     }
-    store.dispatch(setSession({ token, refreshToken: data.refreshToken ?? refreshToken }));
+    store.dispatch(
+      setSession({ token, refreshToken: data.refreshToken ?? refreshToken }),
+    );
     return token;
   } catch (error) {
     /*
@@ -65,7 +69,9 @@ async function requestNewSession(refreshToken: string): Promise<string | null> {
      * exists to fix — the stored refresh token stays put and the next attempt
      * tries again.
      */
-    const status = axios.isAxiosError(error) ? error.response?.status : undefined;
+    const status = axios.isAxiosError(error)
+      ? error.response?.status
+      : undefined;
     if (status === 401 || status === 403) {
       store.dispatch(clearSession());
     }

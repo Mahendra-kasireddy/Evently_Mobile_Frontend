@@ -79,6 +79,9 @@ export interface BookingItem {
   /** The countdown as the card shows it beside the bar — '' when there is none. */
   daysLabel: string;
   eventDateLabel: string;
+  /** The date badge on the card's photo: "17" and "OCT" — '' without a date. */
+  eventDay: string;
+  eventMonth: string;
   organizerName: string | null;
   organizerInitials: string;
   organizerColor: string;

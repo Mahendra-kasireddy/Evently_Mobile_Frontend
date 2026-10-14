@@ -4,15 +4,9 @@ import type { CompositeNavigationProp } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import {
-  ActivityIndicator,
-  FlatList,
-  RefreshControl,
-  ScrollView,
-  View,
-} from 'react-native';
+import { FlatList, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EventlyText, FadeInUp, GradientFill } from '../../Components';
+import { EventlyText, FadeInUp, ThinkingOrbs } from '../../Components';
 import type {
   MainTabParamList,
   RootStackParamList,
@@ -24,12 +18,8 @@ import type {
   HeroDraft,
 } from './types';
 import { NameGateSheet } from '../NameCapture';
-import {
-  HERO_ACCENT_COLOR,
-  OTHER_EVENTS_ON_HOME,
-  HOME_PAGE_GRADIENT,
-  SECTION_TONE_GRADIENT,
-} from './constants';
+import { OTHER_EVENTS_ON_HOME, SECTION_TONE_GRADIENT } from './constants';
+import { HOME_ACCENT, HOME_ORB_COLORS } from './design';
 import { useOpenWithOrganizer } from '../Chat';
 import { useHomeContainer } from './container';
 import { useOpenEvent } from './useOpenEvent';
@@ -290,8 +280,15 @@ export function HomeScreen() {
     return withNameGate(
       <SafeAreaView style={styles.container} edges={['top']}>
         <HomeHeader {...headerProps} />
+        {/* A real wait — the feed is on its way — so the thinking orbs,
+            not a spinner: the one loading state a customer sees most. */}
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={HERO_ACCENT_COLOR} />
+          <ThinkingOrbs
+            size={72}
+            colors={HOME_ORB_COLORS}
+            label="Loading your home"
+          />
+          <Text style={styles.loadingTitle}>Setting the stage</Text>
           <EventlyText variant="body" style={styles.loadingText}>
             Loading your home…
           </EventlyText>
@@ -326,10 +323,15 @@ export function HomeScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={refetch} />
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={refetch}
+            tintColor={HOME_ACCENT.marigold}
+            colors={[HOME_ACCENT.saffron, HOME_ACCENT.rose]}
+          />
         }
       >
-        <HomeHeroPhoto>
+        <HomeHeroPhoto displayName={header.displayName}>
           <HomeHeader {...headerProps} onPhoto />
         </HomeHeroPhoto>
 
@@ -344,9 +346,6 @@ export function HomeScreen() {
           "the picture is at the top" true rather than nearly true.
         */}
         <View style={styles.sheet}>
-          {/* A soft peach-to-lavender wash down the whole page, behind every
-              section — the colour a celebration app should carry. */}
-          <GradientFill colors={HOME_PAGE_GRADIENT} direction="down" />
           {/*
           The customer's own event first — quotes to compare, an advance to
           pay, a day coming up. It is the reason a returning customer opened
