@@ -51,12 +51,12 @@ export const styles = StyleSheet.create({
 });
 
 /** The round photo tucked into the top-right corner of the number step. */
-export const CORNER_SIZE = 200;
+export const CORNER_SIZE = 230;
 export const cornerStyles = StyleSheet.create({
   ring: {
     position: 'absolute',
     // Far enough into the corner to stay clear of the centred wordmark.
-    right: -90,
+    right: -96,
     width: CORNER_SIZE + 16,
     height: CORNER_SIZE + 16,
     borderRadius: (CORNER_SIZE + 16) / 2,
