@@ -14,7 +14,7 @@ const LOGO_MARK = require('../../../assets/images/logo_mark.png');
  * always swaps in a Poppins face, and this line is meant to be the serif. The
  * wordmark wants Poppins, so it goes through the app's component.
  */
-export function AuthHero() {
+export function AuthHero({ compact = false }: { compact?: boolean }) {
   return (
     <View style={heroStyles.brand}>
       <View
@@ -33,19 +33,29 @@ export function AuthHero() {
         </AppText>
       </View>
 
-      <View
-        style={heroStyles.divider}
-        importantForAccessibility="no-hide-descendants"
-      >
-        <View style={heroStyles.rule} />
-        <EventlyIcon name="spa" size={20} color={AUTH_ACCENT} />
-        <View style={heroStyles.rule} />
-      </View>
+      {/* With the keyboard up the ornament goes and the gaps close, so the
+          field and button still fit above the keyboard. */}
+      {compact ? null : (
+        <View
+          style={heroStyles.divider}
+          importantForAccessibility="no-hide-descendants"
+        >
+          <View style={heroStyles.rule} />
+          <EventlyIcon name="spa" size={20} color={AUTH_ACCENT} />
+          <View style={heroStyles.rule} />
+        </View>
+      )}
 
-      <AppText variant="display" style={heroStyles.title}>
+      <AppText
+        variant="display"
+        style={[heroStyles.title, compact && heroStyles.titleCompact]}
+      >
         {LOGIN_COPY.title}
       </AppText>
-      <AppText variant="bodyLarge" style={heroStyles.subtitle}>
+      <AppText
+        variant="bodyLarge"
+        style={[heroStyles.subtitle, compact && heroStyles.subtitleCompact]}
+      >
         {LOGIN_COPY.subtitle}
       </AppText>
     </View>

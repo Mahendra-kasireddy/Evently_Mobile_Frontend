@@ -35,8 +35,6 @@ type LoginNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 const PHONE_STEP_TOP = 150;
 /** The same space while the keyboard is up: the corner photo is gone then. */
 const PHONE_STEP_TOP_KEYBOARD = 20;
-/** Room left between the button and the top of the keyboard. */
-const ABOVE_KEYBOARD = 16;
 
 /**
  * Sign in: a number, then the code that was texted to it.
@@ -86,19 +84,13 @@ export function LoginScreen() {
   /*
    * The keyboard. While it is up the corner photo steps aside and the content
    * rises into its space — otherwise the wordmark slid up under the photo and
-   * the field sat behind the keyboard. Then the form (field + button) is
-   * scrolled to sit just above the keyboard.
+   * the field sat behind the keyboard. The heading also goes compact, so the
+   * wordmark, field and button all fit above the keyboard without scrolling.
+   * (No scroll-to-fit: Android may both resize the window and pad for the
+   * keyboard, and a measured scroll then overshot and hid the wordmark.)
    */
   const [keyboardUp, setKeyboardUp] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
-  const formBottom = useRef(0);
-  const viewport = useRef(0);
-  const keepFormVisible = () => {
-    const y = formBottom.current + ABOVE_KEYBOARD - viewport.current;
-    if (keyboardUp && viewport.current > 0) {
-      scrollRef.current?.scrollTo({ y: Math.max(0, y), animated: true });
-    }
-  };
   useEffect(() => {
     const showEvent =
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
@@ -111,6 +103,8 @@ export function LoginScreen() {
     const show = Keyboard.addListener(showEvent, () => {
       move();
       setKeyboardUp(true);
+      // Start from the top, so the wordmark is always in view.
+      scrollRef.current?.scrollTo({ y: 0, animated: false });
     });
     const hide = Keyboard.addListener(hideEvent, () => {
       move();
@@ -180,10 +174,6 @@ export function LoginScreen() {
       <KeyboardAvoider style={styles.flex}>
         <ScrollView
           ref={scrollRef}
-          onLayout={e => {
-            viewport.current = e.nativeEvent.layout.height;
-            keepFormVisible();
-          }}
           style={styles.scroll}
           contentContainerStyle={[
             styles.content,
@@ -198,15 +188,10 @@ export function LoginScreen() {
               opacity: bodyOpacity,
               transform: [{ translateY: bodyTranslateY }],
             }}
-            onLayout={e => {
-              const { y, height } = e.nativeEvent.layout;
-              formBottom.current = y + height;
-              keepFormVisible();
-            }}
           >
             {isPhoneStep ? (
               <>
-                <AuthHero />
+                <AuthHero compact={keyboardUp} />
                 <PhoneEntry
                   phone={phone}
                   dialCode={dialCode}

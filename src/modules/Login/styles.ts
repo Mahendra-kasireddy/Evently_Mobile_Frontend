@@ -94,6 +94,7 @@ export const heroStyles = StyleSheet.create({
     textAlign: 'center',
     marginTop: spacing.md,
   },
+  titleCompact: { marginTop: spacing.sm },
   titleGap: { marginTop: spacing.lg },
   subtitle: {
     color: textColor.textSecondary,
@@ -103,6 +104,7 @@ export const heroStyles = StyleSheet.create({
     marginBottom: spacing.xl,
     paddingHorizontal: spacing.lg,
   },
+  subtitleCompact: { marginBottom: spacing.md },
   subtitleStrong: { color: textColor.textPrimary, ...fontWeights.bold },
   /* The OTP step's picture: a phone with a message on it, on a peach disc. */
   art: { alignItems: 'center', marginTop: spacing.sm },
