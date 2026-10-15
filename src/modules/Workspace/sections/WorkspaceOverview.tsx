@@ -3,25 +3,23 @@ import { Animated, Image, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  Confetti,
   EventlyIcon,
   AppText,
+  GradientFill,
   PressableScale,
   useReducedMotion,
 } from '../../../Components';
 import {
+  OCCASION_PHOTO,
+  OCCASION_TAGLINE,
   OCCASION_THEME,
-  STAT_RING,
   WORKSPACE_COPY,
   WORKSPACE_PREMIUM_COPY as P,
   WORKSPACE_STATUS_COLOR,
 } from '../constants';
-import { heroStyles as s } from '../premium.styles';
+import { posterUi as s } from '../premium.styles';
 import type { WorkspaceViewModel } from '../types';
 import { ProgressRing } from './ProgressRing';
-
-/** The bundled floral spray, laid faintly into the poster's light corner. */
-const HERO_ART = require('../../../assets/images/flowers_workspace.png');
 
 interface WorkspaceOverviewProps {
   data: WorkspaceViewModel;
@@ -61,51 +59,113 @@ function LiveDot({ color, active }: { color: string; active: boolean }) {
   );
 }
 
-/** One of the three figures under the poster, as a ring you can read at a glance. */
-function Stat({
-  percent,
-  colors,
+/** One row of the details card: a tinted icon tile, a value, a quiet line under it. */
+function Fact({
+  icon,
+  tint,
+  ink,
   value,
-  label,
+  sub,
+  lines = 1,
 }: {
-  percent: number;
-  colors: readonly [string, string];
+  icon: string;
+  tint: string;
+  ink: string;
   value: string;
-  label: string;
+  sub?: string;
+  lines?: number;
 }) {
   return (
-    <View style={s.stat}>
-      <ProgressRing
-        percent={percent}
-        size={58}
-        stroke={6}
-        colors={colors}
-        trackColor="#f1edf8"
-      >
-        <AppText variant="bodySmall" style={s.statValue} numberOfLines={1}>
+    <View style={s.fact}>
+      <View style={[s.factIcon, { backgroundColor: tint }]}>
+        <EventlyIcon name={icon} size={16} color={ink} />
+      </View>
+      <View style={s.factBody}>
+        <AppText
+          variant="bodySmall"
+          weight="semibold"
+          style={s.factValue}
+          numberOfLines={lines}
+        >
           {value}
         </AppText>
-      </ProgressRing>
-      <AppText variant="label" style={s.statLabel}>
+        {sub ? (
+          <AppText variant="caption" color="textSecondary" numberOfLines={1}>
+            {sub}
+          </AppText>
+        ) : null}
+      </View>
+    </View>
+  );
+}
+
+/** One column of the progress card: icon tile and ring side by side, then its words. */
+function Progress({
+  ink,
+  percent,
+  value,
+  label,
+  state,
+  stateColor,
+  last,
+}: {
+  ink: string;
+  percent: number;
+  value: string;
+  label: string;
+  state: string;
+  stateColor: string;
+  last?: boolean;
+}) {
+  return (
+    <View style={[s.progressCol, !last && s.progressDivider]}>
+      <View style={s.progressTop}>
+        <ProgressRing
+          percent={percent}
+          size={58}
+          stroke={5}
+          colors={[ink, ink]}
+          trackColor="#ece9f5"
+        >
+          <AppText
+            variant="bodySmall"
+            weight="semibold"
+            style={s.ringValue}
+            numberOfLines={1}
+          >
+            {value}
+          </AppText>
+        </ProgressRing>
+      </View>
+      <AppText
+        variant="caption"
+        weight="semibold"
+        align="center"
+        numberOfLines={1}
+        style={s.progressLabel}
+      >
         {label}
+      </AppText>
+      <AppText
+        variant="caption"
+        align="center"
+        numberOfLines={1}
+        color={stateColor}
+      >
+        {state}
       </AppText>
     </View>
   );
 }
 
 /**
- * The top of the workspace — a poster for the event, not a form header.
+ * The top of the workspace.
  *
- * Painted in the occasion's own colours (a birthday does not open on a
- * wedding's blush), with the countdown as its centrepiece: a ring that fills
- * as the event gets ready, the days left inside it. The date and the place
- * sit beside it, the organizer — and a way to message them — under it. Three
- * figures float on a card across the poster's foot. The tabs follow it in the
- * screen (see WorkspaceTabs), and pin to the top with a compact header once
- * the poster has scrolled away.
- *
- * Every figure is the booking's own; a booking with no date shows its date
- * chip instead of a countdown, and one with no amount drops the paid ring.
+ * A poster in the occasion's colours with the category's own photograph on
+ * the right, melting into the gradient; the status and the occasion's name
+ * on the left. Under it, one card with the facts (when, where, budget) and the
+ * organizer with a way to message them; then the event's progress in three
+ * rings — planning, payments, tasks — with a word for where each one stands.
  */
 export function WorkspaceOverview({
   data,
@@ -114,47 +174,59 @@ export function WorkspaceOverview({
   isOpeningMessage = false,
 }: WorkspaceOverviewProps) {
   const insets = useSafeAreaInsets();
-  const theme = OCCASION_THEME[data.art] ?? OCCASION_THEME.wedding;
-  const statusColor = WORKSPACE_STATUS_COLOR[data.status] ?? '#ffffff';
+  const theme = OCCASION_THEME[data.art] ?? OCCASION_THEME.birthday;
+  const photo = OCCASION_PHOTO[data.art] ?? OCCASION_PHOTO.birthday;
+  const tagline = OCCASION_TAGLINE[data.art] ?? '';
+  const statusColor = WORKSPACE_STATUS_COLOR[data.status] ?? '#22a06b';
   const pending =
     data.status === 'pending' || data.status === 'awaiting_organizer';
-  const days = data.daysToGo;
+  const taskPercent =
+    data.tasksTotal > 0 ? (data.tasksDone / data.tasksTotal) * 100 : 0;
 
   return (
     <View>
-      <View style={[s.poster, { paddingTop: insets.top + 6 }]}>
-        {/* The poster's colour: deep corner to warm light, three stops. */}
+      <View
+        style={[
+          s.poster,
+          { paddingTop: insets.top + 8, backgroundColor: theme.from },
+        ]}
+      >
+        {/*
+          One layer, no seam: the category photo fills the whole poster and
+          the occasion's colour is washed over it — solid behind the words on
+          the left, thinning out to the right so the photo shows through.
+        */}
         <View style={s.fill} pointerEvents="none">
-          <Svg width="100%" height="100%" preserveAspectRatio="none">
+          <Image
+            source={photo}
+            style={s.photo}
+            resizeMode="cover"
+            accessible={false}
+          />
+          <Svg
+            style={s.fill}
+            width="100%"
+            height="100%"
+            preserveAspectRatio="none"
+          >
             <Defs>
-              <LinearGradient id="wsPoster" x1="0" y1="1" x2="1" y2="0">
-                <Stop offset="0" stopColor={theme.from} />
-                <Stop offset="0.55" stopColor={theme.via} />
-                <Stop offset="1" stopColor={theme.to} />
+              <LinearGradient id="wsWashX" x1="0" y1="0" x2="1" y2="0">
+                <Stop offset="0" stopColor={theme.from} stopOpacity={1} />
+                <Stop offset="0.3" stopColor={theme.from} stopOpacity={0.96} />
+                <Stop offset="0.55" stopColor={theme.via} stopOpacity={0.62} />
+                <Stop offset="0.8" stopColor={theme.via} stopOpacity={0.28} />
+                <Stop offset="1" stopColor={theme.via} stopOpacity={0.12} />
+              </LinearGradient>
+              <LinearGradient id="wsWashY" x1="0" y1="0" x2="0" y2="1">
+                <Stop offset="0" stopColor={theme.from} stopOpacity={0.45} />
+                <Stop offset="0.3" stopColor={theme.from} stopOpacity={0} />
+                <Stop offset="0.75" stopColor={theme.via} stopOpacity={0} />
+                <Stop offset="1" stopColor={theme.via} stopOpacity={0.35} />
               </LinearGradient>
             </Defs>
-            <Rect
-              x={0}
-              y={0}
-              width="100%"
-              height="100%"
-              fill="url(#wsPoster)"
-            />
+            <Rect x={0} y={0} width="100%" height="100%" fill="url(#wsWashX)" />
+            <Rect x={0} y={0} width="100%" height="100%" fill="url(#wsWashY)" />
           </Svg>
-        </View>
-        <View
-          style={[s.glow, s.glowOne, { backgroundColor: theme.glow }]}
-          pointerEvents="none"
-        />
-        <View style={[s.glow, s.glowTwo]} pointerEvents="none" />
-        <Image
-          source={HERO_ART}
-          style={s.art}
-          resizeMode="cover"
-          accessible={false}
-        />
-        <View style={s.confetti} pointerEvents="none">
-          <Confetti />
         </View>
 
         <View style={s.topRow}>
@@ -164,20 +236,15 @@ export function WorkspaceOverview({
             accessibilityRole="button"
             accessibilityLabel="Go back"
           >
-            <EventlyIcon name="chevron-left" size={24} color="#ffffff" />
+            <EventlyIcon name="chevron-left" size={22} color="#ffffff" />
           </PressableScale>
-          <AppText variant="overline" style={s.topTitle}>
+          <AppText variant="overline" color="textOnPrimary" style={s.topTitle}>
             {WORKSPACE_COPY.screenTitle}
           </AppText>
           {data.ref ? (
             <View style={s.refChip}>
-              <EventlyIcon
-                name="pound"
-                size={12}
-                color="rgba(255,255,255,0.85)"
-              />
-              <AppText variant="label" style={s.refText} numberOfLines={1}>
-                {data.ref}
+              <AppText variant="label" color="textOnPrimary" numberOfLines={1}>
+                {`# ${data.ref}`}
               </AppText>
             </View>
           ) : (
@@ -186,15 +253,12 @@ export function WorkspaceOverview({
         </View>
 
         <View style={s.eyebrowRow}>
-          <AppText variant="h1" style={s.emoji}>
+          <AppText variant="h2" style={s.emoji}>
             {theme.emoji}
           </AppText>
           {data.statusLabel ? (
             <View style={s.statusPill}>
-              <LiveDot
-                color={statusColor === '#ffffff' ? '#ffffff' : statusColor}
-                active={pending}
-              />
+              <LiveDot color={statusColor} active={pending} />
               <AppText variant="label" style={s.statusText} numberOfLines={1}>
                 {data.statusLabel}
               </AppText>
@@ -203,117 +267,89 @@ export function WorkspaceOverview({
         </View>
 
         <AppText
-          variant="display"
+          variant="h1"
+          color="textOnPrimary"
           style={s.title}
           numberOfLines={2}
           accessibilityRole="header"
         >
           {data.title}
         </AppText>
+        {tagline ? (
+          <AppText variant="body" style={s.tagline} numberOfLines={1}>
+            {tagline}
+          </AppText>
+        ) : null}
+      </View>
 
-        <View style={s.countRow}>
-          {days != null ? (
-            <ProgressRing
-              percent={data.progress}
-              size={112}
-              stroke={8}
-              colors={['#ffffff', theme.glow]}
-              trackColor="rgba(255,255,255,0.18)"
-            >
-              <View style={s.countInner}>
-                {days > 0 ? (
-                  <>
-                    <AppText variant="display" style={s.countNumber}>
-                      {days}
-                    </AppText>
-                    <AppText variant="label" style={s.countLabel}>
-                      {P.daysToGo(days)}
-                    </AppText>
-                  </>
-                ) : (
-                  <AppText variant="bodySmall" style={s.countToday}>
-                    {days === 0 ? P.today : P.past}
-                  </AppText>
-                )}
-              </View>
-            </ProgressRing>
-          ) : data.dateChip ? (
-            <View style={s.dateBlock}>
-              <AppText variant="label" style={s.dateMonth}>
-                {data.dateChip.month}
-              </AppText>
-              <AppText variant="display" style={s.dateDay}>
-                {data.dateChip.day}
-              </AppText>
-            </View>
+      {/* The facts, and who is organizing it. */}
+      <View style={s.detailsCard}>
+        <View style={s.factsCol}>
+          {data.dateLabel ? (
+            <Fact
+              icon="calendar-heart"
+              tint="#f3e8ff"
+              ink="#8b3fd9"
+              value={data.dateLabel}
+              sub={data.dateDetail}
+            />
           ) : null}
-
-          <View style={s.facts}>
-            {data.dateLabel ? (
-              <View style={s.fact}>
-                <View style={s.factIcon}>
-                  <EventlyIcon
-                    name="calendar-heart"
-                    size={15}
-                    color="#ffffff"
-                  />
-                </View>
-                <AppText
-                  variant="bodySmall"
-                  style={s.factText}
-                  numberOfLines={2}
-                >
-                  {data.dateLabel}
-                </AppText>
-              </View>
-            ) : null}
-            {data.venue ? (
-              <View style={s.fact}>
-                <View style={s.factIcon}>
-                  <EventlyIcon name="map-marker" size={15} color="#ffffff" />
-                </View>
-                <AppText
-                  variant="bodySmall"
-                  style={s.factText}
-                  numberOfLines={3}
-                >
-                  {data.venue}
-                </AppText>
-              </View>
-            ) : null}
-            {data.payment.totalLabel ? (
-              <View style={s.fact}>
-                <View style={s.factIcon}>
-                  <EventlyIcon name="wallet" size={15} color="#ffffff" />
-                </View>
-                <AppText
-                  variant="bodySmall"
-                  style={[s.factText, s.factStrong]}
-                  numberOfLines={1}
-                >
-                  {data.payment.totalLabel}
-                </AppText>
-              </View>
-            ) : null}
-          </View>
+          {data.venue ? (
+            <Fact
+              icon="map-marker"
+              tint="#ffe6f1"
+              ink="#e0337c"
+              value={data.venue}
+              lines={2}
+            />
+          ) : null}
+          {data.payment.totalLabel ? (
+            <Fact
+              icon="currency-inr"
+              tint="#e3f7ee"
+              ink="#1f9d6b"
+              value={data.payment.totalLabel}
+              sub={P.estimatedBudget}
+            />
+          ) : null}
         </View>
 
         {data.organizerName ? (
-          <View style={s.organizerBar}>
-            <View
-              style={[s.avatar, { backgroundColor: data.organizerAvatarColor }]}
-            >
-              <AppText variant="body" style={s.avatarText}>
-                {data.organizerInitials || '·'}
-              </AppText>
-            </View>
-            <View style={s.organizerText}>
-              <AppText variant="caption" style={s.organizerLead}>
-                Organized by
-              </AppText>
-              <AppText variant="h3" style={s.organizerName} numberOfLines={1}>
-                {data.organizerName}
-              </AppText>
+          <View style={s.organizerCol}>
+            <View style={s.organizerRow}>
+              <View style={s.avatarRing}>
+                <View
+                  style={[
+                    s.avatar,
+                    { backgroundColor: data.organizerAvatarColor },
+                  ]}
+                >
+                  <AppText
+                    variant="bodySmall"
+                    weight="semibold"
+                    color="textOnPrimary"
+                  >
+                    {(data.organizerInitials || data.organizerName).slice(0, 1)}
+                  </AppText>
+                </View>
+              </View>
+              <View style={s.organizerText}>
+                <AppText
+                  variant="caption"
+                  color="textSecondary"
+                  numberOfLines={1}
+                >
+                  {P.organizedBy}
+                </AppText>
+                <AppText
+                  variant="caption"
+                  weight="semibold"
+                  numberOfLines={2}
+                  style={s.organizerName}
+                >
+                  {data.organizerName.toUpperCase()}
+                </AppText>
+              </View>
             </View>
             {onMessage ? (
               <PressableScale
@@ -323,15 +359,16 @@ export function WorkspaceOverview({
                 accessibilityRole="button"
                 accessibilityLabel={`${P.message} ${data.organizerName}`}
               >
-                <EventlyIcon
-                  name="chat-processing-outline"
-                  size={16}
-                  color={theme.via}
+                <GradientFill
+                  colors={['#8f5cf7', '#6a3be0']}
+                  direction="across"
                 />
-                <AppText
-                  variant="bodySmall"
-                  style={[s.messageText, { color: theme.via }]}
-                >
+                <EventlyIcon
+                  name="message-text-outline"
+                  size={16}
+                  color="#ffffff"
+                />
+                <AppText variant="buttonSmall" color="textOnPrimary">
                   {P.message}
                 </AppText>
               </PressableScale>
@@ -340,32 +377,40 @@ export function WorkspaceOverview({
         ) : null}
       </View>
 
-      {/* Three figures, floating across the poster's foot. */}
-      <View style={s.statsCard}>
-        <Stat
-          percent={data.progress}
-          colors={STAT_RING.ready}
-          value={`${data.progress}%`}
-          label={P.ready}
-        />
-        {data.payment.totalLabel ? (
-          <Stat
-            percent={data.payment.paidPercent}
-            colors={STAT_RING.paid}
-            value={`${data.payment.paidPercent}%`}
-            label={P.paid}
+      {/* Where the event stands, three ways. */}
+      <View style={s.progressCard}>
+        <View style={s.progressHead}>
+          <AppText variant="h3" style={s.progressTitle}>
+            {P.progressTitle}
+          </AppText>
+        </View>
+        <View style={s.progressRow}>
+          <Progress
+            ink="#1f9d6b"
+            percent={data.progress}
+            value={`${data.progress}%`}
+            label={P.planning}
+            state={P.planningState(data.progress)}
+            stateColor="#1f9d6b"
           />
-        ) : null}
-        <Stat
-          percent={
-            data.tasksTotal > 0 ? (data.tasksDone / data.tasksTotal) * 100 : 0
-          }
-          colors={STAT_RING.tasks}
-          value={
-            data.tasksTotal > 0 ? `${data.tasksDone}/${data.tasksTotal}` : '—'
-          }
-          label={data.tasksTotal > 0 ? P.tasks : P.noTasksShort}
-        />
+          <Progress
+            ink="#7c4ddb"
+            percent={data.payment.paidPercent}
+            value={`${data.payment.paidPercent}%`}
+            label={P.payments}
+            state={P.paymentState(data.payment.paidPercent)}
+            stateColor="#7c4ddb"
+          />
+          <Progress
+            ink="#2f6fe4"
+            percent={taskPercent}
+            value={`${data.tasksDone}/${data.tasksTotal}`}
+            label={P.tasks}
+            state={P.tasksState(data.tasksDone)}
+            stateColor="#8a8799"
+            last
+          />
+        </View>
       </View>
     </View>
   );

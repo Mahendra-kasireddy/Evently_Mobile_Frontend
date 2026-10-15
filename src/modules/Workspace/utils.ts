@@ -19,7 +19,11 @@ function dateLabel(value: string | null | undefined): string {
   if (!value) return '';
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  return d.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 }
 
 /** "12 Dec 2026, 14:30" — for timeline entries, where the time matters. */
@@ -27,10 +31,14 @@ function dateTimeLabel(value: string | null | undefined): string {
   if (!value) return '';
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return '';
-  return `${d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}, ${d.toLocaleTimeString(
-    'en-GB',
-    { hour: '2-digit', minute: '2-digit' },
-  )}`;
+  return `${d.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })}, ${d.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })}`;
 }
 
 /**
@@ -69,7 +77,12 @@ function nameOnly(value: string): string {
   return stripped || trimmed;
 }
 
-const TASK_STATUSES: TaskStatus[] = ['pending', 'in_progress', 'done', 'blocked'];
+const TASK_STATUSES: TaskStatus[] = [
+  'pending',
+  'in_progress',
+  'done',
+  'blocked',
+];
 
 /**
  * The booking as the workspace screen renders it.
@@ -98,6 +111,35 @@ export function chipFor(label: string): { month: string; day: string } | null {
   return day && month.length === 3 ? { month, day } : null;
 }
 
+const WEEKDAYS = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+];
+
+/**
+ * "Friday, 12:00 PM" for the line under the date. The time is left off when
+ * the booking was stored as a bare date (local midnight), rather than claiming
+ * the event starts at 12:00 AM.
+ */
+export function dateDetailFor(iso: string | null | undefined): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  const day = WEEKDAYS[d.getDay()];
+  const h = d.getHours();
+  const m = d.getMinutes();
+  if (h === 0 && m === 0) return day;
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  return `${day}, ${hour12}:${String(m).padStart(2, '0')} ${
+    h < 12 ? 'AM' : 'PM'
+  }`;
+}
+
 export function mapWorkspace(dto: BookingDetailDTO): WorkspaceViewModel {
   const occasion = titleize(dto.occasion);
   const eventDate = dateLabel(dto.eventDate);
@@ -105,16 +147,21 @@ export function mapWorkspace(dto: BookingDetailDTO): WorkspaceViewModel {
   const facts: WorkspaceFact[] = [
     { icon: 'calendar-blank-outline', label: 'When', value: eventDate },
     { icon: 'map-marker-outline', label: 'Where', value: dto.location ?? '' },
-    { icon: 'account-tie-outline', label: 'Organizer', value: dto.organizer?.name ?? '' },
+    {
+      icon: 'account-tie-outline',
+      label: 'Organizer',
+      value: dto.organizer?.name ?? '',
+    },
     { icon: 'pound', label: 'Reference', value: dto.ref ?? '' },
-  ].filter((f) => !!f.value);
+  ].filter(f => !!f.value);
 
   const amount = dto.amount ?? 0;
   const paid = dto.amountPaid ?? 0;
   const advance = dto.advanceAmount ?? 0;
-  const advancePaid = dto.paymentStatus !== 'unpaid' || (advance > 0 && paid >= advance);
+  const advancePaid =
+    dto.paymentStatus !== 'unpaid' || (advance > 0 && paid >= advance);
 
-  const tasks: WorkspaceTask[] = (dto.tasks ?? []).map((t) => {
+  const tasks: WorkspaceTask[] = (dto.tasks ?? []).map(t => {
     const status = TASK_STATUSES.includes(t.status) ? t.status : 'pending';
     const due = dateLabel(t.dueDate);
     return {
@@ -135,14 +182,16 @@ export function mapWorkspace(dto: BookingDetailDTO): WorkspaceViewModel {
       note: entry.note ?? '',
       atLabel: dateTimeLabel(entry.at),
     }))
-    .filter((entry) => !!entry.label)
+    .filter(entry => !!entry.label)
     // Newest first: the customer opens this to see what just happened.
     .reverse();
 
   return {
     id: dto.id,
     ref: dto.ref,
-    workspaceName: occasion ? `Your ${occasion.toLowerCase()} workspace` : WORKSPACE_COPY.fallbackName,
+    workspaceName: occasion
+      ? `Your ${occasion.toLowerCase()} workspace`
+      : WORKSPACE_COPY.fallbackName,
     // The occasion first: it is the name and nothing else. The stored title is
     // the fallback, with the date it carries taken off.
     title: occasion || nameOnly(dto.title) || WORKSPACE_COPY.fallbackName,
@@ -150,7 +199,7 @@ export function mapWorkspace(dto: BookingDetailDTO): WorkspaceViewModel {
     statusLabel: WORKSPACE_STATUS_LABEL[dto.status] ?? '',
     progress: Math.min(100, Math.max(0, Math.round(dto.progress ?? 0))),
     // 0 is a real answer ("today"); a booking with no date has none at all.
-    daysToGo: dto.eventDate ? (dto.daysToGo ?? 0) : null,
+    daysToGo: dto.eventDate ? dto.daysToGo ?? 0 : null,
     steps: dto.steps ?? [],
     facts,
     payment: {
@@ -163,13 +212,20 @@ export function mapWorkspace(dto: BookingDetailDTO): WorkspaceViewModel {
        */
       dueLabel: formatINR(Math.max(0, amount - paid)),
       statusLabel: PAYMENT_STATUS_LABEL[dto.paymentStatus] ?? '',
-      paidPercent: amount > 0 ? Math.min(100, Math.round((paid / amount) * 100)) : 0,
+      paidPercent:
+        amount > 0 ? Math.min(100, Math.round((paid / amount) * 100)) : 0,
       paidHeadline: `₹${Math.round(Math.max(0, paid)).toLocaleString('en-IN')}`,
       advanceLabel: formatINR(advance),
-      advanceState: advancePaid ? 'paid' : dto.advanceMethod === 'cash' ? 'cash_due' : 'due',
-      balanceLabel: formatINR(dto.balanceAmount ?? Math.max(0, amount - advance)),
+      advanceState: advancePaid
+        ? 'paid'
+        : dto.advanceMethod === 'cash'
+        ? 'cash_due'
+        : 'due',
+      balanceLabel: formatINR(
+        dto.balanceAmount ?? Math.max(0, amount - advance),
+      ),
     },
-    tasksDone: tasks.filter((t) => t.status === 'done').length,
+    tasksDone: tasks.filter(t => t.status === 'done').length,
     tasksTotal: tasks.length,
     tasks,
     timeline,
@@ -180,6 +236,7 @@ export function mapWorkspace(dto: BookingDetailDTO): WorkspaceViewModel {
     art: artFor(dto.occasion),
     dateLabel: eventDate,
     dateChip: chipFor(eventDate),
+    dateDetail: dateDetailFor(dto.eventDate),
     venue: (dto.location ?? '').trim(),
     customerName: dto.customer?.name ?? null,
   };

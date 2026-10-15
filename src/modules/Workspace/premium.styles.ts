@@ -724,3 +724,164 @@ export const pinnedStyles = StyleSheet.create({
 export const tabsWrap = StyleSheet.create({
   wrap: { marginTop: 18 },
 });
+
+/*
+ * The workspace's top: the category poster, the details card that overlaps
+ * its foot, and the Event Progress card.
+ */
+const cardLift = Platform.select({
+  ios: {
+    shadowColor: '#3a2470',
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
+  },
+  android: { elevation: 2 },
+});
+
+export const posterUi = StyleSheet.create({
+  poster: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: 54,
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
+    overflow: 'hidden',
+    minHeight: 250,
+  },
+  fill: { ...StyleSheet.absoluteFill },
+  /* Starts a little in from the left: that edge sits under solid colour. */
+  photo: { position: 'absolute', top: 0, bottom: 0, right: 0, left: '22%' },
+
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  glassButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.28)',
+  },
+  topTitle: { opacity: 0.9 },
+  topSpacer: { width: 40 },
+  refChip: {
+    maxWidth: 160,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.28)',
+  },
+
+  eyebrowRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 26,
+  },
+  emoji: { lineHeight: 30 },
+  statusPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flexShrink: 1,
+    paddingVertical: 5,
+    paddingHorizontal: 11,
+    borderRadius: 999,
+    backgroundColor: '#eafaf2',
+  },
+  statusDot: { width: 7, height: 7, borderRadius: 4 },
+  statusText: { color: '#16754f', flexShrink: 1 },
+  title: { marginTop: 8, maxWidth: '62%' },
+  tagline: { color: 'rgba(255,255,255,0.92)', marginTop: 2, maxWidth: '60%' },
+
+  detailsCard: {
+    flexDirection: 'row',
+    marginHorizontal: spacing.md,
+    marginTop: -34,
+    padding: 14,
+    borderRadius: 20,
+    backgroundColor: '#ffffff',
+    ...cardLift,
+  },
+  factsCol: {
+    flex: 1.35,
+    gap: 12,
+    paddingRight: 12,
+    borderRightWidth: 1,
+    borderRightColor: LINE,
+  },
+  fact: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+  factIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  factBody: { flex: 1, minWidth: 0, paddingTop: 1 },
+  factValue: { color: textColor.textPrimary },
+
+  organizerCol: {
+    flex: 1,
+    paddingLeft: 12,
+    justifyContent: 'center',
+    gap: 14,
+  },
+  organizerRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  avatarRing: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#efe8ff',
+  },
+  avatar: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  organizerText: { flex: 1, minWidth: 0 },
+  organizerName: { color: textColor.textPrimary },
+  messageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    height: 42,
+    borderRadius: 21,
+    overflow: 'hidden',
+  },
+
+  progressCard: {
+    marginHorizontal: spacing.md,
+    marginTop: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    backgroundColor: '#ffffff',
+    ...cardLift,
+  },
+  progressHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  progressTitle: { color: textColor.textPrimary },
+  progressRow: { flexDirection: 'row' },
+  progressCol: { flex: 1, alignItems: 'center', paddingHorizontal: 4 },
+  progressDivider: { borderRightWidth: 1, borderRightColor: LINE },
+  progressTop: { alignItems: 'center', marginBottom: 8 },
+  ringValue: { color: textColor.textPrimary },
+  progressLabel: { color: textColor.textPrimary },
+});

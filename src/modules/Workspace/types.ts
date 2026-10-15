@@ -161,6 +161,8 @@ export interface WorkspaceViewModel {
   /** "5 September 2026", and the same date split for the chip. */
   dateLabel: string;
   dateChip: { month: string; day: string } | null;
+  /** "Friday, 12:00 PM" — the weekday, and the time when the booking has one. */
+  dateDetail: string;
   /** The venue, or '' when the booking carries none. */
   venue: string;
 }
@@ -169,7 +171,12 @@ export interface WorkspaceViewModel {
 // GET /idea/mine/:bookingId — the ideas & planning board for one booking.
 // ---------------------------------------------------------------------------
 
-export type IdeaType = 'idea' | 'surprise' | 'question' | 'inspiration' | 'update';
+export type IdeaType =
+  | 'idea'
+  | 'surprise'
+  | 'question'
+  | 'inspiration'
+  | 'update';
 export type IdeaAuthorRole = 'customer' | 'organizer';
 export type IdeaPlanStatus = 'planned' | 'in_progress' | 'done';
 export type IdeaApproval = 'none' | 'pending' | 'approved';
@@ -228,7 +235,12 @@ export interface IdeaBoardDTO {
 }
 
 /** Which slice of the feed is showing. */
-export type BoardFilter = 'all' | 'ideas' | 'inspiration' | 'surprises' | 'awaiting';
+export type BoardFilter =
+  | 'all'
+  | 'ideas'
+  | 'inspiration'
+  | 'surprises'
+  | 'awaiting';
 
 /** What the composer submits. */
 export interface DraftPost {
@@ -272,7 +284,12 @@ export interface InvitationDTO {
     heroMediaType?: 'image' | 'video' | '';
     heroMediaUrl?: string;
   };
-  subEvents: Array<{ id: string; name: string; eventDate: string; venueName: string }>;
+  subEvents: Array<{
+    id: string;
+    name: string;
+    eventDate: string;
+    venueName: string;
+  }>;
 }
 
 /** The guest list, counted for the invitation tab. */

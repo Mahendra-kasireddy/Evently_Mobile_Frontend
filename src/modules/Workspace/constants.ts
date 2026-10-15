@@ -124,7 +124,8 @@ export const WORKSPACE_COPY = {
   timeline: 'Activity',
   noTasks: 'Your organizer has not added any vendor tasks yet.',
   ideas: 'Ideas & Planning',
-  ideasBlurb: 'Explore ideas, themes and tips to make your event even more special.',
+  ideasBlurb:
+    'Explore ideas, themes and tips to make your event even more special.',
   ideasOpen: 'Explore',
   ideasStart: 'Start',
   invitation: 'Guest invitation',
@@ -140,9 +141,21 @@ export const WORKSPACE_COPY = {
  * screen cannot end up offering different rows.
  */
 export const WORKSPACE_TABS: WorkspaceTabItem[] = [
-  { key: 'details', label: WORKSPACE_COPY.tabDetails, icon: 'information-outline' },
-  { key: 'ideas', label: WORKSPACE_COPY.tabIdeas, icon: 'lightbulb-on-outline' },
-  { key: 'invitation', label: WORKSPACE_COPY.tabInvitation, icon: 'email-outline' },
+  {
+    key: 'details',
+    label: WORKSPACE_COPY.tabDetails,
+    icon: 'information-outline',
+  },
+  {
+    key: 'ideas',
+    label: WORKSPACE_COPY.tabIdeas,
+    icon: 'lightbulb-on-outline',
+  },
+  {
+    key: 'invitation',
+    label: WORKSPACE_COPY.tabInvitation,
+    icon: 'email-outline',
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -153,12 +166,40 @@ export const WORKSPACE_TABS: WorkspaceTabItem[] = [
  * Post type → its chip. Colours are scoped to the board so the five kinds are
  * distinguishable at a glance rather than five identical grey pills.
  */
-export const IDEA_TYPE_META: Record<IdeaType, { label: string; icon: string; color: string; bg: string }> = {
-  idea: { label: 'Idea', icon: 'lightbulb-on-outline', color: '#b8541f', bg: '#fdeee7' },
-  inspiration: { label: 'Inspiration', icon: 'image-outline', color: '#2b5aa8', bg: '#e8effa' },
-  question: { label: 'Question', icon: 'help-circle-outline', color: '#7a4bb8', bg: '#f0eafb' },
-  surprise: { label: 'Surprise', icon: 'gift-outline', color: '#a63a63', bg: '#fbe9f0' },
-  update: { label: 'Update', icon: 'bullhorn-outline', color: '#1a2e5a', bg: '#e9edf5' },
+export const IDEA_TYPE_META: Record<
+  IdeaType,
+  { label: string; icon: string; color: string; bg: string }
+> = {
+  idea: {
+    label: 'Idea',
+    icon: 'lightbulb-on-outline',
+    color: '#b8541f',
+    bg: '#fdeee7',
+  },
+  inspiration: {
+    label: 'Inspiration',
+    icon: 'image-outline',
+    color: '#2b5aa8',
+    bg: '#e8effa',
+  },
+  question: {
+    label: 'Question',
+    icon: 'help-circle-outline',
+    color: '#7a4bb8',
+    bg: '#f0eafb',
+  },
+  surprise: {
+    label: 'Surprise',
+    icon: 'gift-outline',
+    color: '#a63a63',
+    bg: '#fbe9f0',
+  },
+  update: {
+    label: 'Update',
+    icon: 'bullhorn-outline',
+    color: '#1a2e5a',
+    bg: '#e9edf5',
+  },
 };
 
 export const IDEA_PLAN_STATUS_LABEL: Record<IdeaPlanStatus, string> = {
@@ -185,7 +226,12 @@ export const IDEA_APPROVAL_LABEL: Record<IdeaApproval, string> = {
  * sends it, so offering it here would be offering something that does not
  * happen.
  */
-export const CUSTOMER_IDEA_TYPES: IdeaType[] = ['idea', 'inspiration', 'question', 'surprise'];
+export const CUSTOMER_IDEA_TYPES: IdeaType[] = [
+  'idea',
+  'inspiration',
+  'question',
+  'surprise',
+];
 
 export const BOARD_FILTERS: Array<{ value: BoardFilter; label: string }> = [
   { value: 'all', label: 'All' },
@@ -196,7 +242,11 @@ export const BOARD_FILTERS: Array<{ value: BoardFilter; label: string }> = [
 ];
 
 /** The four vision slots, in the order the design shows them. */
-export const VISION_SLOTS: Array<{ key: 'theme' | 'vibe' | 'surprise' | 'food'; label: string; icon: string }> = [
+export const VISION_SLOTS: Array<{
+  key: 'theme' | 'vibe' | 'surprise' | 'food';
+  label: string;
+  icon: string;
+}> = [
   { key: 'theme', label: 'Theme', icon: 'palette-outline' },
   { key: 'vibe', label: 'Vibe', icon: 'heart-outline' },
   { key: 'surprise', label: 'Surprise', icon: 'gift-outline' },
@@ -219,16 +269,20 @@ export const IDEAS_COPY = {
     `Share the first one — a theme, a must-have, a photo you love. ${organizer} will turn it into a plan and reply here.`,
   filterEmptyTitle: 'Nothing in this filter',
   filterEmptyBody: 'Try another filter, or post something new.',
-  placeholder: (organizer: string) => `Share how you imagine your day with ${organizer}…`,
-  placeholderSurprise: 'Something you want planned without it showing up anywhere you share…',
+  placeholder: (organizer: string) =>
+    `Share how you imagine your day with ${organizer}…`,
+  placeholderSurprise:
+    'Something you want planned without it showing up anywhere you share…',
   post: 'Post idea',
   posting: 'Posting…',
   photo: 'Photo',
   uploading: 'Uploading…',
-  photoError: "That photo couldn't be uploaded. Try a JPG, PNG or WebP under 8MB.",
+  photoError:
+    "That photo couldn't be uploaded. Try a JPG, PNG or WebP under 8MB.",
   photoLimit: (max: number) => `You can attach up to ${max} photos.`,
   pickError: 'Could not open your photo library.',
-  confidentialNote: (organizer: string) => `Only you and ${organizer} will see this`,
+  confidentialNote: (organizer: string) =>
+    `Only you and ${organizer} will see this`,
   confidential: 'Kept private',
   approve: 'Approve',
   approved: 'Approved by you',
@@ -244,7 +298,10 @@ export const IDEAS_COPY = {
 };
 
 /** Does this post belong in the given filter? */
-export function matchesBoardFilter(idea: { type: IdeaType; approval: IdeaApproval }, filter: BoardFilter): boolean {
+export function matchesBoardFilter(
+  idea: { type: IdeaType; approval: IdeaApproval },
+  filter: BoardFilter,
+): boolean {
   switch (filter) {
     case 'ideas':
       return idea.type === 'idea';
@@ -278,7 +335,7 @@ export function initials(name: string): string {
   const parts = (name ?? '').trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return '·';
   const first = parts[0]?.[0] ?? '';
-  const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? '') : '';
+  const last = parts.length > 1 ? parts[parts.length - 1]?.[0] ?? '' : '';
   return (first + last).toUpperCase();
 }
 
@@ -304,12 +361,71 @@ export const OCCASION_THEME: Record<
   OccasionArtKey,
   { from: string; via: string; to: string; glow: string; emoji: string }
 > = {
-  wedding: { from: '#3b0f3f', via: '#a3285b', to: '#f2795a', glow: '#ffb48a', emoji: '💍' },
-  birthday: { from: '#2a1460', via: '#8a2bd1', to: '#ff5fa2', glow: '#ffc35c', emoji: '🎂' },
-  housewarming: { from: '#0f3b3a', via: '#1f8a6d', to: '#f2b045', glow: '#ffe08a', emoji: '🏡' },
-  naming: { from: '#1b2a6b', via: '#4c6fe0', to: '#f59ac2', glow: '#ffd6e8', emoji: '👶' },
-  anniversary: { from: '#3d0b1f', via: '#b0204a', to: '#ff8a7a', glow: '#ffc1b3', emoji: '💞' },
-  corporate: { from: '#0b1736', via: '#1f3fa0', to: '#29b6c9', glow: '#9be7ff', emoji: '🏢' },
+  wedding: {
+    from: '#3b0f3f',
+    via: '#a3285b',
+    to: '#f2795a',
+    glow: '#ffb48a',
+    emoji: '💍',
+  },
+  birthday: {
+    from: '#2a1460',
+    via: '#8a2bd1',
+    to: '#ff5fa2',
+    glow: '#ffc35c',
+    emoji: '🎂',
+  },
+  housewarming: {
+    from: '#0f3b3a',
+    via: '#1f8a6d',
+    to: '#f2b045',
+    glow: '#ffe08a',
+    emoji: '🏡',
+  },
+  naming: {
+    from: '#1b2a6b',
+    via: '#4c6fe0',
+    to: '#f59ac2',
+    glow: '#ffd6e8',
+    emoji: '👶',
+  },
+  anniversary: {
+    from: '#3d0b1f',
+    via: '#b0204a',
+    to: '#ff8a7a',
+    glow: '#ffc1b3',
+    emoji: '💞',
+  },
+  corporate: {
+    from: '#0b1736',
+    via: '#1f3fa0',
+    to: '#29b6c9',
+    glow: '#9be7ff',
+    emoji: '🏢',
+  },
+};
+
+/**
+ * The photo on the right of the poster, by category. Housewarming has no
+ * photograph bundled yet, so it uses the floral spray until one is added.
+ */
+export const OCCASION_PHOTO: Record<OccasionArtKey, number> = {
+  wedding: require('../../assets/images/login_hero.jpg'),
+  birthday: require('../../assets/images/login_hero_birthday.jpg'),
+  naming: require('../../assets/images/login_hero_naming.jpg'),
+  anniversary: require('../../assets/images/MrandMrs.jpg'),
+  corporate: require('../../assets/images/Corporate.jpeg'),
+  housewarming: require('../../assets/images/flowers_workspace.png'),
+};
+
+/** The line under the poster's title, in the occasion's voice. */
+export const OCCASION_TAGLINE: Record<OccasionArtKey, string> = {
+  wedding: 'Your forever starts here 💍',
+  birthday: 'Let’s make it special! 🎉',
+  naming: 'Welcoming a little one 👶',
+  anniversary: 'Celebrating your love story 💞',
+  housewarming: 'Warm wishes for the new home 🏡',
+  corporate: 'Let’s make it memorable ✨',
 };
 
 /** Ring colours for the three stats. */
@@ -320,7 +436,10 @@ export const STAT_RING = {
 };
 
 /** The active tab, the done milestones, the primary actions. */
-export const WORKSPACE_ACTION_GRADIENT: [string, string] = ['#f47b4d', '#e2477a'];
+export const WORKSPACE_ACTION_GRADIENT: [string, string] = [
+  '#f47b4d',
+  '#e2477a',
+];
 
 export const WORKSPACE_PREMIUM_COPY = {
   daysToGo: (n: number) => (n === 1 ? 'day to go' : 'days to go'),
@@ -331,6 +450,16 @@ export const WORKSPACE_PREMIUM_COPY = {
   tasks: 'Tasks',
   noTasksShort: 'None yet',
   message: 'Message',
+  organizedBy: 'Organized by',
+  estimatedBudget: 'Estimated Budget',
+  progressTitle: 'Event Progress',
+  planning: 'Booking & Planning',
+  payments: 'Payments',
+  planningState: (pct: number) =>
+    pct >= 100 ? 'Completed' : pct > 0 ? 'In progress' : 'Not started',
+  paymentState: (pct: number) =>
+    pct >= 100 ? 'Paid in full' : pct > 0 ? 'Partly paid' : 'Pending',
+  tasksState: (done: number) => `${done} completed`,
   journey: 'Your journey',
   now: 'Now',
   paidOf: (total: string) => `paid of ${total}`,
@@ -355,7 +484,8 @@ export const INVITE_TAB_COPY = {
   draftBody: (organizer: string) =>
     `${organizer} is crafting your invitation. You’ll review and approve it here before any guest sees it.`,
   reviewTitle: 'Ready for your review',
-  reviewBody: (organizer: string) => `${organizer} has shared it. Look it over and approve it — or ask for changes.`,
+  reviewBody: (organizer: string) =>
+    `${organizer} has shared it. Look it over and approve it — or ask for changes.`,
   liveTitle: 'Approved & live',
   liveBody: 'Your guest link is live. Share it with everyone on your list.',
   liveGuests: (sent: number, total: number) =>
@@ -367,9 +497,11 @@ export const INVITE_TAB_COPY = {
   invited: 'Invited',
   sent: 'Sent',
   viewed: 'Opened',
-  notSentYet: (n: number) => `${n} ${n === 1 ? 'guest hasn’t' : 'guests haven’t'} been sent it yet.`,
+  notSentYet: (n: number) =>
+    `${n} ${n === 1 ? 'guest hasn’t' : 'guests haven’t'} been sent it yet.`,
   sendAfterApproval: 'You can send it to your guests once you approve it.',
-  noGuests: 'No guests yet. Start your list now — the invitation can go out the moment it’s approved.',
+  noGuests:
+    'No guests yet. Start your list now — the invitation can go out the moment it’s approved.',
   reviewAction: 'Review invitation',
   reviewActionBody: 'Approve it or ask for changes',
   viewTitle: 'View & share',
