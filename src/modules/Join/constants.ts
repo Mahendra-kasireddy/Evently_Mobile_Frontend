@@ -16,7 +16,7 @@ import type { RoleCardData } from './types';
  */
 export const JOIN_COPY = {
   eyebrow: 'FOR BUSINESSES',
-  title: 'Work with Evently',
+  title: 'Work with Hypie',
   subtitle:
     'Get booked for events near you. Sign in with the same number you already use — one account, both sides.',
   chips: [
@@ -66,7 +66,7 @@ export const ROLE_CARDS: RoleCardData[] = [
     title: 'Sub-vendor',
     description: 'One service — catering, decor, photos, sound, mehendi',
     perks: [
-      'Take jobs from organizers on Evently',
+      'Take jobs from organizers on Hypie',
       'Set your own rate per plate, day or event',
       'Link to an organizer you already work with',
     ],

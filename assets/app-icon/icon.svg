@@ -1,0 +1,15 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#ffa51f"/><stop offset="0.38" stop-color="#f7656a"/>
+<stop offset="0.64" stop-color="#cf3fa2"/><stop offset="0.85" stop-color="#9a35d6"/><stop offset="1" stop-color="#5a2cf5"/></linearGradient>
+<radialGradient id="glow" cx="0.5" cy="0.45" r="0.5"><stop offset="0" stop-color="#ff5f86" stop-opacity="0.35"/><stop offset="1" stop-color="#ff5f86" stop-opacity="0"/></radialGradient>
+<clipPath id="c"><rect width="1024" height="1024"/></clipPath>
+</defs>
+<g clip-path="url(#c)">
+<rect width="1024" height="1024" fill="url(#g)"/>
+<rect width="1024" height="1024" fill="url(#glow)"/>
+<g transform="translate(512 545) scale(0.9) translate(-509 -600)" fill="#fff">
+<circle cx="329" cy="300" r="83"/><circle cx="689" cy="300" r="83"/>
+<path d="M225 425 Q225 391 258 400 C330 414 425 527 509 527 C593 527 688 414 760 400 Q793 391 793 425 L793 835 A71 71 0 0 1 651 835 L651 600 C610 632 560 648 509 648 C458 648 408 632 367 600 L367 835 A71 71 0 0 1 225 835 Z"/>
+</g></g></svg></body></html>

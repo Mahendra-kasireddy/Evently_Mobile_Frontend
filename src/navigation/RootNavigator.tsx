@@ -1,3 +1,4 @@
+import { useCallback, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SeeAllScreen } from '../modules/Home';
 import { AreaPickerScreen, OccasionPickerScreen } from '../modules/Pickers';
@@ -57,8 +58,12 @@ export function RootNavigator() {
   const isOnboardingHydrated = useAppSelector(selectIsOnboardingHydrated);
   const isBusinessView = useAppSelector(selectIsBusinessView);
 
-  if (!isAuthHydrated || !isOnboardingHydrated) {
-    return <SplashScreen />;
+  // The intro plays once per cold start, even when loading is instant.
+  const [introDone, setIntroDone] = useState(false);
+  const finishIntro = useCallback(() => setIntroDone(true), []);
+
+  if (!isAuthHydrated || !isOnboardingHydrated || !introDone) {
+    return <SplashScreen onDone={finishIntro} />;
   }
 
   return (

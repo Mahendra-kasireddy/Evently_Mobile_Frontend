@@ -55,6 +55,9 @@ export function formatSentTo(
   const source = sentTo?.trim()
     ? sentTo.trim()
     : `${DIAL_CODE}${fallbackMobile}`;
+  // The server masks all but the last four digits ("******3409"). Show the
+  // hidden ones as dots — dropping them left a bare "+91 3409".
+  if (/[*xX•]/.test(source)) return formatMaskedSentTo(source);
   const digits = source.replace(/\D/g, '');
   const local =
     digits.length > MOBILE_LENGTH ? digits.slice(-MOBILE_LENGTH) : digits;
@@ -63,6 +66,22 @@ export function formatSentTo(
       ? `+${digits.slice(0, digits.length - MOBILE_LENGTH)}`
       : DIAL_CODE;
   return `${dial} ${formatMobile(local)}`.trim();
+}
+
+/** "+91 •••••• 3409" from "+91******3409", "******3409" or "91******3409". */
+function formatMaskedSentTo(source: string): string {
+  const chars = source.replace(/[^\d*xX•]/g, '').replace(/[*xX]/g, '•');
+  const hasDial = chars.length > MOBILE_LENGTH;
+  const dial = hasDial
+    ? `+${chars.slice(0, chars.length - MOBILE_LENGTH)}`
+    : DIAL_CODE;
+  const local = (hasDial ? chars.slice(-MOBILE_LENGTH) : chars).padStart(
+    MOBILE_LENGTH,
+    '•',
+  );
+  const hidden = local.match(/^•*/)?.[0] ?? '';
+  const shown = local.slice(hidden.length);
+  return [dial, hidden, shown].filter(Boolean).join(' ');
 }
 
 /** `0:07`, never `0:7`. */

@@ -25,7 +25,7 @@ export const LEGAL_SUPPORT_ITEMS: LegalSupportItem[] = [
     key: 'contact',
     icon: 'email-outline',
     label: 'Contact us',
-    hint: 'Send a message to the Evently team',
+    hint: 'Send a message to the Hypie team',
     action: 'contact',
   },
   { key: 'privacy', icon: 'shield-lock-outline', label: 'Privacy Policy', action: 'pending' },

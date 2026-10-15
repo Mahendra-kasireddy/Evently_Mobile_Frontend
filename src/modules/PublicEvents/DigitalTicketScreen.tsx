@@ -86,7 +86,7 @@ export function DigitalTicketScreen() {
           <View style={s.brand}>
             <EventlyIcon name="party-popper" size={18} color="#ffffff" />
             <AppText variant="h3" style={s.brandText}>
-              Evently
+              Hypie
             </AppText>
           </View>
           <View style={ui.spacer26} />

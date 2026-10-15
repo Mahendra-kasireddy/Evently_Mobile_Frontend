@@ -1,8 +1,15 @@
-// Web's actual brand palette (evently-FrontEnd/src/index.css :root) and
-// wordmark treatment (shared/components/Header — lowercase "evently", the
-// "e" in accent orange). Scoped to this module only, matching the same
-// pattern already used by Home/Plan/Login for literal web-brand ports.
-export const SPLASH_BG = '#0e1a33'; // --color-navy-deep
-export const SPLASH_ACCENT = '#e8633a'; // --color-primary
+/*
+ * Hypie's opening screen: the new "M" mark, the wordmark and the tagline on a
+ * warm light page, with the celebrating friends rising in from below.
+ * Scoped to this module; the native launch background (Android colors.xml,
+ * iOS LaunchScreen.storyboard) uses the same page colour so there is no flash.
+ */
+export const SPLASH_BG = '#fff8f4';
+export const SPLASH_INK = '#1b1f4b';
+export const SPLASH_ACCENT = '#e8633a';
 
-export const SPLASH_TAGLINE = 'Effortless celebrations, planned beautifully.';
+export const SPLASH_WORDMARK = 'Hypie';
+export const SPLASH_TAGLINE = 'Celebrate More. Stress Less.';
+
+/** How long the intro plays before the app moves on (if loading is done). */
+export const SPLASH_MIN_MS = 2200;

@@ -65,7 +65,7 @@ export const ORGANIZER_COPY = {
   requested: 'Request sent',
 
   /** Reads "Evently verified · KYC & GST on file" — each half only when true. */
-  verified: 'Evently verified',
+  verified: 'Hypie verified',
   kycOnFile: 'KYC on file',
   gstOnFile: 'GST on file',
   kycAndGstOnFile: 'KYC & GST on file',
@@ -84,7 +84,7 @@ export const ORGANIZER_COPY = {
    */
   repliesWithin: (rate: number, hours: number) =>
     `Replies to ${rate}% of requests within ${hours} ${hours === 1 ? 'hour' : 'hours'}`,
-  advanceHeld: 'Advance refunded by Evently if the booking falls through',
+  advanceHeld: 'Advance refunded by Hypie if the booking falls through',
   itemisedQuotes: 'Itemised quotes — every line priced, nothing bundled',
   usuallyReplies: (hours: number) => `Usually replies in ${hours}h`,
 

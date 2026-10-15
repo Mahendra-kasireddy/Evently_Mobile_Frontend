@@ -8,7 +8,7 @@ import {
   GradientFill,
   KeyboardAvoider,
 } from '../../../Components';
-import { isValidMobile, isValidOtpCode } from '../../Login/utils';
+import { formatSentTo, isValidMobile, isValidOtpCode } from '../../Login/utils';
 import { useSendOtp, useVerifyOtp } from '../../Login/hooks';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { setSession } from '../../../store/authSlice';
@@ -149,7 +149,7 @@ export function AuthGateSection({
           <AppText variant="body" style={authGateStyles.subtitle}>
             {step === 'phone'
               ? copy.subtitle
-              : `We sent it by SMS to ${sentTo ?? 'your phone'}.`}
+              : `We sent it by SMS to ${formatSentTo(sentTo, phone)}.`}
           </AppText>
         </View>
 

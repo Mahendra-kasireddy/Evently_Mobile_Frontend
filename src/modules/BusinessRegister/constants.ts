@@ -32,7 +32,7 @@ export const AUTH_COPY: Record<JoinRole, AuthGateCopy> = {
     title: 'Verify your mobile',
     subtitle: 'Use the number customers should reach your business on.',
     sameNumber:
-      'Already use Evently as a customer? Use that same number — your organizer profile is added to the same account.',
+      'Already use Hypie as a customer? Use that same number — your organizer profile is added to the same account.',
   },
   subvendor: {
     header: 'Become a sub-vendor',
@@ -40,7 +40,7 @@ export const AUTH_COPY: Record<JoinRole, AuthGateCopy> = {
     title: 'Verify your mobile',
     subtitle: 'Use the number organizers already know you by.',
     sameNumber:
-      'Already use Evently as a customer? Use that same number — your sub-vendor profile is added to the same account.',
+      'Already use Hypie as a customer? Use that same number — your sub-vendor profile is added to the same account.',
   },
 };
 

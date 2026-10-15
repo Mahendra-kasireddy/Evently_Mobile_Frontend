@@ -35,7 +35,7 @@ export function CoverBanner({
   const share = () => {
     // The native sheet: nothing here decides where it goes, so there is no
     // list of apps to keep up to date.
-    Share.share({ message: `${name} on Evently` }).catch(() => {});
+    Share.share({ message: `${name} on Hypie` }).catch(() => {});
   };
 
   return (

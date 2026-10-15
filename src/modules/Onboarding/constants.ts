@@ -1,32 +1,40 @@
 import type { OnboardingSlide } from './types';
 
-// Web's actual brand palette (evently-FrontEnd/src/index.css :root) — same
-// navy/orange identity Home/Plan/Login already port. Scoped to this module only.
-export const ONBOARDING_BG = '#0e1a33'; // --color-navy-deep
-export const ONBOARDING_ACCENT = '#e8633a'; // --color-primary
-export const ONBOARDING_ACCENT_WARM = '#ff8b5e'; // --color-accent-warm
+// Hypie's light, warm look — the same page colour as the splash and the
+// "How do you want to use Hypie?" screen. Scoped to this module only.
+export const ONBOARDING_BG = '#fff8f4';
+export const ONBOARDING_INK = '#1b1f4b';
+export const ONBOARDING_MUTED = '#6b6f86';
+export const ONBOARDING_ACCENT = '#f0603a';
+/** The buttons run warm orange into violet, like the app icon. */
+export const ONBOARDING_BUTTON: [string, string] = ['#ff8a4c', '#8a4dff'];
 
-// Exactly 3 slides, one idea each, short enough to read in a glance — the
-// same real value proposition web's login promo panel states, trimmed down
-// (web's /onboarding routes are organizer/sub-vendor signup, a different
-// audience entirely, so this copy isn't ported from a literal onboarding page).
+// Exactly 3 slides, one idea each, short enough to read in a glance.
 export const ONBOARDING_SLIDES: OnboardingSlide[] = [
   {
-    key: 'welcome',
-    icon: 'shield-check-outline',
-    heading: 'Plan events, effortlessly',
-    subtitle: 'Track your event and approve every detail, all in one place.',
+    key: 'discover',
+    art: 'discover',
+    image: require('../../assets/images/onboarding_discover.png'),
+    glow: '#ffe4d6',
+    heading: 'Discover & Book\nYour Celebrations',
+    subtitle:
+      'Find the perfect event for your special moments, compare options and book with ease.',
   },
   {
-    key: 'organizers',
-    icon: 'creation',
-    heading: 'One organizer, everything covered',
-    subtitle: 'Catering, decor, photography & more — no juggling vendors.',
+    key: 'platform',
+    art: 'platform',
+    image: require('../../assets/images/onboarding_platform.png'),
+    glow: '#ece6ff',
+    heading: 'One Platform,\nEndless Possibilities',
+    subtitle:
+      'Connecting customers, organizers and vendors for unforgettable celebrations.',
   },
   {
-    key: 'quotes',
-    icon: 'file-document-outline',
-    heading: 'Compare quotes with confidence',
-    subtitle: 'See transparent, itemised quotes before you decide.',
+    key: 'celebrate',
+    art: 'celebrate',
+    image: require('../../assets/images/onboarding_celebrate.png'),
+    glow: '#ffe3ee',
+    heading: 'Let’s Make\nYour Moments Special!',
+    subtitle: 'Celebrate More. Stress Less.',
   },
 ];

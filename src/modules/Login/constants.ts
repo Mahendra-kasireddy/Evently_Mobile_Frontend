@@ -21,7 +21,7 @@ export const DIAL_CODES = [
 ] as const;
 
 export const LOGIN_COPY = {
-  wordmark: 'Evently',
+  wordmark: 'Hypie',
   title: 'Welcome back',
   subtitle: 'Sign in to continue your celebration journey',
 } as const;

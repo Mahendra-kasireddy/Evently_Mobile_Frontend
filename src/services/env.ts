@@ -76,7 +76,7 @@ export const env = Object.freeze({
   apiBaseUrl: config.apiBaseUrl.replace(/\/+$/, ''),
   /** Where the organizer and sub-vendor dashboards are served from. No trailing slash. */
   webAppUrl: config.webAppUrl.replace(/\/+$/, ''),
-  appName: 'Evently',
+  appName: 'Hypie',
   /** Metro/debug build — about the build, not about which backend it talks to. */
   isDev: __DEV__,
   mode: APP_ENV,

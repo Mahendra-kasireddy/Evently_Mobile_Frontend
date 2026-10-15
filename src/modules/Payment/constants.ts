@@ -59,7 +59,7 @@ export const PAYMENT_COPY = {
    * the same, and worth saying so the option does not read as second-class.
    */
   cashAssurance:
-    'Nothing is charged now. You pay the advance directly to your organizer, and they confirm it in the app once it reaches them. Evently does not hold this money, so it cannot be refunded by us — your organizer still has 48 hours to accept or decline.',
+    'Nothing is charged now. You pay the advance directly to your organizer, and they confirm it in the app once it reaches them. Hypie does not hold this money, so it cannot be refunded by us — your organizer still has 48 hours to accept or decline.',
   cashFailed: "We couldn't book that. Nothing has been charged — please try again.",
   /*
    * Said when no gateway is configured.

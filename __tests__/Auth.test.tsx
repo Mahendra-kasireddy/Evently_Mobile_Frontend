@@ -147,6 +147,10 @@ describe('what the screen shows back', () => {
     expect(formatSentTo('+919000000001', '9849012345')).toBe('+91 90000 00001');
     expect(formatSentTo(null, '9849012345')).toBe('+91 98490 12345');
     expect(formatSentTo('   ', '9849012345')).toBe('+91 98490 12345');
+    // The server masks all but the last four digits; those show as dots.
+    expect(formatSentTo('******3409', '9849012345')).toBe('+91 •••••• 3409');
+    expect(formatSentTo('+91******3409', '9849012345')).toBe('+91 •••••• 3409');
+    expect(formatSentTo('91******3409', '9849012345')).toBe('+91 •••••• 3409');
   });
 
   it('pads the cooldown so it never reads 0:7', () => {

@@ -7,7 +7,7 @@ import { digitsOf, initialsOf } from './utils';
 const RATIONALE = {
   title: 'Add guests from your contacts',
   message:
-    'Evently reads your contacts so you can pick who to invite. Nothing leaves your phone until you add them.',
+    'Hypie reads your contacts so you can pick who to invite. Nothing leaves your phone until you add them.',
   buttonPositive: 'Allow',
 } as const;
 
@@ -134,7 +134,7 @@ export function useContactsImport(): ContactsImportResult {
          forward is Settings — said once, with a way to get there. */
       Alert.alert(
         'Contacts access is off',
-        'Turn on Contacts for Evently in Settings to pick guests from your phonebook. You can still add guests by hand.',
+        'Turn on Contacts for Hypie in Settings to pick guests from your phonebook. You can still add guests by hand.',
         [
           { text: 'Not now', style: 'cancel' },
           { text: 'Open settings', onPress: () => Linking.openSettings() },
@@ -144,7 +144,7 @@ export function useContactsImport(): ContactsImportResult {
     }
     Alert.alert(
       'Contacts access needed',
-      'Evently needs permission to read your contacts to pick guests from them. You can still add guests by hand.',
+      'Hypie needs permission to read your contacts to pick guests from them. You can still add guests by hand.',
     );
   }, []);
 

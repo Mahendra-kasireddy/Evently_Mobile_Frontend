@@ -110,7 +110,7 @@ export function usePaymentContainer(
       order_id: data.orderId,
       amount: data.amountInPaise,
       currency: data.currency,
-      name: 'Evently',
+      name: 'Hypie',
       description: `Advance for your event with ${data.organizerName}`,
       /* The method chosen on our screen is what the sheet opens on, so the
          customer is not asked the same question twice. */

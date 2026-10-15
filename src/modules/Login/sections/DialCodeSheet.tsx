@@ -63,7 +63,7 @@ export function DialCodeSheet({
           })}
 
           <AppText variant="caption" style={dialSheetStyles.note}>
-            Evently currently accepts Indian mobile numbers only.
+            Hypie currently accepts Indian mobile numbers only.
           </AppText>
         </Pressable>
       </Pressable>

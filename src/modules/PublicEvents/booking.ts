@@ -74,7 +74,7 @@ export function useTicketPurchase() {
           order_id: held.payment.orderId,
           amount: held.amountInPaise ?? Math.round(held.amount * 100),
           currency: held.payment.currency,
-          name: 'Evently',
+          name: 'Hypie',
           description: `${quantity} × ticket · ${eventTitle}`,
           theme: { color: '#e8633a' },
         })) as RazorpayResult;

@@ -807,7 +807,7 @@ export function mapTopOrganizers(
   return {
     // "near you" only when they really are. When the search had to widen, the
     // heading says so rather than claiming a locality the server never asserted.
-    title: scope === 'city' ? 'Organizers near you' : 'Organizers on Evently',
+    title: scope === 'city' ? 'Organizers near you' : 'Organizers on Hypie',
     scopeNote:
       scope === 'city'
         ? ''

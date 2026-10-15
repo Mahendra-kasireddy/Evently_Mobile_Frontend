@@ -146,7 +146,7 @@ export function PublicEventDetailScreen() {
       message: `${data.title} — ${formatEventWhen(
         data.startDateTime,
         data.timezone,
-      )}${venueLine ? ` at ${venueLine}` : ''}. Book on Evently.`,
+      )}${venueLine ? ` at ${venueLine}` : ''}. Book on Hypie.`,
     }).catch(() => undefined);
   };
 

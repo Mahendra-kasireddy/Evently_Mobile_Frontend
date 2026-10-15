@@ -74,6 +74,6 @@ describe('reverseGeocode', () => {
     await reverseGeocode(HYDERABAD);
 
     const [, init] = fetchMock.mock.calls[0];
-    expect(init.headers['User-Agent']).toContain('Evently');
+    expect(init.headers['User-Agent']).toContain('Hypie');
   });
 });

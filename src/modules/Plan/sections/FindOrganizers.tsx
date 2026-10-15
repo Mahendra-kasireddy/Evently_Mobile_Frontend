@@ -112,7 +112,7 @@ function OrganizerCard({
               color={colors.onPrimary}
             />
             <AppText variant="label" style={organizersStyles.conciergeText}>
-              Evently Managed
+              Hypie Managed
             </AppText>
           </View>
         ) : organizer.verified ? (

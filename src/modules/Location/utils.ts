@@ -16,7 +16,7 @@ export function getStatusCopy(errorCode: LocationErrorCode | null): LocationStat
     case 'permission_blocked':
       return {
         title: 'Location permission denied',
-        message: 'Location access is turned off for Evently. Enable it in Settings to continue.',
+        message: 'Location access is turned off for Hypie. Enable it in Settings to continue.',
         actionLabel: 'Open Settings',
         action: 'openSettings',
       };

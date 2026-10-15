@@ -194,7 +194,7 @@ describe('mapOrganizer', () => {
      * paperwork — an organizer who uploaded a PAN is not thereby checked.
      */
     expect(model().verification).toEqual({
-      title: 'Evently verified',
+      title: 'Hypie verified',
       detail: 'KYC & GST on file',
     });
     expect(model({ verified: false }).verification).toBeNull();
@@ -367,7 +367,7 @@ describe('CoverBanner and IdentityCard', () => {
         />,
       ),
     );
-    expect(verified).toContain('Evently verified · KYC & GST on file');
+    expect(verified).toContain('Hypie verified · KYC & GST on file');
 
     const unverified = textOf(
       render(
@@ -408,7 +408,7 @@ describe('AssuranceCard', () => {
   it('lists only promises the record supports', () => {
     const text = textOf(render(<AssuranceCard items={model().assurances} />));
     expect(text).toContain('Replies to 92% of requests within 2 hours');
-    expect(text).toContain('Advance refunded by Evently if the booking falls through');
+    expect(text).toContain('Advance refunded by Hypie if the booking falls through');
     expect(text).toContain('Itemised quotes');
   });
 
