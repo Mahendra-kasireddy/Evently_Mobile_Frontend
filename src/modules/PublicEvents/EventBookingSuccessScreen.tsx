@@ -15,7 +15,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText, FadeInUp, PopIn } from '../../Components';
+import { EventlyIcon, AppText, FadeInUp, PopIn } from '../../Components';
 import { absoluteFileUrl } from '../../services/urls';
 import type { RootStackParamList } from '../../navigation/types';
 import { calendarUrl, formatEventWhen, formatPrice } from './constants';
@@ -80,12 +80,12 @@ export function EventBookingSuccessScreen() {
           <EventlyIcon name="check" size={40} color="#ffffff" />
         </PopIn>
         <FadeInUp delay={180}>
-          <EventlyText variant="h1" style={s.heading}>
+          <AppText variant="h1" style={s.heading}>
             You’re Going!
-          </EventlyText>
-          <EventlyText variant="body" style={s.sub}>
+          </AppText>
+          <AppText variant="body" style={s.sub}>
             Your booking has been confirmed.
-          </EventlyText>
+          </AppText>
         </FadeInUp>
 
         <View style={ui.card}>
@@ -98,9 +98,9 @@ export function EventBookingSuccessScreen() {
           ) : null}
           {data ? (
             <>
-              <EventlyText variant="body" style={s.title}>
+              <AppText variant="h3" style={s.title}>
                 {data.title}
-              </EventlyText>
+              </AppText>
               <InfoLine
                 icon="calendar-month-outline"
                 text={formatEventWhen(data.startDateTime, data.timezone)}
@@ -110,30 +110,30 @@ export function EventBookingSuccessScreen() {
           ) : null}
           <View style={ui.divider} />
           <View style={kv.kv}>
-            <EventlyText variant="caption" style={kv.key}>
+            <AppText variant="bodySmall" style={kv.key}>
               {`${params.ticketTypeName} × ${params.quantity}`}
-            </EventlyText>
-            <EventlyText variant="caption" style={kv.value}>
+            </AppText>
+            <AppText variant="bodySmall" style={kv.value}>
               {formatPrice(params.amount)}
-            </EventlyText>
+            </AppText>
           </View>
           <View style={kv.kv}>
-            <EventlyText variant="caption" style={kv.key}>
+            <AppText variant="bodySmall" style={kv.key}>
               Booking ID
-            </EventlyText>
-            <EventlyText variant="caption" style={kv.value}>
+            </AppText>
+            <AppText variant="bodySmall" style={kv.value}>
               {params.reference}
-            </EventlyText>
+            </AppText>
           </View>
           <View style={kv.kv}>
-            <EventlyText variant="caption" style={kv.key}>
+            <AppText variant="bodySmall" style={kv.key}>
               {params.ticketIds.length > 1 ? 'Tickets' : 'Ticket'}
-            </EventlyText>
-            <EventlyText variant="caption" style={kv.value}>
+            </AppText>
+            <AppText variant="bodySmall" style={kv.value}>
               {params.ticketIds.length > 1
                 ? `${params.ticketIds.length} issued`
                 : '1 issued'}
-            </EventlyText>
+            </AppText>
           </View>
         </View>
 
@@ -147,18 +147,18 @@ export function EventBookingSuccessScreen() {
             }
             accessibilityRole="button"
           >
-            <EventlyText variant="body" style={ui.primaryText}>
+            <AppText variant="h3" style={ui.primaryText}>
               View Ticket
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
           <TouchableOpacity
             style={ui.outline}
             onPress={() => navigation.replace('MyTickets')}
             accessibilityRole="button"
           >
-            <EventlyText variant="body" style={ui.outlineText}>
+            <AppText variant="body" style={ui.outlineText}>
               View My Tickets
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
           <TouchableOpacity
             style={ui.outline}
@@ -167,9 +167,9 @@ export function EventBookingSuccessScreen() {
             accessibilityRole="button"
           >
             <EventlyIcon name="calendar-plus" size={18} color={PE_ACCENT} />
-            <EventlyText variant="body" style={ui.outlineText}>
+            <AppText variant="body" style={ui.outlineText}>
               Add to Calendar
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       </ScrollView>

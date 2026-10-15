@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { SORT_OPTIONS, type SortKey } from '../constants';
 import { PE_ACCENT, PE_NAVY } from '../styles';
 import { PE_MUTED, filterUi as s, ui } from '../ui.styles';
@@ -86,9 +86,9 @@ export function FilterSheet({
             color={on ? '#ffffff' : PE_ACCENT}
           />
         ) : null}
-        <EventlyText variant="caption" style={[s.chipText, on && s.chipTextOn]}>
+        <AppText variant="label" style={[s.chipText, on && s.chipTextOn]}>
           {label}
-        </EventlyText>
+        </AppText>
       </TouchableOpacity>
     );
   };
@@ -111,9 +111,9 @@ export function FilterSheet({
         >
           <View style={ui.sheetHandle} />
           <View style={s.head}>
-            <EventlyText variant="subtitle" style={s.title}>
+            <AppText variant="h3" style={s.title}>
               Filters
-            </EventlyText>
+            </AppText>
             <TouchableOpacity
               onPress={onClose}
               hitSlop={10}
@@ -129,9 +129,9 @@ export function FilterSheet({
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <EventlyText variant="caption" style={s.label}>
+            <AppText variant="label" style={s.label}>
               LOCATION
-            </EventlyText>
+            </AppText>
             {cities.length > CITY_SEARCH_FROM ? (
               <View style={s.citySearch}>
                 <EventlyIcon name="magnify" size={16} color={PE_MUTED} />
@@ -153,14 +153,14 @@ export function FilterSheet({
               {shownCities.map(c => cityChip(c, c))}
             </View>
             {!currentCity ? (
-              <EventlyText variant="caption" style={s.hint}>
+              <AppText variant="caption" style={s.hint}>
                 Share your location to see your city here first.
-              </EventlyText>
+              </AppText>
             ) : null}
 
-            <EventlyText variant="caption" style={[s.label, s.labelGap]}>
+            <AppText variant="label" style={[s.label, s.labelGap]}>
               SORT BY
-            </EventlyText>
+            </AppText>
             <View style={s.chips}>
               {SORT_OPTIONS.map(option => {
                 const on = draft.sort === option.key;
@@ -172,12 +172,12 @@ export function FilterSheet({
                     accessibilityRole="radio"
                     accessibilityState={{ selected: on }}
                   >
-                    <EventlyText
-                      variant="caption"
+                    <AppText
+                      variant="label"
                       style={[s.chipText, on && s.chipTextOn]}
                     >
                       {option.label}
-                    </EventlyText>
+                    </AppText>
                   </TouchableOpacity>
                 );
               })}
@@ -190,9 +190,9 @@ export function FilterSheet({
               onPress={() => setDraft(NO_EVENT_FILTERS)}
               accessibilityRole="button"
             >
-              <EventlyText variant="body" style={ui.outlineText}>
+              <AppText variant="body" style={ui.outlineText}>
                 Reset
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
             <TouchableOpacity
               style={[ui.primary, s.action]}
@@ -202,9 +202,9 @@ export function FilterSheet({
               }}
               accessibilityRole="button"
             >
-              <EventlyText variant="body" style={ui.primaryText}>
+              <AppText variant="h3" style={ui.primaryText}>
                 Apply
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
           </View>
         </Pressable>

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import {
   EventlyIcon,
-  EventlyText,
+  AppText,
   GradientFill,
   PressableScale,
   useReducedMotion,
@@ -47,7 +47,10 @@ interface FeaturedEventsProps {
  * is. The server already filters this; checked again here so a stale list or
  * an older server can never put an expired event in the spotlight.
  */
-export function isNotEnded(event: EventCard, now: number = Date.now()): boolean {
+export function isNotEnded(
+  event: EventCard,
+  now: number = Date.now(),
+): boolean {
   if (event.liveState === 'ended') return false;
   const end = event.endDateTime ? Date.parse(event.endDateTime) : NaN;
   if (Number.isFinite(end)) return end > now;
@@ -60,8 +63,8 @@ function tagline(event: EventCard): string {
   const price = event.soldOut
     ? PUBLIC_EVENTS_COPY.soldOut
     : event.startingPrice > 0
-      ? `${PUBLIC_EVENTS_COPY.from} ${formatPrice(event.startingPrice)}`
-      : 'Free entry';
+    ? `${PUBLIC_EVENTS_COPY.from} ${formatPrice(event.startingPrice)}`
+    : 'Free entry';
   return [event.category, price].filter(Boolean).join('  ·  ');
 }
 
@@ -88,10 +91,11 @@ export function FeaturedEvents({ onOpenEvent, style }: FeaturedEventsProps) {
     // On sale or sold out, and not yet over — never one that has ended or
     // been called off.
     const live = (data ?? []).filter(
-      (e) => (e.status === 'published' || e.status === 'sold_out') && isNotEnded(e),
+      e =>
+        (e.status === 'published' || e.status === 'sold_out') && isNotEnded(e),
     );
-    const withCover = live.filter((e) => e.coverUrl);
-    const without = live.filter((e) => !e.coverUrl);
+    const withCover = live.filter(e => e.coverUrl);
+    const without = live.filter(e => !e.coverUrl);
     return [...withCover, ...without].slice(0, FEATURED_LIMIT);
   }, [data]);
 
@@ -120,7 +124,9 @@ export function FeaturedEvents({ onOpenEvent, style }: FeaturedEventsProps) {
 
   const onSettle = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     dragging.current = false;
-    const settled = Math.round(e.nativeEvent.contentOffset.x / Math.max(1, step));
+    const settled = Math.round(
+      e.nativeEvent.contentOffset.x / Math.max(1, step),
+    );
     indexRef.current = settled;
     setIndex(settled);
   };
@@ -142,8 +148,12 @@ export function FeaturedEvents({ onOpenEvent, style }: FeaturedEventsProps) {
       }}
       onMomentumScrollEnd={onSettle}
     >
-      {events.map((event) => {
-        const dates = formatDateSpan(event.startDateTime, event.endDateTime, event.timezone);
+      {events.map(event => {
+        const dates = formatDateSpan(
+          event.startDateTime,
+          event.endDateTime,
+          event.timezone,
+        );
         const place = [event.venueName, event.city].filter(Boolean).join(', ');
         const tint = categoryTint(event.category);
         return (
@@ -162,7 +172,10 @@ export function FeaturedEvents({ onOpenEvent, style }: FeaturedEventsProps) {
                 resizeMode="cover"
               />
             ) : (
-              <GradientFill colors={[tint.bg, '#1b1446']} direction="diagonal" />
+              <GradientFill
+                colors={[tint.bg, '#1b1446']}
+                direction="diagonal"
+              />
             )}
             {/* Dark at the left where the words are, clear at the right where
                 the picture is — so white type reads on any photo. */}
@@ -174,40 +187,61 @@ export function FeaturedEvents({ onOpenEvent, style }: FeaturedEventsProps) {
 
             <View style={s.body}>
               <View>
-                <EventlyText style={s.eyebrow}>{COPY.eyebrow}</EventlyText>
-                <EventlyText style={s.title} numberOfLines={1}>
+                <AppText variant="label" style={s.eyebrow}>
+                  {COPY.eyebrow}
+                </AppText>
+                <AppText variant="h1" style={s.title} numberOfLines={2}>
                   {event.title}
-                </EventlyText>
-                <EventlyText style={s.tagline} numberOfLines={1}>
+                </AppText>
+                <AppText variant="caption" style={s.tagline} numberOfLines={1}>
                   {tagline(event)}
-                </EventlyText>
+                </AppText>
                 {place ? (
                   <View style={s.place}>
-                    <EventlyIcon name="map-marker-outline" size={14} color="#ffffff" />
-                    <EventlyText style={s.placeText} numberOfLines={1}>
+                    <EventlyIcon
+                      name="map-marker-outline"
+                      size={14}
+                      color="#ffffff"
+                    />
+                    <AppText
+                      variant="caption"
+                      style={s.placeText}
+                      numberOfLines={1}
+                    >
                       {place}
-                    </EventlyText>
+                    </AppText>
                   </View>
                 ) : null}
               </View>
 
               <View style={s.explore}>
-                <EventlyText style={s.exploreText}>{COPY.explore}</EventlyText>
+                <AppText variant="bodySmall" style={s.exploreText}>
+                  {COPY.explore}
+                </AppText>
                 <EventlyIcon name="chevron-right" size={16} color="#3a2a8c" />
               </View>
             </View>
 
             {dates ? (
               <View style={s.datePill}>
-                <EventlyIcon name="calendar-blank-outline" size={13} color={PE_NAVY} />
-                <EventlyText style={s.dateText}>{dates}</EventlyText>
+                <EventlyIcon
+                  name="calendar-blank-outline"
+                  size={13}
+                  color={PE_NAVY}
+                />
+                <AppText variant="label" style={s.dateText}>
+                  {dates}
+                </AppText>
               </View>
             ) : null}
 
             {events.length > 1 ? (
               <View style={s.dots} pointerEvents="none">
                 {events.map((e, i) => (
-                  <View key={e.id} style={[s.dot, i === index && s.dotActive]} />
+                  <View
+                    key={e.id}
+                    style={[s.dot, i === index && s.dotActive]}
+                  />
                 ))}
               </View>
             ) : null}

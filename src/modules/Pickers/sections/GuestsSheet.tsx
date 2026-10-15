@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Modal, Pressable, View } from 'react-native';
-import { EventlyText, EventlyTextInput } from '../../../Components';
+import { AppText, EventlyTextInput } from '../../../Components';
 import { brand } from '../../../theme';
 import { GUESTS_COPY, GUESTS_FALLBACK } from '../constants';
 import { guestsSheetStyles as s } from '../styles';
@@ -59,12 +59,12 @@ export function GuestsSheet({
       >
         <Pressable style={s.sheet} onPress={() => undefined}>
           <View style={s.grabber} />
-          <EventlyText variant="h2" style={s.title}>
+          <AppText variant="h2" style={s.title}>
             {GUESTS_COPY.title}
-          </EventlyText>
-          <EventlyText variant="caption" style={s.subtitle}>
+          </AppText>
+          <AppText variant="caption" style={s.subtitle}>
             {GUESTS_COPY.subtitle}
-          </EventlyText>
+          </AppText>
 
           <View style={s.chipRow}>
             {presets.map(preset => {
@@ -82,17 +82,20 @@ export function GuestsSheet({
                   accessibilityLabel={`${preset} guests`}
                   testID={`guests-${preset}`}
                 >
-                  <EventlyText style={[s.chipText, active && s.chipTextActive]}>
+                  <AppText
+                    variant="body"
+                    style={[s.chipText, active && s.chipTextActive]}
+                  >
                     {preset}
-                  </EventlyText>
+                  </AppText>
                 </Pressable>
               );
             })}
           </View>
 
-          <EventlyText variant="subtitle" style={s.customLabel}>
+          <AppText variant="body" weight="medium" style={s.customLabel}>
             {GUESTS_COPY.customLabel}
-          </EventlyText>
+          </AppText>
           <View style={s.customRow}>
             <EventlyTextInput
               style={s.customInput}
@@ -117,9 +120,9 @@ export function GuestsSheet({
               accessibilityLabel={GUESTS_COPY.done}
               testID="guests-done"
             >
-              <EventlyText style={[s.doneText, !canApply && s.doneTextIdle]}>
+              <AppText style={[s.doneText, !canApply && s.doneTextIdle]}>
                 {GUESTS_COPY.done}
-              </EventlyText>
+              </AppText>
             </Pressable>
           </View>
         </Pressable>

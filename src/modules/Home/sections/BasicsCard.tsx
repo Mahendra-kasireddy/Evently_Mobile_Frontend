@@ -3,7 +3,7 @@ import { Animated, Pressable, ScrollView, View } from 'react-native';
 import {
   artFor,
   EventlyIcon,
-  EventlyText,
+  AppText,
   GradientFill,
   PressableScale,
   todayIso,
@@ -101,14 +101,17 @@ function SelectorTile({
             color={answered ? '#ffffff' : accent[1]}
           />
         </View>
-        <EventlyText style={s.tileLabel}>{HERO_FIELD_LABEL[field]}</EventlyText>
+        <AppText variant="overline" style={s.tileLabel}>
+          {HERO_FIELD_LABEL[field]}
+        </AppText>
       </View>
-      <EventlyText
+      <AppText
+        variant="h3"
         style={[s.tileValue, !answered && s.tileValueEmpty]}
         numberOfLines={1}
       >
         {value || EMPTY_VALUE[field]}
-      </EventlyText>
+      </AppText>
     </PressableScale>
   );
 }
@@ -207,9 +210,9 @@ function QuickDates({
 
   return (
     <View style={s.quickRow}>
-      <EventlyText style={s.quickLabel} numberOfLines={1}>
+      <AppText variant="label" style={s.quickLabel} numberOfLines={1}>
         {QUICK_DATES_LABEL}
-      </EventlyText>
+      </AppText>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -266,12 +269,13 @@ function QuickDates({
               accessibilityLabel={`${chip.label}, ${formatWhen(chip.iso)}`}
               testID={`quick-date-${chip.label}`}
             >
-              <EventlyText
+              <AppText
+                variant="label"
                 style={[s.chipText, isActive && s.chipTextActive]}
                 numberOfLines={1}
               >
                 {chip.label}
-              </EventlyText>
+              </AppText>
             </Pressable>
           );
         })}

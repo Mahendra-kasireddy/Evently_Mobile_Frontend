@@ -15,7 +15,7 @@ import Svg, {
   SvgXml,
   Stop,
 } from 'react-native-svg';
-import { EventlyIcon, EventlyText } from '../../Components';
+import { EventlyIcon, AppText } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
 import { PUBLIC_EVENTS_COPY, formatEventWhen } from './constants';
 import { useDigitalTicket } from './hooks';
@@ -47,12 +47,12 @@ function Backdrop() {
 function Fact({ k, v }: { k: string; v: string }) {
   return (
     <View>
-      <EventlyText variant="caption" style={s.factKey}>
+      <AppText variant="caption" style={s.factKey}>
         {k}
-      </EventlyText>
-      <EventlyText variant="caption" style={s.factVal} numberOfLines={1}>
+      </AppText>
+      <AppText variant="bodySmall" style={s.factVal} numberOfLines={1}>
         {v}
-      </EventlyText>
+      </AppText>
     </View>
   );
 }
@@ -85,9 +85,9 @@ export function DigitalTicketScreen() {
           </TouchableOpacity>
           <View style={s.brand}>
             <EventlyIcon name="party-popper" size={18} color="#ffffff" />
-            <EventlyText variant="body" style={s.brandText}>
+            <AppText variant="h3" style={s.brandText}>
               Evently
-            </EventlyText>
+            </AppText>
           </View>
           <View style={ui.spacer26} />
         </View>
@@ -98,13 +98,13 @@ export function DigitalTicketScreen() {
           </View>
         ) : error || !data ? (
           <View style={ui.centre}>
-            <EventlyText variant="body" style={s.lineText}>
+            <AppText variant="caption" style={s.lineText}>
               {error?.message ?? 'We could not open that ticket.'}
-            </EventlyText>
+            </AppText>
             <TouchableOpacity style={[ui.outline, ui.retry]} onPress={refetch}>
-              <EventlyText variant="body" style={ui.outlineText}>
+              <AppText variant="body" style={ui.outlineText}>
                 {PUBLIC_EVENTS_COPY.retry}
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
           </View>
         ) : (
@@ -115,24 +115,24 @@ export function DigitalTicketScreen() {
             {data.checkedInAt ? (
               <View style={s.checked}>
                 <EventlyIcon name="check-circle" size={16} color="#7be0bd" />
-                <EventlyText variant="caption" style={s.checkedText}>
+                <AppText variant="label" style={s.checkedText}>
                   {PUBLIC_EVENTS_COPY.checkedIn}
-                </EventlyText>
+                </AppText>
               </View>
             ) : null}
 
-            <EventlyText variant="h1" style={s.title}>
+            <AppText variant="h2" style={s.title}>
               {data.eventTitle}
-            </EventlyText>
+            </AppText>
             <View style={s.line}>
               <EventlyIcon
                 name="calendar-month-outline"
                 size={14}
                 color="#ffffff"
               />
-              <EventlyText variant="caption" style={s.lineText}>
+              <AppText variant="caption" style={s.lineText}>
                 {formatEventWhen(data.startDateTime, data.timezone)}
-              </EventlyText>
+              </AppText>
             </View>
             {venue.name || venue.city ? (
               <View style={s.line}>
@@ -141,13 +141,9 @@ export function DigitalTicketScreen() {
                   size={14}
                   color="#ffffff"
                 />
-                <EventlyText
-                  variant="caption"
-                  style={s.lineText}
-                  numberOfLines={2}
-                >
+                <AppText variant="caption" style={s.lineText} numberOfLines={2}>
                   {[venue.name, venue.city].filter(Boolean).join(', ')}
-                </EventlyText>
+                </AppText>
               </View>
             ) : null}
 
@@ -157,26 +153,26 @@ export function DigitalTicketScreen() {
                   {/* The server's drawing, rendered as-is. */}
                   <SvgXml xml={data.qrSvg} width={210} height={210} />
                   {/* The short code, for when a camera will not focus. */}
-                  <EventlyText variant="body" style={s.code}>
+                  <AppText variant="h3" style={s.code}>
                     {data.code}
-                  </EventlyText>
+                  </AppText>
                 </>
               ) : (
-                <EventlyText variant="body" style={ui.muted}>
+                <AppText variant="body" style={ui.muted}>
                   This ticket is {data.status.replace('_', ' ')}, so it has no
                   entry code.
-                </EventlyText>
+                </AppText>
               )}
             </View>
 
             {data.customerName ? (
               <View style={s.person}>
-                <EventlyText variant="body" style={s.personName}>
+                <AppText variant="body" style={s.personName}>
                   {data.customerName}
-                </EventlyText>
-                <EventlyText variant="caption" style={s.personNote}>
+                </AppText>
+                <AppText variant="caption" style={s.personNote}>
                   Ticket holder
-                </EventlyText>
+                </AppText>
               </View>
             ) : null}
 
@@ -189,9 +185,9 @@ export function DigitalTicketScreen() {
             {data.qrSvg ? (
               <View style={s.hint}>
                 <EventlyIcon name="qrcode-scan" size={16} color="#ffffff" />
-                <EventlyText variant="caption" style={s.hintText}>
+                <AppText variant="caption" style={s.hintText}>
                   {PUBLIC_EVENTS_COPY.showAtEntry}
-                </EventlyText>
+                </AppText>
               </View>
             ) : null}
 
@@ -206,9 +202,9 @@ export function DigitalTicketScreen() {
               }
               accessibilityRole="button"
             >
-              <EventlyText variant="caption" style={s.eventLinkText}>
+              <AppText variant="buttonSmall" style={s.eventLinkText}>
                 View Event · Live Stream & Memories
-              </EventlyText>
+              </AppText>
               <EventlyIcon name="chevron-right" size={16} color="#ffffff" />
             </TouchableOpacity>
           </ScrollView>

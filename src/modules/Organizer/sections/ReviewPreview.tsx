@@ -1,6 +1,11 @@
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
-import { ORG_ACCENT, ORG_NAVY, ORG_STAR, ORGANIZER_COPY as COPY } from '../constants';
+import { EventlyIcon, AppText } from '../../../Components';
+import {
+  ORG_ACCENT,
+  ORG_NAVY,
+  ORG_STAR,
+  ORGANIZER_COPY as COPY,
+} from '../constants';
 import { previewStyles as s } from '../styles';
 import type { ReviewDTO } from '../types';
 
@@ -20,39 +25,43 @@ interface ReviewPreviewProps {
  * an initial as the server sends it — the person who wrote this did not agree
  * to have their full name on the internet beside an opinion about a business.
  */
-export function ReviewPreview({ review, showAll, onPressAll }: ReviewPreviewProps) {
+export function ReviewPreview({
+  review,
+  showAll,
+  onPressAll,
+}: ReviewPreviewProps) {
   return (
     <View style={s.card}>
       <View style={s.head}>
         <View style={[s.avatar, { backgroundColor: ORG_NAVY }]}>
-          <EventlyText variant="label" style={s.avatarText}>
+          <AppText variant="h3" style={s.avatarText}>
             {review.authorInitials}
-          </EventlyText>
+          </AppText>
         </View>
 
         <View style={s.headText}>
-          <EventlyText variant="cardTitle" style={s.name} numberOfLines={1}>
+          <AppText variant="h3" style={s.name} numberOfLines={1}>
             {review.authorName}
-          </EventlyText>
+          </AppText>
           {review.contextLabel ? (
-            <EventlyText variant="small" style={s.context} numberOfLines={1}>
+            <AppText variant="bodySmall" style={s.context} numberOfLines={1}>
               {review.contextLabel}
-            </EventlyText>
+            </AppText>
           ) : null}
         </View>
 
         <View style={s.scoreRow}>
           <EventlyIcon name="star" size={13} color={ORG_STAR} />
-          <EventlyText variant="label" style={s.score}>
+          <AppText variant="display" style={s.score}>
             {review.rating.toFixed(1)}
-          </EventlyText>
+          </AppText>
         </View>
       </View>
 
       {review.comment ? (
-        <EventlyText variant="body" style={s.comment} numberOfLines={3}>
+        <AppText variant="bodyLarge" style={s.comment} numberOfLines={3}>
           {review.comment}
-        </EventlyText>
+        </AppText>
       ) : null}
 
       {showAll ? (
@@ -62,9 +71,9 @@ export function ReviewPreview({ review, showAll, onPressAll }: ReviewPreviewProp
           accessibilityRole="button"
           accessibilityLabel={COPY.allReviews}
         >
-          <EventlyText variant="label" style={s.allText}>
+          <AppText variant="label" style={s.allText}>
             {COPY.allReviews}
-          </EventlyText>
+          </AppText>
           <EventlyIcon name="chevron-right" size={16} color={ORG_ACCENT} />
         </TouchableOpacity>
       ) : null}

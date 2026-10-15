@@ -1,5 +1,5 @@
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { BOOKING_TAB_LABEL } from '../constants';
 import { eventTabsStyles as s } from '../styles';
 import type { BookingTab } from '../types';
@@ -41,12 +41,9 @@ export function EventTabs({ value, onChange, counts }: EventTabsProps) {
                 <EventlyIcon name="star-four-points" size={8} color="#ffd38a" />
               </View>
             ) : null}
-            <EventlyText
-              variant="caption"
-              style={[s.tabText, on && s.tabTextOn]}
-            >
+            <AppText variant="body" style={[s.tabText, on && s.tabTextOn]}>
               {BOOKING_TAB_LABEL[tab]}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         );
       })}

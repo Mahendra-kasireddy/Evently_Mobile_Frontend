@@ -1,8 +1,8 @@
-import { Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, TouchableOpacity, View } from 'react-native';
 import {
   BorderBeam,
   EventlyIcon,
-  EventlyText,
+  AppText,
   GradientFill,
   PopIn,
   ThinkingOrbs,
@@ -71,16 +71,20 @@ export function Banner({
               <EventlyIcon name="check" size={22} color="#ffffff" />
             </View>
           </PopIn>
-          <Text style={s.successTitle}>Your brief is out.</Text>
-          <EventlyText style={s.successText}>
+          <AppText variant="h2" style={s.successTitle}>
+            Your brief is out.
+          </AppText>
+          <AppText variant="bodySmall" style={s.successText}>
             Quote request sent — organizers will reach out within a day.
-          </EventlyText>
+          </AppText>
           <TouchableOpacity
             onPress={onEditAgain}
             accessibilityRole="button"
             hitSlop={8}
           >
-            <EventlyText style={s.successEdit}>Edit and send again</EventlyText>
+            <AppText variant="bodySmall" style={s.successEdit}>
+              Edit and send again
+            </AppText>
           </TouchableOpacity>
         </View>
       </View>
@@ -101,7 +105,9 @@ export function Banner({
         {/* Where the customer is in the brief: a tiny eyebrow and four
             dots, not a heading — the tiles say what they want. */}
         <View style={s.composerHead}>
-          <EventlyText style={s.composerEyebrow}>Your brief</EventlyText>
+          <AppText variant="overline" style={s.composerEyebrow}>
+            Your brief
+          </AppText>
           <View
             style={s.progress}
             accessible
@@ -113,9 +119,9 @@ export function Banner({
                 style={[s.progressDot, i < answered && s.progressDotOn]}
               />
             ))}
-            <EventlyText style={s.progressText}>
+            <AppText variant="label" style={s.progressText}>
               {`${answered}/${total}`}
-            </EventlyText>
+            </AppText>
           </View>
         </View>
 
@@ -157,11 +163,15 @@ export function Banner({
                   colors={['#ffe2a8', '#ffffff', '#ffc2d4']}
                   label="Sending your brief"
                 />
-                <EventlyText style={s.ctaText}>Sending your brief…</EventlyText>
+                <AppText variant="button" style={s.ctaText}>
+                  Sending your brief…
+                </AppText>
               </>
             ) : (
               <>
-                <EventlyText style={s.ctaText}>{GET_QUOTES_CTA}</EventlyText>
+                <AppText variant="button" style={s.ctaText}>
+                  {GET_QUOTES_CTA}
+                </AppText>
                 <View style={s.ctaArrow}>
                   <EventlyIcon
                     name="arrow-right"
@@ -172,16 +182,18 @@ export function Banner({
               </>
             )}
           </Pressable>
-          <EventlyText style={s.ctaNote}>
+          <AppText variant="buttonSmall" style={s.ctaNote}>
             {ready
               ? 'Free · verified organizers reply within a day'
               : `Answer ${total - answered} more to get quotes`}
-          </EventlyText>
+          </AppText>
         </View>
       </BorderBeam>
 
       {quotesErrorMessage ? (
-        <EventlyText style={s.errorText}>{quotesErrorMessage}</EventlyText>
+        <AppText variant="caption" style={s.errorText}>
+          {quotesErrorMessage}
+        </AppText>
       ) : null}
     </View>
   );

@@ -6,7 +6,7 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-import { EventlyIcon, EventlyImage, EventlyText } from '../../../Components';
+import { EventlyIcon, EventlyImage, AppText } from '../../../Components';
 import { absoluteFileUrl } from '../../../services/urls';
 import { colors } from '../../../theme';
 import { INVITATION_COPY as COPY, INV_ACCENT } from '../constants';
@@ -70,9 +70,9 @@ function Media({
             size={34}
             color={colors.onPrimaryMuted}
           />
-          <EventlyText variant="caption" style={s.unplayableText}>
+          <AppText variant="caption" style={s.unplayableText}>
             {COPY.artworkVideoNoPlayer}
-          </EventlyText>
+          </AppText>
         </View>
       );
     }
@@ -170,11 +170,11 @@ export function InvitationArtwork({
         {artwork.kind === 'video' ? (
           <View style={s.kindChip} pointerEvents="none">
             <EventlyIcon name="play" size={12} color="#ffffff" />
-            <EventlyText variant="caption" style={s.kindChipText}>
+            <AppText variant="label" style={s.kindChipText}>
               {length
                 ? `${COPY.artworkVideoChip} · ${length}`
                 : COPY.artworkVideoChip}
-            </EventlyText>
+            </AppText>
           </View>
         ) : null}
         <View
@@ -183,9 +183,9 @@ export function InvitationArtwork({
           testID="invitation-view"
         >
           <EventlyIcon name="arrow-expand" size={14} color="#ffffff" />
-          <EventlyText variant="caption" style={s.expandChipText}>
+          <AppText variant="label" style={s.expandChipText}>
             {COPY.artworkViewShort}
-          </EventlyText>
+          </AppText>
         </View>
       </TouchableOpacity>
     </View>
@@ -240,12 +240,12 @@ export function ArtworkPending() {
       <View style={s.pendingIcon}>
         <EventlyIcon name="email-fast-outline" size={26} color={INV_ACCENT} />
       </View>
-      <EventlyText variant="h2" style={s.pendingTitle}>
+      <AppText variant="h2" style={s.pendingTitle}>
         {COPY.artworkPendingTitle}
-      </EventlyText>
-      <EventlyText variant="body" style={s.pendingBody}>
+      </AppText>
+      <AppText variant="bodySmall" style={s.pendingBody}>
         {COPY.artworkPendingBody}
-      </EventlyText>
+      </AppText>
     </View>
   );
 }

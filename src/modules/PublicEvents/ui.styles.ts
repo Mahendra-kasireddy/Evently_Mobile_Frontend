@@ -1,5 +1,12 @@
 import { Platform, StyleSheet } from 'react-native';
-import { colors, spacing } from '../../theme';
+import {
+  colors,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+  inputTypography,
+} from '../../theme';
 import {
   PE_ACCENT,
   PE_ACCENT_SOFT,
@@ -47,23 +54,26 @@ export const ui = StyleSheet.create({
     ...shadow,
   },
   cardTitle: {
-    color: PE_NAVY,
-    fontWeight: '800',
-    fontSize: 14,
-    lineHeight: 19,
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
     marginBottom: spacing.s12,
   },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   line: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  lineText: { color: PE_MUTED, fontSize: 12.5, lineHeight: 18, flexShrink: 1 },
-  muted: { color: PE_MUTED, lineHeight: 18 },
+  lineText: {
+    color: textColor.textSecondary,
+    ...typography.caption,
+    flexShrink: 1,
+  },
+  muted: { color: textColor.textSecondary },
   error: { color: PE_LIVE, textAlign: 'center', marginTop: spacing.sm },
   retry: { paddingHorizontal: 24, marginTop: 16 },
   flex: { flex: 1 },
   fill: { position: 'absolute', top: 0, left: 0 },
   centerText: { textAlign: 'center' },
   gapTop: { marginTop: 8 },
-  sectionTitle: { marginTop: 8, marginBottom: 0 },
+  sectionTitle: { ...typography.h2, marginTop: 8, marginBottom: 0 },
   spacer26: { width: 26 },
   scrollPad: { paddingBottom: 24 },
   whitePill: { backgroundColor: '#ffffff' },
@@ -80,7 +90,7 @@ export const ui = StyleSheet.create({
     paddingVertical: 4,
     alignSelf: 'flex-start',
   },
-  pillText: { fontWeight: '700', fontSize: 11 },
+  pillText: { ...typography.label },
   livePill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -91,7 +101,7 @@ export const ui = StyleSheet.create({
     paddingVertical: 3,
   },
   liveDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#ffffff' },
-  livePillText: { color: '#ffffff', fontWeight: '800', fontSize: 10.5 },
+  livePillText: { color: textColor.textOnPrimary, ...typography.label },
 
   primary: {
     height: 50,
@@ -103,7 +113,7 @@ export const ui = StyleSheet.create({
     gap: spacing.sm,
   },
   primaryOff: { opacity: 0.5 },
-  primaryText: { color: '#ffffff', fontWeight: '800', fontSize: 15 },
+  primaryText: { color: textColor.textOnPrimary, ...typography.h3 },
   outline: {
     height: 48,
     borderRadius: 14,
@@ -115,7 +125,11 @@ export const ui = StyleSheet.create({
     flexDirection: 'row',
     gap: spacing.sm,
   },
-  outlineText: { color: PE_ACCENT, fontWeight: '700', fontSize: 14 },
+  outlineText: {
+    color: PE_ACCENT,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
 
   bar: {
     paddingHorizontal: spacing.md,
@@ -144,10 +158,8 @@ export const ui = StyleSheet.create({
   },
   miniText: { flex: 1, gap: 4 },
   miniTitle: {
-    color: PE_NAVY,
-    fontWeight: '800',
-    fontSize: 14,
-    lineHeight: 19,
+    color: textColor.textPrimary,
+    ...typography.h3,
   },
 
   /* Option sheet */
@@ -171,7 +183,11 @@ export const ui = StyleSheet.create({
     backgroundColor: '#e3e6ee',
     marginBottom: spacing.md,
   },
-  sheetTitle: { color: PE_NAVY, fontWeight: '800', marginBottom: spacing.xs },
+  sheetTitle: {
+    color: textColor.textPrimary,
+    ...fontWeights.bold,
+    marginBottom: spacing.xs,
+  },
   sheetRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -180,14 +196,14 @@ export const ui = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: PE_BORDER,
   },
-  sheetRowText: { color: PE_NAVY },
-  sheetRowTextOn: { color: PE_ACCENT, fontWeight: '700' },
+  sheetRowText: { color: textColor.textPrimary },
+  sheetRowTextOn: { color: PE_ACCENT, ...fontWeights.bold },
 });
 
 /** 1 — the list. */
 export const listUi = StyleSheet.create({
   /* ---- Header: the shared AppHeader, then the search row ---- */
-  header: { paddingBottom: spacing.xs },
+  header: {},
   ticketsButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -197,7 +213,7 @@ export const listUi = StyleSheet.create({
     paddingHorizontal: 11,
     paddingVertical: 7,
   },
-  ticketsButtonText: { color: PE_ACCENT, fontWeight: '700', fontSize: 12, lineHeight: 16 },
+  ticketsButtonText: { color: PE_ACCENT, ...typography.buttonSmall },
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -216,7 +232,12 @@ export const listUi = StyleSheet.create({
     backgroundColor: colors.background,
     ...shadow,
   },
-  searchInput: { flex: 1, color: PE_NAVY, fontSize: 13.5, padding: 0 },
+  searchInput: {
+    flex: 1,
+    color: textColor.textPrimary,
+    ...inputTypography.body,
+    padding: 0,
+  },
   filterButton: {
     width: 46,
     height: 46,
@@ -243,7 +264,7 @@ export const listUi = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.background,
   },
-  filterBadgeText: { color: '#ffffff', fontWeight: '800', fontSize: 10, lineHeight: 13 },
+  filterBadgeText: { color: textColor.textOnPrimary, ...typography.label },
 
   /* ---- Applied filters and categories ---- */
   applied: {
@@ -263,8 +284,12 @@ export const listUi = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: PE_ACCENT_SOFT,
   },
-  appliedText: { color: PE_ACCENT, fontWeight: '700', fontSize: 12, lineHeight: 16 },
-  chips: { gap: spacing.sm, paddingHorizontal: spacing.md, paddingVertical: spacing.s12 },
+  appliedText: { color: PE_ACCENT, ...typography.label },
+  chips: {
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.s12,
+  },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -278,11 +303,15 @@ export const listUi = StyleSheet.create({
     overflow: 'hidden',
   },
   chipOn: { borderColor: 'transparent' },
-  chipText: { color: PE_NAVY, fontWeight: '600', fontSize: 12.5, lineHeight: 17 },
-  chipTextOn: { color: '#ffffff', fontWeight: '700' },
+  chipText: { color: textColor.textPrimary, ...typography.label },
+  chipTextOn: { color: textColor.textOnPrimary, ...fontWeights.bold },
 
   /* ---- Poster cards ---- */
-  list: { paddingHorizontal: spacing.md, paddingBottom: spacing.xl, gap: spacing.md },
+  list: {
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.xl,
+    gap: spacing.md,
+  },
   card: {
     backgroundColor: colors.background,
     borderRadius: 22,
@@ -302,7 +331,7 @@ export const listUi = StyleSheet.create({
     paddingVertical: 5,
     maxWidth: '60%',
   },
-  categoryPillText: { color: '#ffffff', fontWeight: '800', fontSize: 11, lineHeight: 15 },
+  categoryPillText: { color: textColor.textOnPrimary, ...typography.label },
   dateBlock: {
     position: 'absolute',
     top: 12,
@@ -314,13 +343,17 @@ export const listUi = StyleSheet.create({
     paddingHorizontal: 8,
     backgroundColor: 'rgba(255,255,255,0.92)',
   },
-  dateDay: { color: PE_NAVY, fontSize: 20, lineHeight: 23, fontWeight: '800' },
-  dateMonth: { color: PE_ACCENT, fontSize: 10.5, lineHeight: 13, fontWeight: '800', letterSpacing: 0.8 },
+  dateDay: { color: textColor.textPrimary, ...typography.h2 },
+  dateMonth: { color: PE_ACCENT, ...typography.label },
   livePill: { position: 'absolute', top: 76, right: 12 },
   posterText: { position: 'absolute', left: 14, right: 14, bottom: 12, gap: 4 },
-  title: { color: '#ffffff', fontWeight: '800', fontSize: 17, lineHeight: 22 },
+  title: { color: textColor.textOnPrimary, ...typography.h3 },
   posterLine: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  posterLineText: { color: 'rgba(255,255,255,0.88)', fontSize: 12, lineHeight: 16, flexShrink: 1 },
+  posterLineText: {
+    color: 'rgba(255,255,255,0.88)',
+    ...typography.caption,
+    flexShrink: 1,
+  },
   strip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -330,8 +363,8 @@ export const listUi = StyleSheet.create({
     paddingVertical: 12,
   },
   priceBlock: { flexShrink: 1 },
-  priceFrom: { color: PE_MUTED, fontSize: 10.5, lineHeight: 14 },
-  price: { color: PE_NAVY, fontWeight: '800', fontSize: 17, lineHeight: 22 },
+  priceFrom: { color: textColor.textSecondary, ...typography.caption },
+  price: { color: textColor.textPrimary, ...typography.h3 },
   notePill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -343,7 +376,11 @@ export const listUi = StyleSheet.create({
     paddingVertical: 6,
   },
   notePillSold: { backgroundColor: '#fdecec' },
-  noteText: { color: PE_NAVY, fontWeight: '700', fontSize: 12, lineHeight: 16, flexShrink: 1 },
+  noteText: {
+    color: textColor.textPrimary,
+    ...typography.label,
+    flexShrink: 1,
+  },
   noteTextSold: { color: '#d93b3b' },
   book: {
     flexDirection: 'row',
@@ -355,8 +392,12 @@ export const listUi = StyleSheet.create({
     paddingRight: 10,
     paddingVertical: 9,
   },
-  bookText: { color: '#ffffff', fontWeight: '800', fontSize: 12.5, lineHeight: 16 },
-  empty: { alignItems: 'center', paddingVertical: spacing.xl, gap: spacing.s12 },
+  bookText: { color: textColor.textOnPrimary, ...typography.label },
+  empty: {
+    alignItems: 'center',
+    paddingVertical: spacing.xl,
+    gap: spacing.s12,
+  },
 });
 
 /** 3 — the event. */
@@ -389,11 +430,19 @@ export const detailUi = StyleSheet.create({
     paddingTop: spacing.lg,
     gap: spacing.md,
   },
-  title: { color: PE_NAVY, fontWeight: '800', fontSize: 20, lineHeight: 26 },
+  title: { color: textColor.textPrimary, ...typography.h2 },
   fact: { flexDirection: 'row', alignItems: 'center', gap: spacing.s12 },
   factText: { flex: 1 },
-  factValue: { color: PE_NAVY, fontWeight: '700', fontSize: 13.5, lineHeight: 19 },
-  factNote: { color: PE_MUTED, fontSize: 12, marginTop: 2, lineHeight: 17 },
+  factValue: {
+    color: textColor.textPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
+  factNote: {
+    color: textColor.textSecondary,
+    ...typography.caption,
+    marginTop: 2,
+  },
   organizer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -410,17 +459,25 @@ export const detailUi = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { color: PE_ACCENT, fontWeight: '800', fontSize: 13 },
-  organizerName: { color: PE_NAVY, fontWeight: '700', fontSize: 14, lineHeight: 19 },
+  avatarText: {
+    color: PE_ACCENT,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
+  organizerName: {
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
   sectionHead: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: spacing.sm,
   },
-  sectionTitle: { color: PE_NAVY, fontWeight: '800', fontSize: 15, lineHeight: 21 },
-  link: { color: PE_ACCENT, fontWeight: '700', fontSize: 13, lineHeight: 18 },
-  about: { color: '#4b5568', fontSize: 13, lineHeight: 20 },
+  sectionTitle: { color: textColor.textPrimary, ...typography.h2 },
+  link: { color: PE_ACCENT, ...typography.buttonSmall },
+  about: { color: textColor.textSecondary, ...typography.bodySmall },
   ticketCard: {
     borderRadius: 16,
     borderWidth: 1,
@@ -436,9 +493,18 @@ export const detailUi = StyleSheet.create({
     justifyContent: 'space-between',
     gap: spacing.sm,
   },
-  ticketName: { color: PE_NAVY, fontWeight: '800', fontSize: 14.5, lineHeight: 20, flex: 1 },
-  ticketPrice: { color: '#e2552f', fontWeight: '800', fontSize: 13.5, lineHeight: 18 },
-  ticketNote: { color: PE_MUTED, fontSize: 12.5, lineHeight: 18 },
+  ticketName: {
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+    flex: 1,
+  },
+  ticketPrice: {
+    color: '#e2552f',
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
+  ticketNote: { color: textColor.textSecondary, ...typography.caption },
   feature: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -465,16 +531,15 @@ export const detailUi = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
   },
-  goingButtonText: { color: '#0e8a68', fontWeight: '800', fontSize: 12, lineHeight: 16 },
+  goingButtonText: { color: '#0e8a68', ...typography.buttonSmall },
   featureText: { flex: 1 },
   featureTitle: {
-    color: PE_NAVY,
-    fontWeight: '700',
-    fontSize: 13.5,
-    lineHeight: 19,
+    color: textColor.textPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
     marginBottom: 2,
   },
-  factLabel: { color: PE_MUTED, fontSize: 11, lineHeight: 15, fontWeight: '600' },
+  factLabel: { color: textColor.textSecondary, ...typography.label },
   iconTile: {
     width: 40,
     height: 40,
@@ -501,7 +566,7 @@ export const detailUi = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
-  organizerBadgeText: { color: '#2554b8', fontWeight: '700', fontSize: 11, lineHeight: 14 },
+  organizerBadgeText: { color: '#2554b8', ...typography.label },
   ticketStrip: { position: 'absolute', top: 0, bottom: 0, left: 0, width: 5 },
   ticketPricePill: {
     borderRadius: 999,
@@ -517,12 +582,16 @@ export const detailUi = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  goingTitle: { color: '#ffffff', fontWeight: '800', fontSize: 14.5, lineHeight: 20 },
-  goingBody: { color: 'rgba(255,255,255,0.88)', fontSize: 12, lineHeight: 16 },
+  goingTitle: {
+    color: textColor.textOnPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
+  goingBody: { color: 'rgba(255,255,255,0.88)', ...typography.caption },
   barRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.s12 },
   barPrice: { flexShrink: 0 },
-  barPriceLabel: { color: PE_MUTED, fontSize: 11, lineHeight: 15 },
-  barPriceValue: { color: PE_NAVY, fontWeight: '800', fontSize: 18, lineHeight: 23 },
+  barPriceLabel: { color: textColor.textSecondary, ...typography.label },
+  barPriceValue: { color: textColor.textPrimary, ...typography.h3 },
   bookButton: {
     flex: 1,
     height: 50,
@@ -535,7 +604,12 @@ export const detailUi = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   bookButtonOff: { opacity: 0.95 },
-  bookText: { color: '#ffffff', fontWeight: '800', fontSize: 14.5, lineHeight: 19, flexShrink: 1 },
+  bookText: {
+    color: textColor.textOnPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+    flexShrink: 1,
+  },
 });
 
 /** 4 — choosing tickets. */
@@ -558,14 +632,12 @@ export const selectUi = StyleSheet.create({
     gap: spacing.sm,
   },
   name: {
-    color: PE_NAVY,
-    fontWeight: '800',
-    fontSize: 15,
-    lineHeight: 21,
+    color: textColor.textPrimary,
+    ...typography.h3,
     flex: 1,
   },
-  price: { color: PE_ACCENT, fontWeight: '800', fontSize: 15 },
-  note: { color: PE_MUTED, fontSize: 12.5, lineHeight: 18 },
+  price: { color: PE_ACCENT, ...typography.h3 },
+  note: { color: textColor.textSecondary, ...typography.caption },
   foot: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -574,9 +646,7 @@ export const selectUi = StyleSheet.create({
   },
   left: {
     color: PE_GREEN,
-    fontWeight: '600',
-    fontSize: 12.5,
-    lineHeight: 18,
+    ...typography.label,
     flexShrink: 1,
   },
   stepper: { flexDirection: 'row', alignItems: 'center', gap: spacing.s12 },
@@ -592,9 +662,8 @@ export const selectUi = StyleSheet.create({
   },
   stepBtnOn: { backgroundColor: PE_NAVY, borderColor: PE_NAVY },
   count: {
-    color: PE_NAVY,
-    fontWeight: '800',
-    fontSize: 15,
+    color: textColor.textPrimary,
+    ...typography.h3,
     minWidth: 18,
     textAlign: 'center',
   },
@@ -604,21 +673,21 @@ export const selectUi = StyleSheet.create({
     paddingVertical: 4,
     backgroundColor: '#f0f2f6',
   },
-  stateTagText: { color: PE_MUTED, fontWeight: '700', fontSize: 11 },
+  stateTagText: { color: textColor.textSecondary, ...typography.label },
   sumRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  sumLabel: { color: PE_MUTED, fontSize: 13, lineHeight: 19 },
-  sumValue: { color: PE_NAVY, fontWeight: '600', fontSize: 13, lineHeight: 19 },
+  sumLabel: { color: textColor.textSecondary, ...typography.label },
+  sumValue: {
+    color: textColor.textPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
   totalLabel: {
-    color: PE_NAVY,
-    fontWeight: '800',
-    fontSize: 15,
-    lineHeight: 21,
+    color: textColor.textPrimary,
+    ...typography.h3,
   },
   totalValue: {
     color: PE_ACCENT,
-    fontWeight: '800',
-    fontSize: 17,
-    lineHeight: 23,
+    ...typography.h3,
   },
 });
 
@@ -630,8 +699,16 @@ export const checkoutUi = StyleSheet.create({
     gap: spacing.s12,
     marginTop: 10,
   },
-  key: { color: PE_MUTED, fontSize: 13, lineHeight: 19, flexShrink: 1 },
-  value: { color: PE_NAVY, fontWeight: '600', fontSize: 13, lineHeight: 19 },
+  key: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    flexShrink: 1,
+  },
+  value: {
+    color: textColor.textPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
   customer: { flexDirection: 'row', alignItems: 'center', gap: spacing.s12 },
   avatar: {
     width: 42,
@@ -641,12 +718,11 @@ export const checkoutUi = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { color: PE_ACCENT, fontWeight: '800' },
+  avatarText: { color: PE_ACCENT, ...fontWeights.bold },
   customerName: {
-    color: PE_NAVY,
-    fontWeight: '700',
-    fontSize: 14,
-    lineHeight: 20,
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
     marginBottom: 2,
   },
   method: {
@@ -668,10 +744,9 @@ export const checkoutUi = StyleSheet.create({
   },
   methodText: { flex: 1 },
   methodTitle: {
-    color: PE_NAVY,
-    fontWeight: '700',
-    fontSize: 13.5,
-    lineHeight: 19,
+    color: textColor.textPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
     marginBottom: 2,
   },
 });
@@ -692,19 +767,22 @@ export const successUi = StyleSheet.create({
     marginTop: spacing.lg,
   },
   heading: {
-    color: PE_NAVY,
-    fontWeight: '800',
-    fontSize: 24,
+    color: textColor.textPrimary,
+    ...typography.h1,
     textAlign: 'center',
   },
-  sub: { color: PE_MUTED, textAlign: 'center', marginTop: -spacing.sm },
+  sub: {
+    color: textColor.textSecondary,
+    textAlign: 'center',
+    marginTop: -spacing.sm,
+  },
   cover: {
     height: 150,
     borderRadius: 12,
     backgroundColor: '#e9edf5',
     marginBottom: spacing.s12,
   },
-  title: { color: PE_NAVY, fontWeight: '800', fontSize: 16, marginBottom: 4 },
+  title: { color: textColor.textPrimary, ...typography.h3, marginBottom: 4 },
   actions: { gap: spacing.s12 },
 });
 
@@ -727,7 +805,7 @@ export const passUi = StyleSheet.create({
     height: 52,
   },
   brand: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  brandText: { color: '#ffffff', fontWeight: '800', fontSize: 18 },
+  brandText: { color: textColor.textOnPrimary, ...typography.h3 },
   content: {
     padding: spacing.lg,
     paddingTop: spacing.sm,
@@ -735,14 +813,12 @@ export const passUi = StyleSheet.create({
     gap: spacing.s12,
   },
   title: {
-    color: '#ffffff',
-    fontWeight: '800',
-    fontSize: 20,
-    lineHeight: 26,
+    color: textColor.textOnPrimary,
+    ...typography.h2,
     textAlign: 'center',
   },
   line: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  lineText: { color: 'rgba(255,255,255,0.85)', fontSize: 12.5 },
+  lineText: { color: 'rgba(255,255,255,0.85)', ...typography.caption },
   qrCard: {
     backgroundColor: '#ffffff',
     borderRadius: 22,
@@ -752,10 +828,18 @@ export const passUi = StyleSheet.create({
     marginTop: spacing.sm,
     alignSelf: 'stretch',
   },
-  code: { color: PE_NAVY, fontWeight: '800', fontSize: 16, letterSpacing: 1.5 },
+  code: { color: textColor.textPrimary, ...typography.h3 },
   person: { alignSelf: 'stretch', marginTop: spacing.sm },
-  personName: { color: '#ffffff', fontWeight: '700', fontSize: 14 },
-  personNote: { color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 2 },
+  personName: {
+    color: textColor.textOnPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
+  personNote: {
+    color: 'rgba(255,255,255,0.7)',
+    ...typography.caption,
+    marginTop: 2,
+  },
   facts: {
     alignSelf: 'stretch',
     flexDirection: 'row',
@@ -764,15 +848,20 @@ export const passUi = StyleSheet.create({
     borderTopColor: 'rgba(255,255,255,0.25)',
     paddingTop: spacing.s12,
   },
-  factKey: { color: 'rgba(255,255,255,0.65)', fontSize: 11 },
-  factVal: { color: '#ffffff', fontWeight: '700', fontSize: 13, marginTop: 2 },
+  factKey: { color: 'rgba(255,255,255,0.65)', ...typography.caption },
+  factVal: {
+    color: textColor.textOnPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+    marginTop: 2,
+  },
   hint: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
     marginTop: spacing.md,
   },
-  hintText: { color: 'rgba(255,255,255,0.85)', fontSize: 12.5 },
+  hintText: { color: 'rgba(255,255,255,0.85)', ...typography.caption },
   checked: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -782,7 +871,7 @@ export const passUi = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
   },
-  checkedText: { color: '#7be0bd', fontWeight: '700', fontSize: 12.5 },
+  checkedText: { color: '#7be0bd', ...typography.label },
   eventLink: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -794,7 +883,7 @@ export const passUi = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 9,
   },
-  eventLinkText: { color: '#ffffff', fontWeight: '700', fontSize: 12.5 },
+  eventLinkText: { color: textColor.textOnPrimary, ...typography.buttonSmall },
 });
 
 /** 9 — memories. */
@@ -815,7 +904,7 @@ export const memoriesUi = StyleSheet.create({
     justifyContent: 'center',
   },
   tabOn: { backgroundColor: PE_PURPLE, borderColor: PE_PURPLE },
-  tabText: { color: PE_NAVY, fontWeight: '600', fontSize: 12.5 },
+  tabText: { color: textColor.textPrimary, ...typography.label },
   tabTextOn: { color: '#ffffff' },
   grid: { paddingHorizontal: spacing.md, paddingBottom: spacing.xl },
   gridRow: { gap: spacing.sm, marginBottom: spacing.sm },
@@ -855,7 +944,7 @@ export const memoriesUi = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
-  pendingText: { color: '#ffffff', fontSize: 10, fontWeight: '700' },
+  pendingText: { color: textColor.textOnPrimary, ...typography.label },
   add: {
     height: 50,
     borderRadius: 14,
@@ -905,7 +994,7 @@ export const liveUi = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: { color: PE_NAVY, fontWeight: '800', fontSize: 18, lineHeight: 24 },
+  title: { color: textColor.textPrimary, ...typography.h3 },
   access: {
     backgroundColor: '#f4f1ff',
     borderRadius: 16,
@@ -921,7 +1010,11 @@ export const liveUi = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  accessTitle: { color: PE_NAVY, fontWeight: '800', fontSize: 14 },
+  accessTitle: {
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
   ok: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -930,7 +1023,7 @@ export const liveUi = StyleSheet.create({
     borderRadius: 10,
     padding: spacing.sm,
   },
-  okText: { color: PE_GREEN, fontWeight: '600', fontSize: 12.5, flex: 1 },
+  okText: { color: PE_GREEN, ...typography.label, flex: 1 },
   watch: {
     height: 48,
     borderRadius: 14,
@@ -951,14 +1044,11 @@ export const filterUi = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: spacing.sm,
   },
-  title: { color: PE_NAVY, fontWeight: '800', fontSize: 17, lineHeight: 23 },
+  title: { color: textColor.textPrimary, ...typography.h3 },
   scroll: { flexGrow: 0 },
   label: {
-    color: PE_MUTED,
-    fontWeight: '700',
-    fontSize: 11.5,
-    lineHeight: 16,
-    letterSpacing: 0.8,
+    color: textColor.textSecondary,
+    ...typography.label,
     marginTop: spacing.sm,
     marginBottom: spacing.s12,
   },
@@ -976,12 +1066,11 @@ export const filterUi = StyleSheet.create({
     backgroundColor: colors.background,
   },
   chipOn: { backgroundColor: PE_ACCENT, borderColor: PE_ACCENT },
-  chipText: { color: PE_NAVY, fontWeight: '600', fontSize: 13, lineHeight: 18 },
+  chipText: { color: textColor.textPrimary, ...typography.label },
   chipTextOn: { color: '#ffffff' },
   hint: {
-    color: PE_MUTED,
-    fontSize: 12,
-    lineHeight: 17,
+    color: textColor.textSecondary,
+    ...typography.caption,
     marginTop: spacing.sm,
   },
   citySearch: {
@@ -994,7 +1083,12 @@ export const filterUi = StyleSheet.create({
     marginBottom: spacing.s12,
     backgroundColor: '#f3f5f9',
   },
-  citySearchInput: { flex: 1, color: PE_NAVY, fontSize: 13.5, padding: 0 },
+  citySearchInput: {
+    flex: 1,
+    color: textColor.textPrimary,
+    ...inputTypography.body,
+    padding: 0,
+  },
   actions: { flexDirection: 'row', gap: spacing.s12, marginTop: spacing.lg },
   action: { flex: 1 },
 });
@@ -1033,9 +1127,8 @@ export const homeUi = StyleSheet.create({
   chipText: {
     flex: 1,
     minWidth: 0,
-    color: PE_NAVY,
-    fontSize: 11,
-    fontWeight: '700',
+    color: textColor.textPrimary,
+    ...typography.label,
   },
   chipTextOn: { color: PE_ACCENT },
 
@@ -1074,13 +1167,20 @@ export const homeUi = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 3,
   },
-  dateChipText: { color: PE_NAVY, fontSize: 11, lineHeight: 14, fontWeight: '800' },
+  dateChipText: { color: textColor.textPrimary, ...typography.label },
 
   /* Fills whatever height the row settled on, which is what gives the price
      row below something to be pushed to the bottom of. */
   body: { flex: 1, padding: spacing.s12, gap: 4 },
-  title: { color: PE_NAVY, fontSize: 13.5, lineHeight: 18, fontWeight: '800' },
-  kind: { color: PE_MUTED, fontSize: 12, lineHeight: 17, flexShrink: 1 },
+  title: {
+    color: textColor.textPrimary,
+    ...typography.h3,
+  },
+  kind: {
+    color: textColor.textSecondary,
+    ...typography.caption,
+    flexShrink: 1,
+  },
   /*
    * On the floor of the card, not under the last line of text.
    *
@@ -1112,8 +1212,8 @@ export const homeUi = StyleSheet.create({
     paddingHorizontal: 9,
     paddingVertical: 5,
   },
-  priceFrom: { color: PE_MUTED, fontSize: 11, lineHeight: 16, fontWeight: '600' },
-  priceAmount: { fontSize: 13, lineHeight: 17, fontWeight: '800' },
+  priceFrom: { color: textColor.textSecondary, ...typography.label },
+  priceAmount: { ...typography.bodySmall, ...fontWeights.semibold },
   view: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1125,12 +1225,11 @@ export const homeUi = StyleSheet.create({
     paddingVertical: 5,
     flexShrink: 0,
   },
-  viewText: { color: '#ffffff', fontSize: 10.5, lineHeight: 14, fontWeight: '700' },
+  viewText: { color: textColor.textOnPrimary, ...typography.label },
 
   note: {
-    color: PE_MUTED,
-    fontSize: 12.5,
-    lineHeight: 18,
+    color: textColor.textSecondary,
+    ...typography.caption,
     paddingHorizontal: spacing.md,
     marginTop: 10,
   },
@@ -1164,7 +1263,7 @@ export const myTicketsUi = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
   },
-  tabText: { color: PE_MUTED, fontWeight: '700', fontSize: 13, lineHeight: 17 },
+  tabText: { color: textColor.textSecondary, ...typography.label },
   tabTextOn: { color: '#ffffff' },
   tabCount: {
     minWidth: 20,
@@ -1176,11 +1275,16 @@ export const myTicketsUi = StyleSheet.create({
     justifyContent: 'center',
   },
   tabCountOn: { backgroundColor: 'rgba(255,255,255,0.28)' },
-  tabCountText: { color: PE_MUTED, fontWeight: '800', fontSize: 10.5, lineHeight: 13 },
+  tabCountText: { color: textColor.textSecondary, ...typography.label },
   tabCountTextOn: { color: '#ffffff' },
 
   list: { padding: spacing.md, gap: spacing.md },
-  card: { backgroundColor: '#ffffff', borderRadius: 20, overflow: 'hidden', ...shadow },
+  card: {
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    overflow: 'hidden',
+    ...shadow,
+  },
   cardFaded: { opacity: 0.72 },
   cover: { height: 132, backgroundColor: '#1b1438' },
   coverImage: { width: '100%', height: '100%' },
@@ -1199,19 +1303,34 @@ export const myTicketsUi = StyleSheet.create({
     paddingHorizontal: 9,
     paddingVertical: 4,
   },
-  countdownText: { color: '#ffffff', fontWeight: '800', fontSize: 11, lineHeight: 14 },
+  countdownText: { color: textColor.textOnPrimary, ...typography.label },
   body: { paddingHorizontal: 14, paddingTop: 12, paddingBottom: 10, gap: 6 },
-  title: { color: PE_NAVY, fontWeight: '800', fontSize: 15, lineHeight: 20 },
+  title: { color: textColor.textPrimary, ...typography.h3 },
   line: { flexDirection: 'row', alignItems: 'center', gap: 7 },
-  lineIcon: { width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
+  lineIcon: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   lineIconDate: { backgroundColor: '#fff0e8' },
   lineIconPlace: { backgroundColor: '#f1ecff' },
-  lineText: { color: PE_MUTED, fontSize: 12, lineHeight: 17, flexShrink: 1 },
+  lineText: {
+    color: textColor.textSecondary,
+    ...typography.caption,
+    flexShrink: 1,
+  },
 
   /* The perforation: half-circles cut from each edge in the page's colour,
      and a dashed line between them. */
   tear: { height: NOTCH, flexDirection: 'row', alignItems: 'center' },
-  notch: { width: NOTCH, height: NOTCH, borderRadius: NOTCH / 2, backgroundColor: MT_CANVAS },
+  notch: {
+    width: NOTCH,
+    height: NOTCH,
+    borderRadius: NOTCH / 2,
+    backgroundColor: MT_CANVAS,
+  },
   notchLeft: { marginLeft: -NOTCH / 2 },
   notchRight: { marginRight: -NOTCH / 2 },
   dashes: {
@@ -1232,7 +1351,13 @@ export const myTicketsUi = StyleSheet.create({
     paddingTop: 6,
     paddingBottom: 14,
   },
-  stubLeft: { flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 1, flexWrap: 'wrap' },
+  stubLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flexShrink: 1,
+    flexWrap: 'wrap',
+  },
   typePill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1242,7 +1367,7 @@ export const myTicketsUi = StyleSheet.create({
     paddingHorizontal: 9,
     paddingVertical: 4,
   },
-  typeText: { color: '#ffffff', fontWeight: '800', fontSize: 11, lineHeight: 14 },
+  typeText: { color: textColor.textOnPrimary, ...typography.label },
   statePill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1252,7 +1377,7 @@ export const myTicketsUi = StyleSheet.create({
     paddingVertical: 4,
   },
   stateDot: { width: 6, height: 6, borderRadius: 3 },
-  stateText: { fontWeight: '700', fontSize: 11, lineHeight: 14 },
+  stateText: { ...typography.label },
   qr: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1262,9 +1387,14 @@ export const myTicketsUi = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
-  qrText: { color: '#ffffff', fontWeight: '800', fontSize: 12, lineHeight: 16 },
+  qrText: { color: textColor.textOnPrimary, ...typography.label },
 
-  empty: { alignItems: 'center', paddingTop: spacing.xl * 1.5, paddingHorizontal: spacing.lg, gap: spacing.sm },
+  empty: {
+    alignItems: 'center',
+    paddingTop: spacing.xl * 1.5,
+    paddingHorizontal: spacing.lg,
+    gap: spacing.sm,
+  },
   emptyIcon: {
     width: 68,
     height: 68,
@@ -1274,8 +1404,12 @@ export const myTicketsUi = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: spacing.xs,
   },
-  emptyTitle: { color: PE_NAVY, fontWeight: '800', fontSize: 16, lineHeight: 22 },
-  emptyBody: { color: PE_MUTED, fontSize: 12.5, lineHeight: 18, textAlign: 'center' },
+  emptyTitle: { color: textColor.textPrimary, ...typography.h2 },
+  emptyBody: {
+    color: textColor.textSecondary,
+    ...typography.body,
+    textAlign: 'center',
+  },
   emptyCta: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1286,7 +1420,7 @@ export const myTicketsUi = StyleSheet.create({
     paddingVertical: 10,
     marginTop: spacing.sm,
   },
-  emptyCtaText: { color: '#ffffff', fontWeight: '800', fontSize: 13, lineHeight: 17 },
+  emptyCtaText: { color: textColor.textOnPrimary, ...typography.buttonSmall },
 });
 
 /* The featured banner at the top of Home's events (sections/FeaturedEvents). */
@@ -1307,22 +1441,31 @@ export const featuredUi = StyleSheet.create({
   },
   eyebrow: {
     color: 'rgba(255,255,255,0.85)',
-    fontSize: 10.5,
-    lineHeight: 14,
-    fontWeight: '700',
-    letterSpacing: 1.4,
+    ...typography.label,
   },
   title: {
-    color: '#ffffff',
-    fontSize: 24,
-    lineHeight: 30,
-    fontWeight: '800',
+    color: textColor.textOnPrimary,
+    ...typography.h1,
     marginTop: 2,
     maxWidth: '72%',
   },
-  tagline: { color: 'rgba(255,255,255,0.92)', fontSize: 12.5, lineHeight: 17, marginTop: 4 },
-  place: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6, maxWidth: '75%' },
-  placeText: { color: 'rgba(255,255,255,0.88)', fontSize: 12, lineHeight: 16, flexShrink: 1 },
+  tagline: {
+    color: 'rgba(255,255,255,0.92)',
+    ...typography.caption,
+    marginTop: 4,
+  },
+  place: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 6,
+    maxWidth: '75%',
+  },
+  placeText: {
+    color: 'rgba(255,255,255,0.88)',
+    ...typography.caption,
+    flexShrink: 1,
+  },
   explore: {
     alignSelf: 'flex-start',
     flexDirection: 'row',
@@ -1334,7 +1477,11 @@ export const featuredUi = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#ffffff',
   },
-  exploreText: { color: '#3a2a8c', fontSize: 13, lineHeight: 17, fontWeight: '700' },
+  exploreText: {
+    color: '#3a2a8c',
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
   datePill: {
     position: 'absolute',
     top: spacing.md,
@@ -1347,7 +1494,7 @@ export const featuredUi = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#ffffff',
   },
-  dateText: { color: PE_NAVY, fontSize: 12, lineHeight: 16, fontWeight: '600' },
+  dateText: { color: textColor.textPrimary, ...typography.label },
   dots: {
     position: 'absolute',
     right: spacing.md,
@@ -1355,7 +1502,12 @@ export const featuredUi = StyleSheet.create({
     flexDirection: 'row',
     gap: 5,
   },
-  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.5)' },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255,255,255,0.5)',
+  },
   dotActive: { backgroundColor: '#ffffff' },
 });
 
@@ -1389,9 +1541,21 @@ export const liveRowUi = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: PE_LIVE,
   },
-  badgeDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#ffffff' },
-  badgeText: { color: '#ffffff', fontSize: 10.5, lineHeight: 14, fontWeight: '800', letterSpacing: 0.6 },
+  badgeDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#ffffff',
+  },
+  badgeText: { color: textColor.textOnPrimary, ...typography.label },
   body: { position: 'absolute', left: 12, right: 12, bottom: 12 },
-  title: { color: '#ffffff', fontSize: 14, lineHeight: 18, fontWeight: '700' },
-  place: { color: 'rgba(255,255,255,0.82)', fontSize: 11.5, lineHeight: 15, marginTop: 3 },
+  title: {
+    color: textColor.textOnPrimary,
+    ...typography.h3,
+  },
+  place: {
+    color: 'rgba(255,255,255,0.82)',
+    ...typography.caption,
+    marginTop: 3,
+  },
 });

@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 import { View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { ORG_ACCENT } from '../constants';
 import { assuranceStyles as s } from '../styles';
 import type { Assurance } from '../types';
@@ -26,9 +26,9 @@ export function AssuranceCard({ items }: AssuranceCardProps) {
           {index > 0 ? <View style={s.divider} /> : null}
           <View style={s.row}>
             <EventlyIcon name={item.icon} size={19} color={ORG_ACCENT} />
-            <EventlyText variant="body" style={s.text}>
+            <AppText variant="body" style={s.text}>
               {item.text}
-            </EventlyText>
+            </AppText>
           </View>
         </Fragment>
       ))}

@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { TOOL_ICON_COLOR, TOOL_ICON_NAME } from '../constants';
 import { planSmarterStyles } from '../styles';
 import { colors } from '../../../theme';
@@ -20,12 +20,16 @@ function ToolCard({ item }: { item: ToolItem }) {
           color={colors.onPrimary}
         />
       </View>
-      <EventlyText variant="subtitle" style={planSmarterStyles.cardTitle}>
+      <AppText
+        variant="body"
+        weight="medium"
+        style={planSmarterStyles.cardTitle}
+      >
         {item.title}
-      </EventlyText>
-      <EventlyText variant="body" style={planSmarterStyles.cardDesc}>
+      </AppText>
+      <AppText variant="body" style={planSmarterStyles.cardDesc}>
         {item.description}
-      </EventlyText>
+      </AppText>
     </View>
   );
 }
@@ -33,12 +37,12 @@ function ToolCard({ item }: { item: ToolItem }) {
 export function PlanSmarter({ data }: PlanSmarterProps) {
   return (
     <View style={planSmarterStyles.section}>
-      <EventlyText variant="h2" style={planSmarterStyles.title}>
+      <AppText variant="h2" style={planSmarterStyles.title}>
         {data.title}
-      </EventlyText>
-      <EventlyText variant="body" style={planSmarterStyles.subtitle}>
+      </AppText>
+      <AppText variant="caption" style={planSmarterStyles.subtitle}>
         {data.subtitle}
-      </EventlyText>
+      </AppText>
       <View style={planSmarterStyles.list}>
         {data.tools.map(tool => (
           <ToolCard key={tool.id} item={tool} />

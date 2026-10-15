@@ -15,7 +15,7 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText, KeyboardAvoider } from '../../Components';
+import { EventlyIcon, AppText, KeyboardAvoider } from '../../Components';
 import { useKeyboardVisible } from '../../hooks/useKeyboardVisible';
 import { colors } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
@@ -112,12 +112,12 @@ export function ConversationScreen() {
           >
             {container.groups.length === 0 ? (
               <>
-                <EventlyText variant="body" style={s.emptyText}>
+                <AppText variant="body" style={s.emptyText}>
                   {COPY.threadEmpty}
-                </EventlyText>
-                <EventlyText variant="caption" style={s.note}>
+                </AppText>
+                <AppText variant="caption" style={s.note}>
                   {COPY.freshnessNote}
-                </EventlyText>
+                </AppText>
               </>
             ) : null}
 
@@ -126,9 +126,9 @@ export function ConversationScreen() {
                 {/* Only once a thread spans more than one day — see
                     `showDayLabels`. */}
                 {container.showDays ? (
-                  <EventlyText variant="caption" style={s.dayLabel}>
+                  <AppText variant="label" style={s.dayLabel}>
                     {group.dayLabel}
-                  </EventlyText>
+                  </AppText>
                 ) : null}
                 {group.items.map(message => {
                   const mine = message.sender === 'customer';
@@ -137,18 +137,18 @@ export function ConversationScreen() {
                       key={message.id}
                       style={[s.bubble, mine ? s.mine : s.theirs]}
                     >
-                      <EventlyText
+                      <AppText
                         variant="body"
                         style={mine ? s.mineText : s.theirsText}
                       >
                         {message.text}
-                      </EventlyText>
-                      <EventlyText
+                      </AppText>
+                      <AppText
                         variant="caption"
                         style={[s.time, mine ? s.mineTime : s.theirsTime]}
                       >
                         {message.timeLabel}
-                      </EventlyText>
+                      </AppText>
                     </View>
                   );
                 })}
@@ -158,9 +158,9 @@ export function ConversationScreen() {
         )}
 
         {container.sendError ? (
-          <EventlyText variant="caption" style={s.sendError}>
+          <AppText variant="caption" style={s.sendError}>
             {COPY.sendFailed}
-          </EventlyText>
+          </AppText>
         ) : null}
 
         <View style={[s.foot, { paddingBottom: footPadding }]}>

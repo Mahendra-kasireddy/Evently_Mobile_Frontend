@@ -3,7 +3,7 @@ import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import {
   EventlyButton,
   EventlyIcon,
-  EventlyText,
+  AppText,
   EventlyTextInput,
   KeyboardAvoider,
 } from '../../../Components';
@@ -91,9 +91,9 @@ export function SignupDetailsSection({
   if (configError && !config) {
     return (
       <View style={screenStyles.centerFill}>
-        <EventlyText variant="body" style={screenStyles.centerText}>
+        <AppText variant="body" style={screenStyles.centerText}>
           {REGISTER_COPY.configFailed}
-        </EventlyText>
+        </AppText>
         <EventlyButton
           title={REGISTER_COPY.retry}
           onPress={onRetryConfig}
@@ -110,22 +110,22 @@ export function SignupDetailsSection({
         keyboardShouldPersistTaps="handled"
       >
         <View style={authGateStyles.stepChip}>
-          <EventlyText style={authGateStyles.stepText}>
+          <AppText variant="label" style={authGateStyles.stepText}>
             STEP 2 OF 2 · YOUR BUSINESS
-          </EventlyText>
+          </AppText>
         </View>
-        <EventlyText variant="h1" style={s.title}>
+        <AppText variant="h1" style={s.title}>
           {COPY.title}
-        </EventlyText>
-        <EventlyText variant="body" style={s.subtitle}>
+        </AppText>
+        <AppText variant="body" style={s.subtitle}>
           {COPY.subtitle}
-        </EventlyText>
+        </AppText>
 
         <View style={s.row}>
           <View style={[s.field, s.half]}>
-            <EventlyText variant="subtitle" style={s.label}>
+            <AppText variant="body" weight="medium" style={s.label}>
               {COPY.firstName}
-            </EventlyText>
+            </AppText>
             <EventlyTextInput
               style={s.input}
               value={details.firstName}
@@ -136,9 +136,9 @@ export function SignupDetailsSection({
             />
           </View>
           <View style={[s.field, s.half]}>
-            <EventlyText variant="subtitle" style={s.label}>
+            <AppText variant="body" weight="medium" style={s.label}>
               {COPY.lastName}
-            </EventlyText>
+            </AppText>
             <EventlyTextInput
               style={s.input}
               value={details.lastName}
@@ -151,9 +151,9 @@ export function SignupDetailsSection({
         </View>
 
         <View style={s.field}>
-          <EventlyText variant="subtitle" style={s.label}>
+          <AppText variant="body" weight="medium" style={s.label}>
             {COPY.businessName}
-          </EventlyText>
+          </AppText>
           <EventlyTextInput
             style={s.input}
             value={details.businessName}
@@ -184,15 +184,15 @@ export function SignupDetailsSection({
 
         <View style={s.note}>
           <EventlyIcon name="clock-outline" size={16} color={REG_GREEN_DARK} />
-          <EventlyText variant="caption" style={s.noteText}>
+          <AppText variant="caption" style={s.noteText}>
             {COPY.laterNote}
-          </EventlyText>
+          </AppText>
         </View>
 
         {showRequired || error ? (
-          <EventlyText variant="body" style={s.error}>
+          <AppText variant="body" style={s.error}>
             {showRequired ? COPY.required : error}
-          </EventlyText>
+          </AppText>
         ) : null}
 
         <EventlyButton
@@ -220,9 +220,9 @@ function ChipGroup({
 }) {
   return (
     <View style={s.field}>
-      <EventlyText variant="subtitle" style={s.label}>
+      <AppText variant="body" weight="medium" style={s.label}>
         {label}
-      </EventlyText>
+      </AppText>
       <View
         style={s.chips}
         accessibilityRole="radiogroup"
@@ -238,12 +238,12 @@ function ChipGroup({
               accessibilityRole="radio"
               accessibilityState={{ selected: on }}
             >
-              <EventlyText
+              <AppText
                 variant="caption"
                 style={[s.chipText, on && s.chipTextOn]}
               >
                 {option.label}
-              </EventlyText>
+              </AppText>
             </Pressable>
           );
         })}

@@ -1,10 +1,6 @@
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
-import {
-  EventlyIcon,
-  EventlyText,
-  EventlyTextInput,
-} from '../../../Components';
+import { EventlyIcon, AppText, EventlyTextInput } from '../../../Components';
 import { brand } from '../../../theme';
 import { DIAL_CODES, MOBILE_LENGTH, PHONE_COPY } from '../constants';
 import { fieldStyles } from '../styles';
@@ -49,11 +45,13 @@ export function PhoneEntry({
           accessibilityLabel={`Country code ${dialCode}. Change`}
           testID="dial-code-button"
         >
-          <EventlyText style={fieldStyles.flag}>
+          <AppText variant="h3" style={fieldStyles.flag}>
             {DIAL_CODES.find(d => d.code === dialCode)?.flag ?? '🌐'}
-          </EventlyText>
+          </AppText>
           <EventlyIcon name="chevron-down" size={16} color={brand.navy} />
-          <EventlyText style={fieldStyles.dialCode}>{dialCode}</EventlyText>
+          <AppText variant="h3" style={fieldStyles.dialCode}>
+            {dialCode}
+          </AppText>
         </Pressable>
 
         <View style={fieldStyles.divider} />

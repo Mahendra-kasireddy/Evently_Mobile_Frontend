@@ -1,20 +1,31 @@
 import { Platform, StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, spacing } from '../../theme';
+import {
+  colors,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+} from '../../theme';
 import {
   PAY_ACCENT,
   PAY_CANVAS,
   PAY_GREEN,
   PAY_GREEN_SOFT,
   PAY_HAIRLINE,
-  PAY_NAVY,
   PAY_NAVY_DEEP,
 } from './constants';
 
 export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: PAY_CANVAS },
 
-  header: { ...globalStyles.row, alignItems: 'center', gap: 12, paddingHorizontal: spacing.md, paddingVertical: 10 },
+  header: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 10,
+  },
   /* Just the chevron. The disc behind it was a second shape to notice for a
      control every screen has in the same corner, and the touch target is the
      box, not the paint. */
@@ -25,24 +36,43 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     marginLeft: -10,
   },
-  title: { color: PAY_NAVY_DEEP, fontSize: 22, fontWeight: '700', letterSpacing: -0.3 },
+  title: { color: textColor.textPrimary, ...typography.h2 },
 
   content: { padding: spacing.md, paddingBottom: spacing.lg },
 
   /* The amount, on its own, in the darkest thing on the screen. Nothing else
      here matters until the customer has read this. */
-  amountCard: { backgroundColor: PAY_NAVY_DEEP, borderRadius: 18, padding: spacing.md + 2 },
+  amountCard: {
+    backgroundColor: PAY_NAVY_DEEP,
+    borderRadius: 18,
+    padding: spacing.md + 2,
+  },
   eyebrow: {
     color: 'rgba(255,255,255,0.6)',
-    fontSize: 11.5,
-    fontWeight: '700',
-    letterSpacing: 1.1,
+    ...typography.label,
   },
-  amount: { color: colors.onPrimary, fontSize: 38, fontWeight: '700', marginTop: 8, letterSpacing: -1 },
-  totalLine: { color: 'rgba(255,255,255,0.62)', fontSize: 14, marginTop: 6, lineHeight: 20 },
-  couponLine: { color: '#7fd6b3', fontSize: 13.5, fontWeight: '600', marginTop: 8 },
+  amount: {
+    color: textColor.textOnPrimary,
+    ...typography.display,
+    marginTop: 8,
+  },
+  totalLine: {
+    color: 'rgba(255,255,255,0.62)',
+    ...typography.body,
+    marginTop: 6,
+  },
+  couponLine: {
+    color: '#7fd6b3',
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+    marginTop: 8,
+  },
 
-  sectionTitle: { color: PAY_NAVY_DEEP, fontSize: 17, fontWeight: '700', marginTop: 22 },
+  sectionTitle: {
+    color: textColor.textPrimary,
+    ...typography.h2,
+    marginTop: 22,
+  },
 
   option: {
     ...globalStyles.row,
@@ -65,8 +95,12 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   optionText: { flex: 1 },
-  optionLabel: { color: PAY_NAVY_DEEP, fontSize: 16, fontWeight: '700' },
-  optionHint: { color: colors.textMuted, fontSize: 13.5, marginTop: 1 },
+  optionLabel: { color: textColor.textPrimary, ...typography.h3 },
+  optionHint: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    marginTop: 1,
+  },
   radio: {
     width: 22,
     height: 22,
@@ -77,7 +111,12 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   radioOn: { borderColor: PAY_ACCENT },
-  radioDot: { width: 11, height: 11, borderRadius: 999, backgroundColor: PAY_ACCENT },
+  radioDot: {
+    width: 11,
+    height: 11,
+    borderRadius: 999,
+    backgroundColor: PAY_ACCENT,
+  },
 
   /* What actually happens to the money, in the calmest colour on the screen —
      it is reassurance, not a warning. */
@@ -105,14 +144,28 @@ export const styles = StyleSheet.create({
     backgroundColor: '#f4f1ec',
     padding: 12,
   },
-  gatewayOffText: { color: '#4a4740', flex: 1, fontSize: 13, lineHeight: 18 },
-  assuranceText: { color: '#2f6b57', flex: 1, fontSize: 13.5, lineHeight: 19 },
+  gatewayOffText: {
+    color: textColor.textSecondary,
+    flex: 1,
+    ...typography.bodySmall,
+  },
+  assuranceText: { color: '#2f6b57', flex: 1, ...typography.bodySmall },
   assuranceTextCash: { color: '#4a4740' },
 
   /* The way out for somebody not ready to commit. Quiet, but present. */
-  talk: { ...globalStyles.row, alignItems: 'center', gap: 8, marginTop: 18, paddingVertical: 4 },
-  talkText: { color: PAY_ACCENT, fontSize: 15, fontWeight: '600' },
-  talkHint: { color: colors.textMuted, fontSize: 13, marginTop: 4, lineHeight: 18 },
+  talk: {
+    ...globalStyles.row,
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 18,
+    paddingVertical: 4,
+  },
+  talkText: { color: PAY_ACCENT, ...typography.h3 },
+  talkHint: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    marginTop: 4,
+  },
 
   foot: {
     borderTopWidth: 1,
@@ -130,12 +183,30 @@ export const styles = StyleSheet.create({
     backgroundColor: PAY_ACCENT,
   },
   payDisabled: { opacity: 0.55 },
-  payText: { color: colors.onPrimary, fontSize: 17, fontWeight: '700' },
-  payError: { color: colors.danger, fontSize: 13, textAlign: 'center', marginBottom: 10, lineHeight: 18 },
+  payText: { color: textColor.textOnPrimary, ...typography.h3 },
+  payError: {
+    color: textColor.textError,
+    ...typography.caption,
+    textAlign: 'center',
+    marginBottom: 10,
+  },
 
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
-  centeredText: { color: colors.textMuted, marginTop: spacing.md, textAlign: 'center', lineHeight: 20 },
-  errorTitle: { color: PAY_NAVY, marginTop: spacing.md, textAlign: 'center' },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.lg,
+  },
+  centeredText: {
+    color: textColor.textSecondary,
+    marginTop: spacing.md,
+    textAlign: 'center',
+  },
+  errorTitle: {
+    color: textColor.textPrimary,
+    marginTop: spacing.md,
+    textAlign: 'center',
+  },
   retry: {
     ...globalStyles.row,
     gap: spacing.xs,
@@ -146,7 +217,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },
-  retryText: { color: PAY_ACCENT, fontWeight: '700' },
+  retryText: { color: PAY_ACCENT, ...fontWeights.bold },
 });
 
 /** The receipt's celebration: green for a paid advance, warm amber for cash still owed. */
@@ -154,15 +225,25 @@ export const SUCCESS_PAID_GRADIENT: [string, string] = ['#3cc9a1', '#0e8a68'];
 export const SUCCESS_CASH_GRADIENT: [string, string] = ['#ffb547', '#f0791a'];
 export const SUCCESS_CTA_GRADIENT: [string, string] = ['#f47b4d', '#e2477a'];
 
-const SUCCESS_INK = '#1a2e5a';
-const SUCCESS_MUTED = '#5d6683';
 const SUCCESS_LINE = '#efe9f6';
 
 export const successStyles = StyleSheet.create({
   container: { flex: 1, backgroundColor: PAY_CANVAS },
   wash: { position: 'absolute', top: 0, left: 0, right: 0, height: 360 },
-  confetti: { position: 'absolute', top: 40, left: 0, right: 0, height: 220, opacity: 0.9 },
-  body: { alignItems: 'stretch', paddingHorizontal: spacing.lg, paddingTop: 36, paddingBottom: spacing.lg },
+  confetti: {
+    position: 'absolute',
+    top: 40,
+    left: 0,
+    right: 0,
+    height: 220,
+    opacity: 0.9,
+  },
+  body: {
+    alignItems: 'stretch',
+    paddingHorizontal: spacing.lg,
+    paddingTop: 36,
+    paddingBottom: spacing.lg,
+  },
 
   badgeRing: {
     alignSelf: 'center',
@@ -189,20 +270,16 @@ export const successStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   heading: {
-    color: PAY_NAVY_DEEP,
-    fontSize: 28,
-    lineHeight: 38,
-    fontWeight: '700',
+    color: textColor.textPrimary,
+    ...typography.h1,
     textAlign: 'center',
     marginTop: 20,
-    letterSpacing: -0.4,
   },
   text: {
-    color: SUCCESS_MUTED,
-    fontSize: 14.5,
+    color: textColor.textSecondary,
+    ...typography.body,
     textAlign: 'center',
     marginTop: 8,
-    lineHeight: 21,
     paddingHorizontal: spacing.sm,
   },
   refChip: {
@@ -216,7 +293,7 @@ export const successStyles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: '#f1ecff',
   },
-  refText: { color: '#5a35e0', fontSize: 12.5, fontWeight: '700', letterSpacing: 0.4 },
+  refText: { color: '#5a35e0', ...typography.label },
 
   receipt: {
     marginTop: 22,
@@ -226,7 +303,11 @@ export const successStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: SUCCESS_LINE,
   },
-  receiptTitle: { color: SUCCESS_INK, fontSize: 16.5, fontWeight: '700', marginBottom: 4 },
+  receiptTitle: {
+    color: textColor.textPrimary,
+    ...typography.h3,
+    marginBottom: 4,
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -243,18 +324,34 @@ export const successStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  rowLabel: { color: SUCCESS_MUTED, fontSize: 13.5 },
-  rowRight: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 8 },
-  rowValue: { color: SUCCESS_INK, fontSize: 14.5, fontWeight: '700', flexShrink: 1, textAlign: 'right' },
+  rowLabel: { color: textColor.textSecondary, ...typography.label },
+  rowRight: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 8,
+  },
+  rowValue: {
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+    flexShrink: 1,
+    textAlign: 'right',
+  },
   badge: { paddingVertical: 2, paddingHorizontal: 8, borderRadius: 6 },
   badgePaid: { backgroundColor: '#e3f7ef' },
   badgeCash: { backgroundColor: '#fff1dc' },
-  badgeText: { fontSize: 11, fontWeight: '800' },
+  badgeText: { ...typography.label },
   badgeTextPaid: { color: '#0e8a68' },
   badgeTextCash: { color: '#c2620f' },
 
   next: { marginTop: 24 },
-  nextTitle: { color: SUCCESS_INK, fontSize: 16, fontWeight: '700', marginBottom: 12 },
+  nextTitle: {
+    color: textColor.textPrimary,
+    ...typography.h3,
+    marginBottom: 12,
+  },
   step: { flexDirection: 'row', gap: 12 },
   stepRail: { alignItems: 'center', width: 30 },
   stepDot: {
@@ -265,10 +362,25 @@ export const successStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  stepLine: { flex: 1, width: 2, borderRadius: 1, backgroundColor: '#f3d5d0', marginVertical: 4 },
+  stepLine: {
+    flex: 1,
+    width: 2,
+    borderRadius: 1,
+    backgroundColor: '#f3d5d0',
+    marginVertical: 4,
+  },
   stepText: { flex: 1, paddingBottom: 16 },
-  stepTitle: { color: SUCCESS_INK, fontSize: 14.5, fontWeight: '600', marginTop: 4 },
-  stepBody: { color: SUCCESS_MUTED, fontSize: 13, lineHeight: 18, marginTop: 2 },
+  stepTitle: {
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+    marginTop: 4,
+  },
+  stepBody: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    marginTop: 2,
+  },
 
   foot: {
     borderTopWidth: 1,
@@ -286,10 +398,13 @@ export const successStyles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: PAY_ACCENT,
   },
-  ctaText: { color: colors.onPrimary, fontSize: 16.5, fontWeight: '700' },
+  ctaText: { color: textColor.textOnPrimary, ...typography.button },
   ctaArrow: { position: 'absolute', right: 20 },
   secondary: { alignItems: 'center', paddingVertical: 12 },
-  secondaryText: { color: SUCCESS_MUTED, fontSize: 14.5, fontWeight: '600' },
+  secondaryText: {
+    color: textColor.textSecondary,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
   tickColor: { color: PAY_GREEN },
 });
-

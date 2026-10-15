@@ -1,5 +1,5 @@
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyText } from '../../../Components';
+import { AppText } from '../../../Components';
 import { CHAT_COPY as COPY } from '../constants';
 import { rowStyles as s } from '../styles';
 import type { ConversationItem } from '../types';
@@ -35,29 +35,29 @@ export function ConversationRow({ item, onPress }: ConversationRowProps) {
       }
     >
       <View style={[s.avatar, { backgroundColor: item.withAvatarColor }]}>
-        <EventlyText variant="subtitle" style={s.avatarText}>
+        <AppText variant="h3" style={s.avatarText}>
           {item.withInitials}
-        </EventlyText>
+        </AppText>
       </View>
 
       <View style={s.text}>
         <View style={s.headRow}>
-          <EventlyText variant="subtitle" style={s.name} numberOfLines={1}>
+          <AppText variant="body" style={s.name} numberOfLines={1}>
             {item.withName}
-          </EventlyText>
+          </AppText>
           {/* Dropped before anyone has written, rather than an empty slot. */}
           {item.whenLabel ? (
-            <EventlyText variant="caption" style={s.when}>
+            <AppText variant="caption" style={s.when}>
               {item.whenLabel}
-            </EventlyText>
+            </AppText>
           ) : null}
         </View>
 
         {/* A thread with no messages is a real state — "Message organizer"
             opens one before anybody writes — so the row says so rather than
             collapsing to a name and a coloured square. */}
-        <EventlyText
-          variant="caption"
+        <AppText
+          variant="body"
           style={[
             s.preview,
             unread && s.previewUnread,
@@ -66,14 +66,14 @@ export function ConversationRow({ item, onPress }: ConversationRowProps) {
           numberOfLines={1}
         >
           {item.preview || COPY.noMessagesYet}
-        </EventlyText>
+        </AppText>
       </View>
 
       {unread ? (
         <View style={s.badge}>
-          <EventlyText variant="caption" style={s.badgeText}>
+          <AppText variant="label" style={s.badgeText}>
             {item.unread > 9 ? '9+' : item.unread}
-          </EventlyText>
+          </AppText>
         </View>
       ) : null}
     </TouchableOpacity>

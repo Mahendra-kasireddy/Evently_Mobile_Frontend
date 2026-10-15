@@ -1,6 +1,12 @@
 import { Platform, StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { brand, spacing } from '../../theme';
+import {
+  brand,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+} from '../../theme';
 
 /** Same curve as the login hero — the two screens are one flow. */
 export const HEADER_RADIUS = 32;
@@ -50,17 +56,18 @@ export const styles = StyleSheet.create({
   },
   eyebrow: {
     color: '#ffb59a',
-    fontSize: 11.5,
-    fontWeight: '800',
-    letterSpacing: 1.8,
+    ...typography.label,
     marginTop: spacing.md,
   },
-  title: { color: brand.onNavy, marginTop: 4, fontSize: 30, lineHeight: 36 },
+  title: {
+    color: textColor.textOnPrimary,
+    marginTop: 4,
+    ...typography.display,
+  },
   subtitle: {
     color: 'rgba(255,255,255,0.78)',
     marginTop: spacing.sm,
-    lineHeight: 20,
-    fontSize: 14,
+    ...typography.body,
   },
   chips: {
     ...globalStyles.row,
@@ -78,13 +85,13 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.14)',
   },
-  chipText: { color: '#ffffff', fontSize: 11, fontWeight: '600' },
+  chipText: { color: textColor.textOnPrimary, ...typography.label },
   content: { padding: spacing.md, paddingTop: spacing.lg, gap: spacing.s12 },
-  pick: { color: brand.navy, fontWeight: '800', fontSize: 17, marginBottom: 2 },
+  pick: { color: textColor.textPrimary, ...typography.h3, marginBottom: 2 },
   sameNumber: {
-    color: brand.textMuted,
+    color: textColor.textSecondary,
     textAlign: 'center',
-    fontSize: 12.5,
+    ...typography.caption,
     marginTop: 4,
   },
 });
@@ -108,11 +115,10 @@ export const roleCardStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   body: { flex: 1 },
-  title: { color: brand.navy, fontSize: 17, lineHeight: 22, fontWeight: '800' },
+  title: { color: textColor.textPrimary, ...typography.h3 },
   description: {
-    color: brand.textMuted,
-    fontSize: 13,
-    lineHeight: 18,
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
     marginTop: 2,
   },
   tag: {
@@ -124,7 +130,7 @@ export const roleCardStyles = StyleSheet.create({
     paddingHorizontal: 8,
     borderRadius: 999,
   },
-  tagText: { fontSize: 11.5, fontWeight: '700' },
+  tagText: { ...typography.label },
   go: { width: 32, alignItems: 'center', justifyContent: 'center' },
 });
 
@@ -139,9 +145,8 @@ export const footnoteStyles = StyleSheet.create({
     borderColor: brand.border,
   },
   title: {
-    color: brand.navy,
-    fontWeight: '800',
-    fontSize: 15,
+    color: textColor.textPrimary,
+    ...typography.h3,
     marginBottom: spacing.s12,
   },
   row: { flexDirection: 'row', justifyContent: 'space-between' },
@@ -170,14 +175,18 @@ export const footnoteStyles = StyleSheet.create({
     borderWidth: 2,
     borderColor: brand.surface,
   },
-  numText: { color: '#ffffff', fontSize: 10.5, fontWeight: '800' },
+  numText: { color: textColor.textOnPrimary, ...typography.label },
   stepTitle: {
-    color: brand.navy,
-    fontSize: 13,
-    fontWeight: '700',
+    color: textColor.textPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
     marginTop: 8,
   },
-  stepBody: { color: brand.textMuted, fontSize: 11.5, marginTop: 1 },
+  stepBody: {
+    color: textColor.textSecondary,
+    ...typography.caption,
+    marginTop: 1,
+  },
   thread: {
     position: 'absolute',
     top: 24,
@@ -188,5 +197,5 @@ export const footnoteStyles = StyleSheet.create({
     borderColor: '#d9d4e0',
   },
   /* Kept for anything still reading the old single-line note. */
-  text: { flex: 1, color: brand.textMuted },
+  text: { flex: 1, color: textColor.textSecondary },
 });

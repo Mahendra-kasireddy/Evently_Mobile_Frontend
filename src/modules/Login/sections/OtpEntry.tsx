@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { Pressable, View } from 'react-native';
-import { EventlyText, EventlyTextInput } from '../../../Components';
+import { AppText, EventlyTextInput } from '../../../Components';
 import type { TextInput } from 'react-native';
 import { OTP_COPY, OTP_LENGTH } from '../constants';
 import { otpStyles } from '../styles';
@@ -65,7 +65,9 @@ export function OtpEntry({
                 : null,
             ]}
           >
-            <EventlyText style={otpStyles.boxText}>{digit}</EventlyText>
+            <AppText variant="h2" style={otpStyles.boxText}>
+              {digit}
+            </AppText>
           </View>
         ))}
 
@@ -96,9 +98,9 @@ export function OtpEntry({
       {/* "Resend OTP in 0:28" while the cooldown runs, then the link. */}
       <View style={otpStyles.resendRow}>
         {canResend ? (
-          <EventlyText variant="caption" style={otpStyles.resendLead}>
+          <AppText variant="bodySmall" style={otpStyles.resendLead}>
             {OTP_COPY.retryLead}
-          </EventlyText>
+          </AppText>
         ) : null}
         <Pressable
           onPress={onResend}
@@ -113,21 +115,21 @@ export function OtpEntry({
           }
           testID="otp-resend-sms"
         >
-          <EventlyText
+          <AppText
             variant="caption"
             style={canResend ? otpStyles.resendLink : otpStyles.resendWait}
           >
             {canResend
               ? OTP_COPY.retryChannel
               : `${OTP_COPY.retryWait} ${formatCooldown(resendSeconds)}`}
-          </EventlyText>
+          </AppText>
         </Pressable>
       </View>
 
       {devCode ? (
-        <EventlyText variant="caption" style={otpStyles.devHint}>
+        <AppText variant="caption" style={otpStyles.devHint}>
           Dev code: {devCode}
-        </EventlyText>
+        </AppText>
       ) : null}
     </View>
   );

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Modal, Pressable, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import {
   DEFAULT_OCCASION_TINT,
   OCCASION_TINT,
@@ -60,13 +60,13 @@ function Tile({
       <View style={[s.iconCircle, { backgroundColor: tint.bg }]}>
         <EventlyIcon name={icon} size={22} color={tint.fg} />
       </View>
-      <EventlyText
-        variant="caption"
+      <AppText
+        variant="label"
         style={[s.label, isSelected && s.labelSelected]}
         numberOfLines={1}
       >
         {label}
-      </EventlyText>
+      </AppText>
     </TouchableOpacity>
   );
 }
@@ -106,12 +106,12 @@ export function OccasionPicker({
 
   return (
     <View style={s.section}>
-      <EventlyText variant="h2" style={s.sectionTitle}>
+      <AppText variant="h2" style={s.sectionTitle}>
         What are we celebrating?
-      </EventlyText>
-      <EventlyText variant="caption" style={s.sectionSubtitle}>
+      </AppText>
+      <AppText variant="caption" style={s.sectionSubtitle}>
         Choose the occasion for your event
-      </EventlyText>
+      </AppText>
 
       <View style={s.grid}>
         {visible.map(occasion => (
@@ -148,12 +148,12 @@ export function OccasionPicker({
             onPress={() => undefined}
           >
             <View style={s.sheetHandle} />
-            <EventlyText variant="h2" style={s.sheetTitle}>
+            <AppText variant="h2" style={s.sheetTitle}>
               More occasions
-            </EventlyText>
-            <EventlyText variant="caption" style={s.sheetSubtitle}>
+            </AppText>
+            <AppText variant="caption" style={s.sheetSubtitle}>
               Select the occasion you&rsquo;re celebrating
-            </EventlyText>
+            </AppText>
 
             <View style={s.grid}>
               {extras.map(occasion => (
@@ -173,9 +173,9 @@ export function OccasionPicker({
               onPress={() => setSheetOpen(false)}
               accessibilityRole="button"
             >
-              <EventlyText variant="body" style={s.sheetCancelText}>
+              <AppText variant="body" style={s.sheetCancelText}>
                 Cancel
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
           </Pressable>
         </Pressable>

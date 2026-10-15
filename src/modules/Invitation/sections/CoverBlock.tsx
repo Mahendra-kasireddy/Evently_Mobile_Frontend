@@ -3,7 +3,7 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import {
   EventlyIcon,
   EventlyImage,
-  EventlyText,
+  AppText,
   OccasionArt,
 } from '../../../Components';
 import type { OccasionArtKey } from '../../../Components/OccasionArt';
@@ -222,41 +222,41 @@ export function CoverBlock({ invitation, mode }: CoverBlockProps) {
 
       <View style={s.body}>
         {eyebrow ? (
-          <EventlyText
-            variant="caption"
+          <AppText
+            variant="label"
             style={[s.eyebrow, { color: template.accent }]}
             numberOfLines={2}
           >
             {eyebrow.toUpperCase()}
-          </EventlyText>
+          </AppText>
         ) : null}
 
-        <EventlyText variant="h1" style={[s.names, nameFont]} numberOfLines={3}>
+        <AppText variant="h1" style={[s.names, nameFont]} numberOfLines={3}>
           {nameText}
-        </EventlyText>
+        </AppText>
 
         <View style={[s.diamond, { backgroundColor: template.accent }]} />
 
         {when ? (
-          <EventlyText variant="body" style={s.when} numberOfLines={1}>
+          <AppText variant="bodySmall" style={s.when} numberOfLines={1}>
             {when}
-          </EventlyText>
+          </AppText>
         ) : null}
         {venue ? (
-          <EventlyText variant="caption" style={s.venue} numberOfLines={2}>
+          <AppText variant="caption" style={s.venue} numberOfLines={2}>
             {venue}
-          </EventlyText>
+          </AppText>
         ) : null}
         {message ? (
-          <EventlyText variant="caption" style={s.message} numberOfLines={4}>
+          <AppText variant="bodySmall" style={s.message} numberOfLines={4}>
             {message}
-          </EventlyText>
+          </AppText>
         ) : null}
 
         <View style={s.scroll}>
-          <EventlyText variant="caption" style={s.scrollText}>
+          <AppText variant="label" style={s.scrollText}>
             {COPY.coverScroll.toUpperCase()}
-          </EventlyText>
+          </AppText>
           <EventlyIcon
             name="chevron-down"
             size={18}
@@ -266,9 +266,9 @@ export function CoverBlock({ invitation, mode }: CoverBlockProps) {
 
         {/* Only the customer is told this, and only when it is true. */}
         {mode === 'editor' && videoUnplayable ? (
-          <EventlyText variant="caption" style={s.note}>
+          <AppText variant="caption" style={s.note}>
             {COPY.coverVideoNoPlayer}
-          </EventlyText>
+          </AppText>
         ) : null}
       </View>
     </>

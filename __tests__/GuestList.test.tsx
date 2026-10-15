@@ -388,7 +388,7 @@ describe('render dump', () => {
           Guest list
         </EventlyText>
         <EventlyText
-          variant="small"
+          variant="bodySmall"
           style={[styles.subtitle, { marginTop: 4 }]}
         >
           {summaryLine(LIST, GUEST_COPY.count, GUEST_COPY.invited)}

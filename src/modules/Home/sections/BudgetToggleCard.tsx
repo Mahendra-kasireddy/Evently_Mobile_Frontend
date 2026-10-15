@@ -1,5 +1,5 @@
 import { Alert, Pressable, Switch, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { BUDGET_TOGGLE_COPY } from '../constants';
 import { HOME_ACCENT, HOME_INK, HOME_PAPER } from '../design';
 import { basicsStyles as s } from '../styles';
@@ -40,9 +40,9 @@ export function BudgetToggleCard({
           />
         </View>
         <View style={s.budgetText}>
-          <EventlyText style={s.budgetTitle}>
+          <AppText variant="bodySmall" style={s.budgetTitle}>
             {BUDGET_TOGGLE_COPY.title}
-          </EventlyText>
+          </AppText>
           <Pressable
             onPress={() =>
               Alert.alert(
@@ -54,9 +54,9 @@ export function BudgetToggleCard({
             accessibilityLabel={BUDGET_TOGGLE_COPY.link}
             hitSlop={8}
           >
-            <EventlyText style={s.budgetLink}>
+            <AppText variant="buttonSmall" style={s.budgetLink}>
               {BUDGET_TOGGLE_COPY.link}
-            </EventlyText>
+            </AppText>
           </Pressable>
         </View>
         <Switch
@@ -89,13 +89,16 @@ export function BudgetToggleCard({
             color={HOME_INK.inkSoft}
           />
           <View style={s.budgetText}>
-            <EventlyText style={s.tileLabel}>Budget</EventlyText>
-            <EventlyText
+            <AppText variant="overline" style={s.tileLabel}>
+              Budget
+            </AppText>
+            <AppText
+              variant="h3"
               style={[s.tileValue, !value && s.tileValueEmpty]}
               numberOfLines={1}
             >
               {value || BUDGET_TOGGLE_COPY.placeholder}
-            </EventlyText>
+            </AppText>
           </View>
           <EventlyIcon
             name="chevron-down"

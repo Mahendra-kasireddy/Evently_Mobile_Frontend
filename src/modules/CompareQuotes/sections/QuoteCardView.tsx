@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { COMPARE_ACCENT, COMPARE_COPY as COPY } from '../constants';
 import { quoteCardStyles as s } from '../styles';
 import type { QuoteCard } from '../types';
@@ -64,36 +64,36 @@ export function QuoteCardView({
     >
       <View style={s.head}>
         <View style={[s.avatar, { backgroundColor: quote.avatarColor }]}>
-          <EventlyText variant="subtitle" style={s.avatarText}>
+          <AppText variant="h3" style={s.avatarText}>
             {quote.initials}
-          </EventlyText>
+          </AppText>
         </View>
 
         <View style={s.headText}>
-          <EventlyText variant="subtitle" style={s.name} numberOfLines={1}>
+          <AppText variant="h3" style={s.name} numberOfLines={1}>
             {quote.organizerName}
-          </EventlyText>
+          </AppText>
           <View style={s.metaRow}>
             {/* A score with no reviews behind it is not a rating. */}
             {quote.reviews > 0 ? (
               <>
                 <EventlyIcon name="star" size={13} color="#e8a33a" />
-                <EventlyText variant="caption" style={s.rating}>
+                <AppText variant="bodySmall" style={s.rating}>
                   {quote.rating.toFixed(1)}
-                </EventlyText>
-                <EventlyText variant="caption" style={s.meta}>
+                </AppText>
+                <AppText variant="bodySmall" style={s.meta}>
                   {`(${quote.reviews})`}
-                </EventlyText>
+                </AppText>
               </>
             ) : (
-              <EventlyText variant="caption" style={s.meta}>
+              <AppText variant="bodySmall" style={s.meta}>
                 No reviews yet
-              </EventlyText>
+              </AppText>
             )}
             {quote.tier ? (
-              <EventlyText variant="caption" style={s.meta}>
+              <AppText variant="bodySmall" style={s.meta}>
                 {`· ${quote.tier}`}
-              </EventlyText>
+              </AppText>
             ) : null}
           </View>
         </View>
@@ -102,32 +102,32 @@ export function QuoteCardView({
           <View
             style={[s.chip, quote.isAccepted ? s.chipAccepted : s.chipLowest]}
           >
-            <EventlyText
-              variant="caption"
+            <AppText
+              variant="label"
               style={[
                 s.chipText,
                 quote.isAccepted ? s.chipTextAccepted : s.chipTextLowest,
               ]}
             >
               {badge}
-            </EventlyText>
+            </AppText>
           </View>
         ) : null}
       </View>
 
       <View style={s.totalRow}>
-        <EventlyText variant="caption" style={s.totalLabel}>
+        <AppText variant="overline" style={s.totalLabel}>
           {COPY.total}
-        </EventlyText>
+        </AppText>
         <View>
-          <EventlyText variant="h1" style={s.totalValue}>
+          <AppText variant="h2" style={s.totalValue}>
             {quote.totalLabel}
-          </EventlyText>
+          </AppText>
           {/* Dropped when the organizer set no advance rather than shown as ₹0. */}
           {quote.advanceLabel ? (
-            <EventlyText variant="caption" style={s.advance}>
+            <AppText variant="bodySmall" style={s.advance}>
               {`${quote.advanceLabel} ${COPY.advance.toLowerCase()}`}
-            </EventlyText>
+            </AppText>
           ) : null}
         </View>
       </View>
@@ -141,9 +141,9 @@ export function QuoteCardView({
             accessibilityState={{ expanded: open }}
             accessibilityLabel={`${COPY.breakdown}, ${quote.organizerName}`}
           >
-            <EventlyText variant="body" style={s.breakdownToggleText}>
+            <AppText variant="body" style={s.breakdownToggleText}>
               {COPY.breakdown}
-            </EventlyText>
+            </AppText>
             <EventlyIcon
               name={open ? 'chevron-up' : 'chevron-down'}
               size={18}
@@ -155,23 +155,23 @@ export function QuoteCardView({
             ? quote.lines.map(line => (
                 <View key={line.key} style={s.line}>
                   <View style={s.lineText}>
-                    <EventlyText variant="body" style={s.lineTitle}>
+                    <AppText variant="body" style={s.lineTitle}>
                       {line.title}
-                    </EventlyText>
+                    </AppText>
                     {line.subtitle ? (
-                      <EventlyText
+                      <AppText
                         variant="caption"
                         style={s.lineSubtitle}
                         numberOfLines={2}
                       >
                         {line.subtitle}
-                      </EventlyText>
+                      </AppText>
                     ) : null}
                   </View>
                   {line.priceLabel ? (
-                    <EventlyText variant="body" style={s.linePrice}>
+                    <AppText variant="body" style={s.linePrice}>
                       {line.priceLabel}
-                    </EventlyText>
+                    </AppText>
                   ) : null}
                 </View>
               ))
@@ -196,13 +196,13 @@ export function QuoteCardView({
               quote.organizerName
             }`}
           >
-            <EventlyText variant="subtitle" style={s.acceptText}>
+            <AppText variant="h3" style={s.acceptText}>
               {COPY.payAdvance(quote.advanceLabel)}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
-          <EventlyText variant="caption" style={s.acceptNote}>
+          <AppText variant="caption" style={s.acceptNote}>
             {COPY.payAdvanceNote}
-          </EventlyText>
+          </AppText>
         </>
       ) : decided ? null : (
         <>
@@ -214,13 +214,13 @@ export function QuoteCardView({
             accessibilityRole="button"
             accessibilityLabel={`${COPY.accept} from ${quote.organizerName}, ${quote.totalLabel}. ${acceptNote}`}
           >
-            <EventlyText variant="subtitle" style={s.acceptText}>
+            <AppText variant="h3" style={s.acceptText}>
               {isAccepting ? COPY.accepting : COPY.accept}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
-          <EventlyText variant="caption" style={s.acceptNote}>
+          <AppText variant="caption" style={s.acceptNote}>
             {acceptNote}
-          </EventlyText>
+          </AppText>
         </>
       )}
     </View>

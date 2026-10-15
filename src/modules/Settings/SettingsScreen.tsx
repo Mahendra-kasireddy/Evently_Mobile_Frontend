@@ -10,7 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   AppHeader,
   EventlyIcon,
-  EventlyText,
+  AppText,
   KeyboardAvoider,
 } from '../../Components';
 import { colors } from '../../theme';
@@ -59,9 +59,9 @@ export function SettingsScreen() {
         {header}
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={colors.primary} />
-          <EventlyText variant="body" style={styles.loadingText}>
+          <AppText variant="body" style={styles.loadingText}>
             {COPY.loading}
-          </EventlyText>
+          </AppText>
         </View>
       </SafeAreaView>
     );
@@ -72,12 +72,12 @@ export function SettingsScreen() {
       <SafeAreaView style={styles.container} edges={['top']}>
         {header}
         <View style={styles.centered}>
-          <EventlyText variant="h2" style={styles.errorTitle}>
+          <AppText variant="h2" style={styles.errorTitle}>
             {COPY.errorTitle}
-          </EventlyText>
-          <EventlyText variant="body" style={styles.errorText}>
+          </AppText>
+          <AppText variant="body" style={styles.errorText}>
             {errorMessage ?? 'Something went wrong.'}
-          </EventlyText>
+          </AppText>
           <TouchableOpacity
             style={styles.retryButton}
             activeOpacity={0.8}
@@ -85,9 +85,9 @@ export function SettingsScreen() {
             accessibilityRole="button"
           >
             <EventlyIcon name="refresh" size={16} color={SETTINGS_ACCENT} />
-            <EventlyText variant="caption" style={styles.retryText}>
+            <AppText variant="caption" style={styles.retryText}>
               {COPY.retry}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -109,9 +109,9 @@ export function SettingsScreen() {
             <RefreshControl refreshing={isLoading} onRefresh={refetch} />
           }
         >
-          <EventlyText variant="caption" style={styles.sectionTitle}>
+          <AppText variant="overline" style={styles.sectionTitle}>
             {COPY.detailsSection}
-          </EventlyText>
+          </AppText>
 
           <View style={styles.card}>
             {SETTINGS_FIELDS.map((field, index) => (
@@ -119,13 +119,13 @@ export function SettingsScreen() {
                 key={field.key}
                 style={[styles.field, index === 0 && styles.fieldFirst]}
               >
-                <EventlyText variant="body" style={styles.label}>
+                <AppText variant="body" style={styles.label}>
                   {field.label}
-                </EventlyText>
+                </AppText>
                 {field.hint ? (
-                  <EventlyText variant="caption" style={styles.hint}>
+                  <AppText variant="caption" style={styles.hint}>
                     {field.hint}
-                  </EventlyText>
+                  </AppText>
                 ) : null}
                 <TextInput
                   style={[
@@ -156,12 +156,12 @@ export function SettingsScreen() {
                 />
               </View>
               <View style={styles.phoneText}>
-                <EventlyText variant="caption" style={styles.hint}>
+                <AppText variant="caption" style={styles.hint}>
                   {COPY.phoneLabel}
-                </EventlyText>
-                <EventlyText variant="body" style={styles.phoneValue}>
+                </AppText>
+                <AppText variant="body" style={styles.phoneValue}>
                   {user.phone}
-                </EventlyText>
+                </AppText>
               </View>
               {user.phone ? (
                 <View style={styles.verified}>
@@ -176,8 +176,8 @@ export function SettingsScreen() {
                       user.phoneVerified ? SETTINGS_GREEN : colors.textMuted
                     }
                   />
-                  <EventlyText
-                    variant="caption"
+                  <AppText
+                    variant="label"
                     style={[
                       styles.verifiedText,
                       {
@@ -188,13 +188,13 @@ export function SettingsScreen() {
                     ]}
                   >
                     {user.phoneVerified ? COPY.verified : COPY.unverified}
-                  </EventlyText>
+                  </AppText>
                 </View>
               ) : null}
             </View>
-            <EventlyText variant="caption" style={styles.phoneNote}>
+            <AppText variant="caption" style={styles.phoneNote}>
               {COPY.phoneNote}
-            </EventlyText>
+            </AppText>
           </View>
 
           <TouchableOpacity
@@ -208,16 +208,16 @@ export function SettingsScreen() {
             {isSaving ? (
               <ActivityIndicator size="small" color={colors.onPrimary} />
             ) : (
-              <EventlyText variant="subtitle" style={styles.saveText}>
+              <AppText variant="h3" style={styles.saveText}>
                 {COPY.save}
-              </EventlyText>
+              </AppText>
             )}
           </TouchableOpacity>
 
           {saveErrorMessage ? (
-            <EventlyText variant="caption" style={styles.saveError}>
+            <AppText variant="caption" style={styles.saveError}>
               {emailInvalid ? COPY.invalidEmail : saveErrorMessage}
-            </EventlyText>
+            </AppText>
           ) : null}
 
           {justSaved ? (
@@ -227,9 +227,9 @@ export function SettingsScreen() {
                 size={16}
                 color={SETTINGS_GREEN}
               />
-              <EventlyText variant="caption" style={styles.savedText}>
+              <AppText variant="caption" style={styles.savedText}>
                 {COPY.saved}
-              </EventlyText>
+              </AppText>
             </View>
           ) : null}
         </ScrollView>

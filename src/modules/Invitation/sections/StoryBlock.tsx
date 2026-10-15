@@ -7,7 +7,7 @@ import {
   type NativeScrollEvent,
   type NativeSyntheticEvent,
 } from 'react-native';
-import { EventlyImage, EventlyText } from '../../../Components';
+import { EventlyImage, AppText } from '../../../Components';
 import { absoluteFileUrl } from '../../../services/urls';
 import { INVITATION_COPY as COPY } from '../constants';
 import { storyStyles as s } from '../styles';
@@ -55,9 +55,9 @@ export function StoryBlock({ cards, title, onOpen }: StoryBlockProps) {
 
   return (
     <View style={s.block}>
-      <EventlyText variant="subtitle" style={s.title} numberOfLines={1}>
+      <AppText variant="overline" style={s.title} numberOfLines={1}>
         {title || COPY.storyTitle}
-      </EventlyText>
+      </AppText>
 
       <FlatList
         ref={listRef}
@@ -97,13 +97,9 @@ export function StoryBlock({ cards, title, onOpen }: StoryBlockProps) {
               />
             </TouchableOpacity>
             {item.caption ? (
-              <EventlyText
-                variant="caption"
-                style={s.caption}
-                numberOfLines={3}
-              >
+              <AppText variant="bodySmall" style={s.caption} numberOfLines={3}>
                 {item.caption}
-              </EventlyText>
+              </AppText>
             ) : null}
           </View>
         )}
@@ -120,9 +116,9 @@ export function StoryBlock({ cards, title, onOpen }: StoryBlockProps) {
             <View key={card.id} style={[s.dot, index === active && s.dotOn]} />
           ))}
         </View>
-        <EventlyText variant="caption" style={s.count}>
+        <AppText variant="label" style={s.count}>
           {COPY.storyPosition(active + 1, cards.length)}
-        </EventlyText>
+        </AppText>
       </View>
     </View>
   );

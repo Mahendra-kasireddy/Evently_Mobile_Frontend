@@ -14,7 +14,15 @@ import ReactTestRenderer from 'react-test-renderer';
 
 jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
   const { Text } = require('react-native');
-  return function MockIcon({ name, size, color }: { name: string; size?: number; color?: string }) {
+  return function MockIcon({
+    name,
+    size,
+    color,
+  }: {
+    name: string;
+    size?: number;
+    color?: string;
+  }) {
     return <Text style={{ fontSize: size, color }}>{` icon:${name}`}</Text>;
   };
 });
@@ -32,8 +40,10 @@ import { EventlyIcon, EventlyText } from '../src/Components';
 import type { PaymentOrderDTO } from '../src/modules/Payment/types';
 
 declare const process: { env: Record<string, string | undefined> };
-const fs: { writeFileSync(p: string, d: string, e: string): void; existsSync(p: string): boolean } =
-  require('fs');
+const fs: {
+  writeFileSync(p: string, d: string, e: string): void;
+  existsSync(p: string): boolean;
+} = require('fs');
 
 /** An order exactly as the server prices it. */
 const order = (over: Partial<PaymentOrderDTO> = {}): PaymentOrderDTO => ({
@@ -70,13 +80,17 @@ describe('mapPayment', () => {
 
   it('names the coupon that moved the total', () => {
     // A total below the quote the customer accepted has to explain itself.
-    const m = mapPayment(order({ couponCode: 'FESTIVE10', couponDiscount: 20000 }));
+    const m = mapPayment(
+      order({ couponCode: 'FESTIVE10', couponDiscount: 20000 }),
+    );
     expect(m.couponLine).toBe('FESTIVE10 saved ₹20,000');
   });
 
   it('says nothing about a coupon when none was applied', () => {
     expect(mapPayment(order()).couponLine).toBe('');
-    expect(mapPayment(order({ couponCode: 'X', couponDiscount: 0 })).couponLine).toBe('');
+    expect(
+      mapPayment(order({ couponCode: 'X', couponDiscount: 0 })).couponLine,
+    ).toBe('');
   });
 
   it('drops the balance clause when the advance is the whole price', () => {
@@ -85,7 +99,9 @@ describe('mapPayment', () => {
   });
 
   it('falls back to a neutral name rather than an empty sentence', () => {
-    expect(mapPayment(order({ organizerName: '' })).organizerName).toBe('your organizer');
+    expect(mapPayment(order({ organizerName: '' })).organizerName).toBe(
+      'your organizer',
+    );
   });
 });
 
@@ -121,7 +137,11 @@ describe('methods', () => {
   it('offers the three Razorpay opens on, each a real method name', () => {
     // The first three are passed through as `prefill.method`, so a label here
     // that is not a Razorpay method would open the sheet on a menu instead.
-    expect(PAY_OPTIONS.map((o) => o.id).slice(0, 3)).toEqual(['upi', 'card', 'netbanking']);
+    expect(PAY_OPTIONS.map(o => o.id).slice(0, 3)).toEqual([
+      'upi',
+      'card',
+      'netbanking',
+    ]);
   });
 
   it('offers cash last, and never sends it to the gateway', () => {
@@ -131,7 +151,7 @@ describe('methods', () => {
      * would make the one path that works without a gateway the hardest to
      * find. Last, because it is the one Evently cannot stand behind.
      */
-    const ids = PAY_OPTIONS.map((o) => o.id);
+    const ids = PAY_OPTIONS.map(o => o.id);
     expect(ids).toEqual(['upi', 'card', 'netbanking', 'cash']);
     expect(ids[ids.length - 1]).toBe('cash');
   });
@@ -163,8 +183,12 @@ describe('methods', () => {
     expect(SUCCESS_COPY.cashHeading).not.toBe(SUCCESS_COPY.heading);
     expect(SUCCESS_COPY.cashHeading).toContain('cash');
     expect(SUCCESS_COPY.cashHeading).not.toContain('paid');
-    expect(SUCCESS_COPY.cashBody('Mahendra Events')).toContain('Mahendra Events');
-    expect(SUCCESS_COPY.cashBody('Mahendra Events')).toContain('once they confirm');
+    expect(SUCCESS_COPY.cashBody('Mahendra Events')).toContain(
+      'Mahendra Events',
+    );
+    expect(SUCCESS_COPY.cashBody('Mahendra Events')).toContain(
+      'once they confirm',
+    );
   });
 });
 
@@ -207,12 +231,19 @@ describe('render dump', () => {
             {PAYMENT_COPY.payWith}
           </EventlyText>
           {PAY_OPTIONS.map((option, index) => (
-            <View key={option.id} style={[s.option, index === selected && s.optionOn]}>
+            <View
+              key={option.id}
+              style={[s.option, index === selected && s.optionOn]}
+            >
               <View style={s.optionIcon}>
                 <EventlyIcon name={option.icon} size={20} color="#0e1a33" />
               </View>
               <View style={s.optionText}>
-                <EventlyText variant="subtitle" style={s.optionLabel}>
+                <EventlyText
+                  variant="body"
+                  weight="medium"
+                  style={s.optionLabel}
+                >
                   {option.label}
                 </EventlyText>
                 <EventlyText variant="caption" style={s.optionHint}>
@@ -227,7 +258,9 @@ describe('render dump', () => {
 
           <View style={[s.assurance, isCash(selected) && s.assuranceCash]}>
             <EventlyIcon
-              name={isCash(selected) ? 'hand-coin-outline' : 'shield-check-outline'}
+              name={
+                isCash(selected) ? 'hand-coin-outline' : 'shield-check-outline'
+              }
               size={18}
               color={isCash(selected) ? '#0e1a33' : '#1d9e75'}
             />
@@ -235,13 +268,15 @@ describe('render dump', () => {
               variant="caption"
               style={[s.assuranceText, isCash(selected) && s.assuranceTextCash]}
             >
-              {isCash(selected) ? PAYMENT_COPY.cashAssurance : PAYMENT_COPY.assurance}
+              {isCash(selected)
+                ? PAYMENT_COPY.cashAssurance
+                : PAYMENT_COPY.assurance}
             </EventlyText>
           </View>
 
           <View style={s.talk}>
             <EventlyIcon name="chat-outline" size={18} color="#e8633a" />
-            <EventlyText variant="subtitle" style={s.talkText}>
+            <EventlyText variant="body" weight="medium" style={s.talkText}>
               {PAYMENT_COPY.talkFirst}
             </EventlyText>
           </View>
@@ -252,7 +287,7 @@ describe('render dump', () => {
 
         <View style={s.foot}>
           <View style={s.pay}>
-            <EventlyText variant="subtitle" style={s.payText}>
+            <EventlyText variant="body" weight="medium" style={s.payText}>
               {isCash(selected) ? m.cashCtaLabel : m.ctaLabel}
             </EventlyText>
           </View>
@@ -278,7 +313,11 @@ describe('render dump', () => {
         </View>
         <View style={successStyles.foot}>
           <View style={successStyles.cta}>
-            <EventlyText variant="subtitle" style={successStyles.ctaText}>
+            <EventlyText
+              variant="body"
+              weight="medium"
+              style={successStyles.ctaText}
+            >
               {SUCCESS_COPY.cta}
             </EventlyText>
           </View>
@@ -286,7 +325,10 @@ describe('render dump', () => {
       </View>
     );
 
-    const success = successPanel(SUCCESS_COPY.heading, SUCCESS_COPY.body('Mahendra Events'));
+    const success = successPanel(
+      SUCCESS_COPY.heading,
+      SUCCESS_COPY.body('Mahendra Events'),
+    );
     const successCash = successPanel(
       SUCCESS_COPY.cashHeading,
       SUCCESS_COPY.cashBody('Mahendra Events'),

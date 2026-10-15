@@ -3,7 +3,7 @@ import { Animated, TouchableOpacity, View } from 'react-native';
 import {
   Confetti,
   EventlyIcon,
-  EventlyText,
+  AppText,
   GradientFill,
   GradientText,
   useReducedMotion,
@@ -94,9 +94,9 @@ function FactChip({
   return (
     <View style={s.factChip}>
       <GradientIcon name={icon} colors={colors} />
-      <EventlyText variant="caption" style={s.factText} numberOfLines={1}>
+      <AppText variant="label" style={s.factText} numberOfLines={1}>
         {label}
-      </EventlyText>
+      </AppText>
     </View>
   );
 }
@@ -149,13 +149,13 @@ function BriefJourney() {
                 <View style={s.journeyLineSpacer} />
               )}
             </View>
-            <EventlyText
-              variant="caption"
+            <AppText
+              variant="label"
               style={[s.journeyLabel, (done || current) && s.journeyLabelOn]}
               numberOfLines={2}
             >
               {label}
-            </EventlyText>
+            </AppText>
           </View>
         );
       })}
@@ -174,45 +174,45 @@ function QuoteRowView({
   const body = (
     <>
       <View style={[s.quoteAvatar, { backgroundColor: quote.avatarColor }]}>
-        <EventlyText variant="subtitle" style={s.quoteAvatarText}>
+        <AppText variant="label" style={s.quoteAvatarText}>
           {quote.initials}
-        </EventlyText>
+        </AppText>
       </View>
       <View style={s.quoteText}>
         <View style={s.quoteNameRow}>
-          <EventlyText variant="subtitle" style={s.quoteName} numberOfLines={1}>
+          <AppText variant="body" style={s.quoteName} numberOfLines={1}>
             {quote.organizerName}
-          </EventlyText>
+          </AppText>
           {quote.isLowest ? (
             <View style={s.bestTag}>
               <GradientFill
                 colors={CURRENT_EVENT_STAGE_GRADIENT.quotes_received}
                 direction="across"
               />
-              <EventlyText variant="caption" style={s.bestTagText}>
+              <AppText variant="label" style={s.bestTagText}>
                 Best price
-              </EventlyText>
+              </AppText>
             </View>
           ) : null}
         </View>
         {/* Dropped rather than left blank for a quote with no priced lines and
             no timestamp — an empty second line reads as missing information. */}
         {quote.metaLabel ? (
-          <EventlyText variant="caption" style={s.quoteMeta} numberOfLines={1}>
+          <AppText variant="caption" style={s.quoteMeta} numberOfLines={1}>
             {quote.metaLabel}
-          </EventlyText>
+          </AppText>
         ) : null}
       </View>
       <View style={s.quoteMoney}>
-        <EventlyText variant="subtitle" style={s.quoteTotal}>
+        <AppText variant="body" style={s.quoteTotal}>
           {quote.totalLabel}
-        </EventlyText>
-        <EventlyText
+        </AppText>
+        <AppText
           variant="caption"
           style={[s.quoteDelta, quote.isLowest && s.quoteDeltaLowest]}
         >
           {quote.deltaLabel}
-        </EventlyText>
+        </AppText>
       </View>
     </>
   );
@@ -291,17 +291,17 @@ export function EventHero({
           <PulseDot
             active={waitingOnReplies || event.stage === 'in_progress'}
           />
-          <EventlyText variant="caption" style={s.stageText} numberOfLines={1}>
+          <AppText variant="overline" style={s.stageText} numberOfLines={1}>
             {event.stageLabel}
-          </EventlyText>
+          </AppText>
         </View>
         {daysLabel ? (
           <View style={s.daysBadge}>
             <GradientFill colors={EVENT_DAYS_GRADIENT} direction="across" />
             <EventlyIcon name="calendar-heart" size={11} color="#ffffff" />
-            <EventlyText variant="caption" style={s.daysText}>
+            <AppText variant="label" style={s.daysText}>
               {daysLabel}
-            </EventlyText>
+            </AppText>
           </View>
         ) : null}
       </View>
@@ -353,13 +353,13 @@ export function EventHero({
                     name="send-check-outline"
                     colors={EVENT_FACT_GRADIENT.where}
                   />
-                  <EventlyText
+                  <AppText
                     variant="caption"
                     style={s.panelLineText}
                     numberOfLines={2}
                   >
                     {event.reachLine}
-                  </EventlyText>
+                  </AppText>
                 </View>
               ) : null}
               {event.closesLabel ? (
@@ -368,12 +368,12 @@ export function EventHero({
                     name="clock-outline"
                     colors={CURRENT_EVENT_STAGE_GRADIENT.submitted}
                   />
-                  <EventlyText
+                  <AppText
                     variant="caption"
                     style={[s.panelLineText, s.panelLineStrong]}
                   >
                     {event.closesLabel}
-                  </EventlyText>
+                  </AppText>
                 </View>
               ) : null}
             </View>
@@ -382,9 +382,9 @@ export function EventHero({
       ) : hasQuotes ? (
         <>
           {event.reachLine ? (
-            <EventlyText variant="body" style={s.reach} numberOfLines={2}>
+            <AppText variant="bodySmall" style={s.reach} numberOfLines={2}>
               {event.reachLine}
-            </EventlyText>
+            </AppText>
           ) : null}
           {/* Only while the brief is still taking quotes. */}
           {event.closesLabel ? (
@@ -394,9 +394,9 @@ export function EventHero({
                 direction="across"
               />
               <EventlyIcon name="clock-outline" size={14} color="#ffffff" />
-              <EventlyText variant="caption" style={s.closesText}>
+              <AppText variant="label" style={s.closesText}>
                 {event.closesLabel}
-              </EventlyText>
+              </AppText>
             </View>
           ) : null}
           {event.quoteRows.map(quote => (
@@ -411,13 +411,13 @@ export function EventHero({
               <View style={s.awaitingSlot}>
                 <EventlyIcon name="dots-horizontal" size={15} color="#b4a9d6" />
               </View>
-              <EventlyText
-                variant="body"
+              <AppText
+                variant="bodySmall"
                 style={s.awaitingText}
                 numberOfLines={2}
               >
                 {event.awaitingLabel}
-              </EventlyText>
+              </AppText>
             </View>
           ) : null}
         </>
@@ -425,12 +425,12 @@ export function EventHero({
         /* Nothing to compare and not waiting on replies — how far along it is. */
         <View style={s.progressBlock}>
           <View style={s.progressHead}>
-            <EventlyText variant="caption" style={s.progressCaption}>
+            <AppText variant="label" style={s.progressCaption}>
               Progress
-            </EventlyText>
-            <EventlyText variant="caption" style={s.progressPercent}>
+            </AppText>
+            <AppText variant="label" style={s.progressPercent}>
               {`${Math.round(event.progress)}%`}
-            </EventlyText>
+            </AppText>
           </View>
           <View style={s.track}>
             <View style={[s.fill, { width: `${event.progress}%` }]}>
@@ -438,9 +438,9 @@ export function EventHero({
             </View>
           </View>
           {event.closesLabel ? (
-            <EventlyText variant="caption" style={s.progressLabel}>
+            <AppText variant="label" style={s.progressLabel}>
               {event.closesLabel}
-            </EventlyText>
+            </AppText>
           ) : null}
         </View>
       )}
@@ -453,9 +453,9 @@ export function EventHero({
         accessibilityLabel={`${ctaLabel}. ${spoken}.`}
       >
         <GradientFill colors={EVENT_HERO_CTA_GRADIENT} direction="across" />
-        <EventlyText variant="subtitle" style={s.ctaText}>
+        <AppText variant="button" style={s.ctaText}>
           {ctaLabel}
-        </EventlyText>
+        </AppText>
         <View style={s.ctaArrow}>
           <EventlyIcon name="arrow-right" size={16} color="#ffffff" />
         </View>
@@ -467,9 +467,9 @@ export function EventHero({
         onPress={onPressDetails}
         accessibilityRole="button"
       >
-        <EventlyText variant="body" style={s.linkText}>
+        <AppText variant="buttonSmall" style={s.linkText}>
           See all quotes & your brief
-        </EventlyText>
+        </AppText>
         <EventlyIcon name="chevron-right" size={16} color="#7c5cdb" />
       </TouchableOpacity>
     </View>

@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
+import { AppHeader, EventlyIcon, AppText } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
 import {
   COMPARE_ACCENT,
@@ -84,9 +84,9 @@ export function CompareQuotesScreen() {
         {header}
         <View style={s.centered}>
           <ActivityIndicator size="large" color={COMPARE_ACCENT} />
-          <EventlyText variant="body" style={s.loadingText}>
+          <AppText variant="body" style={s.loadingText}>
             {COPY.loading}
-          </EventlyText>
+          </AppText>
         </View>
       </SafeAreaView>
     );
@@ -97,12 +97,12 @@ export function CompareQuotesScreen() {
       <SafeAreaView style={s.container} edges={['top']}>
         {header}
         <View style={s.centered}>
-          <EventlyText variant="h2" style={s.emptyTitle}>
+          <AppText variant="h2" style={s.emptyTitle}>
             {COPY.errorTitle}
-          </EventlyText>
-          <EventlyText variant="body" style={s.errorText}>
+          </AppText>
+          <AppText variant="body" style={s.errorText}>
             {errorMessage ?? 'Something went wrong.'}
-          </EventlyText>
+          </AppText>
           <TouchableOpacity
             style={s.retryButton}
             activeOpacity={0.8}
@@ -110,9 +110,9 @@ export function CompareQuotesScreen() {
             accessibilityRole="button"
           >
             <EventlyIcon name="refresh" size={16} color={COMPARE_ACCENT} />
-            <EventlyText variant="caption" style={s.retryText}>
+            <AppText variant="caption" style={s.retryText}>
               {COPY.retry}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -139,24 +139,24 @@ export function CompareQuotesScreen() {
       {header}
 
       <View style={s.brief}>
-        <EventlyText variant="h2" style={s.briefTitle} numberOfLines={1}>
+        <AppText variant="h2" style={s.briefTitle} numberOfLines={1}>
           {model.title}
-        </EventlyText>
+        </AppText>
         {model.factsLine ? (
-          <EventlyText variant="caption" style={s.briefFacts} numberOfLines={2}>
+          <AppText variant="bodySmall" style={s.briefFacts} numberOfLines={2}>
             {model.factsLine}
-          </EventlyText>
+          </AppText>
         ) : null}
         {/* Only when there are two different prices to sit between. */}
         {model.spreadLabel ? (
-          <EventlyText variant="caption" style={s.spread}>
+          <AppText variant="bodySmall" style={s.spread}>
             {model.spreadLabel}
-          </EventlyText>
+          </AppText>
         ) : null}
         {model.isDecided ? (
-          <EventlyText variant="caption" style={s.decidedNote}>
+          <AppText variant="bodySmall" style={s.decidedNote}>
             {COPY.decidedNote}
-          </EventlyText>
+          </AppText>
         ) : null}
       </View>
 
@@ -182,16 +182,16 @@ export function CompareQuotesScreen() {
           accessibilityLabel={LINE_BY_LINE_ENTRY}
         >
           <EventlyIcon name="table-column" size={17} color={COMPARE_ACCENT} />
-          <EventlyText variant="caption" style={entry.label}>
+          <AppText variant="body" style={entry.label}>
             {LINE_BY_LINE_ENTRY}
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
       ) : null}
 
       {acceptError ? (
-        <EventlyText variant="caption" style={s.acceptError}>
+        <AppText variant="caption" style={s.acceptError}>
           {COPY.acceptFailed}
-        </EventlyText>
+        </AppText>
       ) : null}
 
       <ScrollView

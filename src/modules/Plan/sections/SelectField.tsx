@@ -1,5 +1,5 @@
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { PLAN_ACCENT, PLAN_TEXT_MUTED } from '../constants';
 import { eventDetailsStyles } from '../styles';
 
@@ -48,13 +48,13 @@ export function SelectField({
       accessibilityRole="button"
       accessibilityLabel={`${caption}. ${value || placeholder}`}
     >
-      <EventlyText
-        variant="caption"
+      <AppText
+        variant="overline"
         style={eventDetailsStyles.caption}
         numberOfLines={1}
       >
         {caption}
-      </EventlyText>
+      </AppText>
 
       <View style={eventDetailsStyles.controlValueRow}>
         <EventlyIcon
@@ -62,7 +62,7 @@ export function SelectField({
           size={14}
           color={filled ? PLAN_ACCENT : PLAN_TEXT_MUTED}
         />
-        <EventlyText
+        <AppText
           variant="body"
           style={
             filled
@@ -72,7 +72,7 @@ export function SelectField({
           numberOfLines={1}
         >
           {value || placeholder}
-        </EventlyText>
+        </AppText>
         {showChevron ? (
           <EventlyIcon name="chevron-down" size={15} color={PLAN_TEXT_MUTED} />
         ) : null}

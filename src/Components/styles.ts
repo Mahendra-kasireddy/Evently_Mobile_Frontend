@@ -1,5 +1,14 @@
 import { StyleSheet } from 'react-native';
-import { brand, colors, fontFor, layout, spacing, typography } from '../theme';
+import {
+  brand,
+  colors,
+  layout,
+  spacing,
+  typography,
+  inputTypography,
+  fontWeights,
+  textColor,
+} from '../theme';
 
 export const appHeaderStyles = StyleSheet.create({
   container: {
@@ -25,8 +34,8 @@ export const appHeaderStyles = StyleSheet.create({
   },
   backButtonPressed: { opacity: 0.6 },
   titleCol: { flexShrink: 1 },
-  title: { color: colors.text, flexShrink: 1 },
-  subtitle: { color: colors.textMuted, marginTop: 1 },
+  title: { color: textColor.textPrimary, flexShrink: 1 },
+  subtitle: { color: textColor.textSecondary, marginTop: 1 },
   rightElement: { marginLeft: spacing.md },
 });
 
@@ -41,13 +50,13 @@ export const eventlyButtonStyles = StyleSheet.create({
   },
   disabled: { opacity: 0.5 },
   primary: { backgroundColor: colors.primary },
-  primaryText: { color: colors.onPrimary },
+  primaryText: { color: textColor.textOnPrimary },
   outline: {
     borderWidth: 1,
     borderColor: colors.primary,
     backgroundColor: colors.background,
   },
-  outlineText: { color: colors.primary },
+  outlineText: { color: textColor.textLink },
   danger: {
     borderWidth: 1,
     borderColor: colors.danger,
@@ -58,12 +67,10 @@ export const eventlyButtonStyles = StyleSheet.create({
 
 export const eventlyTextInputStyles = StyleSheet.create({
   base: {
-    ...typography.input,
-    // A TextInput is not an EventlyText, so nothing resolves its weight into a
-    // Poppins face for it — without this the field falls back to the system font
-    // and the form looks like it belongs to a different app.
-    fontFamily: fontFor(typography.input.fontWeight),
-    color: colors.text,
+    // A TextInput is not an AppText, so it takes the Inter face from the
+    // token directly — without it the field falls back to the system font.
+    ...inputTypography.bodyLarge,
+    color: textColor.textPrimary,
     minHeight: layout.inputHeight,
     borderWidth: 1,
     borderColor: colors.border,
@@ -114,14 +121,14 @@ export const calendarSheetStyles = StyleSheet.create({
     backgroundColor: brand.borderStrong,
     marginBottom: spacing.md,
   },
-  title: { color: brand.navy, marginBottom: spacing.md },
+  title: { color: textColor.textPrimary, marginBottom: spacing.md },
   headRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: spacing.md,
   },
-  monthLabel: { color: brand.navy },
+  monthLabel: { color: textColor.textPrimary },
   navButton: {
     width: 32,
     height: 32,
@@ -150,7 +157,7 @@ export const calendarSheetStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   daySelected: { backgroundColor: brand.accent },
-  dayText: { color: brand.navy, fontSize: 14, lineHeight: 20 },
+  dayText: { color: textColor.textPrimary, ...typography.body },
   dayTextDisabled: { color: brand.borderStrong },
-  dayTextSelected: { color: brand.onAccent, fontWeight: '700' },
+  dayTextSelected: { color: textColor.textOnPrimary, ...fontWeights.bold },
 });

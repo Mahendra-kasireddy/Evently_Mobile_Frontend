@@ -1,6 +1,13 @@
 import { Platform, StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { brand, spacing } from '../../theme';
+import {
+  brand,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+  inputTypography,
+} from '../../theme';
 
 /*
  * Sign-in, as designed: a warm cream page, a serif wordmark and headings,
@@ -12,9 +19,6 @@ export const AUTH_MUTED = '#6b7280';
 export const AUTH_ACCENT = '#e2683c';
 export const AUTH_ACCENT_SOFT = '#fbe7dd';
 export const AUTH_BORDER = '#ece6e1';
-
-/** Serif for the wordmark and headings — the platform's own, nothing bundled. */
-export const AUTH_SERIF = Platform.select({ ios: 'Georgia', android: 'serif' });
 
 export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: AUTH_CANVAS },
@@ -43,7 +47,7 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#fdecea',
   },
-  errorText: { color: '#b3261e', flex: 1, fontSize: 13, lineHeight: 19 },
+  errorText: { color: textColor.textError, flex: 1, ...typography.caption },
 });
 
 /** The round photo tucked into the top-right corner of the number step. */
@@ -74,11 +78,8 @@ export const heroStyles = StyleSheet.create({
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   logoMark: { width: 46, height: 46 },
   wordmark: {
-    fontSize: 34,
-    lineHeight: 42,
-    fontWeight: '700',
-    color: AUTH_NAVY,
-    letterSpacing: -0.5,
+    ...typography.display,
+    color: textColor.textPrimary,
   },
   divider: {
     flexDirection: 'row',
@@ -88,25 +89,21 @@ export const heroStyles = StyleSheet.create({
   },
   rule: { width: 28, height: 1.5, borderRadius: 1, backgroundColor: '#f2a582' },
   title: {
-    fontFamily: AUTH_SERIF,
-    fontWeight: '700',
-    fontSize: 32,
-    lineHeight: 40,
-    color: AUTH_NAVY,
+    ...typography.display,
+    color: textColor.textPrimary,
     textAlign: 'center',
     marginTop: spacing.md,
   },
   titleGap: { marginTop: spacing.lg },
   subtitle: {
-    color: '#5b6478',
-    fontSize: 16,
-    lineHeight: 24,
+    color: textColor.textSecondary,
+    ...typography.bodyLarge,
     textAlign: 'center',
     marginTop: spacing.sm,
     marginBottom: spacing.xl,
     paddingHorizontal: spacing.lg,
   },
-  subtitleStrong: { color: AUTH_NAVY, fontWeight: '700' },
+  subtitleStrong: { color: textColor.textPrimary, ...fontWeights.bold },
   /* The OTP step's picture: a phone with a message on it, on a peach disc. */
   art: { alignItems: 'center', marginTop: spacing.sm },
   artDisc: {
@@ -168,12 +165,10 @@ export const fieldStyles = StyleSheet.create({
     paddingRight: spacing.s12,
     height: '100%',
   },
-  flag: { fontSize: 18, lineHeight: 22 },
+  flag: { ...typography.h3 },
   dialCode: {
-    color: AUTH_NAVY,
-    fontSize: 15,
-    fontWeight: '600',
-    lineHeight: 20,
+    color: textColor.textPrimary,
+    ...typography.h3,
   },
   divider: { width: 1, height: 26, backgroundColor: AUTH_BORDER },
   input: {
@@ -183,8 +178,8 @@ export const fieldStyles = StyleSheet.create({
     paddingVertical: 0,
     borderWidth: 0,
     backgroundColor: 'transparent',
-    color: AUTH_NAVY,
-    fontSize: 16,
+    color: textColor.textPrimary,
+    ...inputTypography.bodyLarge,
   },
   /* The name step's single field. */
   nameInput: {
@@ -194,8 +189,8 @@ export const fieldStyles = StyleSheet.create({
     borderColor: AUTH_BORDER,
     backgroundColor: '#ffffff',
     paddingHorizontal: spacing.md,
-    color: AUTH_NAVY,
-    fontSize: 16,
+    color: textColor.textPrimary,
+    ...inputTypography.bodyLarge,
   },
 });
 
@@ -219,10 +214,8 @@ export const otpStyles = StyleSheet.create({
   boxFilled: { borderColor: AUTH_NAVY },
   boxActive: { borderColor: AUTH_ACCENT },
   boxText: {
-    color: AUTH_NAVY,
-    fontSize: 22,
-    fontWeight: '700',
-    lineHeight: 28,
+    color: textColor.textPrimary,
+    ...typography.h2,
   },
   hiddenInput: {
     position: 'absolute',
@@ -243,22 +236,24 @@ export const otpStyles = StyleSheet.create({
     marginTop: spacing.lg,
     marginBottom: spacing.lg,
   },
-  resendLead: { color: AUTH_MUTED, fontSize: 13.5, lineHeight: 19 },
+  resendLead: { color: textColor.textSecondary, ...typography.bodySmall },
   resendLink: {
     color: AUTH_ACCENT,
-    fontWeight: '700',
-    fontSize: 13.5,
-    lineHeight: 19,
+    ...typography.buttonSmall,
   },
-  resendWait: { color: AUTH_MUTED, fontSize: 13.5, lineHeight: 19 },
-  devHint: { color: AUTH_MUTED, textAlign: 'center', marginTop: spacing.md },
+  resendWait: { color: textColor.textSecondary, ...typography.bodySmall },
+  devHint: {
+    color: textColor.textSecondary,
+    textAlign: 'center',
+    marginTop: spacing.md,
+  },
   safetyRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
   },
-  safetyText: { color: AUTH_MUTED, fontSize: 12.5, lineHeight: 18 },
+  safetyText: { color: textColor.textSecondary, ...typography.caption },
 });
 
 /** The primary action: a warm gradient, left to right. */
@@ -292,7 +287,7 @@ export const ctaStyles = StyleSheet.create({
     }),
   },
   buttonPressed: { opacity: 0.88 },
-  label: { color: '#ffffff', fontSize: 17, fontWeight: '700', lineHeight: 22 },
+  label: { color: textColor.textOnPrimary, ...typography.h3 },
   arrow: { position: 'absolute', right: 22 },
 });
 
@@ -305,26 +300,24 @@ export const businessEntryStyles = StyleSheet.create({
     gap: 4,
     paddingVertical: spacing.xs,
   },
-  lead: { color: AUTH_MUTED, fontSize: 13, lineHeight: 18 },
+  lead: { color: textColor.textSecondary, ...typography.bodySmall },
   action: {
     color: AUTH_ACCENT,
-    fontWeight: '700',
-    fontSize: 13,
-    lineHeight: 18,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
   },
 });
 
 export const termsStyles = StyleSheet.create({
   text: {
-    color: AUTH_MUTED,
+    color: textColor.textSecondary,
     textAlign: 'center',
-    fontSize: 12.5,
-    lineHeight: 19,
+    ...typography.caption,
   },
   link: {
     color: AUTH_ACCENT,
     textDecorationLine: 'underline',
-    fontWeight: '600',
+    ...fontWeights.semibold,
   },
 });
 
@@ -349,7 +342,7 @@ export const dialSheetStyles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: brand.borderStrong,
   },
-  title: { color: brand.navy, marginTop: spacing.sm },
+  title: { color: textColor.textPrimary, marginTop: spacing.sm },
   row: {
     ...globalStyles.row,
     gap: spacing.sm,
@@ -360,6 +353,6 @@ export const dialSheetStyles = StyleSheet.create({
     padding: spacing.md,
   },
   rowSelected: { borderColor: brand.accent, backgroundColor: brand.accentSoft },
-  rowLabel: { flex: 1, color: brand.navy, fontWeight: '600' },
-  note: { color: brand.textMuted, textAlign: 'center' },
+  rowLabel: { flex: 1, color: textColor.textPrimary, ...fontWeights.semibold },
+  note: { color: textColor.textSecondary, textAlign: 'center' },
 });

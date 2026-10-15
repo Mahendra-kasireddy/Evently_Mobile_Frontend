@@ -1,5 +1,5 @@
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyText } from '../../../Components';
+import { AppText } from '../../../Components';
 import { sectionHeadStyles as s } from '../styles';
 
 interface BookingSectionHeadProps {
@@ -25,17 +25,17 @@ export function BookingSectionHead({
   return (
     <View style={s.row}>
       <View style={s.left}>
-        <EventlyText variant="subtitle" style={s.title} numberOfLines={1}>
+        <AppText variant="h3" style={s.title} numberOfLines={1}>
           {title}
-        </EventlyText>
+        </AppText>
         {count ? (
           <View style={s.count}>
-            <EventlyText
-              variant="caption"
+            <AppText
+              variant="label"
               style={[s.countText, { color: gradient[1] }]}
             >
               {count}
-            </EventlyText>
+            </AppText>
           </View>
         ) : null}
       </View>
@@ -46,12 +46,12 @@ export function BookingSectionHead({
           accessibilityRole="button"
           accessibilityLabel={`See all ${title}`}
         >
-          <EventlyText
-            variant="caption"
+          <AppText
+            variant="bodySmall"
             style={[s.seeAll, { color: gradient[1] }]}
           >
             See all
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
       ) : null}
     </View>

@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { EventlyIcon, EventlyImage, EventlyText } from '../../../Components';
+import { EventlyIcon, EventlyImage, AppText } from '../../../Components';
 import { colors } from '../../../theme';
 import { absoluteFileUrl } from '../../../services/urls';
 import { INVITATION_COPY as COPY, MEMORY_CAPTION_MAX } from '../constants';
@@ -64,12 +64,12 @@ export function AddMemorySheet({
           style={sheetStyles.container}
           onPress={e => e.stopPropagation()}
         >
-          <EventlyText variant="h2" style={s.sheetTitle}>
+          <AppText variant="h3" style={s.sheetTitle}>
             {COPY.memoryAddTitle}
-          </EventlyText>
-          <EventlyText variant="caption" style={s.sheetLead}>
+          </AppText>
+          <AppText variant="caption" style={s.sheetLead}>
             {COPY.memoryAddLead}
-          </EventlyText>
+          </AppText>
 
           {options.map(([icon, name, note, onPress]) => (
             <TouchableOpacity
@@ -84,12 +84,12 @@ export function AddMemorySheet({
                 <EventlyIcon name={icon} size={19} color={colors.primary} />
               </View>
               <View style={s.optionText}>
-                <EventlyText variant="subtitle" style={s.optionName}>
+                <AppText variant="body" style={s.optionName}>
                   {name}
-                </EventlyText>
-                <EventlyText variant="caption" style={s.optionNote}>
+                </AppText>
+                <AppText variant="caption" style={s.optionNote}>
                   {note}
-                </EventlyText>
+                </AppText>
               </View>
               <EventlyIcon
                 name="chevron-right"
@@ -154,12 +154,12 @@ export function ConfirmMemorySheet({
       <View style={sheetStyles.backdrop}>
         <View style={sheetStyles.container}>
           <ScrollView showsVerticalScrollIndicator={false}>
-            <EventlyText variant="h2" style={s.sheetTitle}>
+            <AppText variant="h3" style={s.sheetTitle}>
               {COPY.memoryConfirmTitle}
-            </EventlyText>
-            <EventlyText variant="caption" style={s.sheetLead}>
+            </AppText>
+            <AppText variant="caption" style={s.sheetLead}>
               {COPY.memoryConfirmLead}
-            </EventlyText>
+            </AppText>
 
             {picked ? (
               picked.isClip ? (
@@ -172,10 +172,10 @@ export function ConfirmMemorySheet({
                     size={38}
                     color="rgba(255,255,255,0.9)"
                   />
-                  <EventlyText variant="caption" style={s.lengthText}>
+                  <AppText variant="caption" style={s.lengthText}>
                     {picked.reel ? COPY.memoryReel : COPY.memoryVideos}
                     {picked.durationSec ? ` · ${picked.durationSec}s` : ''}
-                  </EventlyText>
+                  </AppText>
                 </View>
               ) : (
                 <EventlyImage
@@ -186,9 +186,9 @@ export function ConfirmMemorySheet({
               )
             ) : null}
 
-            <EventlyText variant="caption" style={s.fieldLabel}>
+            <AppText variant="overline" style={s.fieldLabel}>
               {COPY.memoryWhichEvent}
-            </EventlyText>
+            </AppText>
             <View style={s.eventRow}>
               {[{ id: '', name: COPY.memoryTheCelebration }, ...subEvents].map(
                 e => {
@@ -202,21 +202,21 @@ export function ConfirmMemorySheet({
                       accessibilityRole="button"
                       accessibilityState={{ selected: on }}
                     >
-                      <EventlyText
-                        variant="caption"
+                      <AppText
+                        variant="label"
                         style={[s.tabText, on && s.tabTextOn]}
                       >
                         {e.name}
-                      </EventlyText>
+                      </AppText>
                     </TouchableOpacity>
                   );
                 },
               )}
             </View>
 
-            <EventlyText variant="caption" style={s.fieldLabel}>
+            <AppText variant="overline" style={s.fieldLabel}>
               {COPY.memoryCaption}
-            </EventlyText>
+            </AppText>
             <TextInput
               style={s.captionInput}
               value={caption}
@@ -227,12 +227,12 @@ export function ConfirmMemorySheet({
               maxLength={MEMORY_CAPTION_MAX + 20}
               editable={!busy}
             />
-            <EventlyText
+            <AppText
               variant="caption"
               style={[s.counter, over && s.counterOver]}
             >
               {caption.length} / {MEMORY_CAPTION_MAX}
-            </EventlyText>
+            </AppText>
 
             {busy ? (
               <>
@@ -244,20 +244,17 @@ export function ConfirmMemorySheet({
                     ]}
                   />
                 </View>
-                <EventlyText variant="caption" style={s.sayText}>
+                <AppText variant="caption" style={s.sayText}>
                   {COPY.memoryAdding}
-                </EventlyText>
+                </AppText>
               </>
             ) : null}
 
             {error ? (
               <View style={[s.say, s.sayWarn]}>
-                <EventlyText
-                  variant="caption"
-                  style={[s.sayText, s.sayTextWarn]}
-                >
+                <AppText variant="caption" style={[s.sayText, s.sayTextWarn]}>
                   {error}
-                </EventlyText>
+                </AppText>
               </View>
             ) : null}
 
@@ -268,9 +265,9 @@ export function ConfirmMemorySheet({
                 onPress={busy ? onCancel : onRetake}
                 testID="memory-retake"
               >
-                <EventlyText variant="subtitle" style={s.sheetGhostText}>
+                <AppText variant="bodySmall" style={s.sheetGhostText}>
                   {busy ? COPY.memoryCancel : COPY.memoryRetake}
-                </EventlyText>
+                </AppText>
               </TouchableOpacity>
               <TouchableOpacity
                 style={s.sheetPrimary}
@@ -279,9 +276,9 @@ export function ConfirmMemorySheet({
                 onPress={() => onSend(subEventId, caption.trim())}
                 testID="memory-send"
               >
-                <EventlyText variant="subtitle" style={s.sheetPrimaryText}>
+                <AppText variant="bodySmall" style={s.sheetPrimaryText}>
                   {busy ? COPY.memoryAdding : COPY.memoryShare}
-                </EventlyText>
+                </AppText>
               </TouchableOpacity>
             </View>
           </ScrollView>
@@ -356,13 +353,13 @@ export function MemoryViewer({
                 <EventlyIcon name="chevron-left" size={18} color="#fff" />
               </TouchableOpacity>
 
-              <EventlyText
-                variant="caption"
+              <AppText
+                variant="bodySmall"
                 style={s.viewerCaption}
                 numberOfLines={2}
               >
                 {item.caption || COPY.memoryPosition(index + 1, items.length)}
-              </EventlyText>
+              </AppText>
 
               <TouchableOpacity
                 style={s.viewerPill}
@@ -381,9 +378,9 @@ export function MemoryViewer({
                   the host is not a guest, so this is shown and not offered. */}
               <View style={s.viewerPill}>
                 <EventlyIcon name="heart-outline" size={15} color="#fff" />
-                <EventlyText variant="caption" style={s.viewerPillText}>
+                <AppText variant="label" style={s.viewerPillText}>
                   {item.likes}
-                </EventlyText>
+                </AppText>
               </View>
               {canDownload ? (
                 <TouchableOpacity
@@ -393,9 +390,9 @@ export function MemoryViewer({
                   testID="memory-download"
                 >
                   <EventlyIcon name="download-outline" size={15} color="#fff" />
-                  <EventlyText variant="caption" style={s.viewerPillText}>
+                  <AppText variant="label" style={s.viewerPillText}>
                     {COPY.memorySave}
-                  </EventlyText>
+                  </AppText>
                 </TouchableOpacity>
               ) : null}
             </View>

@@ -11,46 +11,100 @@ import {
   type NativeSyntheticEvent,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EventlyButton, EventlyIcon, EventlyText } from '../../Components';
+import { EventlyButton, EventlyIcon, AppText } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
 import { useAppDispatch } from '../../store/hooks';
 import { setHasSeenOnboarding } from '../../store/onboardingSlice';
-import { ONBOARDING_ACCENT, ONBOARDING_ACCENT_WARM, ONBOARDING_SLIDES } from './constants';
+import {
+  ONBOARDING_ACCENT,
+  ONBOARDING_ACCENT_WARM,
+  ONBOARDING_SLIDES,
+} from './constants';
 import { styles } from './styles';
 import type { OnboardingSlide } from './types';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const AnimatedFlatList = Animated.createAnimatedComponent(FlatList<OnboardingSlide>);
+const AnimatedFlatList = Animated.createAnimatedComponent(
+  FlatList<OnboardingSlide>,
+);
 
 type OnboardingNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-function OnboardingSlideItem({ item, index, scrollX }: { item: OnboardingSlide; index: number; scrollX: Animated.Value }) {
-  const inputRange = [(index - 1) * SCREEN_WIDTH, index * SCREEN_WIDTH, (index + 1) * SCREEN_WIDTH];
-  const opacity = scrollX.interpolate({ inputRange, outputRange: [0.25, 1, 0.25], extrapolate: 'clamp' });
-  const scale = scrollX.interpolate({ inputRange, outputRange: [0.82, 1, 0.82], extrapolate: 'clamp' });
-  const translateY = scrollX.interpolate({ inputRange, outputRange: [18, 0, 18], extrapolate: 'clamp' });
+function OnboardingSlideItem({
+  item,
+  index,
+  scrollX,
+}: {
+  item: OnboardingSlide;
+  index: number;
+  scrollX: Animated.Value;
+}) {
+  const inputRange = [
+    (index - 1) * SCREEN_WIDTH,
+    index * SCREEN_WIDTH,
+    (index + 1) * SCREEN_WIDTH,
+  ];
+  const opacity = scrollX.interpolate({
+    inputRange,
+    outputRange: [0.25, 1, 0.25],
+    extrapolate: 'clamp',
+  });
+  const scale = scrollX.interpolate({
+    inputRange,
+    outputRange: [0.82, 1, 0.82],
+    extrapolate: 'clamp',
+  });
+  const translateY = scrollX.interpolate({
+    inputRange,
+    outputRange: [18, 0, 18],
+    extrapolate: 'clamp',
+  });
 
   return (
     <View style={styles.slide}>
-      <Animated.View style={[styles.iconCircle, { opacity, transform: [{ scale }] }]}>
-        <EventlyIcon name={item.icon} size={40} color={ONBOARDING_ACCENT_WARM} />
+      <Animated.View
+        style={[styles.iconCircle, { opacity, transform: [{ scale }] }]}
+      >
+        <EventlyIcon
+          name={item.icon}
+          size={40}
+          color={ONBOARDING_ACCENT_WARM}
+        />
       </Animated.View>
       <Animated.View style={{ opacity, transform: [{ translateY }] }}>
-        <EventlyText variant="h1" style={styles.heading}>
+        <AppText variant="h2" style={styles.heading}>
           {item.heading}
-        </EventlyText>
-        <EventlyText variant="body" style={styles.subtitle}>
+        </AppText>
+        <AppText variant="body" style={styles.subtitle}>
           {item.subtitle}
-        </EventlyText>
+        </AppText>
       </Animated.View>
     </View>
   );
 }
 
-function OnboardingDot({ index, scrollX }: { index: number; scrollX: Animated.Value }) {
-  const inputRange = [(index - 1) * SCREEN_WIDTH, index * SCREEN_WIDTH, (index + 1) * SCREEN_WIDTH];
-  const width = scrollX.interpolate({ inputRange, outputRange: [8, 22, 8], extrapolate: 'clamp' });
-  const opacity = scrollX.interpolate({ inputRange, outputRange: [0.4, 1, 0.4], extrapolate: 'clamp' });
+function OnboardingDot({
+  index,
+  scrollX,
+}: {
+  index: number;
+  scrollX: Animated.Value;
+}) {
+  const inputRange = [
+    (index - 1) * SCREEN_WIDTH,
+    index * SCREEN_WIDTH,
+    (index + 1) * SCREEN_WIDTH,
+  ];
+  const width = scrollX.interpolate({
+    inputRange,
+    outputRange: [8, 22, 8],
+    extrapolate: 'clamp',
+  });
+  const opacity = scrollX.interpolate({
+    inputRange,
+    outputRange: [0.4, 1, 0.4],
+    extrapolate: 'clamp',
+  });
   return <Animated.View style={[styles.dot, { width, opacity }]} />;
 }
 
@@ -75,7 +129,9 @@ export function OnboardingScreen() {
     listRef.current?.scrollToIndex({ index: activeIndex + 1, animated: true });
   };
 
-  const handleMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const handleMomentumScrollEnd = (
+    event: NativeSyntheticEvent<NativeScrollEvent>,
+  ) => {
     const width = event.nativeEvent.layoutMeasurement.width;
     if (!width) return;
     const index = Math.round(event.nativeEvent.contentOffset.x / width);
@@ -86,10 +142,13 @@ export function OnboardingScreen() {
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.skipRow}>
         {isLastSlide ? null : (
-          <TouchableOpacity onPress={finish} accessibilityLabel="Skip onboarding">
-            <EventlyText variant="body" style={styles.skipText}>
+          <TouchableOpacity
+            onPress={finish}
+            accessibilityLabel="Skip onboarding"
+          >
+            <AppText variant="body" style={styles.skipText}>
               Skip
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         )}
       </View>
@@ -101,10 +160,19 @@ export function OnboardingScreen() {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         keyExtractor={(slide: OnboardingSlide) => slide.key}
-        onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: false })}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+          { useNativeDriver: false },
+        )}
         scrollEventThrottle={16}
         onMomentumScrollEnd={handleMomentumScrollEnd}
-        renderItem={({ item, index }: { item: OnboardingSlide; index: number }) => (
+        renderItem={({
+          item,
+          index,
+        }: {
+          item: OnboardingSlide;
+          index: number;
+        }) => (
           <OnboardingSlideItem item={item} index={index} scrollX={scrollX} />
         )}
       />

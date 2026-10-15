@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Confetti,
   EventlyIcon,
-  EventlyText,
+  AppText,
   PressableScale,
   useReducedMotion,
 } from '../../../Components';
@@ -39,14 +39,26 @@ function LiveDot({ color, active }: { color: string; active: boolean }) {
     if (!active || reduceMotion) return undefined;
     const loop = Animated.loop(
       Animated.sequence([
-        Animated.timing(pulse, { toValue: 0.25, duration: 800, useNativeDriver: true }),
-        Animated.timing(pulse, { toValue: 1, duration: 800, useNativeDriver: true }),
+        Animated.timing(pulse, {
+          toValue: 0.25,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulse, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
       ]),
     );
     loop.start();
     return () => loop.stop();
   }, [active, reduceMotion, pulse]);
-  return <Animated.View style={[s.statusDot, { backgroundColor: color, opacity: pulse }]} />;
+  return (
+    <Animated.View
+      style={[s.statusDot, { backgroundColor: color, opacity: pulse }]}
+    />
+  );
 }
 
 /** One of the three figures under the poster, as a ring you can read at a glance. */
@@ -63,14 +75,20 @@ function Stat({
 }) {
   return (
     <View style={s.stat}>
-      <ProgressRing percent={percent} size={58} stroke={6} colors={colors} trackColor="#f1edf8">
-        <EventlyText style={s.statValue} numberOfLines={1}>
+      <ProgressRing
+        percent={percent}
+        size={58}
+        stroke={6}
+        colors={colors}
+        trackColor="#f1edf8"
+      >
+        <AppText variant="bodySmall" style={s.statValue} numberOfLines={1}>
           {value}
-        </EventlyText>
+        </AppText>
       </ProgressRing>
-      <EventlyText variant="caption" style={s.statLabel}>
+      <AppText variant="label" style={s.statLabel}>
         {label}
-      </EventlyText>
+      </AppText>
     </View>
   );
 }
@@ -98,7 +116,8 @@ export function WorkspaceOverview({
   const insets = useSafeAreaInsets();
   const theme = OCCASION_THEME[data.art] ?? OCCASION_THEME.wedding;
   const statusColor = WORKSPACE_STATUS_COLOR[data.status] ?? '#ffffff';
-  const pending = data.status === 'pending' || data.status === 'awaiting_organizer';
+  const pending =
+    data.status === 'pending' || data.status === 'awaiting_organizer';
   const days = data.daysToGo;
 
   return (
@@ -114,12 +133,26 @@ export function WorkspaceOverview({
                 <Stop offset="1" stopColor={theme.to} />
               </LinearGradient>
             </Defs>
-            <Rect x={0} y={0} width="100%" height="100%" fill="url(#wsPoster)" />
+            <Rect
+              x={0}
+              y={0}
+              width="100%"
+              height="100%"
+              fill="url(#wsPoster)"
+            />
           </Svg>
         </View>
-        <View style={[s.glow, s.glowOne, { backgroundColor: theme.glow }]} pointerEvents="none" />
+        <View
+          style={[s.glow, s.glowOne, { backgroundColor: theme.glow }]}
+          pointerEvents="none"
+        />
         <View style={[s.glow, s.glowTwo]} pointerEvents="none" />
-        <Image source={HERO_ART} style={s.art} resizeMode="cover" accessible={false} />
+        <Image
+          source={HERO_ART}
+          style={s.art}
+          resizeMode="cover"
+          accessible={false}
+        />
         <View style={s.confetti} pointerEvents="none">
           <Confetti />
         </View>
@@ -133,15 +166,19 @@ export function WorkspaceOverview({
           >
             <EventlyIcon name="chevron-left" size={24} color="#ffffff" />
           </PressableScale>
-          <EventlyText variant="caption" style={s.topTitle}>
+          <AppText variant="overline" style={s.topTitle}>
             {WORKSPACE_COPY.screenTitle}
-          </EventlyText>
+          </AppText>
           {data.ref ? (
             <View style={s.refChip}>
-              <EventlyIcon name="pound" size={12} color="rgba(255,255,255,0.85)" />
-              <EventlyText variant="caption" style={s.refText} numberOfLines={1}>
+              <EventlyIcon
+                name="pound"
+                size={12}
+                color="rgba(255,255,255,0.85)"
+              />
+              <AppText variant="label" style={s.refText} numberOfLines={1}>
                 {data.ref}
-              </EventlyText>
+              </AppText>
             </View>
           ) : (
             <View style={s.topSpacer} />
@@ -149,20 +186,30 @@ export function WorkspaceOverview({
         </View>
 
         <View style={s.eyebrowRow}>
-          <EventlyText style={s.emoji}>{theme.emoji}</EventlyText>
+          <AppText variant="h1" style={s.emoji}>
+            {theme.emoji}
+          </AppText>
           {data.statusLabel ? (
             <View style={s.statusPill}>
-              <LiveDot color={statusColor === '#ffffff' ? '#ffffff' : statusColor} active={pending} />
-              <EventlyText variant="caption" style={s.statusText} numberOfLines={1}>
+              <LiveDot
+                color={statusColor === '#ffffff' ? '#ffffff' : statusColor}
+                active={pending}
+              />
+              <AppText variant="label" style={s.statusText} numberOfLines={1}>
                 {data.statusLabel}
-              </EventlyText>
+              </AppText>
             </View>
           ) : null}
         </View>
 
-        <EventlyText variant="h1" style={s.title} numberOfLines={2} accessibilityRole="header">
+        <AppText
+          variant="display"
+          style={s.title}
+          numberOfLines={2}
+          accessibilityRole="header"
+        >
           {data.title}
-        </EventlyText>
+        </AppText>
 
         <View style={s.countRow}>
           {days != null ? (
@@ -176,24 +223,28 @@ export function WorkspaceOverview({
               <View style={s.countInner}>
                 {days > 0 ? (
                   <>
-                    <EventlyText style={s.countNumber}>{days}</EventlyText>
-                    <EventlyText variant="caption" style={s.countLabel}>
+                    <AppText variant="display" style={s.countNumber}>
+                      {days}
+                    </AppText>
+                    <AppText variant="label" style={s.countLabel}>
                       {P.daysToGo(days)}
-                    </EventlyText>
+                    </AppText>
                   </>
                 ) : (
-                  <EventlyText variant="caption" style={s.countToday}>
+                  <AppText variant="bodySmall" style={s.countToday}>
                     {days === 0 ? P.today : P.past}
-                  </EventlyText>
+                  </AppText>
                 )}
               </View>
             </ProgressRing>
           ) : data.dateChip ? (
             <View style={s.dateBlock}>
-              <EventlyText variant="caption" style={s.dateMonth}>
+              <AppText variant="label" style={s.dateMonth}>
                 {data.dateChip.month}
-              </EventlyText>
-              <EventlyText style={s.dateDay}>{data.dateChip.day}</EventlyText>
+              </AppText>
+              <AppText variant="display" style={s.dateDay}>
+                {data.dateChip.day}
+              </AppText>
             </View>
           ) : null}
 
@@ -201,11 +252,19 @@ export function WorkspaceOverview({
             {data.dateLabel ? (
               <View style={s.fact}>
                 <View style={s.factIcon}>
-                  <EventlyIcon name="calendar-heart" size={15} color="#ffffff" />
+                  <EventlyIcon
+                    name="calendar-heart"
+                    size={15}
+                    color="#ffffff"
+                  />
                 </View>
-                <EventlyText variant="body" style={s.factText} numberOfLines={2}>
+                <AppText
+                  variant="bodySmall"
+                  style={s.factText}
+                  numberOfLines={2}
+                >
                   {data.dateLabel}
-                </EventlyText>
+                </AppText>
               </View>
             ) : null}
             {data.venue ? (
@@ -213,9 +272,13 @@ export function WorkspaceOverview({
                 <View style={s.factIcon}>
                   <EventlyIcon name="map-marker" size={15} color="#ffffff" />
                 </View>
-                <EventlyText variant="body" style={s.factText} numberOfLines={3}>
+                <AppText
+                  variant="bodySmall"
+                  style={s.factText}
+                  numberOfLines={3}
+                >
                   {data.venue}
-                </EventlyText>
+                </AppText>
               </View>
             ) : null}
             {data.payment.totalLabel ? (
@@ -223,9 +286,13 @@ export function WorkspaceOverview({
                 <View style={s.factIcon}>
                   <EventlyIcon name="wallet" size={15} color="#ffffff" />
                 </View>
-                <EventlyText variant="body" style={[s.factText, s.factStrong]} numberOfLines={1}>
+                <AppText
+                  variant="bodySmall"
+                  style={[s.factText, s.factStrong]}
+                  numberOfLines={1}
+                >
                   {data.payment.totalLabel}
-                </EventlyText>
+                </AppText>
               </View>
             ) : null}
           </View>
@@ -233,16 +300,20 @@ export function WorkspaceOverview({
 
         {data.organizerName ? (
           <View style={s.organizerBar}>
-            <View style={[s.avatar, { backgroundColor: data.organizerAvatarColor }]}>
-              <EventlyText style={s.avatarText}>{data.organizerInitials || '·'}</EventlyText>
+            <View
+              style={[s.avatar, { backgroundColor: data.organizerAvatarColor }]}
+            >
+              <AppText variant="body" style={s.avatarText}>
+                {data.organizerInitials || '·'}
+              </AppText>
             </View>
             <View style={s.organizerText}>
-              <EventlyText variant="caption" style={s.organizerLead}>
+              <AppText variant="caption" style={s.organizerLead}>
                 Organized by
-              </EventlyText>
-              <EventlyText variant="subtitle" style={s.organizerName} numberOfLines={1}>
+              </AppText>
+              <AppText variant="h3" style={s.organizerName} numberOfLines={1}>
                 {data.organizerName}
-              </EventlyText>
+              </AppText>
             </View>
             {onMessage ? (
               <PressableScale
@@ -252,10 +323,17 @@ export function WorkspaceOverview({
                 accessibilityRole="button"
                 accessibilityLabel={`${P.message} ${data.organizerName}`}
               >
-                <EventlyIcon name="chat-processing-outline" size={16} color={theme.via} />
-                <EventlyText variant="caption" style={[s.messageText, { color: theme.via }]}>
+                <EventlyIcon
+                  name="chat-processing-outline"
+                  size={16}
+                  color={theme.via}
+                />
+                <AppText
+                  variant="bodySmall"
+                  style={[s.messageText, { color: theme.via }]}
+                >
                   {P.message}
-                </EventlyText>
+                </AppText>
               </PressableScale>
             ) : null}
           </View>
@@ -264,7 +342,12 @@ export function WorkspaceOverview({
 
       {/* Three figures, floating across the poster's foot. */}
       <View style={s.statsCard}>
-        <Stat percent={data.progress} colors={STAT_RING.ready} value={`${data.progress}%`} label={P.ready} />
+        <Stat
+          percent={data.progress}
+          colors={STAT_RING.ready}
+          value={`${data.progress}%`}
+          label={P.ready}
+        />
         {data.payment.totalLabel ? (
           <Stat
             percent={data.payment.paidPercent}
@@ -274,13 +357,16 @@ export function WorkspaceOverview({
           />
         ) : null}
         <Stat
-          percent={data.tasksTotal > 0 ? (data.tasksDone / data.tasksTotal) * 100 : 0}
+          percent={
+            data.tasksTotal > 0 ? (data.tasksDone / data.tasksTotal) * 100 : 0
+          }
           colors={STAT_RING.tasks}
-          value={data.tasksTotal > 0 ? `${data.tasksDone}/${data.tasksTotal}` : '—'}
+          value={
+            data.tasksTotal > 0 ? `${data.tasksDone}/${data.tasksTotal}` : '—'
+          }
           label={data.tasksTotal > 0 ? P.tasks : P.noTasksShort}
         />
       </View>
-
     </View>
   );
 }

@@ -13,14 +13,18 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import {
   AppHeader,
   EventlyIcon,
-  EventlyText,
+  AppText,
   FadeInUp,
   GradientFill,
   PressableScale,
 } from '../../Components';
 import { absoluteFileUrl } from '../../services/urls';
 import type { RootStackParamList } from '../../navigation/types';
-import { PUBLIC_EVENTS_COPY, TICKET_STATE_LABEL, formatEventWhen } from './constants';
+import {
+  PUBLIC_EVENTS_COPY,
+  TICKET_STATE_LABEL,
+  formatEventWhen,
+} from './constants';
 import { useMyTickets } from './hooks';
 import { TICKET_STATE_TINT, myTicketsUi as s } from './ui.styles';
 import type { MyTicket } from './types';
@@ -39,14 +43,16 @@ const TICKET_ACCENTS: Array<[string, string]> = [
 ];
 
 /** Still ahead of you: not yet used, or used today and not over. */
-const isUpcoming = (t: MyTicket) => t.state === 'upcoming' || t.state === 'checked_in';
+const isUpcoming = (t: MyTicket) =>
+  t.state === 'upcoming' || t.state === 'checked_in';
 
 /** "Today", "Tomorrow", "In 12 days" — or '' once it has passed. */
 function countdown(iso: string | null): string {
   if (!iso) return '';
   const at = new Date(iso);
   if (Number.isNaN(at.getTime())) return '';
-  const day = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const day = (d: Date) =>
+    new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
   const days = Math.round((day(at) - day(new Date())) / 86_400_000);
   if (days < 0) return '';
   if (days === 0) return 'Today';
@@ -103,7 +109,9 @@ export function MyTicketsScreen() {
           style={[s.card, faded && s.cardFaded]}
           onPress={() => open(item)}
           accessibilityRole="button"
-          accessibilityLabel={`${item.eventTitle}, ${TICKET_STATE_LABEL[item.state]}`}
+          accessibilityLabel={`${item.eventTitle}, ${
+            TICKET_STATE_LABEL[item.state]
+          }`}
           testID={`my-ticket-${item.ticketId}`}
         >
           <View style={s.cover}>
@@ -120,39 +128,45 @@ export function MyTicketsScreen() {
                     <Stop offset="1" stopColor="#0b0f24" stopOpacity={0.55} />
                   </LinearGradient>
                 </Defs>
-                <Rect x={0} y={0} width="100%" height="100%" fill={`url(#${shadeId})`} />
+                <Rect
+                  x={0}
+                  y={0}
+                  width="100%"
+                  height="100%"
+                  fill={`url(#${shadeId})`}
+                />
               </Svg>
             </View>
             {when && isUpcoming(item) ? (
               <View style={s.countdown}>
                 <EventlyIcon name="timer-sand" size={12} color="#ffffff" />
-                <EventlyText variant="caption" style={s.countdownText}>
+                <AppText variant="label" style={s.countdownText}>
                   {when}
-                </EventlyText>
+                </AppText>
               </View>
             ) : null}
           </View>
 
           <View style={s.body}>
-            <EventlyText variant="body" style={s.title} numberOfLines={2}>
+            <AppText variant="h3" style={s.title} numberOfLines={2}>
               {item.eventTitle}
-            </EventlyText>
+            </AppText>
             <View style={s.line}>
               <View style={[s.lineIcon, s.lineIconDate]}>
                 <EventlyIcon name="calendar-month" size={12} color="#e2552f" />
               </View>
-              <EventlyText variant="caption" style={s.lineText} numberOfLines={1}>
+              <AppText variant="caption" style={s.lineText} numberOfLines={1}>
                 {formatEventWhen(item.startDateTime, item.timezone)}
-              </EventlyText>
+              </AppText>
             </View>
             {where ? (
               <View style={s.line}>
                 <View style={[s.lineIcon, s.lineIconPlace]}>
                   <EventlyIcon name="map-marker" size={12} color="#6d4df2" />
                 </View>
-                <EventlyText variant="caption" style={s.lineText} numberOfLines={1}>
+                <AppText variant="caption" style={s.lineText} numberOfLines={1}>
                   {where}
-                </EventlyText>
+                </AppText>
               </View>
             ) : null}
           </View>
@@ -165,26 +179,36 @@ export function MyTicketsScreen() {
               {item.ticketTypeName ? (
                 <View style={s.typePill}>
                   <GradientFill colors={accent} direction="across" />
-                  <EventlyIcon name="ticket-confirmation" size={11} color="#ffffff" />
-                  <EventlyText variant="caption" style={s.typeText} numberOfLines={1}>
+                  <EventlyIcon
+                    name="ticket-confirmation"
+                    size={11}
+                    color="#ffffff"
+                  />
+                  <AppText variant="label" style={s.typeText} numberOfLines={1}>
                     {item.ticketTypeName}
-                  </EventlyText>
+                  </AppText>
                 </View>
               ) : null}
               <View style={[s.statePill, { backgroundColor: tint.bg }]}>
                 <View style={[s.stateDot, { backgroundColor: tint.fg }]} />
-                <EventlyText variant="caption" style={[s.stateText, { color: tint.fg }]}>
+                <AppText
+                  variant="label"
+                  style={[s.stateText, { color: tint.fg }]}
+                >
                   {TICKET_STATE_LABEL[item.state]}
-                </EventlyText>
+                </AppText>
               </View>
             </View>
             {/* Drawn as a button, pressed as part of the card. */}
             <View style={s.qr}>
-              <GradientFill colors={faded ? ['#b8c0cc', '#8a93a3'] : accent} direction="diagonal" />
+              <GradientFill
+                colors={faded ? ['#b8c0cc', '#8a93a3'] : accent}
+                direction="diagonal"
+              />
               <EventlyIcon name="qrcode" size={15} color="#ffffff" />
-              <EventlyText variant="caption" style={s.qrText}>
+              <AppText variant="label" style={s.qrText}>
                 {faded ? 'View' : 'Show QR'}
-              </EventlyText>
+              </AppText>
             </View>
           </View>
         </PressableScale>
@@ -198,10 +222,7 @@ export function MyTicketsScreen() {
       <View style={[s.header, { paddingTop: insets.top }]}>
         {/* The app's one header — the same title, size and back arrow as
             every other screen. */}
-        <AppHeader
-          title="My Tickets"
-          onBackPress={navigation.goBack}
-        />
+        <AppHeader title="My Tickets" onBackPress={navigation.goBack} />
 
         {/* A segmented switch; the chosen side fills with the gradient. */}
         <View style={s.tabs} accessibilityRole="tablist">
@@ -220,17 +241,19 @@ export function MyTicketsScreen() {
                 accessibilityRole="tab"
                 accessibilityState={{ selected: on }}
               >
-                {on ? <GradientFill colors={HERO_GRADIENT} direction="across" /> : null}
-                <EventlyText variant="caption" style={[s.tabText, on && s.tabTextOn]}>
+                {on ? (
+                  <GradientFill colors={HERO_GRADIENT} direction="across" />
+                ) : null}
+                <AppText variant="label" style={[s.tabText, on && s.tabTextOn]}>
                   {t.label}
-                </EventlyText>
+                </AppText>
                 <View style={[s.tabCount, on && s.tabCountOn]}>
-                  <EventlyText
-                    variant="caption"
+                  <AppText
+                    variant="label"
                     style={[s.tabCountText, on && s.tabCountTextOn]}
                   >
                     {t.count}
-                  </EventlyText>
+                  </AppText>
                 </View>
               </TouchableOpacity>
             );
@@ -244,34 +267,42 @@ export function MyTicketsScreen() {
         renderItem={renderItem}
         contentContainerStyle={[s.list, { paddingBottom: insets.bottom + 24 }]}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={loading} onRefresh={refetch} />}
+        refreshControl={
+          <RefreshControl refreshing={loading} onRefresh={refetch} />
+        }
         ListEmptyComponent={
           loading ? null : (
             <FadeInUp style={s.empty}>
               <View style={s.emptyIcon}>
                 <GradientFill colors={HERO_GRADIENT} direction="diagonal" />
-                <EventlyIcon name="ticket-confirmation-outline" size={30} color="#ffffff" />
+                <EventlyIcon
+                  name="ticket-confirmation-outline"
+                  size={30}
+                  color="#ffffff"
+                />
               </View>
-              <EventlyText variant="body" style={s.emptyTitle}>
+              <AppText variant="h2" style={s.emptyTitle}>
                 {error
                   ? 'We couldn’t load your tickets'
                   : tab === 'upcoming'
                   ? 'No upcoming tickets'
                   : 'No past tickets yet'}
-              </EventlyText>
-              <EventlyText variant="caption" style={s.emptyBody}>
+              </AppText>
+              <AppText variant="body" style={s.emptyBody}>
                 {error ? error.message : PUBLIC_EVENTS_COPY.ticketsEmpty}
-              </EventlyText>
+              </AppText>
               {!error ? (
                 <TouchableOpacity
                   style={s.emptyCta}
-                  onPress={() => navigation.navigate('Main', { screen: 'Events' })}
+                  onPress={() =>
+                    navigation.navigate('Main', { screen: 'Events' })
+                  }
                   accessibilityRole="button"
                 >
                   <GradientFill colors={HERO_GRADIENT} direction="across" />
-                  <EventlyText variant="caption" style={s.emptyCtaText}>
+                  <AppText variant="buttonSmall" style={s.emptyCtaText}>
                     Explore events
-                  </EventlyText>
+                  </AppText>
                   <EventlyIcon name="arrow-right" size={14} color="#ffffff" />
                 </TouchableOpacity>
               ) : null}

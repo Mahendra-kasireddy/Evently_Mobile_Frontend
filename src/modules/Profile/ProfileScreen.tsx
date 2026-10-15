@@ -7,12 +7,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  AppHeader,
-  EventlyIcon,
-  EventlyText,
-  FadeInUp,
-} from '../../Components';
+import { AppHeader, EventlyIcon, AppText, FadeInUp } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
 import { PROFILE_ACCENT, PROFILE_COPY as COPY } from './constants';
 import { useProfileContainer } from './container';
@@ -20,6 +15,7 @@ import { ProfileGroup } from './sections/ProfileGroup';
 import { ProfileIdentity } from './sections/ProfileIdentity';
 import { styles } from './styles';
 import type { ProfileAction } from './types';
+import { useScrollTopOnBlur } from '../../hooks/useScrollTopOnBlur';
 
 type ProfileNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -33,6 +29,8 @@ type ProfileNavigationProp = NativeStackNavigationProp<RootStackParamList>;
  * shows no pill, because a badge reading "0" is noise.
  */
 export function ProfileScreen() {
+  /* Leaving the tab puts it back at the top for next time. */
+  const scrollRef = useScrollTopOnBlur();
   const navigation = useNavigation<ProfileNavigationProp>();
   const {
     profile,
@@ -109,9 +107,9 @@ export function ProfileScreen() {
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={PROFILE_ACCENT} />
-          <EventlyText variant="body" style={styles.loadingText}>
+          <AppText variant="body" style={styles.loadingText}>
             {COPY.loading}
-          </EventlyText>
+          </AppText>
         </View>
       </SafeAreaView>
     );
@@ -121,12 +119,12 @@ export function ProfileScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.centered}>
-          <EventlyText variant="h2" style={styles.errorTitle}>
+          <AppText variant="h2" style={styles.errorTitle}>
             {COPY.errorTitle}
-          </EventlyText>
-          <EventlyText variant="body" style={styles.errorText}>
+          </AppText>
+          <AppText variant="body" style={styles.errorText}>
             {errorMessage ?? 'Something went wrong.'}
-          </EventlyText>
+          </AppText>
           <TouchableOpacity
             style={styles.retryButton}
             activeOpacity={0.8}
@@ -134,9 +132,9 @@ export function ProfileScreen() {
             accessibilityRole="button"
           >
             <EventlyIcon name="refresh" size={16} color={PROFILE_ACCENT} />
-            <EventlyText variant="caption" style={styles.retryText}>
+            <AppText variant="caption" style={styles.retryText}>
               {COPY.retry}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -152,6 +150,7 @@ export function ProfileScreen() {
           needs the back arrow every other pushed screen has. */}
       <AppHeader title={COPY.title} />
       <ScrollView
+        ref={scrollRef as never}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >

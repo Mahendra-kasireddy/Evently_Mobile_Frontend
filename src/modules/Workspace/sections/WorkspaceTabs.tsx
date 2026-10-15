@@ -1,6 +1,15 @@
 import { useEffect, useRef } from 'react';
-import { ScrollView, useWindowDimensions, type LayoutChangeEvent } from 'react-native';
-import { EventlyIcon, EventlyText, GradientFill, PressableScale } from '../../../Components';
+import {
+  ScrollView,
+  useWindowDimensions,
+  type LayoutChangeEvent,
+} from 'react-native';
+import {
+  EventlyIcon,
+  AppText,
+  GradientFill,
+  PressableScale,
+} from '../../../Components';
 import { WORKSPACE_ACTION_GRADIENT } from '../constants';
 import { heroStyles as s } from '../premium.styles';
 import type { WorkspaceTab, WorkspaceTabItem } from '../types';
@@ -22,7 +31,12 @@ interface WorkspaceTabsProps {
  * view: tapping "Guest invitations" used to leave half of it off the right
  * edge, as if it had not been selected at all.
  */
-export function WorkspaceTabs({ tabs, tab, onSelectTab, idSuffix = '' }: WorkspaceTabsProps) {
+export function WorkspaceTabs({
+  tabs,
+  tab,
+  onSelectTab,
+  idSuffix = '',
+}: WorkspaceTabsProps) {
   const { width } = useWindowDimensions();
   const scrollRef = useRef<ScrollView>(null);
   const layouts = useRef<Record<string, { x: number; width: number }>>({});
@@ -41,7 +55,10 @@ export function WorkspaceTabs({ tabs, tab, onSelectTab, idSuffix = '' }: Workspa
   }, [tab, width]);
 
   const onTabLayout = (key: WorkspaceTab) => (e: LayoutChangeEvent) => {
-    layouts.current[key] = { x: e.nativeEvent.layout.x, width: e.nativeEvent.layout.width };
+    layouts.current[key] = {
+      x: e.nativeEvent.layout.x,
+      width: e.nativeEvent.layout.width,
+    };
     if (key === tab) reveal(key, false);
   };
 
@@ -65,11 +82,24 @@ export function WorkspaceTabs({ tabs, tab, onSelectTab, idSuffix = '' }: Workspa
             accessibilityLabel={item.label}
             testID={`workspace-tab-${item.key}${idSuffix}`}
           >
-            {active ? <GradientFill colors={WORKSPACE_ACTION_GRADIENT} direction="across" /> : null}
-            <EventlyIcon name={item.icon} size={16} color={active ? '#ffffff' : '#6b6488'} />
-            <EventlyText variant="body" style={[s.tabLabel, active && s.tabLabelActive]} numberOfLines={1}>
+            {active ? (
+              <GradientFill
+                colors={WORKSPACE_ACTION_GRADIENT}
+                direction="across"
+              />
+            ) : null}
+            <EventlyIcon
+              name={item.icon}
+              size={16}
+              color={active ? '#ffffff' : '#6b6488'}
+            />
+            <AppText
+              variant="label"
+              style={[s.tabLabel, active && s.tabLabelActive]}
+              numberOfLines={1}
+            >
               {item.label}
-            </EventlyText>
+            </AppText>
           </PressableScale>
         );
       })}

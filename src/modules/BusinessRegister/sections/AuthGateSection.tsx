@@ -3,7 +3,7 @@ import { ScrollView, TouchableOpacity, View } from 'react-native';
 import {
   EventlyButton,
   EventlyIcon,
-  EventlyText,
+  AppText,
   EventlyTextInput,
   GradientFill,
   KeyboardAvoider,
@@ -139,18 +139,18 @@ export function AuthGateSection({
             <EventlyIcon name="arrow-left" size={20} color="#ffffff" />
           </TouchableOpacity>
           <View style={authGateStyles.heroStepChip}>
-            <EventlyText style={authGateStyles.heroStepText}>
+            <AppText variant="label" style={authGateStyles.heroStepText}>
               {copy.step}
-            </EventlyText>
+            </AppText>
           </View>
-          <EventlyText variant="h1" style={authGateStyles.title}>
+          <AppText variant="h1" style={authGateStyles.title}>
             {step === 'phone' ? copy.title : 'Enter the 6-digit code'}
-          </EventlyText>
-          <EventlyText variant="body" style={authGateStyles.subtitle}>
+          </AppText>
+          <AppText variant="body" style={authGateStyles.subtitle}>
             {step === 'phone'
               ? copy.subtitle
               : `We sent it by SMS to ${sentTo ?? 'your phone'}.`}
-          </EventlyText>
+          </AppText>
         </View>
 
         <View style={authGateStyles.sheet}>
@@ -161,21 +161,29 @@ export function AuthGateSection({
                 size={18}
                 color="#4b3bd6"
               />
-              <EventlyText variant="caption" style={authGateStyles.infoText}>
+              <AppText variant="caption" style={authGateStyles.infoText}>
                 {copy.sameNumber}
-              </EventlyText>
+              </AppText>
             </View>
           ) : null}
 
           {step === 'phone' ? (
             <View style={authGateStyles.form}>
-              <EventlyText variant="subtitle" style={authGateStyles.label}>
+              <AppText
+                variant="body"
+                weight="medium"
+                style={authGateStyles.label}
+              >
                 Mobile number
-              </EventlyText>
+              </AppText>
               <View style={authGateStyles.phoneRow}>
-                <EventlyText variant="subtitle" style={authGateStyles.dialCode}>
+                <AppText
+                  variant="body"
+                  weight="medium"
+                  style={authGateStyles.dialCode}
+                >
                   🇮🇳 +91
-                </EventlyText>
+                </AppText>
                 <EventlyTextInput
                   style={authGateStyles.phoneInput}
                   placeholder="98765 43210"
@@ -187,9 +195,9 @@ export function AuthGateSection({
                 />
               </View>
               {errorMessage ? (
-                <EventlyText variant="body" style={authGateStyles.error}>
+                <AppText variant="body" style={authGateStyles.error}>
                   {errorMessage}
-                </EventlyText>
+                </AppText>
               ) : null}
               <EventlyButton
                 title={
@@ -211,9 +219,9 @@ export function AuthGateSection({
                 accessibilityLabel="Change mobile number"
               >
                 <EventlyIcon name="arrow-left" size={15} color={REG_ACCENT} />
-                <EventlyText variant="body" style={authGateStyles.backText}>
+                <AppText variant="body" style={authGateStyles.backText}>
                   Change number
-                </EventlyText>
+                </AppText>
               </TouchableOpacity>
 
               <View style={authGateStyles.otpRow}>
@@ -237,15 +245,15 @@ export function AuthGateSection({
               </View>
 
               {devCode ? (
-                <EventlyText variant="caption" style={authGateStyles.devHint}>
+                <AppText variant="caption" style={authGateStyles.devHint}>
                   Dev code: {devCode}
-                </EventlyText>
+                </AppText>
               ) : null}
 
               {errorMessage ? (
-                <EventlyText variant="body" style={authGateStyles.error}>
+                <AppText variant="body" style={authGateStyles.error}>
                   {errorMessage}
-                </EventlyText>
+                </AppText>
               ) : null}
 
               <EventlyButton
@@ -258,20 +266,20 @@ export function AuthGateSection({
               />
 
               {resendSeconds > 0 ? (
-                <EventlyText variant="body" style={authGateStyles.resendMuted}>
+                <AppText variant="body" style={authGateStyles.resendMuted}>
                   Resend code in 0:{String(resendSeconds).padStart(2, '0')}
-                </EventlyText>
+                </AppText>
               ) : (
                 <TouchableOpacity
                   onPress={resendCode}
                   accessibilityLabel="Resend code"
                 >
-                  <EventlyText
+                  <AppText
                     variant="body"
                     style={[authGateStyles.resendActive, { color: REG_GREEN }]}
                   >
                     Resend code
-                  </EventlyText>
+                  </AppText>
                 </TouchableOpacity>
               )}
             </View>

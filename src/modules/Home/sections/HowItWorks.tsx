@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import {
   HOW_STEP_ICON_BG,
   HOW_STEP_ICON_COLOR,
@@ -39,15 +39,15 @@ function StepRow({ item, isLast }: StepRowProps) {
               { borderColor: HOW_STEP_ICON_COLOR },
             ]}
           >
-            <EventlyText
-              variant="caption"
+            <AppText
+              variant="label"
               style={[
                 howItWorksStyles.numberBadgeText,
                 { color: HOW_STEP_ICON_COLOR },
               ]}
             >
               {item.num}
-            </EventlyText>
+            </AppText>
           </View>
         </View>
         {isLast ? null : (
@@ -60,12 +60,16 @@ function StepRow({ item, isLast }: StepRowProps) {
         )}
       </View>
       <View style={howItWorksStyles.stepContent}>
-        <EventlyText variant="subtitle" style={howItWorksStyles.cardTitle}>
+        <AppText
+          variant="body"
+          weight="medium"
+          style={howItWorksStyles.cardTitle}
+        >
           {item.title}
-        </EventlyText>
-        <EventlyText variant="body" style={howItWorksStyles.cardDesc}>
+        </AppText>
+        <AppText variant="body" style={howItWorksStyles.cardDesc}>
           {item.description}
-        </EventlyText>
+        </AppText>
       </View>
     </View>
   );
@@ -74,12 +78,12 @@ function StepRow({ item, isLast }: StepRowProps) {
 export function HowItWorks({ data }: HowItWorksProps) {
   return (
     <View style={howItWorksStyles.section}>
-      <EventlyText variant="h2" style={howItWorksStyles.title}>
+      <AppText variant="h2" style={howItWorksStyles.title}>
         {data.title}
-      </EventlyText>
-      <EventlyText variant="body" style={howItWorksStyles.subtitle}>
+      </AppText>
+      <AppText variant="caption" style={howItWorksStyles.subtitle}>
         {data.subtitle}
-      </EventlyText>
+      </AppText>
       <View style={howItWorksStyles.list}>
         {data.steps.map((step, index) => (
           <StepRow

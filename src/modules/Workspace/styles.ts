@@ -1,6 +1,13 @@
 import { StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, fontFor, spacing } from '../../theme';
+import {
+  colors,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+  inputTypography,
+} from '../../theme';
 import {
   WORKSPACE_ACCENT,
   WORKSPACE_ACCENT_SOFT,
@@ -16,9 +23,14 @@ export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   scroll: { flex: 1 },
   content: { paddingBottom: spacing.xl },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
-  loadingText: { color: colors.textMuted, marginTop: spacing.md },
-  errorText: { color: colors.danger, textAlign: 'center' },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.lg,
+  },
+  loadingText: { color: textColor.textSecondary, marginTop: spacing.md },
+  errorText: { color: textColor.textError, textAlign: 'center' },
   retryButton: {
     ...globalStyles.row,
     gap: spacing.xs,
@@ -29,7 +41,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },
-  retryText: { color: WORKSPACE_ACCENT, fontWeight: '700' },
+  retryText: { color: WORKSPACE_ACCENT, ...fontWeights.bold },
 });
 
 // The navy hero: progress ring, status and countdown.
@@ -42,18 +54,30 @@ export const heroStyles = StyleSheet.create({
     overflow: 'hidden',
   },
   top: { ...globalStyles.row, gap: spacing.md },
-  ringWrap: { width: 78, height: 78, alignItems: 'center', justifyContent: 'center' },
-  ringText: { position: 'absolute', alignItems: 'center', justifyContent: 'center' },
-  ringPercent: { color: colors.onPrimary, fontSize: 17, fontWeight: '700' },
-  ringCaption: { color: colors.onPrimaryMuted, fontSize: 10, marginTop: 1 },
+  ringWrap: {
+    width: 78,
+    height: 78,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ringText: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ringPercent: { color: textColor.textOnPrimary, ...typography.h3 },
+  ringCaption: {
+    color: colors.onPrimaryMuted,
+    ...typography.caption,
+    marginTop: 1,
+  },
   headText: { flex: 1 },
   eyebrow: {
     color: colors.onPrimaryMuted,
-    letterSpacing: 0.8,
+    ...fontWeights.bold,
     textTransform: 'uppercase',
-    fontWeight: '700',
   },
-  title: { color: colors.onPrimary, fontSize: 20, fontWeight: '700', marginTop: 2 },
+  title: { color: textColor.textOnPrimary, ...typography.h2, marginTop: 2 },
   statusPill: {
     ...globalStyles.row,
     alignSelf: 'flex-start',
@@ -65,7 +89,7 @@ export const heroStyles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   statusDot: { width: 6, height: 6, borderRadius: 3 },
-  statusText: { color: colors.onPrimary, fontWeight: '700' },
+  statusText: { color: textColor.textOnPrimary, ...fontWeights.bold },
   countdown: {
     ...globalStyles.row,
     gap: spacing.sm,
@@ -74,7 +98,7 @@ export const heroStyles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.14)',
   },
-  countdownCount: { color: colors.onPrimary, fontSize: 26, fontWeight: '700' },
+  countdownCount: { color: textColor.textOnPrimary, ...typography.h1 },
   countdownLabel: { color: colors.onPrimaryMuted },
 });
 
@@ -90,11 +114,8 @@ export const heroStyles = StyleSheet.create({
 export const sectionStyles = StyleSheet.create({
   section: { marginTop: spacing.lg, paddingHorizontal: spacing.md },
   title: {
-    color: WORKSPACE_NAVY,
-    fontSize: 15.5,
-    lineHeight: 20,
-    fontWeight: '700',
-    letterSpacing: -0.2,
+    color: textColor.textPrimary,
+    ...typography.h3,
   },
   card: {
     ...globalStyles.card,
@@ -104,12 +125,8 @@ export const sectionStyles = StyleSheet.create({
     padding: spacing.md,
     marginTop: spacing.sm,
   },
-  emptyText: { color: colors.textMuted, fontSize: 13.5, lineHeight: 19 },
+  emptyText: { color: textColor.textSecondary, ...typography.body },
 });
-
-
-
-
 
 /**
  * The two "open something bigger" rows in the workspace: the ideas board and
@@ -143,8 +160,12 @@ export const summaryRowStyles = StyleSheet.create({
   iconChipIdeas: { backgroundColor: WORKSPACE_VIOLET_SOFT },
   iconChipInvite: { backgroundColor: WORKSPACE_GREEN_SOFT },
   text: { flex: 1 },
-  title: { color: WORKSPACE_NAVY, fontSize: 14, lineHeight: 19, fontWeight: '700' },
-  body: { color: colors.textMuted, fontSize: 12.5, lineHeight: 17, marginTop: 2 },
+  title: {
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
+  body: { color: textColor.textSecondary, ...typography.caption, marginTop: 2 },
   cta: {
     ...globalStyles.row,
     gap: 2,
@@ -154,11 +175,15 @@ export const summaryRowStyles = StyleSheet.create({
     paddingVertical: spacing.sm,
     backgroundColor: WORKSPACE_ACCENT,
   },
-  ctaGhost: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.border },
-  ctaText: { color: colors.onPrimary, fontSize: 12.5, fontWeight: '700' },
-  ctaGhostText: { color: WORKSPACE_NAVY, fontSize: 12.5, fontWeight: '700' },
+  ctaGhost: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  ctaText: { color: textColor.textOnPrimary, ...typography.buttonSmall },
+  ctaGhostText: { color: textColor.textPrimary, ...typography.buttonSmall },
   /** The organizer has not shared an invitation yet — a step, not an error. */
-  pendingText: { color: colors.textMuted, fontSize: 12.5, lineHeight: 17 },
+  pendingText: { color: textColor.textSecondary, ...typography.caption },
 });
 
 /* ---------------------------------------------------------------------------
@@ -194,13 +219,10 @@ export const ideasCardStyles = StyleSheet.create({
   },
   text: { flex: 1, minWidth: 0 },
   title: {
-    color: WORKSPACE_NAVY_DEEP,
-    fontSize: 16.5,
-    lineHeight: 22,
-    fontWeight: '700',
-    letterSpacing: -0.3,
+    color: textColor.textPrimary,
+    ...typography.h3,
   },
-  body: { color: colors.textMuted, fontSize: 12.5, lineHeight: 17, marginTop: 3 },
+  body: { color: textColor.textSecondary, ...typography.caption, marginTop: 3 },
 
   /* The organizer's newest post, set on paper inside the card so it reads as
      something they wrote rather than as more of the card's own copy. */
@@ -220,17 +242,24 @@ export const ideasCardStyles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
-  typeChipText: { fontSize: 10.5, fontWeight: '700', letterSpacing: 0.2 },
-  latestWhen: { color: colors.textMuted, fontSize: 11, marginLeft: 'auto' },
+  typeChipText: { ...typography.label },
+  latestWhen: {
+    color: textColor.textSecondary,
+    ...typography.caption,
+    marginLeft: 'auto',
+  },
   latestText: {
-    color: WORKSPACE_NAVY_DEEP,
-    fontSize: 13,
-    lineHeight: 18,
+    color: textColor.textPrimary,
+    ...typography.bodySmall,
     marginTop: 8,
   },
   latestFoot: { ...globalStyles.row, gap: 5, marginTop: 8 },
-  latestFootText: { color: colors.textMuted, fontSize: 11.5, flexShrink: 1 },
-  latestFootDone: { color: WORKSPACE_GREEN, fontWeight: '700' },
+  latestFootText: {
+    color: textColor.textSecondary,
+    ...typography.caption,
+    flexShrink: 1,
+  },
+  latestFootDone: { color: WORKSPACE_GREEN, ...fontWeights.bold },
 
   cta: {
     ...globalStyles.row,
@@ -245,10 +274,14 @@ export const ideasCardStyles = StyleSheet.create({
   },
   /* Beside the words rather than under them, for the card that has nothing
      else on it. */
-  ctaInline: { alignSelf: 'center', marginTop: 0, paddingLeft: 13, paddingRight: 9 },
-  ctaText: { color: colors.onPrimary, fontSize: 13.5, fontWeight: '700' },
+  ctaInline: {
+    alignSelf: 'center',
+    marginTop: 0,
+    paddingLeft: 13,
+    paddingRight: 9,
+  },
+  ctaText: { color: textColor.textOnPrimary, ...typography.buttonSmall },
 });
-
 
 export const boardStyles = StyleSheet.create({
   content: { paddingBottom: spacing.xl },
@@ -297,23 +330,17 @@ export const boardStyles = StyleSheet.create({
     marginTop: 14,
   },
   heroPillText: {
-    color: colors.onPrimary,
-    fontSize: 10.5,
-    fontWeight: '700',
-    letterSpacing: 1,
+    color: textColor.textOnPrimary,
+    ...typography.label,
   },
   heroTitle: {
     flex: 1,
-    color: colors.onPrimary,
-    fontSize: 19,
-    lineHeight: 25,
-    fontWeight: '700',
-    letterSpacing: -0.4,
+    color: textColor.textOnPrimary,
+    ...typography.h2,
   },
   heroSubtitle: {
     color: 'rgba(255,255,255,0.82)',
-    fontSize: 13,
-    lineHeight: 18,
+    ...typography.bodySmall,
     marginTop: 4,
   },
 
@@ -332,19 +359,22 @@ export const boardStyles = StyleSheet.create({
     paddingBottom: 4,
   },
   stats: { ...globalStyles.row, gap: 8 },
-  stat: { flex: 1, borderRadius: 16, paddingHorizontal: 12, paddingVertical: 12 },
+  stat: {
+    flex: 1,
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
   statShared: { backgroundColor: WORKSPACE_VIOLET_SOFT },
   statPlanned: { backgroundColor: WORKSPACE_GREEN_SOFT },
   statAwaiting: { backgroundColor: WORKSPACE_ACCENT_SOFT },
-  statValue: { fontSize: 19, lineHeight: 24, fontWeight: '700', letterSpacing: -0.4 },
+  statValue: { ...typography.h2 },
   statValueShared: { color: WORKSPACE_VIOLET },
   statValuePlanned: { color: WORKSPACE_GREEN },
   statValueAwaiting: { color: WORKSPACE_ACCENT },
   statLabel: {
-    color: colors.textMuted,
-    fontSize: 11.5,
-    lineHeight: 15,
-    fontWeight: '600',
+    color: textColor.textSecondary,
+    ...typography.label,
     marginTop: 2,
   },
 
@@ -368,21 +398,35 @@ export const boardStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarSquare: { borderRadius: 12, backgroundColor: WORKSPACE_NAVY },
-  avatarText: { color: colors.onPrimary, fontWeight: '700', fontSize: 13 },
+  avatarText: {
+    color: textColor.textOnPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
   input: {
     flex: 1,
     // A TextInput resolves no face of its own — see Components/EventlyText.
-    fontFamily: fontFor('400'),
+    ...inputTypography.body,
     minHeight: 58,
     maxHeight: 150,
-    color: colors.text,
-    fontSize: 14,
+    color: textColor.textPrimary,
     padding: 0,
     paddingTop: spacing.sm,
     textAlignVertical: 'top',
   },
-  thumbs: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.sm },
-  thumb: { width: 72, height: 72, borderRadius: 12, overflow: 'hidden', backgroundColor: colors.surface },
+  thumbs: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+  },
+  thumb: {
+    width: 72,
+    height: 72,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: colors.surface,
+  },
   thumbImage: { width: '100%', height: '100%' },
   thumbRemove: {
     position: 'absolute',
@@ -395,7 +439,12 @@ export const boardStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  typeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, marginTop: spacing.md },
+  typeRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.xs,
+    marginTop: spacing.md,
+  },
   typeChip: {
     ...globalStyles.row,
     gap: 4,
@@ -404,10 +453,18 @@ export const boardStyles = StyleSheet.create({
     paddingVertical: 6,
     backgroundColor: colors.surface,
   },
-  typeChipText: { color: colors.textMuted, fontWeight: '700', fontSize: 12 },
-  composerFoot: { ...globalStyles.row, justifyContent: 'space-between', marginTop: spacing.md },
-  photoButton: { ...globalStyles.row, gap: spacing.xs, paddingVertical: spacing.xs },
-  photoText: { color: colors.textMuted, fontWeight: '700' },
+  typeChipText: { color: textColor.textSecondary, ...typography.label },
+  composerFoot: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    marginTop: spacing.md,
+  },
+  photoButton: {
+    ...globalStyles.row,
+    gap: spacing.xs,
+    paddingVertical: spacing.xs,
+  },
+  photoText: { color: textColor.textSecondary, ...fontWeights.bold },
   postButton: {
     ...globalStyles.row,
     gap: spacing.xs,
@@ -417,14 +474,22 @@ export const boardStyles = StyleSheet.create({
     paddingVertical: spacing.sm + 2,
   },
   postButtonDisabled: { opacity: 0.45 },
-  postButtonText: { color: colors.onPrimary, fontWeight: '700' },
+  postButtonText: { color: textColor.textOnPrimary, ...fontWeights.bold },
   secretNote: { ...globalStyles.row, gap: spacing.xs, marginTop: spacing.sm },
-  secretNoteText: { color: colors.textMuted, flex: 1 },
-  composerError: { color: colors.danger, marginTop: spacing.sm },
-  counter: { color: colors.textMuted, textAlign: 'right', marginTop: spacing.xs },
+  secretNoteText: { color: textColor.textSecondary, flex: 1 },
+  composerError: { color: textColor.textError, marginTop: spacing.sm },
+  counter: {
+    color: colors.textMuted,
+    textAlign: 'right',
+    marginTop: spacing.xs,
+  },
 
   // Filters.
-  filters: { paddingHorizontal: spacing.md, paddingTop: spacing.lg, gap: spacing.xs },
+  filters: {
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.lg,
+    gap: spacing.xs,
+  },
   filter: {
     borderRadius: 999,
     borderWidth: 1,
@@ -433,8 +498,11 @@ export const boardStyles = StyleSheet.create({
     paddingVertical: 7,
     marginRight: spacing.xs,
   },
-  filterOn: { backgroundColor: WORKSPACE_VIOLET, borderColor: WORKSPACE_VIOLET },
-  filterText: { color: colors.textMuted, fontSize: 12.5, fontWeight: '700' },
+  filterOn: {
+    backgroundColor: WORKSPACE_VIOLET,
+    borderColor: WORKSPACE_VIOLET,
+  },
+  filterText: { color: textColor.textSecondary, ...typography.label },
   filterTextOn: { color: colors.onPrimary },
 
   // Feed.
@@ -451,27 +519,40 @@ export const boardStyles = StyleSheet.create({
   who: { flex: 1 },
   whoRow: { ...globalStyles.row, gap: spacing.xs },
   name: {
-    color: WORKSPACE_NAVY,
-    fontSize: 14,
-    lineHeight: 19,
-    fontWeight: '700',
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
     flexShrink: 1,
   },
   youTag: {
-    color: colors.textMuted,
+    color: textColor.textSecondary,
     backgroundColor: colors.surface,
     borderRadius: 999,
     paddingHorizontal: 6,
     paddingVertical: 1,
-    fontSize: 11,
+    ...typography.label,
     overflow: 'hidden',
   },
-  time: { color: colors.textMuted, fontSize: 12, lineHeight: 16, marginTop: 1 },
-  cardText: { color: colors.text, fontSize: 14, lineHeight: 20, marginTop: spacing.sm },
-  images: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.sm },
-  image: { width: 96, height: 96, borderRadius: 12, backgroundColor: colors.surface },
+  time: { color: textColor.textSecondary, ...typography.caption, marginTop: 1 },
+  cardText: {
+    color: textColor.textPrimary,
+    ...typography.body,
+    marginTop: spacing.sm,
+  },
+  images: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+  },
+  image: {
+    width: 96,
+    height: 96,
+    borderRadius: 12,
+    backgroundColor: colors.surface,
+  },
   secretChip: { ...globalStyles.row, gap: 4, marginTop: spacing.sm },
-  secretChipText: { color: colors.textMuted },
+  secretChipText: { color: textColor.textSecondary },
 
   reply: {
     backgroundColor: colors.surface,
@@ -479,22 +560,40 @@ export const boardStyles = StyleSheet.create({
     padding: spacing.md,
     marginTop: spacing.md,
   },
-  replyHead: { ...globalStyles.row, justifyContent: 'space-between', gap: spacing.sm },
-  replyTitle: { color: WORKSPACE_NAVY, fontSize: 13.5, lineHeight: 18, fontWeight: '700' },
-  statusChip: { ...globalStyles.row, gap: 5, borderRadius: 999, paddingHorizontal: spacing.sm, paddingVertical: 3 },
+  replyHead: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  replyTitle: {
+    color: textColor.textPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
+  statusChip: {
+    ...globalStyles.row,
+    gap: 5,
+    borderRadius: 999,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+  },
   statusDot: { width: 6, height: 6, borderRadius: 3 },
-  statusText: { fontWeight: '700', fontSize: 11 },
+  statusText: { ...typography.label },
   replyText: {
-    color: colors.textMuted,
-    fontSize: 13,
-    lineHeight: 18,
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
     marginTop: spacing.xs,
   },
 
-  approveRow: { ...globalStyles.row, justifyContent: 'space-between', gap: spacing.sm, marginTop: spacing.md },
-  approvalLabel: { color: colors.accent, fontWeight: '700', flexShrink: 1 },
+  approveRow: {
+    ...globalStyles.row,
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+    marginTop: spacing.md,
+  },
+  approvalLabel: { color: colors.accent, ...fontWeights.bold, flexShrink: 1 },
   approvedRow: { ...globalStyles.row, gap: spacing.xs, marginTop: spacing.md },
-  approvedText: { color: colors.success, fontWeight: '700' },
+  approvedText: { color: colors.success, ...fontWeights.bold },
   approveButton: {
     ...globalStyles.row,
     gap: spacing.xs,
@@ -503,7 +602,7 @@ export const boardStyles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },
-  approveText: { color: colors.onPrimary, fontWeight: '700' },
+  approveText: { color: textColor.textOnPrimary, ...fontWeights.bold },
 
   // Vision.
   vision: {
@@ -516,13 +615,15 @@ export const boardStyles = StyleSheet.create({
     padding: spacing.md,
   },
   visionTitle: {
-    color: WORKSPACE_NAVY,
-    fontSize: 15.5,
-    lineHeight: 20,
-    fontWeight: '700',
+    color: textColor.textPrimary,
+    ...typography.h3,
   },
-  visionSubtitle: { color: colors.textMuted, fontSize: 12.5, lineHeight: 17, marginTop: 2 },
-  visionEmpty: { color: colors.textMuted, marginTop: spacing.sm, lineHeight: 20 },
+  visionSubtitle: {
+    color: textColor.textSecondary,
+    ...typography.caption,
+    marginTop: 2,
+  },
+  visionEmpty: { color: textColor.textSecondary, marginTop: spacing.sm },
   visionRow: { ...globalStyles.row, gap: spacing.sm, marginTop: spacing.md },
   visionChip: {
     width: 34,
@@ -533,12 +634,28 @@ export const boardStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   visionText: { flex: 1 },
-  visionLabel: { color: colors.textMuted, letterSpacing: 0.6, textTransform: 'uppercase', fontWeight: '700' },
-  visionValue: { color: WORKSPACE_NAVY, fontSize: 13.5, lineHeight: 18, marginTop: 1 },
-  visionValueEmpty: { color: colors.textMuted, fontStyle: 'italic', marginTop: 1 },
+  visionLabel: {
+    color: textColor.textSecondary,
+    ...fontWeights.bold,
+    textTransform: 'uppercase',
+  },
+  visionValue: {
+    color: textColor.textPrimary,
+    ...typography.bodySmall,
+    marginTop: 1,
+  },
+  visionValueEmpty: {
+    color: colors.textMuted,
+    fontStyle: 'italic',
+    marginTop: 1,
+  },
 
   // Empty feed.
-  empty: { alignItems: 'center', paddingHorizontal: spacing.lg, paddingVertical: spacing.xl },
+  empty: {
+    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.xl,
+  },
   emptyIcon: {
     width: 52,
     height: 52,
@@ -547,8 +664,17 @@ export const boardStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  emptyTitle: { color: WORKSPACE_NAVY, fontSize: 17, fontWeight: '700', marginTop: spacing.sm },
-  emptyBody: { color: colors.textMuted, textAlign: 'center', marginTop: spacing.xs, lineHeight: 20 },
+  emptyTitle: {
+    color: textColor.textPrimary,
+    ...typography.h2,
+    marginTop: spacing.sm,
+  },
+  emptyBody: {
+    ...typography.body,
+    color: textColor.textSecondary,
+    textAlign: 'center',
+    marginTop: spacing.xs,
+  },
 });
 
 /* ---------------------------------------------------------------------------
@@ -562,6 +688,3 @@ export const boardStyles = StyleSheet.create({
  * answers "which event is this, when, where and how far along", and the tabs
  * put the rest where it can be looked for rather than scrolled past.
  * ------------------------------------------------------------------------- */
-
-
-

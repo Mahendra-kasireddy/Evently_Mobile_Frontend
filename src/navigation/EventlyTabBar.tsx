@@ -15,11 +15,12 @@ import Svg, { Path } from 'react-native-svg';
 import { GooeyBubbles } from './GooeyBubbles';
 import {
   EventlyIcon,
-  EventlyText,
+  AppText,
   GradientFill,
   useReducedMotion,
 } from '../Components';
 
+import { tabBarLabel, textColor } from '../theme';
 /*
  * Each tab in its own colour — Home coral, Bookings violet, Events teal,
  * Profile blue — so the bar is read by colour before it is read by label.
@@ -85,7 +86,6 @@ const TAB_LOOK: Record<
 const FALLBACK = TAB_LOOK.Home;
 /** Tab screens with no button on the bar — reached another way (Plan and Chat: the + menu). */
 const OFF_BAR = new Set(['Plan', 'Chat']);
-const MUTED = '#9a909f';
 
 /* The bar and the raised button in its notch. */
 const BAR_HEIGHT = 66;
@@ -216,13 +216,13 @@ function TabButton({
           color={focused ? look.ink : `${look.ink}99`}
         />
       </View>
-      <EventlyText
-        variant="caption"
+      <AppText
+        variant="label"
         style={[s.label, focused && s.labelOn, focused && { color: look.ink }]}
         numberOfLines={1}
       >
         {label}
-      </EventlyText>
+      </AppText>
     </Pressable>
   );
 }
@@ -470,9 +470,6 @@ export function EventlyTabBar({
 
       {/* A child of the strip, not of the bar: Android delivers no touches
           outside a parent's box, and the button rises above the bar's. */}
-      {/* A soft pink glow pooled behind the +, so it sits in a light of its
-          own colour rather than on bare white. */}
-      {open ? null : <View style={s.fabHalo} pointerEvents="none" />}
       <Pressable
         ref={fabRef}
         /* Hidden while the menu is open — its copy in the Modal, with no
@@ -617,8 +614,9 @@ const s = StyleSheet.create({
     borderRadius: 3,
     backgroundColor: 'rgba(255,255,255,0.95)',
   },
-  label: { color: MUTED, fontSize: 11, lineHeight: 14, fontWeight: '500' },
-  labelOn: { fontWeight: '700' },
+  label: { color: textColor.textSecondary, ...tabBarLabel },
+  // Active is told by colour; the label keeps the 11/500 tab face.
+  labelOn: {},
 
   fab: {
     position: 'absolute',
@@ -632,24 +630,7 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#e8433a',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#ff4f7a',
-        shadowOpacity: 0.55,
-        shadowRadius: 12,
-        shadowOffset: { width: 0, height: 6 },
-      },
-      android: { elevation: 8 },
-    }),
-  },
-  fabHalo: {
-    position: 'absolute',
-    top: 2 - 9,
-    alignSelf: 'center',
-    width: FAB_SIZE + 18,
-    height: FAB_SIZE + 18,
-    borderRadius: (FAB_SIZE + 18) / 2,
-    backgroundColor: 'rgba(255,111,145,0.18)',
+    // Flat: no glow, halo or drop shadow around the +.
   },
   fabFloating: { alignSelf: 'auto' },
   fabHidden: { opacity: 0 },

@@ -6,7 +6,7 @@ import {
   Confetti,
   EventlyIcon,
   EventlyImage,
-  EventlyText,
+  AppText,
 } from '../../../Components';
 import { absoluteFileUrl } from '../../../services/urls';
 import { colors } from '../../../theme';
@@ -71,7 +71,13 @@ export function BoardHero({
             preserveAspectRatio="none"
           >
             <Defs>
-              <LinearGradient id="boardHero" x1="10%" y1="0%" x2="90%" y2="100%">
+              <LinearGradient
+                id="boardHero"
+                x1="10%"
+                y1="0%"
+                x2="90%"
+                y2="100%"
+              >
                 <Stop offset="0" stopColor={WORKSPACE_VIOLET} />
                 <Stop offset="1" stopColor="#2b2158" />
               </LinearGradient>
@@ -107,12 +113,16 @@ export function BoardHero({
             accessibilityRole="button"
             accessibilityLabel="Go back"
           >
-            <EventlyIcon name="chevron-left" size={21} color={colors.onPrimary} />
+            <EventlyIcon
+              name="chevron-left"
+              size={21}
+              color={colors.onPrimary}
+            />
           </TouchableOpacity>
 
-          <EventlyText variant="h1" style={s.heroTitle} numberOfLines={2}>
+          <AppText variant="h2" style={s.heroTitle} numberOfLines={2}>
             {IDEAS_COPY.heroTitle}
-          </EventlyText>
+          </AppText>
         </View>
       </View>
 
@@ -120,12 +130,12 @@ export function BoardHero({
         <View style={s.stats}>
           {stats.map(([value, label, tile, tone]) => (
             <View key={label} style={[s.stat, tile]}>
-              <EventlyText variant="h2" style={[s.statValue, tone]}>
+              <AppText variant="h2" style={[s.statValue, tone]}>
                 {value}
-              </EventlyText>
-              <EventlyText variant="caption" style={s.statLabel}>
+              </AppText>
+              <AppText variant="label" style={s.statLabel}>
                 {label}
-              </EventlyText>
+              </AppText>
             </View>
           ))}
         </View>
@@ -147,7 +157,10 @@ interface BoardFiltersProps {
  */
 export function BoardFilters({ value, items, onChange }: BoardFiltersProps) {
   const available = BOARD_FILTERS.filter(
-    (f) => f.value === 'all' || f.value === value || items.some((i) => matchesBoardFilter(i, f.value)),
+    f =>
+      f.value === 'all' ||
+      f.value === value ||
+      items.some(i => matchesBoardFilter(i, f.value)),
   );
 
   if (available.length <= 1) return null;
@@ -159,9 +172,11 @@ export function BoardFilters({ value, items, onChange }: BoardFiltersProps) {
       contentContainerStyle={s.filters}
       accessibilityRole="tablist"
     >
-      {available.map((filter) => {
+      {available.map(filter => {
         const on = filter.value === value;
-        const count = items.filter((i) => matchesBoardFilter(i, filter.value)).length;
+        const count = items.filter(i =>
+          matchesBoardFilter(i, filter.value),
+        ).length;
         return (
           <TouchableOpacity
             key={filter.value}
@@ -172,9 +187,12 @@ export function BoardFilters({ value, items, onChange }: BoardFiltersProps) {
             accessibilityState={{ selected: on }}
             accessibilityLabel={`${filter.label}, ${count}`}
           >
-            <EventlyText variant="caption" style={[s.filterText, on && s.filterTextOn]}>
+            <AppText
+              variant="label"
+              style={[s.filterText, on && s.filterTextOn]}
+            >
               {filter.label} · {count}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         );
       })}
@@ -200,46 +218,51 @@ export function IdeaCard({ idea, isApproving, onApprove }: IdeaCardProps) {
   const meta = IDEA_TYPE_META[idea.type] ?? IDEA_TYPE_META.idea;
   const fromOrganizer = idea.authorRole === 'organizer';
   const replyStatus = idea.reply?.status;
-  const replyColor = replyStatus ? IDEA_PLAN_STATUS_COLOR[replyStatus] : colors.textMuted;
+  const replyColor = replyStatus
+    ? IDEA_PLAN_STATUS_COLOR[replyStatus]
+    : colors.textMuted;
 
   return (
     <View style={s.card}>
       <View style={s.cardHead}>
         <View style={[s.avatar, fromOrganizer && s.avatarSquare]}>
-          <EventlyText variant="caption" style={s.avatarText}>
+          <AppText variant="bodySmall" style={s.avatarText}>
             {initials(idea.authorName)}
-          </EventlyText>
+          </AppText>
         </View>
         <View style={s.who}>
           <View style={s.whoRow}>
-            <EventlyText variant="body" style={s.name} numberOfLines={1}>
+            <AppText variant="body" style={s.name} numberOfLines={1}>
               {idea.authorName || (fromOrganizer ? 'Your organizer' : 'You')}
-            </EventlyText>
+            </AppText>
             {!fromOrganizer ? (
-              <EventlyText variant="caption" style={s.youTag}>
+              <AppText variant="label" style={s.youTag}>
                 {IDEAS_COPY.you}
-              </EventlyText>
+              </AppText>
             ) : null}
           </View>
-          <EventlyText variant="caption" style={s.time}>
+          <AppText variant="caption" style={s.time}>
             {relativeTime(idea.createdAt)}
-          </EventlyText>
+          </AppText>
         </View>
         <View style={[s.typeChip, { backgroundColor: meta.bg }]}>
           <EventlyIcon name={meta.icon} size={12} color={meta.color} />
-          <EventlyText variant="caption" style={[s.typeChipText, { color: meta.color }]}>
+          <AppText
+            variant="label"
+            style={[s.typeChipText, { color: meta.color }]}
+          >
             {meta.label}
-          </EventlyText>
+          </AppText>
         </View>
       </View>
 
-      <EventlyText variant="body" style={s.cardText}>
+      <AppText variant="body" style={s.cardText}>
         {idea.text}
-      </EventlyText>
+      </AppText>
 
       {idea.images?.length > 0 ? (
         <View style={s.images}>
-          {idea.images.map((image) => (
+          {idea.images.map(image => (
             <EventlyImage
               key={image.url}
               source={{ uri: absoluteFileUrl(image.url) }}
@@ -253,9 +276,9 @@ export function IdeaCard({ idea, isApproving, onApprove }: IdeaCardProps) {
       {idea.confidential ? (
         <View style={s.secretChip}>
           <EventlyIcon name="lock-outline" size={12} color={colors.textMuted} />
-          <EventlyText variant="caption" style={s.secretChipText}>
+          <AppText variant="caption" style={s.secretChipText}>
             {IDEAS_COPY.confidential}
-          </EventlyText>
+          </AppText>
         </View>
       ) : null}
 
@@ -263,29 +286,34 @@ export function IdeaCard({ idea, isApproving, onApprove }: IdeaCardProps) {
       {idea.reply ? (
         <View style={s.reply}>
           <View style={s.replyHead}>
-            <EventlyText variant="caption" style={s.replyTitle}>
+            <AppText variant="bodySmall" style={s.replyTitle}>
               {IDEAS_COPY.plan}
-            </EventlyText>
-            <View style={[s.statusChip, { backgroundColor: `${replyColor}22` }]}>
+            </AppText>
+            <View
+              style={[s.statusChip, { backgroundColor: `${replyColor}22` }]}
+            >
               <View style={[s.statusDot, { backgroundColor: replyColor }]} />
-              <EventlyText variant="caption" style={[s.statusText, { color: replyColor }]}>
+              <AppText
+                variant="label"
+                style={[s.statusText, { color: replyColor }]}
+              >
                 {replyStatus ? IDEA_PLAN_STATUS_LABEL[replyStatus] : ''}
-              </EventlyText>
+              </AppText>
             </View>
           </View>
           {idea.reply.text ? (
-            <EventlyText variant="caption" style={s.replyText}>
+            <AppText variant="bodySmall" style={s.replyText}>
               {idea.reply.text}
-            </EventlyText>
+            </AppText>
           ) : null}
         </View>
       ) : null}
 
       {idea.approval === 'pending' ? (
         <View style={s.approveRow}>
-          <EventlyText variant="caption" style={s.approvalLabel} numberOfLines={2}>
+          <AppText variant="caption" style={s.approvalLabel} numberOfLines={2}>
             {idea.approvalLabel || IDEA_APPROVAL_LABEL.pending}
-          </EventlyText>
+          </AppText>
           <TouchableOpacity
             style={s.approveButton}
             activeOpacity={0.85}
@@ -299,17 +327,17 @@ export function IdeaCard({ idea, isApproving, onApprove }: IdeaCardProps) {
             ) : (
               <EventlyIcon name="check" size={14} color={colors.onPrimary} />
             )}
-            <EventlyText variant="caption" style={s.approveText}>
+            <AppText variant="caption" style={s.approveText}>
               {IDEAS_COPY.approve}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       ) : idea.approval === 'approved' ? (
         <View style={s.approvedRow}>
           <EventlyIcon name="check-circle" size={16} color={colors.success} />
-          <EventlyText variant="caption" style={s.approvedText}>
+          <AppText variant="caption" style={s.approvedText}>
             {IDEAS_COPY.approved}
-          </EventlyText>
+          </AppText>
         </View>
       ) : null}
     </View>
@@ -324,32 +352,45 @@ export function IdeaCard({ idea, isApproving, onApprove }: IdeaCardProps) {
  * plausible guess, and before anything is captured the card explains that
  * instead of standing empty.
  */
-export function VisionCard({ vision, organizerName }: { vision: BoardVision; organizerName: string }) {
+export function VisionCard({
+  vision,
+  organizerName,
+}: {
+  vision: BoardVision;
+  organizerName: string;
+}) {
   return (
     <View style={s.vision}>
-      <EventlyText variant="h2" style={s.visionTitle}>
+      <AppText variant="h3" style={s.visionTitle}>
         {IDEAS_COPY.visionTitle}
-      </EventlyText>
+      </AppText>
 
       {!vision.captured ? (
-        <EventlyText variant="body" style={s.visionEmpty}>
+        <AppText variant="body" style={s.visionEmpty}>
           {IDEAS_COPY.visionEmpty(organizerName)}
-        </EventlyText>
+        </AppText>
       ) : (
-        VISION_SLOTS.map((slot) => {
+        VISION_SLOTS.map(slot => {
           const value = vision[slot.key];
           return (
             <View key={slot.key} style={s.visionRow}>
               <View style={s.visionChip}>
-                <EventlyIcon name={slot.icon} size={16} color={WORKSPACE_ACCENT} />
+                <EventlyIcon
+                  name={slot.icon}
+                  size={16}
+                  color={WORKSPACE_ACCENT}
+                />
               </View>
               <View style={s.visionText}>
-                <EventlyText variant="caption" style={s.visionLabel}>
+                <AppText variant="caption" style={s.visionLabel}>
                   {slot.label}
-                </EventlyText>
-                <EventlyText variant="body" style={value ? s.visionValue : s.visionValueEmpty}>
+                </AppText>
+                <AppText
+                  variant="body"
+                  style={value ? s.visionValue : s.visionValueEmpty}
+                >
                   {value || IDEAS_COPY.visionSlotEmpty}
-                </EventlyText>
+                </AppText>
               </View>
             </View>
           );
@@ -360,7 +401,13 @@ export function VisionCard({ vision, organizerName }: { vision: BoardVision; org
 }
 
 /** Nothing at all, or nothing in this filter — two different situations. */
-export function BoardEmpty({ hasAnyPosts, organizerName }: { hasAnyPosts: boolean; organizerName: string }) {
+export function BoardEmpty({
+  hasAnyPosts,
+  organizerName,
+}: {
+  hasAnyPosts: boolean;
+  organizerName: string;
+}) {
   return (
     <View style={s.empty}>
       <View style={s.emptyIcon}>
@@ -370,12 +417,14 @@ export function BoardEmpty({ hasAnyPosts, organizerName }: { hasAnyPosts: boolea
           color={WORKSPACE_ACCENT}
         />
       </View>
-      <EventlyText variant="subtitle" style={s.emptyTitle}>
+      <AppText variant="h2" style={s.emptyTitle}>
         {hasAnyPosts ? IDEAS_COPY.filterEmptyTitle : IDEAS_COPY.emptyTitle}
-      </EventlyText>
-      <EventlyText variant="body" style={s.emptyBody}>
-        {hasAnyPosts ? IDEAS_COPY.filterEmptyBody : IDEAS_COPY.emptyBody(organizerName)}
-      </EventlyText>
+      </AppText>
+      <AppText variant="body" style={s.emptyBody}>
+        {hasAnyPosts
+          ? IDEAS_COPY.filterEmptyBody
+          : IDEAS_COPY.emptyBody(organizerName)}
+      </AppText>
     </View>
   );
 }

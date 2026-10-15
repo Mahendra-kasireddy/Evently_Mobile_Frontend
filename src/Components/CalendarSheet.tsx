@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Modal, Pressable, View } from 'react-native';
 import { brand } from '../theme';
 import { EventlyIcon } from './EventlyIcon';
-import { EventlyText } from './EventlyText';
+import { AppText } from './AppText';
 import { calendarSheetStyles as s } from './styles';
 
 const MONTH_NAMES = [
@@ -132,9 +132,9 @@ export function CalendarSheet({
         <Pressable style={s.card} onPress={() => undefined}>
           <View style={s.grabber} />
           {title ? (
-            <EventlyText variant="h2" style={s.title}>
+            <AppText variant="h2" style={s.title}>
               {title}
-            </EventlyText>
+            </AppText>
           ) : null}
 
           <View style={s.headRow}>
@@ -148,9 +148,9 @@ export function CalendarSheet({
             >
               <EventlyIcon name="chevron-left" size={18} color={brand.navy} />
             </Pressable>
-            <EventlyText variant="subtitle" style={s.monthLabel}>
+            <AppText variant="body" weight="medium" style={s.monthLabel}>
               {MONTH_NAMES[viewMonth]} {viewYear}
-            </EventlyText>
+            </AppText>
             <Pressable
               style={s.navButton}
               onPress={goNextMonth}
@@ -163,13 +163,13 @@ export function CalendarSheet({
 
           <View style={s.weekdayRow}>
             {WEEKDAY_LABELS.map((label, i) => (
-              <EventlyText
+              <AppText
                 key={`${label}-${i}`}
                 variant="caption"
                 style={s.weekday}
               >
                 {label}
-              </EventlyText>
+              </AppText>
             ))}
           </View>
 
@@ -195,7 +195,8 @@ export function CalendarSheet({
                     accessibilityLabel={iso}
                     testID={`calendar-day-${iso}`}
                   >
-                    <EventlyText
+                    <AppText
+                      variant="body"
                       style={[
                         s.dayText,
                         disabled && s.dayTextDisabled,
@@ -203,7 +204,7 @@ export function CalendarSheet({
                       ]}
                     >
                       {cell.day}
-                    </EventlyText>
+                    </AppText>
                   </Pressable>
                 </View>
               );

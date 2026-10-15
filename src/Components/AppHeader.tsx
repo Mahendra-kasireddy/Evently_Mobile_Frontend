@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Pressable, View } from 'react-native';
 import { colors, layout } from '../theme';
 import { EventlyIcon } from './EventlyIcon';
-import { EventlyText } from './EventlyText';
+import { AppText } from './AppText';
 import { appHeaderStyles } from './styles';
 
 interface AppHeaderProps {
@@ -26,9 +26,9 @@ interface AppHeaderProps {
 /**
  * The app's one header: back arrow, title, optional trailing action.
  *
- * Fixed at the design system's 56pt with 16pt gutters, its content vertically
+ * Fixed at the design system's slim 48pt with 16pt gutters, its content vertically
  * centred, so a header on one screen is the same height as a header on
- * another. The back chevron is 20pt inside a 44pt touch target — the icon is
+ * another. The back chevron is 22pt inside a 44pt touch target — the icon is
  * what you see, the target is what you hit, and they are not the same
  * measurement.
  *
@@ -40,7 +40,7 @@ interface AppHeaderProps {
  * Safe areas are deliberately NOT applied here. Every screen that uses this
  * already wraps itself in `SafeAreaView edges={['top']}`, and insetting again
  * would pad twice — visibly so on a notched iPhone. The header sits inside
- * that inset, which is what makes it 56pt of header rather than 56pt minus the
+ * that inset, which is what makes it 48pt of header rather than 48pt minus the
  * status bar.
  */
 export function AppHeader({
@@ -82,21 +82,17 @@ export function AppHeader({
           </Pressable>
         )}
         <View style={appHeaderStyles.titleCol}>
-          <EventlyText
-            variant="screenTitle"
-            style={appHeaderStyles.title}
-            numberOfLines={1}
-          >
+          <AppText variant="h3" style={appHeaderStyles.title} numberOfLines={1}>
             {title}
-          </EventlyText>
+          </AppText>
           {subtitle ? (
-            <EventlyText
+            <AppText
               variant="caption"
               style={appHeaderStyles.subtitle}
               numberOfLines={1}
             >
               {subtitle}
-            </EventlyText>
+            </AppText>
           ) : null}
         </View>
       </View>

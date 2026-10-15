@@ -1,6 +1,12 @@
 import { useMemo, useState } from 'react';
-import { Modal, Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText, EventlyTextInput } from '../../../Components';
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { EventlyIcon, AppText, EventlyTextInput } from '../../../Components';
 import { PLAN_ACCENT, PLAN_TEXT_MUTED } from '../constants';
 import { selectModalStyles } from '../styles';
 
@@ -34,7 +40,7 @@ export function SelectListModal({
   const visibleOptions = useMemo(() => {
     if (!allowCustomInput || !query.trim()) return options;
     const q = query.trim().toLowerCase();
-    return options.filter((o) => o.toLowerCase().includes(q));
+    return options.filter(o => o.toLowerCase().includes(q));
   }, [allowCustomInput, options, query]);
 
   const handleClose = () => {
@@ -54,21 +60,34 @@ export function SelectListModal({
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={handleClose}
+    >
       <Pressable style={selectModalStyles.overlay} onPress={handleClose}>
         <Pressable style={selectModalStyles.card} onPress={() => undefined}>
           <View style={selectModalStyles.headRow}>
-            <EventlyText variant="h2" style={selectModalStyles.title}>
+            <AppText variant="h2" style={selectModalStyles.title}>
               {title}
-            </EventlyText>
-            <TouchableOpacity style={selectModalStyles.closeButton} onPress={handleClose} accessibilityLabel={`Close ${title}`}>
+            </AppText>
+            <TouchableOpacity
+              style={selectModalStyles.closeButton}
+              onPress={handleClose}
+              accessibilityLabel={`Close ${title}`}
+            >
               <EventlyIcon name="close" size={18} color={PLAN_TEXT_MUTED} />
             </TouchableOpacity>
           </View>
 
           {allowCustomInput ? (
             <View style={selectModalStyles.searchRow}>
-              <EventlyIcon name="map-marker-outline" size={16} color={PLAN_TEXT_MUTED} />
+              <EventlyIcon
+                name="map-marker-outline"
+                size={16}
+                color={PLAN_TEXT_MUTED}
+              />
               <EventlyTextInput
                 style={selectModalStyles.searchInput}
                 value={query || value}
@@ -82,31 +101,50 @@ export function SelectListModal({
 
           <ScrollView keyboardShouldPersistTaps="handled">
             {clearLabel ? (
-              <TouchableOpacity style={selectModalStyles.clearRow} onPress={() => choose('')}>
-                <EventlyIcon name="close-circle-outline" size={16} color={PLAN_TEXT_MUTED} />
-                <EventlyText variant="body" style={selectModalStyles.clearText}>
+              <TouchableOpacity
+                style={selectModalStyles.clearRow}
+                onPress={() => choose('')}
+              >
+                <EventlyIcon
+                  name="close-circle-outline"
+                  size={16}
+                  color={PLAN_TEXT_MUTED}
+                />
+                <AppText variant="body" style={selectModalStyles.clearText}>
                   {clearLabel}
-                </EventlyText>
+                </AppText>
               </TouchableOpacity>
             ) : null}
 
             {visibleOptions.length === 0 ? (
-              <EventlyText variant="body" style={selectModalStyles.emptyText}>
+              <AppText variant="body" style={selectModalStyles.emptyText}>
                 No matches — you can still use what you typed.
-              </EventlyText>
+              </AppText>
             ) : (
               visibleOptions.map((option, index) => {
                 const isSelected = option === value;
                 return (
                   <TouchableOpacity
                     key={option}
-                    style={[selectModalStyles.optionRow, index === 0 && selectModalStyles.optionRowFirst]}
+                    style={[
+                      selectModalStyles.optionRow,
+                      index === 0 && selectModalStyles.optionRowFirst,
+                    ]}
                     onPress={() => choose(option)}
                   >
-                    <EventlyText variant="body" style={isSelected ? selectModalStyles.optionTextSelected : selectModalStyles.optionText}>
+                    <AppText
+                      variant="body"
+                      style={
+                        isSelected
+                          ? selectModalStyles.optionTextSelected
+                          : selectModalStyles.optionText
+                      }
+                    >
                       {option}
-                    </EventlyText>
-                    {isSelected ? <EventlyIcon name="check" size={16} color={PLAN_ACCENT} /> : null}
+                    </AppText>
+                    {isSelected ? (
+                      <EventlyIcon name="check" size={16} color={PLAN_ACCENT} />
+                    ) : null}
                   </TouchableOpacity>
                 );
               })

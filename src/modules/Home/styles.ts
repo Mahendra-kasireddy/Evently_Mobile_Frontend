@@ -1,13 +1,13 @@
 import { Dimensions, Platform, StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, fontFamilies, spacing } from '../../theme';
 import {
-  EYEBROW,
-  HOME_ACCENT,
-  HOME_INK,
-  HOME_PAPER,
-  displayType,
-} from './design';
+  colors,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+} from '../../theme';
+import { HOME_ACCENT, HOME_INK, HOME_PAPER } from './design';
 import {
   BOOKED_CARD_PHOTO_BG,
   BOOKED_STEP_DONE_COLOR,
@@ -65,17 +65,17 @@ export const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   loadingTitle: {
-    ...displayType(22),
-    color: HOME_INK.ink,
+    ...typography.h2,
+    color: textColor.textPrimary,
     marginTop: spacing.lg,
     textAlign: 'center',
   },
   loadingText: {
-    color: HOME_INK.inkSoft,
+    color: textColor.textSecondary,
     marginTop: spacing.xs,
     textAlign: 'center',
   },
-  errorText: { color: colors.danger, textAlign: 'center' },
+  errorText: { color: textColor.textError, textAlign: 'center' },
 });
 
 export const homeHeroPhotoStyles = StyleSheet.create({
@@ -101,9 +101,7 @@ export const homeHeroPhotoStyles = StyleSheet.create({
     paddingBottom: HERO_PHOTO_OVERLAP + 22,
   },
   eyebrow: {
-    ...EYEBROW,
-    fontFamily: fontFamilies.semibold,
-    fontWeight: undefined,
+    ...typography.overline,
     color: HOME_ACCENT.marigold,
     marginBottom: 8,
     textShadowColor: 'rgba(0,0,0,0.5)',
@@ -111,8 +109,8 @@ export const homeHeroPhotoStyles = StyleSheet.create({
     textShadowRadius: 6,
   },
   headline: {
-    ...displayType(31),
-    color: '#ffffff',
+    ...typography.display,
+    color: textColor.textOnPrimary,
     textShadowColor: 'rgba(0,0,0,0.35)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 10,
@@ -148,22 +146,18 @@ export const homeHeaderStyles = StyleSheet.create({
   pinOnPhoto: { backgroundColor: 'rgba(255,255,255,0.16)' },
   locationTitle: {
     flexShrink: 1,
-    color: HOME_INK.ink,
-    fontSize: 17,
-    lineHeight: 22,
-    fontWeight: '700',
-    letterSpacing: -0.2,
+    color: textColor.textPrimary,
+    ...typography.h3,
   },
   locationSub: {
-    color: HOME_INK.inkSoft,
-    fontSize: 12,
-    lineHeight: 16,
+    color: textColor.textSecondary,
+    ...typography.caption,
     marginTop: 1,
     marginLeft: 28,
   },
   /* Over the photograph: white, with a soft shadow so it reads on any picture. */
   onPhotoText: {
-    color: '#ffffff',
+    color: textColor.textOnPrimary,
     textShadowColor: 'rgba(0,0,0,0.4)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 6,
@@ -207,10 +201,8 @@ export const homeHeaderStyles = StyleSheet.create({
     paddingHorizontal: 3,
   },
   badgeText: {
-    color: '#ffffff',
-    fontSize: 9.5,
-    fontWeight: '700',
-    lineHeight: 12,
+    color: textColor.textOnPrimary,
+    ...typography.label,
   },
 });
 
@@ -240,7 +232,7 @@ export const basicsStyles = StyleSheet.create({
     paddingTop: 14,
     paddingBottom: 10,
   },
-  composerEyebrow: { ...EYEBROW, color: HOME_INK.inkSoft },
+  composerEyebrow: { ...typography.overline, color: textColor.textSecondary },
   progress: { ...globalStyles.row, gap: 4 },
   progressDot: {
     width: 6,
@@ -251,10 +243,8 @@ export const basicsStyles = StyleSheet.create({
   progressDotOn: { backgroundColor: HOME_ACCENT.marigold, width: 14 },
   progressText: {
     marginLeft: 4,
-    color: HOME_INK.inkSoft,
-    fontSize: 11,
-    lineHeight: 14,
-    fontWeight: '600',
+    color: textColor.textSecondary,
+    ...typography.label,
   },
 
   /* The four selectors, two by two. */
@@ -290,16 +280,13 @@ export const basicsStyles = StyleSheet.create({
     overflow: 'hidden',
   },
   tileIconIdle: { backgroundColor: HOME_PAPER.card },
-  tileLabel: { ...EYEBROW, color: HOME_INK.inkSoft, letterSpacing: 1.2 },
+  tileLabel: { ...typography.overline, color: textColor.textSecondary },
   tileValue: {
     marginTop: 8,
-    color: HOME_INK.ink,
-    fontSize: 15,
-    lineHeight: 20,
-    fontWeight: '700',
-    letterSpacing: -0.2,
+    color: textColor.textPrimary,
+    ...typography.h3,
   },
-  tileValueEmpty: { color: HOME_INK.inkFaint, fontWeight: '500' },
+  tileValueEmpty: { color: textColor.textDisabled, ...fontWeights.medium },
 
   /* Quick dates, under the tiles. */
   quickRow: {
@@ -310,10 +297,8 @@ export const basicsStyles = StyleSheet.create({
     paddingBottom: 12,
   },
   quickLabel: {
-    color: HOME_INK.inkSoft,
-    fontSize: 11.5,
-    lineHeight: 15,
-    fontWeight: '500',
+    color: textColor.textSecondary,
+    ...typography.label,
   },
   quickScroll: { flex: 1 },
   quickChips: { gap: 6, paddingRight: spacing.md, alignItems: 'center' },
@@ -337,12 +322,10 @@ export const basicsStyles = StyleSheet.create({
   },
   chipActive: { borderColor: 'transparent' },
   chipText: {
-    color: HOME_INK.inkSoft,
-    fontSize: 12,
-    lineHeight: 17,
-    fontWeight: '500',
+    color: textColor.textSecondary,
+    ...typography.label,
   },
-  chipTextActive: { color: HOME_INK.ink, fontWeight: '700' },
+  chipTextActive: { color: textColor.textPrimary, ...fontWeights.bold },
 
   /* Budget: a section of the composer, not a box of its own. */
   budgetCard: { borderTopWidth: 1, borderTopColor: HOME_PAPER.hairline },
@@ -362,15 +345,13 @@ export const basicsStyles = StyleSheet.create({
   },
   budgetText: { flex: 1 },
   budgetTitle: {
-    color: HOME_INK.ink,
-    fontSize: 13.5,
-    lineHeight: 19,
-    fontWeight: '600',
+    color: textColor.textPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
   },
   budgetLink: {
-    color: HOME_INK.inkSoft,
-    fontSize: 11.5,
-    lineHeight: 16,
+    color: textColor.textSecondary,
+    ...typography.buttonSmall,
     textDecorationLine: 'underline',
   },
   rangeRow: {
@@ -405,11 +386,8 @@ export const basicsStyles = StyleSheet.create({
   ctaIdle: { opacity: 0.55 },
   ctaPressed: { opacity: 0.9 },
   ctaText: {
-    color: '#ffffff',
-    fontSize: 16,
-    lineHeight: 21,
-    fontWeight: '700',
-    letterSpacing: 0.2,
+    color: textColor.textOnPrimary,
+    ...typography.button,
   },
   ctaArrow: {
     width: 26,
@@ -422,17 +400,15 @@ export const basicsStyles = StyleSheet.create({
   ctaNote: {
     marginTop: 8,
     textAlign: 'center',
-    color: HOME_INK.inkSoft,
-    fontSize: 11.5,
-    lineHeight: 15,
+    color: textColor.textSecondary,
+    ...typography.buttonSmall,
   },
 
   errorText: {
-    color: colors.danger,
+    color: textColor.textError,
     marginTop: spacing.sm,
     paddingHorizontal: spacing.xs,
-    fontSize: 12.5,
-    lineHeight: 17,
+    ...typography.caption,
   },
   successCard: {
     backgroundColor: HOME_PAPER.card,
@@ -452,21 +428,19 @@ export const basicsStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   successTitle: {
-    ...displayType(22),
-    color: HOME_INK.ink,
+    ...typography.h2,
+    color: textColor.textPrimary,
     textAlign: 'center',
   },
   successText: {
-    color: HOME_INK.inkSoft,
+    color: textColor.textSecondary,
     textAlign: 'center',
-    fontSize: 13.5,
-    lineHeight: 19,
+    ...typography.bodySmall,
   },
   successEdit: {
     color: HOME_ACCENT.sindoor,
-    fontWeight: '700',
-    fontSize: 13,
-    lineHeight: 18,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
   },
 });
 
@@ -506,7 +480,7 @@ export const bannerStyles = StyleSheet.create({
   },
   content: { position: 'relative' },
   greeting: { color: colors.onPrimaryMuted },
-  heading: { color: colors.onPrimary, marginTop: spacing.xs },
+  heading: { color: textColor.textOnPrimary, marginTop: spacing.xs },
   accent: { color: HERO_ACCENT_WARM_COLOR },
   subtitle: { color: colors.onPrimaryMuted, marginTop: spacing.sm },
   // Single tappable "search" trigger — a solid floating white card (matching
@@ -534,14 +508,13 @@ export const bannerStyles = StyleSheet.create({
   },
   searchTextWrap: { flex: 1, marginLeft: spacing.sm },
   searchLabel: {
-    color: colors.textMuted,
-    letterSpacing: 0.5,
+    color: textColor.textSecondary,
     textTransform: 'uppercase',
   },
   searchSummary: {
-    color: CATEGORY_ICON_BADGE_COLOR,
+    color: textColor.textPrimary,
     marginTop: 2,
-    fontWeight: '700',
+    ...fontWeights.bold,
   },
   searchArrowButton: {
     width: 34,
@@ -561,7 +534,7 @@ export const bannerStyles = StyleSheet.create({
     marginTop: spacing.lg,
   },
   successText: {
-    color: colors.onPrimary,
+    color: textColor.textOnPrimary,
     textAlign: 'center',
     marginTop: spacing.xs,
   },
@@ -571,7 +544,7 @@ export const bannerStyles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   formErrorText: {
-    color: colors.danger,
+    color: textColor.textError,
     marginTop: spacing.sm,
     textAlign: 'center',
   },
@@ -588,9 +561,9 @@ export const bannerStyles = StyleSheet.create({
     padding: spacing.lg,
     maxHeight: '82%',
   },
-  sheetTitle: { color: colors.text },
+  sheetTitle: { color: textColor.textPrimary },
   sheetSubtitle: {
-    color: colors.textMuted,
+    color: textColor.textSecondary,
     marginTop: spacing.xs,
     marginBottom: spacing.sm,
   },
@@ -605,7 +578,7 @@ export const bannerStyles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: spacing.xs,
   },
-  chipGroupLabel: { color: colors.text, fontWeight: '700' },
+  chipGroupLabel: { color: textColor.textPrimary, ...fontWeights.bold },
   // Wraps now that the sheet shows one field at a time - every option is
   // visible at once instead of hidden off the right edge of a scroller.
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
@@ -622,8 +595,8 @@ export const bannerStyles = StyleSheet.create({
     backgroundColor: CATEGORY_ICON_BADGE_COLOR,
     borderColor: CATEGORY_ICON_BADGE_COLOR,
   },
-  chipText: { color: colors.text },
-  chipTextActive: { color: colors.onPrimary, fontWeight: '700' },
+  chipText: { color: textColor.textPrimary },
+  chipTextActive: { color: textColor.textOnPrimary, ...fontWeights.bold },
   getQuotesButton: { marginTop: spacing.lg },
 });
 
@@ -638,9 +611,8 @@ export const eventSummaryStyles = StyleSheet.create({
   wrap: { marginTop: spacing.lg },
   label: {
     color: colors.onPrimaryMuted,
-    letterSpacing: 0.8,
+    ...fontWeights.bold,
     textTransform: 'uppercase',
-    fontWeight: '700',
     marginBottom: spacing.sm,
   },
 
@@ -675,18 +647,16 @@ export const eventSummaryStyles = StyleSheet.create({
   },
   rowText: { flex: 1 },
   rowLabel: {
-    color: colors.textMuted,
-    letterSpacing: 0.6,
+    color: textColor.textSecondary,
+    ...fontWeights.bold,
     textTransform: 'uppercase',
-    fontWeight: '700',
   },
   rowValue: {
-    color: CATEGORY_ICON_BADGE_COLOR,
+    color: textColor.textPrimary,
     marginTop: 1,
-    fontSize: 16,
-    fontWeight: '700',
+    ...typography.h3,
   },
-  rowValueEmpty: { color: colors.textMuted, fontSize: 15, fontWeight: '400' },
+  rowValueEmpty: { color: textColor.textSecondary, ...typography.bodyLarge },
 
   cta: {
     ...globalStyles.row,
@@ -698,10 +668,11 @@ export const eventSummaryStyles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   ctaBusy: { opacity: 0.75 },
-  ctaText: { color: colors.onPrimary, fontSize: 16, fontWeight: '700' },
+  ctaText: { color: textColor.textOnPrimary, ...typography.button },
 
   // Neither a real event nor a draft to fall back on.
   emptyBody: {
+    ...typography.body,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.lg,
     alignItems: 'center',
@@ -716,12 +687,12 @@ export const eventSummaryStyles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   emptyTitle: {
-    color: CATEGORY_ICON_BADGE_COLOR,
-    fontSize: 17,
-    fontWeight: '700',
+    color: textColor.textPrimary,
+    ...typography.h2,
   },
   emptyText: {
-    color: colors.textMuted,
+    ...typography.body,
+    color: textColor.textSecondary,
     textAlign: 'center',
     marginTop: spacing.xs,
   },
@@ -750,9 +721,13 @@ export const eventSummaryStyles = StyleSheet.create({
   },
 
   errorBody: { padding: spacing.lg, alignItems: 'center' },
-  errorTitle: { color: colors.text, fontWeight: '700', marginTop: spacing.sm },
+  errorTitle: {
+    color: textColor.textPrimary,
+    ...fontWeights.bold,
+    marginTop: spacing.sm,
+  },
   errorText: {
-    color: colors.textMuted,
+    color: textColor.textSecondary,
     textAlign: 'center',
     marginTop: spacing.xs,
   },
@@ -766,7 +741,7 @@ export const eventSummaryStyles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },
-  retryText: { color: HERO_ACCENT_COLOR, fontWeight: '700' },
+  retryText: { color: HERO_ACCENT_COLOR, ...fontWeights.bold },
 });
 
 // The trust strip under the card - "quotes in under a day", and so on.
@@ -837,11 +812,9 @@ export const bookedEventStyles = StyleSheet.create({
   },
   statusText: {
     color: HERO_ACCENT_COLOR,
-    fontWeight: '800',
-    fontSize: 11,
-    letterSpacing: 0.6,
+    ...typography.label,
   },
-  ref: { color: colors.textMuted, fontSize: 11, flexShrink: 1 },
+  ref: { color: textColor.textSecondary, ...typography.caption, flexShrink: 1 },
   topSpacer: { flex: 1 },
   more: {
     width: 34,
@@ -852,16 +825,14 @@ export const bookedEventStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    color: HOME_NAVY,
-    fontSize: 28,
-    lineHeight: 34,
-    fontWeight: '800',
+    color: textColor.textPrimary,
+    ...typography.h1,
     marginTop: spacing.s12,
     maxWidth: '62%',
   },
   facts: { gap: 8, marginTop: spacing.sm, maxWidth: '56%' },
   fact: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
-  factText: { color: HOME_NAVY, fontSize: 12.5, lineHeight: 17, flex: 1 },
+  factText: { color: textColor.textPrimary, ...typography.caption, flex: 1 },
 
   /* The white panel over the photo's bottom edge. */
   body: {
@@ -877,9 +848,9 @@ export const bookedEventStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  progressTitle: { color: HOME_NAVY, fontWeight: '800' },
+  progressTitle: { color: textColor.textPrimary, ...fontWeights.bold },
   progressCountRow: { flexDirection: 'row', alignItems: 'center', gap: 2 },
-  progressCount: { color: HOME_NAVY },
+  progressCount: { color: textColor.textPrimary },
   steps: { flexDirection: 'row' },
   step: { flex: 1, alignItems: 'center', gap: 4 },
   connector: {
@@ -907,13 +878,12 @@ export const bookedEventStyles = StyleSheet.create({
     borderColor: HOME_ACCENT_SOFT,
   },
   stepLabel: {
-    color: HOME_NAVY,
-    fontSize: 10,
-    lineHeight: 13,
+    color: textColor.textPrimary,
+    ...typography.label,
     textAlign: 'center',
   },
   stepLabelDone: { color: HOME_NAVY },
-  stepLabelNext: { color: HERO_ACCENT_COLOR, fontWeight: '700' },
+  stepLabelNext: { color: HERO_ACCENT_COLOR, ...fontWeights.bold },
   statusRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -931,8 +901,8 @@ export const bookedEventStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   statusTextCol: { flex: 1 },
-  statusTitle: { color: HOME_NAVY, fontWeight: '700' },
-  statusBody: { color: colors.textMuted, marginTop: 1 },
+  statusTitle: { color: textColor.textPrimary, ...fontWeights.bold },
+  statusBody: { color: textColor.textSecondary, marginTop: 1 },
 
   menuOverlay: {
     flex: 1,
@@ -958,8 +928,8 @@ export const bookedEventStyles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: HOME_HAIRLINE,
   },
-  menuText: { color: HOME_NAVY, fontWeight: '600' },
-  menuCancel: { color: colors.textMuted, fontWeight: '600' },
+  menuText: { color: textColor.textPrimary, ...fontWeights.semibold },
+  menuCancel: { color: textColor.textSecondary, ...fontWeights.semibold },
 });
 
 export const currentEventStyles = StyleSheet.create({
@@ -975,7 +945,7 @@ export const currentEventStyles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: spacing.sm,
   },
-  title: { color: colors.text, flexShrink: 1 },
+  title: { color: textColor.textPrimary, flexShrink: 1 },
   stageRow: { marginTop: spacing.sm },
   stagePill: {
     ...globalStyles.row,
@@ -987,7 +957,7 @@ export const currentEventStyles = StyleSheet.create({
     gap: spacing.xs,
   },
   stageDot: { width: 6, height: 6, borderRadius: 3 },
-  stageText: { fontWeight: '700' },
+  stageText: { ...fontWeights.bold },
   footerRow: {
     ...globalStyles.row,
     justifyContent: 'space-between',
@@ -999,7 +969,7 @@ export const currentEventStyles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
   },
-  daysToGo: { color: colors.primary, fontWeight: '700' },
+  daysToGo: { color: textColor.textLink, ...fontWeights.bold },
   progressTrack: {
     height: 8,
     borderRadius: 4,
@@ -1012,7 +982,7 @@ export const currentEventStyles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderRadius: 4,
   },
-  progressLabel: { color: colors.textMuted },
+  progressLabel: { color: textColor.textSecondary },
 });
 
 // ---------------------------------------------------------------------------
@@ -1055,10 +1025,10 @@ export const packagesStyles = StyleSheet.create({
   },
   list: { paddingHorizontal: spacing.md, paddingTop: spacing.md },
   headText: { flex: 1, paddingRight: spacing.sm },
-  title: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 20, fontWeight: '700' },
-  subtitle: { color: colors.textMuted, marginTop: spacing.xs, lineHeight: 20 },
+  title: { color: textColor.textPrimary, ...typography.h2 },
+  subtitle: { color: textColor.textSecondary, marginTop: spacing.xs },
   buildButton: { ...globalStyles.row, gap: 2, paddingTop: 2 },
-  buildText: { color: HERO_ACCENT_COLOR, fontWeight: '700' },
+  buildText: { color: HERO_ACCENT_COLOR, ...fontWeights.bold },
 
   card: {
     ...globalStyles.card,
@@ -1085,11 +1055,8 @@ export const packagesStyles = StyleSheet.create({
     paddingVertical: 5,
   },
   badgeText: {
-    color: CATEGORY_ICON_BADGE_COLOR,
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
+    color: textColor.textPrimary,
+    ...typography.overline,
   },
 
   body: { padding: spacing.md },
@@ -1099,16 +1066,14 @@ export const packagesStyles = StyleSheet.create({
     gap: spacing.sm,
   },
   packageTitle: {
-    color: CATEGORY_ICON_BADGE_COLOR,
-    fontSize: 18,
-    fontWeight: '700',
+    color: textColor.textPrimary,
+    ...typography.h3,
     flexShrink: 1,
   },
   guests: { color: colors.textMuted },
   budget: {
     color: HERO_ACCENT_COLOR,
-    fontSize: 21,
-    fontWeight: '700',
+    ...typography.h2,
     marginTop: spacing.xs,
   },
 
@@ -1136,7 +1101,7 @@ export const packagesStyles = StyleSheet.create({
     backgroundColor: HERO_ACCENT_COLOR,
     marginTop: spacing.md,
   },
-  exploreText: { color: colors.onPrimary, fontSize: 16, fontWeight: '700' },
+  exploreText: { color: textColor.textOnPrimary, ...typography.h3 },
 });
 
 // ---------------------------------------------------------------------------
@@ -1146,11 +1111,11 @@ export const packagesStyles = StyleSheet.create({
 export const topOrganizersStyles = StyleSheet.create({
   section: { marginTop: spacing.lg, paddingHorizontal: spacing.md },
   header: { ...globalStyles.row, justifyContent: 'space-between' },
-  title: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 20, fontWeight: '700' },
+  title: { color: textColor.textPrimary, ...typography.h2 },
 
   // Shown only when these organizers are not actually local — see `scope`.
   scopeNote: { ...globalStyles.row, gap: spacing.xs, marginTop: spacing.sm },
-  scopeNoteText: { color: colors.textMuted, flex: 1 },
+  scopeNoteText: { color: textColor.textSecondary, flex: 1 },
 
   card: {
     ...globalStyles.card,
@@ -1168,9 +1133,9 @@ export const topOrganizersStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { color: colors.onPrimary, fontSize: 18, fontWeight: '700' },
+  avatarText: { color: textColor.textOnPrimary, ...typography.h3 },
   idCol: { flex: 1 },
-  name: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 17, fontWeight: '700' },
+  name: { color: textColor.textPrimary, ...typography.h3 },
   tierBadge: {
     ...globalStyles.row,
     alignSelf: 'flex-start',
@@ -1181,7 +1146,7 @@ export const topOrganizersStyles = StyleSheet.create({
     paddingVertical: 3,
     marginTop: spacing.xs,
   },
-  tierBadgeText: { fontWeight: '700' },
+  tierBadgeText: { ...fontWeights.bold },
 
   ratingRow: {
     ...globalStyles.row,
@@ -1190,11 +1155,11 @@ export const topOrganizersStyles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   ratingValue: {
-    color: CATEGORY_ICON_BADGE_COLOR,
-    fontWeight: '700',
+    color: textColor.textPrimary,
+    ...fontWeights.bold,
     marginLeft: spacing.xs,
   },
-  ratingMuted: { color: colors.textMuted, marginLeft: 3 },
+  ratingMuted: { color: textColor.textSecondary, marginLeft: 3 },
   // Stands in for the rating line when nobody has reviewed this organizer yet.
   noRating: { color: colors.textMuted, marginTop: spacing.md },
 
@@ -1227,18 +1192,17 @@ export const topOrganizersStyles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   viewButtonText: {
-    color: CATEGORY_ICON_BADGE_COLOR,
-    fontSize: 15,
-    fontWeight: '700',
+    color: textColor.textPrimary,
+    ...typography.button,
   },
   quoteButton: { backgroundColor: HERO_ACCENT_COLOR },
-  quoteButtonText: { color: colors.onPrimary, fontSize: 15, fontWeight: '700' },
+  quoteButtonText: { color: textColor.textOnPrimary, ...typography.button },
   quoteButtonBusy: { opacity: 0.7 },
 
   // Replaces the two actions once a request has been sent to this organizer.
   sentRow: { ...globalStyles.row, gap: spacing.xs, marginTop: spacing.md },
-  sentText: { color: colors.success, fontWeight: '700' },
-  errorText: { color: colors.danger, marginTop: spacing.sm },
+  sentText: { color: colors.success, ...fontWeights.bold },
+  errorText: { color: textColor.textError, marginTop: spacing.sm },
 
   // No organizers at all — an empty list under a "near you" heading reads as a
   // broken screen, so the section becomes one honest prompt instead.
@@ -1260,12 +1224,13 @@ export const topOrganizersStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   emptyTitle: {
-    color: CATEGORY_ICON_BADGE_COLOR,
-    fontWeight: '700',
+    ...typography.h2,
+    color: textColor.textPrimary,
     marginTop: spacing.sm,
   },
   emptyBody: {
-    color: colors.textMuted,
+    ...typography.body,
+    color: textColor.textSecondary,
     textAlign: 'center',
     marginTop: spacing.xs,
   },
@@ -1279,7 +1244,7 @@ export const topOrganizersStyles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },
-  emptyCtaText: { color: HERO_ACCENT_COLOR, fontWeight: '700' },
+  emptyCtaText: { color: HERO_ACCENT_COLOR, ...fontWeights.bold },
 });
 
 // The "View Profile" sheet. Mobile has no organizer route of its own yet, so
@@ -1315,13 +1280,13 @@ export const organizerSheetStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { color: colors.onPrimary, fontSize: 18, fontWeight: '700' },
+  avatarText: { color: textColor.textOnPrimary, ...typography.h3 },
   headText: { flex: 1 },
-  name: { color: CATEGORY_ICON_BADGE_COLOR, fontSize: 19, fontWeight: '700' },
-  meta: { color: colors.textMuted, marginTop: 2 },
+  name: { color: textColor.textPrimary, ...typography.h2 },
+  meta: { color: textColor.textSecondary, marginTop: 2 },
   centered: { alignItems: 'center', paddingVertical: spacing.xl },
   errorText: {
-    color: colors.danger,
+    color: textColor.textError,
     textAlign: 'center',
     marginTop: spacing.sm,
   },
@@ -1333,10 +1298,10 @@ export const organizerSheetStyles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
-  factLabel: { color: colors.textMuted },
+  factLabel: { color: textColor.textSecondary },
   factValue: {
-    color: CATEGORY_ICON_BADGE_COLOR,
-    fontWeight: '700',
+    color: textColor.textPrimary,
+    ...fontWeights.bold,
     flexShrink: 1,
     textAlign: 'right',
   },
@@ -1366,7 +1331,7 @@ export const organizerSheetStyles = StyleSheet.create({
     borderColor: colors.border,
     marginTop: spacing.lg,
   },
-  closeText: { color: CATEGORY_ICON_BADGE_COLOR, fontWeight: '700' },
+  closeText: { color: textColor.textPrimary, ...fontWeights.bold },
   /** Asking this organizer for a quote — the action moved off the list row. */
   quoteButton: {
     alignItems: 'center',
@@ -1377,7 +1342,7 @@ export const organizerSheetStyles = StyleSheet.create({
     marginTop: spacing.lg,
   },
   quoteButtonBusy: { opacity: 0.6 },
-  quoteText: { color: colors.onPrimary, fontSize: 16, fontWeight: '600' },
+  quoteText: { color: textColor.textOnPrimary, ...typography.h3 },
   requestedRow: {
     ...globalStyles.row,
     justifyContent: 'center',
@@ -1387,9 +1352,9 @@ export const organizerSheetStyles = StyleSheet.create({
     backgroundColor: '#e8f6ef',
     marginTop: spacing.lg,
   },
-  requestedText: { color: HOME_GREEN, fontWeight: '600' },
+  requestedText: { color: HOME_GREEN, ...fontWeights.semibold },
   requestError: {
-    color: colors.danger,
+    color: textColor.textError,
     textAlign: 'center',
     marginTop: spacing.sm,
   },
@@ -1397,8 +1362,8 @@ export const organizerSheetStyles = StyleSheet.create({
 
 export const howItWorksStyles = StyleSheet.create({
   section: { marginTop: spacing.lg, paddingHorizontal: spacing.md },
-  title: { color: colors.text },
-  subtitle: { color: colors.textMuted, marginTop: spacing.xs },
+  title: { color: textColor.textPrimary },
+  subtitle: { color: textColor.textSecondary, marginTop: spacing.xs },
   list: { marginTop: spacing.lg },
   // A connected timeline: an icon "node" per step, linked by a vertical
   // line, with the step content beside it — reads as a guided journey
@@ -1424,7 +1389,7 @@ export const howItWorksStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  numberBadgeText: { fontWeight: '700', fontSize: 10, lineHeight: 12 },
+  numberBadgeText: { ...typography.label },
   connector: {
     width: 2,
     flex: 1,
@@ -1432,14 +1397,14 @@ export const howItWorksStyles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   stepContent: { flex: 1, paddingLeft: spacing.md, paddingBottom: spacing.xl },
-  cardTitle: { color: colors.text, marginBottom: spacing.xs },
-  cardDesc: { color: colors.textMuted },
+  cardTitle: { color: textColor.textPrimary, marginBottom: spacing.xs },
+  cardDesc: { color: textColor.textSecondary },
 });
 
 export const planSmarterStyles = StyleSheet.create({
   section: { marginTop: spacing.lg, paddingHorizontal: spacing.md },
-  title: { color: colors.text },
-  subtitle: { color: colors.textMuted, marginTop: spacing.xs },
+  title: { color: textColor.textPrimary },
+  subtitle: { color: textColor.textSecondary, marginTop: spacing.xs },
   // A 2x2 grid of colorful tiles reads as a set of distinct tools at a
   // glance, rather than four identical bordered boxes stacked vertically.
   list: {
@@ -1462,8 +1427,8 @@ export const planSmarterStyles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: spacing.sm,
   },
-  cardTitle: { color: colors.text, marginBottom: spacing.xs },
-  cardDesc: { color: colors.textMuted },
+  cardTitle: { color: textColor.textPrimary, marginBottom: spacing.xs },
+  cardDesc: { color: textColor.textSecondary },
 });
 
 // ---------------------------------------------------------------------------
@@ -1493,9 +1458,8 @@ export const sectionStyles = StyleSheet.create({
    * larger than the cards' own titles so the page reads in chapters.
    */
   title: {
-    ...displayType(17.5),
-    letterSpacing: -0.2,
-    color: HOME_INK.ink,
+    ...typography.h3,
+    color: textColor.textPrimary,
     flexShrink: 1,
   },
   /** Kept for the review dump; headings carry no badge any more. */
@@ -1522,32 +1486,35 @@ export const sectionStyles = StyleSheet.create({
   },
   action: {
     color: HOME_ACCENT.sindoor,
-    fontSize: 13,
-    lineHeight: 17,
-    fontWeight: '600',
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
   },
   /** A label that is a fact, not a control ("3 live"). */
   actionStatic: { color: HOME_ACCENT.sindoor },
   /** The line under a section heading. */
   subtitle: {
-    color: HOME_INK.inkSoft,
+    color: textColor.textSecondary,
     marginTop: spacing.xs,
     paddingHorizontal: spacing.md,
-    fontSize: 13,
-    lineHeight: 19,
+    ...typography.bodySmall,
   },
 });
 
 export const seeAllStyles = StyleSheet.create({
   list: { paddingTop: spacing.sm, paddingBottom: spacing.xl, flexGrow: 1 },
   count: {
-    color: colors.textMuted,
+    color: textColor.textSecondary,
     paddingHorizontal: spacing.md,
     marginBottom: spacing.xs,
   },
-  emptyTitle: { color: HOME_NAVY, textAlign: 'center' },
+  emptyTitle: {
+    ...typography.h2,
+    color: textColor.textPrimary,
+    textAlign: 'center',
+  },
   emptyBody: {
-    color: colors.textMuted,
+    ...typography.body,
+    color: textColor.textSecondary,
     textAlign: 'center',
     marginTop: spacing.sm,
   },
@@ -1612,25 +1579,17 @@ export const eventRowStyles = StyleSheet.create({
   },
   dateMonth: {
     color: HERO_ACCENT_COLOR,
-    fontSize: 9.5,
-    fontWeight: '700',
-    letterSpacing: 0.8,
-    lineHeight: 12,
+    ...typography.label,
   },
   dateDay: {
-    color: HOME_NAVY,
-    fontSize: 15,
-    fontWeight: '700',
-    lineHeight: 18,
+    color: textColor.textPrimary,
+    ...typography.h3,
   },
 
   body: { flex: 1 },
   title: {
-    color: HOME_NAVY,
-    fontSize: 16.5,
-    fontWeight: '700',
-    lineHeight: 21,
-    letterSpacing: -0.2,
+    color: textColor.textPrimary,
+    ...typography.h3,
   },
   stageRow: { ...globalStyles.row, gap: 6, marginTop: 4 },
   stageDot: {
@@ -1640,19 +1599,16 @@ export const eventRowStyles = StyleSheet.create({
     backgroundColor: HOME_GREEN,
   },
   stageText: {
-    color: colors.textMuted,
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 0.4,
-    textTransform: 'uppercase',
+    color: textColor.textSecondary,
+    ...typography.overline,
     flexShrink: 1,
   },
   /* The one fact worth its own weight — how many have replied, when it
      closes, or failing both, where it is. */
   fact: {
-    color: HOME_NAVY,
-    fontSize: 13.5,
-    fontWeight: '700',
+    color: textColor.textPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
     marginTop: 6,
   },
 
@@ -1664,7 +1620,7 @@ export const eventRowStyles = StyleSheet.create({
     paddingVertical: 9,
     flexShrink: 1,
   },
-  ctaText: { color: colors.onPrimary, fontSize: 13, fontWeight: '700' },
+  ctaText: { color: textColor.textOnPrimary, ...typography.buttonSmall },
   /* A 34pt disc: the icon is what you see, the target is what you hit. */
   edit: {
     width: 34,
@@ -1684,8 +1640,6 @@ export const eventRowStyles = StyleSheet.create({
  * carried by gradients — the title, the icon discs, the pills, the button —
  * rather than by a dark ground.
  */
-const HERO_INK = '#1a2e5a';
-const HERO_MUTED = '#5d6683';
 const HERO_HAIRLINE = 'rgba(124,92,219,0.14)';
 
 export const eventHeroStyles = StyleSheet.create({
@@ -1756,11 +1710,8 @@ export const eventHeroStyles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   stageText: {
-    color: '#ffffff',
-    fontSize: 10.5,
-    fontWeight: '700',
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
+    color: textColor.textOnPrimary,
+    ...typography.overline,
     flexShrink: 1,
   },
   daysBadge: {
@@ -1772,14 +1723,11 @@ export const eventHeroStyles = StyleSheet.create({
     paddingHorizontal: 9,
     borderRadius: 999,
   },
-  daysText: { color: '#ffffff', fontSize: 11, fontWeight: '700' },
+  daysText: { color: textColor.textOnPrimary, ...typography.label },
 
   titleWrap: { marginTop: 10, paddingRight: 36 },
   title: {
-    fontSize: 21,
-    fontWeight: '700',
-    lineHeight: 27,
-    letterSpacing: -0.3,
+    ...typography.h2,
   },
   factRow: {
     flexDirection: 'row',
@@ -1795,9 +1743,8 @@ export const eventHeroStyles = StyleSheet.create({
     maxWidth: '100%',
   },
   factText: {
-    color: HERO_INK,
-    fontSize: 12.5,
-    fontWeight: '600',
+    color: textColor.textPrimary,
+    ...typography.label,
     flexShrink: 1,
   },
   iconDisc: {
@@ -1808,7 +1755,11 @@ export const eventHeroStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  reach: { color: HERO_MUTED, fontSize: 13, lineHeight: 18, marginTop: 8 },
+  reach: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    marginTop: 8,
+  },
 
   /* Waiting on replies: the brief's journey, on a white panel. */
   panel: { marginTop: 14 },
@@ -1842,18 +1793,21 @@ export const eventHeroStyles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   journeyLabel: {
-    color: '#9a94b3',
-    fontSize: 11,
-    lineHeight: 14,
+    color: textColor.textDisabled,
+    ...typography.label,
     textAlign: 'center',
     marginTop: 5,
     paddingHorizontal: 2,
   },
-  journeyLabelOn: { color: HERO_INK, fontWeight: '600' },
+  journeyLabelOn: { color: textColor.textPrimary, ...fontWeights.semibold },
   panelFoot: { marginTop: 10, gap: 6 },
   panelLine: { ...globalStyles.row, alignItems: 'center', gap: 8 },
-  panelLineText: { color: HERO_MUTED, fontSize: 12.5, lineHeight: 17, flex: 1 },
-  panelLineStrong: { color: '#c2620f', fontWeight: '700' },
+  panelLineText: {
+    color: textColor.textSecondary,
+    ...typography.caption,
+    flex: 1,
+  },
+  panelLineStrong: { color: '#c2620f', ...fontWeights.bold },
 
   /* Any other stage with nothing to compare: how far along it is. */
   progressBlock: { marginTop: 12 },
@@ -1862,8 +1816,8 @@ export const eventHeroStyles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 8,
   },
-  progressCaption: { color: HERO_MUTED, fontSize: 12, fontWeight: '600' },
-  progressPercent: { color: HERO_INK, fontSize: 12.5, fontWeight: '700' },
+  progressCaption: { color: textColor.textSecondary, ...typography.label },
+  progressPercent: { color: textColor.textPrimary, ...typography.label },
   track: {
     height: 8,
     borderRadius: 4,
@@ -1871,7 +1825,11 @@ export const eventHeroStyles = StyleSheet.create({
     overflow: 'hidden',
   },
   fill: { height: '100%', borderRadius: 4, overflow: 'hidden' },
-  progressLabel: { color: HERO_MUTED, fontSize: 13, marginTop: 8 },
+  progressLabel: {
+    color: textColor.textSecondary,
+    ...typography.label,
+    marginTop: 8,
+  },
 
   /** "Closes in 4 days" — the one thing on this card with a clock on it. */
   closesPill: {
@@ -1885,7 +1843,7 @@ export const eventHeroStyles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  closesText: { color: colors.onPrimary, fontSize: 12, fontWeight: '700' },
+  closesText: { color: textColor.textOnPrimary, ...typography.label },
 
   /* One white card per reply; the cheapest gets a green edge and a tag. */
   quoteRow: {
@@ -1906,16 +1864,15 @@ export const eventHeroStyles = StyleSheet.create({
     flexShrink: 0,
   },
   quoteAvatarText: {
-    color: colors.onPrimary,
-    fontSize: 12.5,
-    fontWeight: '700',
+    color: textColor.textOnPrimary,
+    ...typography.label,
   },
   quoteText: { flex: 1, minWidth: 0 },
   quoteNameRow: { ...globalStyles.row, alignItems: 'center', gap: 6 },
   quoteName: {
-    color: HERO_INK,
-    fontSize: 14,
-    fontWeight: '600',
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
     flexShrink: 1,
   },
   bestTag: {
@@ -1924,14 +1881,26 @@ export const eventHeroStyles = StyleSheet.create({
     paddingHorizontal: 7,
     borderRadius: 6,
   },
-  bestTagText: { color: '#ffffff', fontSize: 10.5, fontWeight: '800' },
-  quoteMeta: { color: HERO_MUTED, fontSize: 12, marginTop: 1 },
+  bestTagText: { color: textColor.textOnPrimary, ...typography.label },
+  quoteMeta: {
+    color: textColor.textSecondary,
+    ...typography.caption,
+    marginTop: 1,
+  },
   quoteMoney: { alignItems: 'flex-end', flexShrink: 0 },
-  quoteTotal: { color: HERO_INK, fontSize: 14.5, fontWeight: '700' },
+  quoteTotal: {
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
   /* Green on the cheapest, muted on the rest: the delta is information, not a
      warning, and colouring every row would say all of them are notable. */
-  quoteDelta: { color: HERO_MUTED, fontSize: 12, marginTop: 1 },
-  quoteDeltaLowest: { color: HOME_GREEN, fontWeight: '700' },
+  quoteDelta: {
+    color: textColor.textSecondary,
+    ...typography.caption,
+    marginTop: 1,
+  },
+  quoteDeltaLowest: { color: HOME_GREEN, ...fontWeights.bold },
 
   /* The organizers still to answer, drawn as an empty seat rather than a row
      — there is nothing to compare yet, and it should not look like there is. */
@@ -1954,7 +1923,11 @@ export const eventHeroStyles = StyleSheet.create({
     justifyContent: 'center',
     flexShrink: 0,
   },
-  awaitingText: { color: HERO_MUTED, fontSize: 13, flex: 1 },
+  awaitingText: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    flex: 1,
+  },
 
   cta: {
     alignItems: 'center',
@@ -1965,7 +1938,7 @@ export const eventHeroStyles = StyleSheet.create({
     backgroundColor: HERO_ACCENT_COLOR,
     marginTop: 14,
   },
-  ctaText: { color: colors.onPrimary, fontSize: 15, fontWeight: '700' },
+  ctaText: { color: textColor.textOnPrimary, ...typography.button },
   ctaArrow: { position: 'absolute', right: 16 },
   link: {
     ...globalStyles.row,
@@ -1974,7 +1947,7 @@ export const eventHeroStyles = StyleSheet.create({
     gap: 2,
     paddingTop: 10,
   },
-  linkText: { color: '#7c5cdb', fontSize: 13.5, fontWeight: '600' },
+  linkText: { color: '#7c5cdb', ...typography.buttonSmall },
 });
 
 /*
@@ -2008,18 +1981,12 @@ export const offersStyles = StyleSheet.create({
   /* The code, where the reference puts its category line. It is the part the
      customer carries to a checkout. */
   code: {
-    color: colors.textMuted,
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
+    color: textColor.textSecondary,
+    ...typography.overline,
   },
   title: {
-    color: HOME_NAVY,
-    fontSize: 17,
-    fontWeight: '700',
-    lineHeight: 22,
-    letterSpacing: -0.3,
+    color: textColor.textPrimary,
+    ...typography.h3,
     marginTop: 6,
   },
 
@@ -2035,17 +2002,18 @@ export const offersStyles = StyleSheet.create({
   },
   value: {
     color: HERO_ACCENT_COLOR,
-    fontSize: 26,
-    fontWeight: '700',
-    letterSpacing: -0.6,
+    ...typography.h1,
     flexShrink: 0,
   },
-  valueNote: { color: colors.textMuted, fontSize: 12.5, flexShrink: 1 },
+  valueNote: {
+    color: textColor.textSecondary,
+    ...typography.caption,
+    flexShrink: 1,
+  },
 
   terms: {
-    color: colors.textMuted,
-    fontSize: 12,
-    lineHeight: 16,
+    color: textColor.textSecondary,
+    ...typography.caption,
     marginTop: 6,
   },
   cta: {
@@ -2056,7 +2024,7 @@ export const offersStyles = StyleSheet.create({
     paddingVertical: 10,
     marginTop: 12,
   },
-  ctaText: { color: colors.onPrimary, fontSize: 13.5, fontWeight: '700' },
+  ctaText: { color: textColor.textOnPrimary, ...typography.buttonSmall },
 
   /*
    * The reference has a photograph here. A platform coupon has no picture of
@@ -2116,16 +2084,12 @@ export const couponSheetStyles = StyleSheet.create({
   headText: { flex: 1 },
   code: {
     color: HERO_ACCENT_COLOR,
-    fontSize: 12.5,
-    fontWeight: '700',
-    letterSpacing: 1.2,
+    ...typography.label,
   },
   title: {
-    color: HOME_NAVY,
-    fontSize: 22,
-    fontWeight: '700',
+    color: textColor.textPrimary,
+    ...typography.h2,
     marginTop: 4,
-    lineHeight: 28,
   },
   close: {
     width: 34,
@@ -2137,10 +2101,9 @@ export const couponSheetStyles = StyleSheet.create({
     flexShrink: 0,
   },
   description: {
-    color: '#414b5c',
-    fontSize: 14.5,
+    color: textColor.textSecondary,
+    ...typography.body,
     marginTop: 10,
-    lineHeight: 21,
   },
   rows: { marginTop: 18, borderTopWidth: 1, borderTopColor: '#efe9e5' },
   row: {
@@ -2151,11 +2114,11 @@ export const couponSheetStyles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#efe9e5',
   },
-  rowLabel: { color: colors.textMuted, fontSize: 14 },
+  rowLabel: { color: textColor.textSecondary, ...typography.label },
   rowValue: {
-    color: HOME_NAVY,
-    fontSize: 14.5,
-    fontWeight: '600',
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
     flexShrink: 1,
     textAlign: 'right',
   },
@@ -2165,7 +2128,11 @@ export const couponSheetStyles = StyleSheet.create({
     gap: 8,
     marginTop: 16,
   },
-  noteText: { color: '#5b6470', fontSize: 13, lineHeight: 19, flex: 1 },
+  noteText: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    flex: 1,
+  },
 });
 
 /** The illustration inside an occasion tile. */
@@ -2236,13 +2203,11 @@ export const occasionGridStyles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.55)',
   },
   tileLabel: {
-    color: HOME_INK.ink,
+    color: textColor.textPrimary,
     textAlign: 'center',
     /* A quarter of a phone is about 85pt of text. "Housewarming" fits that at
        11.5 and breaks mid-word at 12.5. */
-    fontSize: 11.5,
-    lineHeight: 15,
-    fontWeight: '500',
+    ...typography.label,
     minHeight: 30,
     paddingHorizontal: 1,
   },
@@ -2325,18 +2290,15 @@ export const packageCardStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   badgeText: {
-    color: '#ffffff',
-    fontWeight: '700',
-    fontSize: 11,
-    lineHeight: 15,
+    color: textColor.textOnPrimary,
+    ...typography.label,
   },
   content: { flex: 1, justifyContent: 'flex-end', padding: 12, gap: 4 },
-  title: { color: '#ffffff', fontSize: 15, lineHeight: 20, fontWeight: '700' },
-  subtitle: { color: 'rgba(255,255,255,0.75)', fontSize: 11, lineHeight: 15 },
+  title: { color: textColor.textOnPrimary, ...typography.h3 },
+  subtitle: { color: 'rgba(255,255,255,0.75)', ...typography.caption },
   meta: {
     color: 'rgba(255,255,255,0.7)',
-    fontSize: 10.5,
-    lineHeight: 15,
+    ...typography.caption,
     marginTop: 1,
   },
   priceLine: {
@@ -2347,19 +2309,16 @@ export const packageCardStyles = StyleSheet.create({
   },
   priceCaption: {
     color: 'rgba(255,255,255,0.7)',
-    fontSize: 10.5,
-    lineHeight: 14,
+    ...typography.caption,
   },
   price: {
-    color: '#ffffff',
-    fontSize: 15,
-    lineHeight: 20,
-    fontWeight: '700',
+    color: textColor.textOnPrimary,
+    ...typography.h3,
     flexShrink: 1,
   },
   listPrice: {
     color: 'rgba(255,255,255,0.55)',
-    fontSize: 11,
+    ...typography.caption,
     textDecorationLine: 'line-through',
   },
   /* "View Package": a wide frosted button, leaving room on its right for the
@@ -2378,10 +2337,8 @@ export const packageCardStyles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.3)',
   },
   ctaText: {
-    color: '#ffffff',
-    fontWeight: '600',
-    fontSize: 12.5,
-    lineHeight: 17,
+    color: textColor.textOnPrimary,
+    ...typography.buttonSmall,
   },
   heart: {
     position: 'absolute',
@@ -2491,7 +2448,11 @@ export const organizerRowStyles = StyleSheet.create({
     overflow: 'hidden',
   },
   logoImage: { width: '100%', height: '100%' },
-  logoText: { color: colors.onPrimary, fontWeight: '800', fontSize: 13 },
+  logoText: {
+    color: textColor.textOnPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
   body: {
     paddingHorizontal: spacing.s12,
     paddingTop: ORGANIZER_RING / 2 + 8,
@@ -2500,10 +2461,8 @@ export const organizerRowStyles = StyleSheet.create({
   },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   name: {
-    color: HOME_INK.ink,
-    fontWeight: '800',
-    fontSize: 14,
-    lineHeight: 19,
+    color: textColor.textPrimary,
+    ...typography.h3,
     flexShrink: 1,
   },
   ratingPill: {
@@ -2517,16 +2476,13 @@ export const organizerRowStyles = StyleSheet.create({
   },
   rating: {
     color: '#9a6a08',
-    fontWeight: '800',
-    fontSize: 11.5,
-    lineHeight: 15,
+    ...typography.label,
   },
-  reviews: { color: colors.textMuted, fontSize: 11, lineHeight: 15 },
+  reviews: { color: textColor.textSecondary, ...typography.caption },
   locationRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   location: {
-    color: colors.textMuted,
-    fontSize: 12,
-    lineHeight: 16,
+    color: textColor.textSecondary,
+    ...typography.caption,
     flexShrink: 1,
   },
   ratingLine: { flexDirection: 'row', alignItems: 'center', gap: 6 },
@@ -2537,12 +2493,12 @@ export const organizerRowStyles = StyleSheet.create({
     paddingVertical: 3,
     flexShrink: 1,
   },
-  tagText: { fontSize: 10.5, lineHeight: 14, fontWeight: '600' },
+  tagText: { ...typography.label },
   emptyText: {
-    color: colors.textMuted,
+    ...typography.body,
+    color: textColor.textSecondary,
     paddingHorizontal: spacing.md,
     marginTop: 12,
-    lineHeight: 20,
   },
 });
 
@@ -2570,11 +2526,9 @@ export const trustStripStyles = StyleSheet.create({
     backgroundColor: HOME_ACCENT.jadeSoft,
   },
   label: {
-    color: HOME_INK.ink,
-    fontSize: 12,
+    color: textColor.textPrimary,
+    ...typography.label,
     marginTop: 10,
-    lineHeight: 16,
-    fontWeight: '500',
   },
 });
 
@@ -2631,19 +2585,17 @@ export const otherEventCardStyles = StyleSheet.create({
     paddingVertical: 5,
   },
   pillDot: { width: 7, height: 7, borderRadius: 4 },
-  pillText: { color: HERO_ACCENT_COLOR, fontWeight: '700', fontSize: 11.5 },
+  pillText: { color: HERO_ACCENT_COLOR, ...typography.label },
   countdown: {
     borderRadius: 999,
     paddingHorizontal: 9,
     paddingVertical: 5,
     backgroundColor: HOME_NAVY,
   },
-  countdownText: { color: '#ffffff', fontWeight: '700', fontSize: 11 },
+  countdownText: { color: textColor.textOnPrimary, ...typography.label },
   title: {
-    color: HOME_NAVY,
-    fontSize: 20,
-    lineHeight: 26,
-    fontWeight: '800',
+    color: textColor.textPrimary,
+    ...typography.h3,
     maxWidth: '70%',
   },
   metaRow: {
@@ -2653,7 +2605,7 @@ export const otherEventCardStyles = StyleSheet.create({
     rowGap: 4,
   },
   metaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  metaText: { color: HOME_NAVY, fontWeight: '500' },
+  metaText: { color: textColor.textPrimary, ...fontWeights.medium },
   cta: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -2664,7 +2616,7 @@ export const otherEventCardStyles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 9,
   },
-  ctaText: { color: '#ffffff', fontWeight: '700', fontSize: 13 },
+  ctaText: { color: textColor.textOnPrimary, ...typography.buttonSmall },
   progressTrack: {
     position: 'absolute',
     left: 0,

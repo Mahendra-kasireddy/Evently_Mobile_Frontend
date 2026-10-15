@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { EventlyIcon, EventlyText, PressableScale } from '../../../Components';
+import { EventlyIcon, AppText, PressableScale } from '../../../Components';
 import { GUEST_COPY as COPY } from '../constants';
 import { rowStyles as s } from '../styles';
 import type { GuestRowViewModel, GuestStatus } from '../types';
@@ -51,25 +51,25 @@ export function GuestRow({ guest, onEdit }: GuestRowProps) {
       accessibilityLabel={`Edit ${guest.name}`}
     >
       <View style={[s.avatar, { backgroundColor: guest.avatarColor }]}>
-        <EventlyText variant="label" style={s.avatarText}>
+        <AppText variant="h3" style={s.avatarText}>
           {guest.initials}
-        </EventlyText>
+        </AppText>
       </View>
 
       <View style={s.text}>
-        <EventlyText variant="cardTitle" style={s.name} numberOfLines={1}>
+        <AppText variant="h3" style={s.name} numberOfLines={1}>
           {guest.name}
-        </EventlyText>
-        <EventlyText variant="small" style={s.meta} numberOfLines={1}>
+        </AppText>
+        <AppText variant="bodySmall" style={s.meta} numberOfLines={1}>
           {guest.metaLine}
-        </EventlyText>
+        </AppText>
       </View>
 
       <View style={[s.status, { backgroundColor: st.wash }]}>
         <EventlyIcon name={st.icon} size={13} color={st.ink} />
-        <EventlyText style={[s.statusText, { color: st.ink }]}>
+        <AppText variant="label" style={[s.statusText, { color: st.ink }]}>
           {st.label}
-        </EventlyText>
+        </AppText>
       </View>
     </PressableScale>
   );

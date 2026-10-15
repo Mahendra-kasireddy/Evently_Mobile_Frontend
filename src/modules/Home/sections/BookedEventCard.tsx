@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Image, Modal, Pressable, TouchableOpacity, View } from 'react-native';
 import type { ImageSourcePropType } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import {
   BOOKED_CARD_PHOTO_BG,
   BOOKED_CTA,
@@ -89,9 +89,9 @@ function Fact({
   return (
     <View style={s.fact}>
       <EventlyIcon name={icon} size={16} color={HOME_NAVY} />
-      <EventlyText variant="caption" style={s.factText} numberOfLines={lines}>
+      <AppText variant="caption" style={s.factText} numberOfLines={lines}>
         {text}
-      </EventlyText>
+      </AppText>
     </View>
   );
 }
@@ -125,8 +125,8 @@ function Milestones({ steps }: { steps: BookedStep[] }) {
                 color={step.done || isNext ? colors.onPrimary : HOME_NAVY}
               />
             </View>
-            <EventlyText
-              variant="caption"
+            <AppText
+              variant="label"
               style={[
                 s.stepLabel,
                 step.done && s.stepLabelDone,
@@ -135,7 +135,7 @@ function Milestones({ steps }: { steps: BookedStep[] }) {
               numberOfLines={2}
             >
               {step.label}
-            </EventlyText>
+            </AppText>
           </View>
         );
       })}
@@ -215,15 +215,15 @@ export function BookedEventCard({
         <View style={s.topRow}>
           <View style={s.statusPill}>
             <EventlyIcon name="check" size={13} color={HERO_ACCENT_COLOR} />
-            <EventlyText variant="caption" style={s.statusText}>
+            <AppText variant="label" style={s.statusText}>
               {BOOKED_STATUS_LABEL[data.status]}
-            </EventlyText>
+            </AppText>
           </View>
           {/* Decoration, and optional: an older booking has no reference. */}
           {data.ref ? (
-            <EventlyText variant="caption" style={s.ref} numberOfLines={1}>
+            <AppText variant="caption" style={s.ref} numberOfLines={1}>
               {data.ref}
-            </EventlyText>
+            </AppText>
           ) : null}
           <View style={s.topSpacer} />
           <TouchableOpacity
@@ -237,9 +237,9 @@ export function BookedEventCard({
           </TouchableOpacity>
         </View>
 
-        <EventlyText variant="h1" style={s.title} numberOfLines={1}>
+        <AppText variant="h1" style={s.title} numberOfLines={1}>
           {data.title}
-        </EventlyText>
+        </AppText>
 
         {/* Each fact is dropped rather than left as an empty line for a
             booking that came from no brief. */}
@@ -254,13 +254,13 @@ export function BookedEventCard({
         {data.steps.length > 0 ? (
           <>
             <View style={s.progressHead}>
-              <EventlyText variant="subtitle" style={s.progressTitle}>
+              <AppText variant="body" weight="medium" style={s.progressTitle}>
                 Event planning progress
-              </EventlyText>
+              </AppText>
               <View style={s.progressCountRow}>
-                <EventlyText variant="caption" style={s.progressCount}>
+                <AppText variant="caption" style={s.progressCount}>
                   {data.stepsDoneLabel}
-                </EventlyText>
+                </AppText>
                 <EventlyIcon name="chevron-right" size={16} color={HOME_NAVY} />
               </View>
             </View>
@@ -277,20 +277,17 @@ export function BookedEventCard({
             />
           </View>
           <View style={s.statusTextCol}>
-            <EventlyText
-              variant="subtitle"
+            <AppText
+              variant="body"
+              weight="medium"
               style={s.statusTitle}
               numberOfLines={1}
             >
               {status.title}
-            </EventlyText>
-            <EventlyText
-              variant="caption"
-              style={s.statusBody}
-              numberOfLines={2}
-            >
+            </AppText>
+            <AppText variant="caption" style={s.statusBody} numberOfLines={2}>
               {status.body}
-            </EventlyText>
+            </AppText>
           </View>
           <EventlyIcon name="chevron-right" size={20} color={HOME_NAVY} />
         </View>
@@ -317,9 +314,9 @@ export function BookedEventCard({
                 size={20}
                 color={HOME_NAVY}
               />
-              <EventlyText variant="body" style={s.menuText}>
+              <AppText variant="body" style={s.menuText}>
                 {BOOKED_CTA}
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
             {onMessageOrganizer ? (
               <TouchableOpacity
@@ -335,13 +332,9 @@ export function BookedEventCard({
                   size={20}
                   color={BOOKED_STEP_DONE_COLOR}
                 />
-                <EventlyText
-                  variant="body"
-                  style={s.menuText}
-                  numberOfLines={1}
-                >
+                <AppText variant="body" style={s.menuText} numberOfLines={1}>
                   {`Message ${data.organizerName}`}
-                </EventlyText>
+                </AppText>
               </TouchableOpacity>
             ) : null}
             <TouchableOpacity
@@ -349,9 +342,9 @@ export function BookedEventCard({
               onPress={() => setMenuOpen(false)}
               accessibilityRole="button"
             >
-              <EventlyText variant="body" style={s.menuCancel}>
+              <AppText variant="body" style={s.menuCancel}>
                 Cancel
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
           </Pressable>
         </Pressable>

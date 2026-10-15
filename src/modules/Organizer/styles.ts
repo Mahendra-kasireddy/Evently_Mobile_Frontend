@@ -1,6 +1,13 @@
 import { StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { brand, colors, fontFor, spacing } from '../../theme';
+import {
+  brand,
+  colors,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+} from '../../theme';
 import {
   ORG_ACCENT,
   ORG_BAR,
@@ -24,7 +31,13 @@ export const WORK_TILE_HEIGHT = 208;
 
 /** Every card on this screen shares one shape, so the column reads as one thing. */
 /** RN's own absoluteFillObject isn't in this version's types; same thing. */
-const fill = { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } as const;
+const fill = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+} as const;
 
 const card = {
   backgroundColor: brand.surface,
@@ -36,10 +49,19 @@ const card = {
 export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: ORG_CANVAS },
   content: { paddingBottom: spacing.s40 },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
-  loadingText: { color: colors.textMuted, marginTop: spacing.md },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.lg,
+  },
+  loadingText: { color: textColor.textSecondary, marginTop: spacing.md },
   errorTitle: { color: ORG_NAVY, marginTop: spacing.md, textAlign: 'center' },
-  errorText: { color: colors.danger, textAlign: 'center', marginTop: spacing.sm },
+  errorText: {
+    color: textColor.textError,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+  },
   retryButton: {
     ...globalStyles.row,
     gap: spacing.xs,
@@ -50,7 +72,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },
-  retryText: { color: ORG_ACCENT, fontWeight: '700' },
+  retryText: { color: ORG_ACCENT, ...fontWeights.bold },
 
   /** Section headings sit in the gutter; the cards they head are inset the same. */
   sectionHead: {
@@ -61,10 +83,10 @@ export const styles = StyleSheet.create({
     marginTop: spacing.lg,
     marginBottom: spacing.s12,
   },
-  sectionTitle: { color: ORG_NAVY, letterSpacing: -0.2 },
-  sectionMeta: { color: brand.textMuted },
+  sectionTitle: { ...typography.h2, color: ORG_NAVY },
+  sectionMeta: { color: textColor.textSecondary },
   note: {
-    color: brand.textMuted,
+    color: textColor.textSecondary,
     paddingHorizontal: spacing.md,
     marginTop: spacing.s12,
   },
@@ -111,7 +133,7 @@ export const coverStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.16)',
   },
-  badgeText: { color: brand.onNavy },
+  badgeText: { color: textColor.textOnPrimary },
 });
 
 // ---------------------------------------------------------------------------
@@ -137,9 +159,9 @@ export const identityStyles = StyleSheet.create({
     borderWidth: 3,
     borderColor: brand.surface,
   },
-  avatarText: { color: brand.onNavy, fontSize: 24, lineHeight: 30, fontWeight: '700' },
+  avatarText: { color: textColor.textOnPrimary, ...typography.h1 },
   headText: { flex: 1, gap: 6 },
-  name: { color: ORG_NAVY, fontSize: 23, lineHeight: 29, letterSpacing: -0.4, fontWeight: '700' },
+  name: { color: ORG_NAVY, ...typography.h2 },
   tierChip: {
     ...globalStyles.row,
     alignSelf: 'flex-start',
@@ -149,15 +171,19 @@ export const identityStyles = StyleSheet.create({
     paddingHorizontal: 10,
     backgroundColor: brand.coolSoft,
   },
-  tierText: { color: brand.textMuted },
+  tierText: { color: textColor.textSecondary },
   place: { color: brand.textMuted },
 
-  divider: { height: 1, backgroundColor: ORG_HAIRLINE, marginVertical: spacing.md },
+  divider: {
+    height: 1,
+    backgroundColor: ORG_HAIRLINE,
+    marginVertical: spacing.md,
+  },
 
   stats: { ...globalStyles.row, justifyContent: 'space-between' },
   stat: { flex: 1, gap: 2 },
-  statValue: { color: ORG_NAVY, fontSize: 21, lineHeight: 26, letterSpacing: -0.3, fontWeight: '700' },
-  statLabel: { color: brand.textMuted },
+  statValue: { color: ORG_NAVY, ...typography.h2 },
+  statLabel: { color: textColor.textSecondary },
 });
 
 // ---------------------------------------------------------------------------
@@ -177,7 +203,7 @@ export const availabilityStyles = StyleSheet.create({
     borderColor: '#d7e8df',
   },
   text: { flex: 1, gap: 3 },
-  title: { color: '#1c3f33', fontWeight: '600' },
+  title: { color: textColor.textPrimary, ...fontWeights.semibold },
   detail: { color: '#476155' },
   hold: {
     borderRadius: 999,
@@ -187,7 +213,7 @@ export const availabilityStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#cfe2d8',
   },
-  holdText: { color: ORG_GREEN, fontWeight: '600' },
+  holdText: { color: ORG_GREEN, ...fontWeights.semibold },
 });
 
 // ---------------------------------------------------------------------------
@@ -197,7 +223,11 @@ export const availabilityStyles = StyleSheet.create({
 export const assuranceStyles = StyleSheet.create({
   card: { ...card, marginHorizontal: spacing.md, marginTop: spacing.s12 },
   row: { ...globalStyles.row, gap: spacing.s12, padding: spacing.md },
-  divider: { height: 1, backgroundColor: ORG_HAIRLINE, marginHorizontal: spacing.md },
+  divider: {
+    height: 1,
+    backgroundColor: ORG_HAIRLINE,
+    marginHorizontal: spacing.md,
+  },
   text: { flex: 1, color: ORG_NAVY },
 });
 
@@ -257,23 +287,34 @@ export const ratingStyles = StyleSheet.create({
     padding: spacing.md,
   },
   left: { alignItems: 'flex-start', gap: 4, minWidth: 92 },
-  score: { color: ORG_NAVY, fontSize: 46, lineHeight: 52, letterSpacing: -1.4, fontWeight: '700' },
+  score: { color: ORG_NAVY, ...typography.display },
   stars: { ...globalStyles.row, gap: 1 },
-  reviews: { color: ORG_ACCENT, fontWeight: '600' },
+  reviews: { color: ORG_ACCENT, ...fontWeights.semibold },
   bars: { flex: 1, gap: 6, paddingTop: 6 },
   barRow: { ...globalStyles.row, gap: spacing.sm },
   barStars: { color: brand.textMuted, width: 10 },
-  track: { flex: 1, height: 7, borderRadius: 999, backgroundColor: ORG_TRACK, overflow: 'hidden' },
+  track: {
+    flex: 1,
+    height: 7,
+    borderRadius: 999,
+    backgroundColor: ORG_TRACK,
+    overflow: 'hidden',
+  },
   fill: { height: '100%', borderRadius: 999, backgroundColor: ORG_BAR },
-  barCount: { color: brand.textMuted, width: 26, textAlign: 'right' },
+  barCount: { color: textColor.textSecondary, width: 26, textAlign: 'right' },
 
-  emptyBody: { color: brand.textMuted, flex: 1 },
+  emptyBody: { ...typography.body, color: textColor.textSecondary, flex: 1 },
   completed: { color: brand.textMuted, marginTop: 2 },
 });
 
 /** The one review shown inline, as a taste of the full page. */
 export const previewStyles = StyleSheet.create({
-  card: { ...card, marginHorizontal: spacing.md, marginTop: spacing.s12, padding: spacing.md },
+  card: {
+    ...card,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.s12,
+    padding: spacing.md,
+  },
   head: { ...globalStyles.row, gap: spacing.s12 },
   avatar: {
     width: 38,
@@ -282,14 +323,19 @@ export const previewStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { color: brand.onNavy },
+  avatarText: { color: textColor.textOnPrimary },
   headText: { flex: 1, gap: 1 },
   name: { color: ORG_NAVY },
-  context: { color: brand.textMuted },
+  context: { color: textColor.textSecondary },
   scoreRow: { ...globalStyles.row, gap: 3 },
-  score: { color: ORG_NAVY, fontWeight: '600' },
+  score: { color: ORG_NAVY, ...fontWeights.semibold },
   comment: { color: brand.textMuted, marginTop: spacing.s12 },
-  all: { ...globalStyles.row, gap: 3, alignSelf: 'flex-start', marginTop: spacing.s12 },
+  all: {
+    ...globalStyles.row,
+    gap: 3,
+    alignSelf: 'flex-start',
+    marginTop: spacing.s12,
+  },
   allText: { color: ORG_ACCENT },
 });
 
@@ -309,8 +355,8 @@ export const footerStyles = StyleSheet.create({
   },
   row: { ...globalStyles.row, justifyContent: 'space-between' },
   typicalRow: { ...globalStyles.row, gap: 6 },
-  typicalLabel: { color: brand.textPlaceholder, letterSpacing: 0.6 },
-  typicalValue: { color: ORG_NAVY, fontSize: 17, lineHeight: 22, fontWeight: '700' },
+  typicalLabel: { color: textColor.textDisabled },
+  typicalValue: { color: ORG_NAVY, ...typography.h3 },
   replyRow: { ...globalStyles.row, gap: 6 },
   dot: { width: 7, height: 7, borderRadius: 999, backgroundColor: ORG_CHECK },
   reassurance: { color: brand.textMuted },
@@ -336,16 +382,21 @@ export const footerStyles = StyleSheet.create({
   },
   ctaBusy: { opacity: 0.7 },
   ctaDone: { backgroundColor: brand.disabledBg },
-  ctaText: { color: brand.onAccent, fontSize: 17, lineHeight: 22, fontWeight: '600' },
+  ctaText: { color: textColor.textOnPrimary, ...typography.button },
   ctaNote: { color: 'rgba(255,255,255,0.86)' },
-  ctaDoneText: { color: brand.textMuted },
-  error: { color: colors.danger },
+  ctaDoneText: { color: textColor.textSecondary },
+  error: { color: textColor.textError },
 });
 
 export const reviewsStyles = StyleSheet.create({
   container: { flex: 1, backgroundColor: ORG_CANVAS },
   list: { padding: spacing.md, paddingBottom: spacing.xl },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.lg,
+  },
   centeredIcon: {
     width: 64,
     height: 64,
@@ -354,9 +405,23 @@ export const reviewsStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  emptyTitle: { color: ORG_NAVY, marginTop: spacing.md, textAlign: 'center' },
-  emptyBody: { color: colors.textMuted, marginTop: spacing.sm, textAlign: 'center', lineHeight: 20 },
-  errorText: { color: colors.danger, textAlign: 'center', marginTop: spacing.sm },
+  emptyTitle: {
+    ...typography.h2,
+    color: ORG_NAVY,
+    marginTop: spacing.md,
+    textAlign: 'center',
+  },
+  emptyBody: {
+    ...typography.body,
+    color: textColor.textSecondary,
+    marginTop: spacing.sm,
+    textAlign: 'center',
+  },
+  errorText: {
+    color: textColor.textError,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+  },
   retryButton: {
     ...globalStyles.row,
     gap: spacing.xs,
@@ -367,7 +432,7 @@ export const reviewsStyles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },
-  retryText: { color: ORG_ACCENT, fontWeight: '700' },
+  retryText: { color: ORG_ACCENT, ...fontWeights.bold },
   more: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -378,7 +443,7 @@ export const reviewsStyles = StyleSheet.create({
     backgroundColor: colors.background,
     marginTop: 4,
   },
-  moreText: { color: ORG_NAVY, fontSize: 15, fontWeight: '600' },
+  moreText: { color: ORG_NAVY, ...typography.h3 },
 });
 
 export const summaryCardStyles = StyleSheet.create({
@@ -393,14 +458,33 @@ export const summaryCardStyles = StyleSheet.create({
     marginBottom: 14,
   },
   left: { alignItems: 'center', flexShrink: 0 },
-  score: { color: ORG_NAVY, fontSize: 42, fontWeight: '700', letterSpacing: -1.2 },
-  total: { color: colors.textMuted, fontSize: 13, marginTop: 2 },
+  score: { color: ORG_NAVY, ...typography.display },
+  total: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    marginTop: 2,
+  },
   bars: { flex: 1, gap: 7 },
   barRow: { ...globalStyles.row, gap: 10 },
-  barStars: { color: colors.textMuted, fontSize: 13, width: 10 },
-  track: { flex: 1, height: 8, borderRadius: 999, backgroundColor: ORG_TRACK, overflow: 'hidden' },
+  barStars: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    width: 10,
+  },
+  track: {
+    flex: 1,
+    height: 8,
+    borderRadius: 999,
+    backgroundColor: ORG_TRACK,
+    overflow: 'hidden',
+  },
   fill: { height: '100%', borderRadius: 999, backgroundColor: '#e8a33a' },
-  barCount: { color: colors.textMuted, fontSize: 13, minWidth: 22, textAlign: 'right' },
+  barCount: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    minWidth: 22,
+    textAlign: 'right',
+  },
 
   tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 14 },
   tag: {
@@ -413,8 +497,8 @@ export const summaryCardStyles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
   },
-  tagLabel: { color: ORG_NAVY, fontSize: 14.5, fontWeight: '500' },
-  tagCount: { color: colors.textMuted, fontSize: 14 },
+  tagLabel: { color: ORG_NAVY, ...typography.body, ...fontWeights.medium },
+  tagCount: { color: textColor.textSecondary, ...typography.body },
 });
 
 export const reviewCardStyles = StyleSheet.create({
@@ -427,20 +511,43 @@ export const reviewCardStyles = StyleSheet.create({
     marginBottom: 12,
   },
   head: { ...globalStyles.row, gap: 12 },
-  avatar: { width: 46, height: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { color: colors.onPrimary, fontSize: 15, fontWeight: '700' },
+  avatar: {
+    width: 46,
+    height: 46,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarText: { color: textColor.textOnPrimary, ...typography.h3 },
   headText: { flex: 1 },
-  name: { color: ORG_NAVY, fontSize: 16, fontWeight: '700' },
-  context: { color: colors.textMuted, fontSize: 13.5, marginTop: 1, lineHeight: 18 },
+  name: { color: ORG_NAVY, ...typography.h3 },
+  context: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    marginTop: 1,
+  },
   stars: { ...globalStyles.row, gap: 3, flexShrink: 0 },
-  comment: { color: '#25303f', fontSize: 15, lineHeight: 22, marginTop: 12 },
+  comment: {
+    color: textColor.textPrimary,
+    ...typography.bodyLarge,
+    marginTop: 12,
+  },
   tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10 },
-  tag: { borderRadius: 999, backgroundColor: ORG_TRACK, paddingHorizontal: 10, paddingVertical: 4 },
-  tagText: { color: '#5b6470', fontSize: 12 },
+  tag: {
+    borderRadius: 999,
+    backgroundColor: ORG_TRACK,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  tagText: { color: textColor.textSecondary, ...typography.label },
 });
 
 export const leaveReviewStyles = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: 'rgba(14,26,51,0.45)', justifyContent: 'flex-end' },
+  backdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(14,26,51,0.45)',
+    justifyContent: 'flex-end',
+  },
   sheet: {
     backgroundColor: ORG_CANVAS,
     borderTopLeftRadius: 24,
@@ -456,28 +563,34 @@ export const leaveReviewStyles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 10,
   },
-  title: { color: ORG_NAVY, fontSize: 22, fontWeight: '700', paddingHorizontal: spacing.md, marginTop: spacing.md },
+  title: {
+    color: ORG_NAVY,
+    ...typography.h2,
+    paddingHorizontal: spacing.md,
+    marginTop: spacing.md,
+  },
   subtitle: {
-    color: colors.textMuted,
-    fontSize: 13.5,
-    lineHeight: 19,
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
     paddingHorizontal: spacing.md,
     marginTop: 4,
   },
   groupLabel: {
-    color: '#7b8595',
-    fontSize: 12.5,
-    fontWeight: '700',
-    letterSpacing: 0.9,
-    textTransform: 'uppercase',
+    color: textColor.textSecondary,
+    ...typography.overline,
     paddingHorizontal: spacing.md,
     marginTop: spacing.lg,
     marginBottom: 10,
   },
   starRow: { ...globalStyles.row, gap: 10, paddingHorizontal: spacing.md },
   starButton: { padding: 2 },
-  starWord: { color: ORG_NAVY, fontSize: 15, fontWeight: '600', marginLeft: 6 },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: spacing.md },
+  starWord: { color: ORG_NAVY, ...typography.h3, marginLeft: 6 },
+  chips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingHorizontal: spacing.md,
+  },
   chip: {
     borderRadius: 999,
     borderWidth: 1,
@@ -487,7 +600,11 @@ export const leaveReviewStyles = StyleSheet.create({
     paddingVertical: 8,
   },
   chipOn: { backgroundColor: ORG_NAVY, borderColor: ORG_NAVY },
-  chipText: { color: '#414b5c', fontSize: 13.5, fontWeight: '500' },
+  chipText: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    ...fontWeights.medium,
+  },
   chipTextOn: { color: colors.onPrimary },
   input: {
     borderRadius: 14,
@@ -498,13 +615,12 @@ export const leaveReviewStyles = StyleSheet.create({
     marginHorizontal: spacing.md,
     minHeight: 110,
     textAlignVertical: 'top',
-    color: colors.text,
-    fontFamily: fontFor('400'),
+    color: textColor.textPrimary,
+    ...fontWeights.regular,
   },
   permanence: {
-    color: colors.textMuted,
-    fontSize: 12.5,
-    lineHeight: 18,
+    color: textColor.textSecondary,
+    ...typography.caption,
     paddingHorizontal: spacing.md,
     marginTop: 12,
   },
@@ -518,6 +634,11 @@ export const leaveReviewStyles = StyleSheet.create({
     marginTop: 12,
   },
   submitDisabled: { opacity: 0.45 },
-  submitText: { color: colors.onPrimary, fontSize: 16, fontWeight: '600' },
-  error: { color: colors.danger, fontSize: 13, textAlign: 'center', marginTop: 8 },
+  submitText: { color: textColor.textOnPrimary, ...typography.h3 },
+  error: {
+    color: textColor.textError,
+    ...typography.caption,
+    textAlign: 'center',
+    marginTop: 8,
+  },
 });

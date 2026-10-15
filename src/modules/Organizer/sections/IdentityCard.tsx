@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { brand } from '../../../theme';
 import { identityStyles as s } from '../styles';
 import type { OrganizerViewModel } from '../types';
@@ -20,25 +20,31 @@ export function IdentityCard({ organizer }: IdentityCardProps) {
     <View style={s.card}>
       <View style={s.head}>
         <View style={[s.avatar, { backgroundColor: organizer.avatarColor }]}>
-          <EventlyText style={s.avatarText}>{organizer.initials}</EventlyText>
+          <AppText variant="h1" style={s.avatarText}>
+            {organizer.initials}
+          </AppText>
         </View>
 
         <View style={s.headText}>
-          <EventlyText style={s.name} numberOfLines={2}>
+          <AppText variant="h2" style={s.name} numberOfLines={2}>
             {organizer.name}
-          </EventlyText>
+          </AppText>
 
           <View style={s.tierChip}>
-            <EventlyIcon name="medal-outline" size={12} color={brand.textMuted} />
-            <EventlyText variant="small" style={s.tierText}>
+            <EventlyIcon
+              name="medal-outline"
+              size={12}
+              color={brand.textMuted}
+            />
+            <AppText variant="bodySmall" style={s.tierText}>
               {organizer.tier} partner
-            </EventlyText>
+            </AppText>
           </View>
 
           {organizer.placeLabel ? (
-            <EventlyText variant="body" style={s.place} numberOfLines={1}>
+            <AppText variant="body" style={s.place} numberOfLines={1}>
               {organizer.placeLabel}
-            </EventlyText>
+            </AppText>
           ) : null}
         </View>
       </View>
@@ -47,12 +53,18 @@ export function IdentityCard({ organizer }: IdentityCardProps) {
         <>
           <View style={s.divider} />
           <View style={s.stats}>
-            {organizer.stats.map((stat) => (
+            {organizer.stats.map(stat => (
               <View key={stat.key} style={s.stat}>
-                <EventlyText style={s.statValue}>{stat.value}</EventlyText>
-                <EventlyText variant="small" style={s.statLabel} numberOfLines={1}>
+                <AppText variant="h2" style={s.statValue}>
+                  {stat.value}
+                </AppText>
+                <AppText
+                  variant="bodySmall"
+                  style={s.statLabel}
+                  numberOfLines={1}
+                >
                   {stat.label}
-                </EventlyText>
+                </AppText>
               </View>
             ))}
           </View>

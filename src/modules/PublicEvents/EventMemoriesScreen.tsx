@@ -17,7 +17,7 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
+import { AppHeader, EventlyIcon, AppText } from '../../Components';
 import { absoluteFileUrl } from '../../services/urls';
 import { normalizeError } from '../../services/errors';
 import type { RootStackParamList } from '../../navigation/types';
@@ -118,9 +118,9 @@ export function EventMemoriesScreen() {
       ) : null}
       {item.status === 'pending' ? (
         <View style={s.pending}>
-          <EventlyText variant="caption" style={s.pendingText}>
+          <AppText variant="label" style={s.pendingText}>
             Awaiting approval
-          </EventlyText>
+          </AppText>
         </View>
       ) : null}
     </TouchableOpacity>
@@ -141,12 +141,9 @@ export function EventMemoriesScreen() {
               accessibilityRole="tab"
               accessibilityState={{ selected: on }}
             >
-              <EventlyText
-                variant="caption"
-                style={[s.tabText, on && s.tabTextOn]}
-              >
+              <AppText variant="label" style={[s.tabText, on && s.tabTextOn]}>
                 {t.label}
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
           );
         })}
@@ -171,13 +168,13 @@ export function EventMemoriesScreen() {
             {loading ? (
               <ActivityIndicator color={PE_PURPLE} />
             ) : (
-              <EventlyText variant="body" style={[ui.muted, ui.centerText]}>
+              <AppText variant="body" style={[ui.muted, ui.centerText]}>
                 {error
                   ? error.message
                   : data?.canUpload
                   ? 'No memories yet. Be the first to add one.'
                   : 'No memories have been shared yet.'}
-              </EventlyText>
+              </AppText>
             )}
           </View>
         }
@@ -186,9 +183,9 @@ export function EventMemoriesScreen() {
       {data?.canUpload ? (
         <View style={[ui.bar, { paddingBottom: Math.max(insets.bottom, 12) }]}>
           {uploadError ? (
-            <EventlyText variant="caption" style={ui.error}>
+            <AppText variant="caption" style={ui.error}>
               {uploadError}
-            </EventlyText>
+            </AppText>
           ) : null}
           <TouchableOpacity
             style={[s.add, uploading && ui.primaryOff]}
@@ -208,9 +205,9 @@ export function EventMemoriesScreen() {
                   size={18}
                   color="#ffffff"
                 />
-                <EventlyText variant="body" style={ui.primaryText}>
+                <AppText variant="h3" style={ui.primaryText}>
                   Add Memory
-                </EventlyText>
+                </AppText>
               </>
             )}
           </TouchableOpacity>

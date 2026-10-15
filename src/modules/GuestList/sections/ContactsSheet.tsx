@@ -6,11 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {
-  EventlyIcon,
-  EventlyText,
-  EventlyTextInput,
-} from '../../../Components';
+import { EventlyIcon, AppText, EventlyTextInput } from '../../../Components';
 import { GUEST_MUTED } from '../constants';
 import { contactsSheetStyles as s, sheetStyles as base } from '../styles';
 import type { ContactCandidate } from '../useContactsImport';
@@ -99,7 +95,9 @@ export function ContactsSheet({
           <View style={base.grabber} />
 
           <View style={base.head}>
-            <EventlyText style={base.title}>Add from contacts</EventlyText>
+            <AppText variant="h2" style={base.title}>
+              Add from contacts
+            </AppText>
             <TouchableOpacity
               style={base.close}
               onPress={close}
@@ -121,9 +119,9 @@ export function ContactsSheet({
 
           <ScrollView style={s.list} showsVerticalScrollIndicator={false}>
             {shown.length === 0 ? (
-              <EventlyText variant="body" style={s.empty}>
+              <AppText variant="body" style={s.empty}>
                 No contacts match that.
-              </EventlyText>
+              </AppText>
             ) : (
               shown.map(contact => {
                 const on = picked.includes(contact.key);
@@ -143,20 +141,16 @@ export function ContactsSheet({
                       ) : null}
                     </View>
                     <View style={s.rowText}>
-                      <EventlyText
-                        variant="cardTitle"
-                        style={s.name}
-                        numberOfLines={1}
-                      >
+                      <AppText variant="h3" style={s.name} numberOfLines={1}>
                         {contact.name}
-                      </EventlyText>
-                      <EventlyText
-                        variant="small"
+                      </AppText>
+                      <AppText
+                        variant="bodySmall"
                         style={s.phone}
                         numberOfLines={1}
                       >
                         {contact.phone}
-                      </EventlyText>
+                      </AppText>
                     </View>
                   </TouchableOpacity>
                 );
@@ -181,7 +175,7 @@ export function ContactsSheet({
                   }`
             }
           >
-            <EventlyText style={base.saveText}>
+            <AppText variant="h3" style={base.saveText}>
               {isSaving
                 ? 'Adding…'
                 : picked.length === 0
@@ -189,7 +183,7 @@ export function ContactsSheet({
                 : `Add ${picked.length} ${
                     picked.length === 1 ? 'guest' : 'guests'
                   }`}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </Pressable>
       </Pressable>

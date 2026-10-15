@@ -16,7 +16,7 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import {
   AppHeader,
   EventlyIcon,
-  EventlyText,
+  AppText,
   FadeInUp,
   GradientFill,
   PressableScale,
@@ -50,6 +50,7 @@ import { fetchCities } from '../Search/services';
 import { PE_ACCENT, PE_NAVY } from './styles';
 import { PE_MUTED, listUi as s, ui } from './ui.styles';
 import type { EventCard } from './types';
+import { useScrollTopOnBlur } from '../../hooks/useScrollTopOnBlur';
 
 /* Typed against the root list without naming a route of its own: this screen
    is a tab, and the places it leads to are pushed on the stack above. */
@@ -122,25 +123,25 @@ function EventListCard({
         {event.category ? (
           <View style={s.categoryPill}>
             <GradientFill colors={gradient} direction="across" />
-            <EventlyText
-              variant="caption"
+            <AppText
+              variant="label"
               style={s.categoryPillText}
               numberOfLines={1}
             >
               {event.category}
-            </EventlyText>
+            </AppText>
           </View>
         ) : null}
 
         {/* The day, big, on frosted glass — the first thing a poster says. */}
         {date ? (
           <View style={s.dateBlock}>
-            <EventlyText variant="h2" style={s.dateDay}>
+            <AppText variant="h2" style={s.dateDay}>
               {date.day}
-            </EventlyText>
-            <EventlyText variant="caption" style={s.dateMonth}>
+            </AppText>
+            <AppText variant="label" style={s.dateMonth}>
               {date.month}
-            </EventlyText>
+            </AppText>
           </View>
         ) : null}
 
@@ -151,22 +152,22 @@ function EventListCard({
         ) : null}
 
         <View style={s.posterText}>
-          <EventlyText variant="h2" style={s.title} numberOfLines={2}>
+          <AppText variant="h3" style={s.title} numberOfLines={2}>
             {event.title}
-          </EventlyText>
+          </AppText>
           <View style={s.posterLine}>
             <EventlyIcon
               name="clock-outline"
               size={13}
               color="rgba(255,255,255,0.85)"
             />
-            <EventlyText
+            <AppText
               variant="caption"
               style={s.posterLineText}
               numberOfLines={1}
             >
               {weekdayTime(event.startDateTime, event.timezone)}
-            </EventlyText>
+            </AppText>
           </View>
           {where ? (
             <View style={s.posterLine}>
@@ -175,13 +176,13 @@ function EventListCard({
                 size={13}
                 color="rgba(255,255,255,0.85)"
               />
-              <EventlyText
+              <AppText
                 variant="caption"
                 style={s.posterLineText}
                 numberOfLines={1}
               >
                 {where}
-              </EventlyText>
+              </AppText>
             </View>
           ) : null}
         </View>
@@ -195,24 +196,24 @@ function EventListCard({
               size={13}
               color={event.soldOut ? '#d93b3b' : PE_NAVY}
             />
-            <EventlyText
-              variant="caption"
+            <AppText
+              variant="label"
               style={[s.noteText, event.soldOut && s.noteTextSold]}
               numberOfLines={1}
             >
               {note}
-            </EventlyText>
+            </AppText>
           </View>
         ) : (
           <View style={s.priceBlock}>
-            <EventlyText variant="caption" style={s.priceFrom}>
+            <AppText variant="caption" style={s.priceFrom}>
               {event.startingPrice > 0 ? 'Tickets from' : 'Entry'}
-            </EventlyText>
-            <EventlyText variant="h2" style={s.price}>
+            </AppText>
+            <AppText variant="h3" style={s.price}>
               {event.startingPrice > 0
                 ? formatPrice(event.startingPrice)
                 : 'Free'}
-            </EventlyText>
+            </AppText>
           </View>
         )}
         {/* Drawn as a button, pressed as part of the card. */}
@@ -221,9 +222,9 @@ function EventListCard({
             colors={note ? ['#8a93a3', '#5b6475'] : gradient}
             direction="across"
           />
-          <EventlyText variant="caption" style={s.bookText}>
+          <AppText variant="label" style={s.bookText}>
             {note ? 'View details' : 'Book now'}
-          </EventlyText>
+          </AppText>
           <EventlyIcon name="arrow-right" size={14} color="#ffffff" />
         </View>
       </View>
@@ -240,6 +241,8 @@ function EventListCard({
  * send that would show a draft.
  */
 export function PublicEventsScreen() {
+  /* Leaving the tab puts it back at the top for next time. */
+  const scrollRef = useScrollTopOnBlur();
   const navigation = useNavigation<Nav>();
   const insets = useSafeAreaInsets();
   const place = useAppSelector(selectLocationPlace);
@@ -293,15 +296,19 @@ export function PublicEventsScreen() {
               testID="open-my-tickets"
               style={s.ticketsButton}
             >
-              <EventlyIcon name="ticket-confirmation-outline" size={15} color={PE_ACCENT} />
-              <EventlyText variant="caption" style={s.ticketsButtonText}>
+              <EventlyIcon
+                name="ticket-confirmation-outline"
+                size={15}
+                color={PE_ACCENT}
+              />
+              <AppText variant="buttonSmall" style={s.ticketsButtonText}>
                 My Tickets
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
           }
         />
 
-      <View style={s.searchRow}>
+        <View style={s.searchRow}>
           <View style={s.searchField}>
             <EventlyIcon name="magnify" size={18} color={PE_MUTED} />
             <TextInput
@@ -342,9 +349,9 @@ export function PublicEventsScreen() {
             />
             {filterCount > 0 ? (
               <View style={s.filterBadge}>
-                <EventlyText variant="caption" style={s.filterBadgeText}>
+                <AppText variant="label" style={s.filterBadgeText}>
                   {filterCount}
-                </EventlyText>
+                </AppText>
               </View>
             ) : null}
           </TouchableOpacity>
@@ -362,9 +369,9 @@ export function PublicEventsScreen() {
               accessibilityLabel={`Remove ${filters.city}`}
             >
               <EventlyIcon name="map-marker" size={13} color={PE_ACCENT} />
-              <EventlyText variant="caption" style={s.appliedText}>
+              <AppText variant="label" style={s.appliedText}>
                 {filters.city}
-              </EventlyText>
+              </AppText>
               <EventlyIcon name="close" size={13} color={PE_ACCENT} />
             </TouchableOpacity>
           ) : null}
@@ -378,9 +385,9 @@ export function PublicEventsScreen() {
               accessibilityLabel={`Remove sort ${sortLabel}`}
             >
               <EventlyIcon name="sort" size={13} color={PE_ACCENT} />
-              <EventlyText variant="caption" style={s.appliedText}>
+              <AppText variant="label" style={s.appliedText}>
                 {sortLabel}
-              </EventlyText>
+              </AppText>
               <EventlyIcon name="close" size={13} color={PE_ACCENT} />
             </TouchableOpacity>
           ) : null}
@@ -412,12 +419,12 @@ export function PublicEventsScreen() {
                   size={15}
                   color={on ? '#ffffff' : look.gradient[1]}
                 />
-                <EventlyText
-                  variant="caption"
+                <AppText
+                  variant="label"
                   style={[s.chipText, on && s.chipTextOn]}
                 >
                   {c.label}
-                </EventlyText>
+                </AppText>
               </TouchableOpacity>
             );
           })}
@@ -425,6 +432,7 @@ export function PublicEventsScreen() {
       </View>
 
       <FlatList
+        ref={scrollRef as never}
         data={events}
         keyExtractor={item => item.id}
         renderItem={({ item, index }) => (
@@ -452,18 +460,18 @@ export function PublicEventsScreen() {
             {loading ? (
               <>
                 <ActivityIndicator color={PE_ACCENT} />
-                <EventlyText variant="body" style={ui.muted}>
+                <AppText variant="body" style={ui.muted}>
                   {PUBLIC_EVENTS_COPY.loading}
-                </EventlyText>
+                </AppText>
               </>
             ) : (
-              <EventlyText variant="body" style={ui.muted}>
+              <AppText variant="body" style={ui.muted}>
                 {error
                   ? error.message
                   : filtered
                   ? PUBLIC_EVENTS_COPY.emptySearch
                   : PUBLIC_EVENTS_COPY.empty}
-              </EventlyText>
+              </AppText>
             )}
           </View>
         }

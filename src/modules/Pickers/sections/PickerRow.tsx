@@ -1,5 +1,5 @@
 import { Pressable, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { brand } from '../../../theme';
 import { styles as s } from '../styles';
 
@@ -32,12 +32,13 @@ export function PickerRow({
       testID={testID}
     >
       <EventlyIcon name={icon} size={20} color={brand.textMuted} />
-      <EventlyText
+      <AppText
+        variant="bodyLarge"
         style={[s.rowLabel, selected && s.rowLabelSelected]}
         numberOfLines={1}
       >
         {label}
-      </EventlyText>
+      </AppText>
 
       {selected ? (
         <EventlyIcon name="check" size={18} color={brand.accent} />

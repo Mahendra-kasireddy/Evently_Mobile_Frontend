@@ -1,5 +1,5 @@
 import { ScrollView, TouchableOpacity, View } from 'react-native';
-import { EventlyText } from '../../../Components';
+import { AppText } from '../../../Components';
 import { filterStyles as s } from '../styles';
 import type { GroupFilterOption, GuestGroup } from '../types';
 
@@ -37,13 +37,16 @@ export function GroupFilter({ options, active, onChange }: GroupFilterProps) {
             accessibilityState={{ selected: on }}
             accessibilityLabel={`${option.label}, ${option.count}`}
           >
-            <EventlyText variant="label" style={on ? s.chipTextOn : s.chipText}>
+            <AppText variant="label" style={on ? s.chipTextOn : s.chipText}>
               {option.label}
-            </EventlyText>
+            </AppText>
             <View style={[s.count, on && s.countOn]}>
-              <EventlyText style={[s.countText, on && s.countTextOn]}>
+              <AppText
+                variant="label"
+                style={[s.countText, on && s.countTextOn]}
+              >
                 {option.count}
-              </EventlyText>
+              </AppText>
             </View>
           </TouchableOpacity>
         );

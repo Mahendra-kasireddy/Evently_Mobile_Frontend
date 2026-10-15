@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   AppHeader,
   EventlyIcon,
-  EventlyText,
+  AppText,
   EventlyTextInput,
   FadeInUp,
   GradientFill,
@@ -113,9 +113,9 @@ function GuestListForBooking({
       */}
       <AppHeader title={title || COPY.title} onBackPress={onBack} />
       {c.summary ? (
-        <EventlyText variant="small" style={s.subtitle}>
+        <AppText variant="bodySmall" style={s.subtitle}>
           {c.summary}
-        </EventlyText>
+        </AppText>
       ) : null}
     </>
   );
@@ -126,9 +126,9 @@ function GuestListForBooking({
         {header}
         <View style={s.centered}>
           <ActivityIndicator size="large" color={GUEST_ACCENT} />
-          <EventlyText variant="body" style={s.centeredText}>
+          <AppText variant="body" style={s.centeredText}>
             {COPY.loading}
-          </EventlyText>
+          </AppText>
         </View>
       </SafeAreaView>
     );
@@ -139,12 +139,12 @@ function GuestListForBooking({
       <SafeAreaView style={s.container} edges={['top']}>
         {header}
         <View style={s.centered}>
-          <EventlyText variant="sectionTitle" style={s.errorTitle}>
+          <AppText variant="h2" style={s.errorTitle}>
             {COPY.errorTitle}
-          </EventlyText>
-          <EventlyText variant="body" style={s.centeredText}>
+          </AppText>
+          <AppText variant="body" style={s.centeredText}>
             {c.errorMessage ?? ''}
-          </EventlyText>
+          </AppText>
           <TouchableOpacity
             style={s.retry}
             activeOpacity={0.8}
@@ -152,9 +152,9 @@ function GuestListForBooking({
             accessibilityRole="button"
           >
             <EventlyIcon name="refresh" size={16} color={GUEST_ACCENT} />
-            <EventlyText variant="label" style={s.retryText}>
+            <AppText variant="label" style={s.retryText}>
               {COPY.retry}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -188,10 +188,12 @@ function GuestListForBooking({
                 />
               </View>
             </PopIn>
-            <EventlyText style={e.title}>{COPY.emptyLead}</EventlyText>
-            <EventlyText variant="body" style={e.body}>
+            <AppText variant="h2" style={e.title}>
+              {COPY.emptyLead}
+            </AppText>
+            <AppText variant="body" style={e.body}>
               {COPY.emptyHint}
-            </EventlyText>
+            </AppText>
             <View style={e.actions}>
               <PressableScale
                 style={e.action}
@@ -215,12 +217,12 @@ function GuestListForBooking({
                     />
                   )}
                 </View>
-                <EventlyText style={e.actionTitle}>
+                <AppText variant="h3" style={e.actionTitle}>
                   {COPY.emptyContactsTitle}
-                </EventlyText>
-                <EventlyText style={e.actionBody}>
+                </AppText>
+                <AppText variant="caption" style={e.actionBody}>
                   {COPY.emptyContactsBody}
-                </EventlyText>
+                </AppText>
               </PressableScale>
               <PressableScale
                 style={e.action}
@@ -236,12 +238,12 @@ function GuestListForBooking({
                     color="#ffffff"
                   />
                 </View>
-                <EventlyText style={e.actionTitle}>
+                <AppText variant="h3" style={e.actionTitle}>
                   {COPY.emptyManualTitle}
-                </EventlyText>
-                <EventlyText style={e.actionBody}>
+                </AppText>
+                <AppText variant="caption" style={e.actionBody}>
                   {COPY.emptyManualBody}
-                </EventlyText>
+                </AppText>
               </PressableScale>
             </View>
           </View>
@@ -305,19 +307,19 @@ function GuestListForBooking({
                   size={16}
                   color={GUEST_NAVY}
                 />
-                <EventlyText variant="small" style={s.noticeText}>
+                <AppText variant="bodySmall" style={s.noticeText}>
                   {c.notice}
-                </EventlyText>
+                </AppText>
               </TouchableOpacity>
             ) : null}
 
             <View style={s.content}>
               {c.rows.length === 0 ? (
-                <EventlyText variant="body" style={s.noMatch}>
+                <AppText variant="body" style={s.noMatch}>
                   {c.query
                     ? COPY.noMatch(c.query)
                     : COPY.emptyGroup(activeLabel)}
-                </EventlyText>
+                </AppText>
               ) : (
                 c.rows.map((guest, i) => (
                   <FadeInUp key={guest.id} delay={Math.min(i, 8) * 30}>
@@ -345,9 +347,9 @@ function GuestListForBooking({
                   color={GUEST_NAVY}
                 />
               )}
-              <EventlyText style={f.contactsText}>
+              <AppText variant="h3" style={f.contactsText}>
                 {COPY.contactsShort}
-              </EventlyText>
+              </AppText>
             </PressableScale>
 
             <PressableScale
@@ -358,7 +360,9 @@ function GuestListForBooking({
             >
               <GradientFill colors={ADD_GRADIENT} direction="across" />
               <EventlyIcon name="plus" size={20} color="#ffffff" />
-              <EventlyText style={f.ctaText}>{COPY.addGuest}</EventlyText>
+              <AppText variant="button" style={f.ctaText}>
+                {COPY.addGuest}
+              </AppText>
             </PressableScale>
           </View>
         </>

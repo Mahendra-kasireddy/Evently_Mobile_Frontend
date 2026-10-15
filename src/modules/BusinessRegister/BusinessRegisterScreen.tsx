@@ -7,7 +7,7 @@ import {
 } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyButton, EventlyText } from '../../Components';
+import { AppHeader, EventlyButton, AppText } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
 import { saveDefaultRole } from '../../services/defaultRole';
 import {
@@ -132,9 +132,9 @@ export function BusinessRegisterScreen() {
       <SafeAreaView style={s.container} edges={['top']}>
         <AppHeader title={copy.header} />
         <View style={s.centerFill}>
-          <EventlyText variant="body" style={s.centerText}>
+          <AppText variant="body" style={s.centerText}>
             {organizer.error}
-          </EventlyText>
+          </AppText>
           <EventlyButton
             title={REGISTER_COPY.retry}
             onPress={() => organizer.submit()}
@@ -154,9 +154,9 @@ function Loading({ label }: { label?: string }) {
       <View style={s.centerFill}>
         <ActivityIndicator size="large" color={REG_ACCENT} />
         {label ? (
-          <EventlyText variant="body" style={s.centerText}>
+          <AppText variant="body" style={s.centerText}>
             {label}
-          </EventlyText>
+          </AppText>
         ) : null}
       </View>
     </SafeAreaView>

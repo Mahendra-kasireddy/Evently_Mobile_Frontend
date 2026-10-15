@@ -1,5 +1,5 @@
 import { ScrollView, TouchableOpacity } from 'react-native';
-import { EventlyText } from '../../../Components';
+import { AppText } from '../../../Components';
 import { threadStyles as s } from '../styles';
 
 interface SuggestionBarProps {
@@ -33,9 +33,9 @@ export function SuggestionBar({ suggestions, onPick }: SuggestionBarProps) {
           accessibilityRole="button"
           accessibilityLabel={text}
         >
-          <EventlyText variant="caption" style={s.chipText}>
+          <AppText variant="label" style={s.chipText}>
             {text}
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
       ))}
     </ScrollView>

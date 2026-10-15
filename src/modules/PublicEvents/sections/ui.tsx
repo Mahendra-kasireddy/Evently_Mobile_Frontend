@@ -1,5 +1,5 @@
 import { Image, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { absoluteFileUrl } from '../../../services/urls';
 import { categoryTint, formatEventWhen } from '../constants';
 import { PE_MUTED, ui } from '../ui.styles';
@@ -10,13 +10,13 @@ export function CategoryPill({ category }: { category: string }) {
   const tint = categoryTint(category);
   return (
     <View style={[ui.pill, { backgroundColor: tint.bg }]}>
-      <EventlyText
-        variant="caption"
+      <AppText
+        variant="label"
         style={[ui.pillText, { color: tint.fg }]}
         numberOfLines={1}
       >
         {category}
-      </EventlyText>
+      </AppText>
     </View>
   );
 }
@@ -26,9 +26,9 @@ export function LivePill() {
   return (
     <View style={ui.livePill}>
       <View style={ui.liveDot} />
-      <EventlyText variant="caption" style={ui.livePillText}>
+      <AppText variant="label" style={ui.livePillText}>
         LIVE NOW
-      </EventlyText>
+      </AppText>
     </View>
   );
 }
@@ -47,9 +47,9 @@ export function InfoLine({
   return (
     <View style={ui.line}>
       <EventlyIcon name={icon} size={14} color={PE_MUTED} />
-      <EventlyText variant="caption" style={ui.lineText} numberOfLines={lines}>
+      <AppText variant="caption" style={ui.lineText} numberOfLines={lines}>
         {text}
-      </EventlyText>
+      </AppText>
     </View>
   );
 }
@@ -76,9 +76,9 @@ export function EventMini({
         resizeMode="cover"
       />
       <View style={ui.miniText}>
-        <EventlyText variant="body" style={ui.miniTitle} numberOfLines={2}>
+        <AppText variant="h3" style={ui.miniTitle} numberOfLines={2}>
           {title}
-        </EventlyText>
+        </AppText>
         <InfoLine
           icon="calendar-month-outline"
           text={formatEventWhen(startDateTime, timezone)}

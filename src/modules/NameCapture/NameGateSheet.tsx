@@ -7,13 +7,12 @@ import {
   Pressable,
   ScrollView,
   StatusBar,
-  Text,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   EventlyIcon,
-  EventlyText,
+  AppText,
   EventlyTextInput,
   GradientFill,
   KeyboardAvoider,
@@ -79,7 +78,10 @@ export function NameGateSheet({ onNameSaved }: NameGateSheetProps) {
       <View style={[styles.page, { paddingTop: insets.top }]}>
         <KeyboardAvoider style={styles.flex}>
           <ScrollView
-            contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 24 }]}
+            contentContainerStyle={[
+              styles.content,
+              { paddingBottom: insets.bottom + 24 },
+            ]}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
@@ -96,7 +98,10 @@ export function NameGateSheet({ onNameSaved }: NameGateSheetProps) {
               >
                 <View style={styles.avatarCircle}>
                   {photoPreview ? (
-                    <Image source={{ uri: photoPreview }} style={styles.avatarImage} />
+                    <Image
+                      source={{ uri: photoPreview }}
+                      style={styles.avatarImage}
+                    />
                   ) : (
                     <EventlyIcon name="account" size={76} color="#f2b8a0" />
                   )}
@@ -112,26 +117,42 @@ export function NameGateSheet({ onNameSaved }: NameGateSheetProps) {
               </Pressable>
 
               <View style={styles.bubble} pointerEvents="none">
-                <Text style={styles.bubbleText}>{COPY.greeting} 👋</Text>
+                <AppText variant="h3" style={styles.bubbleText}>
+                  {COPY.greeting} 👋
+                </AppText>
               </View>
             </View>
 
-            <Pressable onPress={openPhotoChoices} hitSlop={8} style={styles.photoLink}>
-              <EventlyText variant="caption" style={styles.photoLinkText}>
-                {isUploadingPhoto ? COPY.uploading : hasPhoto ? COPY.changePhoto : COPY.addPhoto}
-              </EventlyText>
+            <Pressable
+              onPress={openPhotoChoices}
+              hitSlop={8}
+              style={styles.photoLink}
+            >
+              <AppText variant="caption" style={styles.photoLinkText}>
+                {isUploadingPhoto
+                  ? COPY.uploading
+                  : hasPhoto
+                  ? COPY.changePhoto
+                  : COPY.addPhoto}
+              </AppText>
             </Pressable>
 
             {/* The serif heading uses the platform Text: the app's text
                 component always swaps in a Poppins face. */}
-            <Text style={styles.heading} accessibilityRole="header">
+            <AppText
+              variant="display"
+              style={styles.heading}
+              accessibilityRole="header"
+            >
               {COPY.heading}
-            </Text>
-            <EventlyText variant="body" style={styles.subtitle}>
+            </AppText>
+            <AppText variant="bodyLarge" style={styles.subtitle}>
               {COPY.subtitle}
-            </EventlyText>
+            </AppText>
 
-            <View style={[styles.inputRow, isFocused && styles.inputRowFocused]}>
+            <View
+              style={[styles.inputRow, isFocused && styles.inputRowFocused]}
+            >
               <EventlyIcon
                 name="account-outline"
                 size={22}
@@ -156,9 +177,9 @@ export function NameGateSheet({ onNameSaved }: NameGateSheetProps) {
             </View>
 
             {errorMessage ? (
-              <EventlyText variant="caption" style={styles.errorText}>
+              <AppText variant="caption" style={styles.errorText}>
                 {errorMessage}
-              </EventlyText>
+              </AppText>
             ) : null}
 
             {/* Pressable even when incomplete, so a tap says what is missing
@@ -176,12 +197,17 @@ export function NameGateSheet({ onNameSaved }: NameGateSheetProps) {
               accessibilityState={{ disabled: !isValid, busy: isSubmitting }}
               testID="name-gate-continue"
             >
-              <GradientFill colors={NAME_GATE_CTA_GRADIENT} direction="across" />
+              <GradientFill
+                colors={NAME_GATE_CTA_GRADIENT}
+                direction="across"
+              />
               {isSubmitting ? (
                 <ActivityIndicator color="#ffffff" />
               ) : (
                 <>
-                  <EventlyText style={styles.ctaLabel}>{COPY.cta}</EventlyText>
+                  <AppText variant="button" style={styles.ctaLabel}>
+                    {COPY.cta}
+                  </AppText>
                   <View style={styles.ctaArrow}>
                     <EventlyIcon name="arrow-right" size={20} color="#ffffff" />
                   </View>

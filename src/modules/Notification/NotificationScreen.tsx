@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
+import { AppHeader, EventlyIcon, AppText } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
 import { NOTIFICATION_COPY as COPY, NOTIF_ACCENT } from './constants';
 import { useNotificationContainer } from './container';
@@ -69,12 +69,12 @@ export function NotificationScreen() {
             accessibilityRole="button"
             accessibilityLabel={COPY.markAllRead}
           >
-            <EventlyText
-              variant="caption"
+            <AppText
+              variant="bodySmall"
               style={[s.markAllRead, isMarkingAllRead && s.markAllReadDisabled]}
             >
               {COPY.markAllRead}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         ) : undefined
       }
@@ -87,9 +87,9 @@ export function NotificationScreen() {
         {header}
         <View style={s.centered}>
           <ActivityIndicator size="large" color={NOTIF_ACCENT} />
-          <EventlyText variant="body" style={s.loadingText}>
+          <AppText variant="body" style={s.loadingText}>
             {COPY.loading}
-          </EventlyText>
+          </AppText>
         </View>
       </SafeAreaView>
     );
@@ -100,12 +100,12 @@ export function NotificationScreen() {
       <SafeAreaView style={s.container} edges={['top']}>
         {header}
         <View style={s.centered}>
-          <EventlyText variant="h2" style={s.emptyTitle}>
+          <AppText variant="h2" style={s.emptyTitle}>
             {COPY.errorTitle}
-          </EventlyText>
-          <EventlyText variant="body" style={s.errorText}>
+          </AppText>
+          <AppText variant="body" style={s.errorText}>
             {errorMessage ?? 'Something went wrong.'}
-          </EventlyText>
+          </AppText>
           <TouchableOpacity
             style={s.retryButton}
             activeOpacity={0.8}
@@ -113,9 +113,9 @@ export function NotificationScreen() {
             accessibilityRole="button"
           >
             <EventlyIcon name="refresh" size={16} color={NOTIF_ACCENT} />
-            <EventlyText variant="caption" style={s.retryText}>
+            <AppText variant="caption" style={s.retryText}>
               {COPY.retry}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -130,13 +130,13 @@ export function NotificationScreen() {
           <View style={s.centeredIcon}>
             <EventlyIcon name="bell-outline" size={28} color={NOTIF_ACCENT} />
           </View>
-          <EventlyText variant="h2" style={s.emptyTitle}>
+          <AppText variant="h2" style={s.emptyTitle}>
             {COPY.emptyTitle}
-          </EventlyText>
+          </AppText>
           {/* Says where to change it, since the customer chose what arrives. */}
-          <EventlyText variant="body" style={s.emptyBody}>
+          <AppText variant="body" style={s.emptyBody}>
             {COPY.emptyBody}
-          </EventlyText>
+          </AppText>
         </View>
       </SafeAreaView>
     );

@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { ORG_CHECK, ORGANIZER_COPY as COPY } from '../constants';
 import { chipStyles as s, styles } from '../styles';
 
@@ -23,17 +23,17 @@ export function Handles({ items }: HandlesProps) {
   return (
     <View>
       <View style={styles.sectionHead}>
-        <EventlyText variant="sectionTitle" style={styles.sectionTitle}>
+        <AppText variant="h2" style={styles.sectionTitle}>
           {COPY.handles}
-        </EventlyText>
+        </AppText>
       </View>
       <View style={s.wrap}>
-        {items.map((item) => (
+        {items.map(item => (
           <View key={item} style={s.chip}>
             <EventlyIcon name="check" size={14} color={ORG_CHECK} />
-            <EventlyText variant="label" style={s.chipText}>
+            <AppText variant="bodySmall" style={s.chipText}>
               {item}
-            </EventlyText>
+            </AppText>
           </View>
         ))}
       </View>

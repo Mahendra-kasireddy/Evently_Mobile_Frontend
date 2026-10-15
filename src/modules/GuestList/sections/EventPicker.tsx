@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import {
   EventlyIcon,
-  EventlyText,
+  AppText,
   FadeInUp,
   GradientFill,
   PressableScale,
@@ -69,9 +69,9 @@ export function EventPicker({ onPick }: EventPickerProps) {
     return (
       <View style={base.centered}>
         <ActivityIndicator size="large" color={GUEST_ACCENT} />
-        <EventlyText variant="body" style={base.centeredText}>
+        <AppText variant="body" style={base.centeredText}>
           {COPY.loadingEvents}
-        </EventlyText>
+        </AppText>
       </View>
     );
   }
@@ -79,9 +79,9 @@ export function EventPicker({ onPick }: EventPickerProps) {
   if (error && events.length === 0) {
     return (
       <View style={base.centered}>
-        <EventlyText variant="sectionTitle" style={base.errorTitle}>
+        <AppText variant="h2" style={base.errorTitle}>
           {COPY.eventsErrorTitle}
-        </EventlyText>
+        </AppText>
         <TouchableOpacity
           style={base.retry}
           activeOpacity={0.8}
@@ -89,9 +89,9 @@ export function EventPicker({ onPick }: EventPickerProps) {
           accessibilityRole="button"
         >
           <EventlyIcon name="refresh" size={16} color={GUEST_ACCENT} />
-          <EventlyText variant="label" style={base.retryText}>
+          <AppText variant="label" style={base.retryText}>
             {COPY.retry}
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
       </View>
     );
@@ -105,12 +105,12 @@ export function EventPicker({ onPick }: EventPickerProps) {
           size={36}
           color={GUEST_MUTED}
         />
-        <EventlyText variant="sectionTitle" style={base.errorTitle}>
+        <AppText variant="h2" style={base.errorTitle}>
           {COPY.noEventsTitle}
-        </EventlyText>
-        <EventlyText variant="body" style={base.centeredText}>
+        </AppText>
+        <AppText variant="body" style={base.centeredText}>
           {COPY.noEventsBody}
-        </EventlyText>
+        </AppText>
       </View>
     );
   }
@@ -120,9 +120,9 @@ export function EventPicker({ onPick }: EventPickerProps) {
       contentContainerStyle={base.content}
       showsVerticalScrollIndicator={false}
     >
-      <EventlyText variant="body" style={s.lead}>
+      <AppText variant="body" style={s.lead}>
         {COPY.pickLead}
-      </EventlyText>
+      </AppText>
       {events.map((event, i) => {
         const name = event.bookingTitle || event.occasion;
         const date = eventDateParts(event.eventDate);
@@ -142,8 +142,12 @@ export function EventPicker({ onPick }: EventPickerProps) {
                 <GradientFill colors={tile} direction="diagonal" />
                 {date ? (
                   <>
-                    <EventlyText style={s.tileDay}>{date.day}</EventlyText>
-                    <EventlyText style={s.tileMonth}>{date.month}</EventlyText>
+                    <AppText variant="h2" style={s.tileDay}>
+                      {date.day}
+                    </AppText>
+                    <AppText variant="label" style={s.tileMonth}>
+                      {date.month}
+                    </AppText>
                   </>
                 ) : (
                   <EventlyIcon
@@ -154,25 +158,24 @@ export function EventPicker({ onPick }: EventPickerProps) {
                 )}
               </View>
               <View style={s.text}>
-                <EventlyText
-                  variant="cardTitle"
-                  style={s.title}
-                  numberOfLines={1}
-                >
+                <AppText variant="h2" style={s.title} numberOfLines={1}>
                   {name}
-                </EventlyText>
+                </AppText>
                 {date ? (
-                  <EventlyText variant="small" style={s.meta} numberOfLines={1}>
+                  <AppText variant="bodySmall" style={s.meta} numberOfLines={1}>
                     {date.line}
-                  </EventlyText>
+                  </AppText>
                 ) : null}
                 <View style={s.status}>
                   <View
                     style={[s.statusDot, { backgroundColor: status.color }]}
                   />
-                  <EventlyText style={[s.statusText, { color: status.color }]}>
+                  <AppText
+                    variant="label"
+                    style={[s.statusText, { color: status.color }]}
+                  >
                     {status.label}
-                  </EventlyText>
+                  </AppText>
                 </View>
               </View>
               <View style={s.go}>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
+import { Animated, Easing, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, {
   Defs,
@@ -8,7 +8,12 @@ import Svg, {
   Rect,
   Stop,
 } from 'react-native-svg';
-import { FadeInUp, RevealImage, useReducedMotion } from '../../../Components';
+import {
+  FadeInUp,
+  RevealImage,
+  useReducedMotion,
+  AppText,
+} from '../../../Components';
 import { LOOPS_ENABLED } from '../../../Components/effects';
 import { HOME_INK, greetingFor } from '../design';
 import { homeHeroPhotoStyles as s } from '../styles';
@@ -203,9 +208,9 @@ export function HomeHeroPhoto({
       <View style={[s.overlay, { paddingTop: insets.top }]}>
         {children}
         <FadeInUp delay={220} distance={10} style={s.copy}>
-          <Text style={s.eyebrow} numberOfLines={1}>
+          <AppText variant="overline" style={s.eyebrow} numberOfLines={1}>
             {greeting}
-          </Text>
+          </AppText>
           <Animated.View
             style={{
               opacity: words,
@@ -219,11 +224,15 @@ export function HomeHeroPhoto({
               ],
             }}
           >
-            <Text style={s.headline} accessibilityRole="header">
+            <AppText
+              variant="display"
+              style={s.headline}
+              accessibilityRole="header"
+            >
               {slide.lead}
               {'\n'}
-              <Text style={s.headlineAccent}>{slide.accent}</Text>
-            </Text>
+              <AppText style={s.headlineAccent}>{slide.accent}</AppText>
+            </AppText>
           </Animated.View>
         </FadeInUp>
       </View>

@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { EventlyButton, EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyButton, EventlyIcon, AppText } from '../../../Components';
 import { colors } from '../../../theme';
 import { locationDetailsStyles } from '../styles';
 import { formatCoordinates } from '../utils';
@@ -34,12 +34,12 @@ export function LocationDetails({
       <View style={locationDetailsStyles.iconBadge}>
         <EventlyIcon name="crosshairs-gps" size={32} color={colors.primary} />
       </View>
-      <EventlyText variant="h2" style={locationDetailsStyles.title}>
+      <AppText variant="h2" style={locationDetailsStyles.title}>
         {place?.label ?? 'Current location'}
-      </EventlyText>
-      <EventlyText variant="body" style={locationDetailsStyles.coordinates}>
+      </AppText>
+      <AppText variant="body" style={locationDetailsStyles.coordinates}>
         {formatCoordinates(coordinates.latitude, coordinates.longitude)}
-      </EventlyText>
+      </AppText>
 
       <EventlyButton
         title={isRefreshing ? 'Updating…' : 'Refresh'}

@@ -1,9 +1,9 @@
-import { Image, Text, View } from 'react-native';
+import { Image, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import {
   Confetti,
   EventlyIcon,
-  EventlyText,
+  AppText,
   GradientFill,
   GradientText,
   PressableScale,
@@ -41,7 +41,12 @@ function prettyDate(value: string | null | undefined): string {
   if (!value) return '';
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return value;
-  return d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  return d.toLocaleDateString('en-IN', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
 }
 
 /** The invitation, drawn small: what a guest will open, at a glance. */
@@ -53,16 +58,27 @@ function Poster({
   invitation: InvitationDTO | null;
 }) {
   const theme = OCCASION_THEME[workspace.art] ?? OCCASION_THEME.wedding;
-  const media = invitation?.details.heroMediaType === 'image' ? invitation.details.heroMediaUrl : '';
-  const isVideo = invitation?.details.heroMediaType === 'video' && !!invitation.details.heroMediaUrl;
-  const date = invitation ? prettyDate(invitation.details.eventDate) : workspace.dateLabel;
+  const media =
+    invitation?.details.heroMediaType === 'image'
+      ? invitation.details.heroMediaUrl
+      : '';
+  const isVideo =
+    invitation?.details.heroMediaType === 'video' &&
+    !!invitation.details.heroMediaUrl;
+  const date = invitation
+    ? prettyDate(invitation.details.eventDate)
+    : workspace.dateLabel;
   const time = invitation?.details.eventTime ?? '';
   const venue = invitation?.details.venueName || workspace.venue;
 
   return (
     <View style={s.poster}>
       {media ? (
-        <Image source={{ uri: absoluteFileUrl(media) }} style={s.posterImage} resizeMode="cover" />
+        <Image
+          source={{ uri: absoluteFileUrl(media) }}
+          style={s.posterImage}
+          resizeMode="cover"
+        />
       ) : (
         <View style={s.posterFill}>
           <Svg width="100%" height="100%" preserveAspectRatio="none">
@@ -72,7 +88,13 @@ function Poster({
                 <Stop offset="1" stopColor="#f3ecff" />
               </LinearGradient>
             </Defs>
-            <Rect x={0} y={0} width="100%" height="100%" fill="url(#invPoster)" />
+            <Rect
+              x={0}
+              y={0}
+              width="100%"
+              height="100%"
+              fill="url(#invPoster)"
+            />
           </Svg>
         </View>
       )}
@@ -85,41 +107,64 @@ function Poster({
       ) : null}
 
       <View style={s.posterBody}>
-        <EventlyText style={[s.posterEyebrow, media ? s.onPhoto : null]}>
+        <AppText
+          variant="label"
+          style={[s.posterEyebrow, media ? s.onPhoto : null]}
+        >
           {(invitation?.details.eyebrow || C.eyebrow).toUpperCase()}
-        </EventlyText>
+        </AppText>
         {media ? (
-          <Text style={[s.posterHosts, s.onPhoto]} numberOfLines={2}>
-            {invitation ? hostsLine(invitation, workspace.title) : workspace.title}
-          </Text>
+          <AppText
+            variant="display"
+            style={[s.posterHosts, s.onPhoto]}
+            numberOfLines={2}
+          >
+            {invitation
+              ? hostsLine(invitation, workspace.title)
+              : workspace.title}
+          </AppText>
         ) : (
           <GradientText
             colors={[theme.via, theme.to]}
             style={s.posterHosts}
             numberOfLines={2}
           >
-            {invitation ? hostsLine(invitation, workspace.title) : workspace.title}
+            {invitation
+              ? hostsLine(invitation, workspace.title)
+              : workspace.title}
           </GradientText>
         )}
-        <View style={[s.posterRule, media ? s.posterRuleOnPhoto : { backgroundColor: theme.to }]} />
+        <View
+          style={[
+            s.posterRule,
+            media ? s.posterRuleOnPhoto : { backgroundColor: theme.to },
+          ]}
+        />
         {date ? (
-          <EventlyText style={[s.posterMeta, media ? s.onPhoto : null]}>
+          <AppText
+            variant="body"
+            style={[s.posterMeta, media ? s.onPhoto : null]}
+          >
             {[date, time].filter(Boolean).join(' · ')}
-          </EventlyText>
+          </AppText>
         ) : null}
         {venue ? (
-          <EventlyText style={[s.posterVenue, media ? s.onPhotoMuted : null]} numberOfLines={2}>
+          <AppText
+            variant="bodySmall"
+            style={[s.posterVenue, media ? s.onPhotoMuted : null]}
+            numberOfLines={2}
+          >
             {venue}
-          </EventlyText>
+          </AppText>
         ) : null}
       </View>
 
       {isVideo ? (
         <View style={s.videoBadge}>
           <EventlyIcon name="play" size={12} color="#ffffff" />
-          <EventlyText variant="caption" style={s.videoBadgeText}>
+          <AppText variant="label" style={s.videoBadgeText}>
             {C.video}
-          </EventlyText>
+          </AppText>
         </View>
       ) : null}
     </View>
@@ -142,7 +187,11 @@ export function InvitationTab({
   onOpenGuests,
 }: InvitationTabProps) {
   const organizer = workspace.organizerName ?? C.yourOrganizer;
-  const state = !invitation ? 'draft' : invitation.status === 'approved' ? 'live' : 'review';
+  const state = !invitation
+    ? 'draft'
+    : invitation.status === 'approved'
+    ? 'live'
+    : 'review';
   const look = {
     draft: {
       icon: 'palette-outline',
@@ -170,14 +219,18 @@ export function InvitationTab({
      review — start the guest list so it is ready. */
   const action =
     state === 'review'
-      ? { icon: 'eye-check-outline', label: C.reviewAction, onPress: onOpenInvitation }
+      ? {
+          icon: 'eye-check-outline',
+          label: C.reviewAction,
+          onPress: onOpenInvitation,
+        }
       : state === 'live'
-        ? { icon: 'share-variant', label: C.viewTitle, onPress: onOpenInvitation }
-        : {
-            icon: 'account-multiple-plus-outline',
-            label: guests && guests.total > 0 ? C.manageGuests : C.startGuests,
-            onPress: onOpenGuests,
-          };
+      ? { icon: 'share-variant', label: C.viewTitle, onPress: onOpenInvitation }
+      : {
+          icon: 'account-multiple-plus-outline',
+          label: guests && guests.total > 0 ? C.manageGuests : C.startGuests,
+          onPress: onOpenGuests,
+        };
 
   return (
     <View style={s.wrap}>
@@ -196,12 +249,12 @@ export function InvitationTab({
           <EventlyIcon name={look.icon} size={18} color="#ffffff" />
         </View>
         <View style={s.ribbonText}>
-          <EventlyText variant="subtitle" style={s.ribbonTitle}>
+          <AppText variant="h3" style={s.ribbonTitle}>
             {look.title}
-          </EventlyText>
-          <EventlyText variant="caption" style={s.ribbonBody}>
+          </AppText>
+          <AppText variant="bodySmall" style={s.ribbonBody}>
             {look.body}
-          </EventlyText>
+          </AppText>
         </View>
       </View>
 
@@ -213,9 +266,9 @@ export function InvitationTab({
       >
         <GradientFill colors={WORKSPACE_ACTION_GRADIENT} direction="across" />
         <EventlyIcon name={action.icon} size={18} color="#ffffff" />
-        <EventlyText variant="subtitle" style={s.mainButtonText}>
+        <AppText variant="button" style={s.mainButtonText}>
           {action.label}
-        </EventlyText>
+        </AppText>
       </PressableScale>
     </View>
   );

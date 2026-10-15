@@ -1,10 +1,20 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ActivityIndicator, FlatList, RefreshControl, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
+import { AppHeader, EventlyIcon, AppText } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
-import { PAYMENTS_ACCENT, PAYMENTS_COPY as COPY, PAYMENTS_GREEN } from './constants';
+import {
+  PAYMENTS_ACCENT,
+  PAYMENTS_COPY as COPY,
+  PAYMENTS_GREEN,
+} from './constants';
 import { usePaymentsContainer } from './container';
 import { PaymentRow } from './sections/PaymentRow';
 import { styles } from './styles';
@@ -22,10 +32,14 @@ type PaymentsNavigationProp = NativeStackNavigationProp<RootStackParamList>;
  */
 export function PaymentsScreen() {
   const navigation = useNavigation<PaymentsNavigationProp>();
-  const { items, summary, isLoading, isError, errorMessage, refetch } = usePaymentsContainer();
+  const { items, summary, isLoading, isError, errorMessage, refetch } =
+    usePaymentsContainer();
 
   const openWorkspace = (item: PaymentItem) =>
-    navigation.navigate('Workspace', { bookingId: item.bookingId, workspaceName: item.title });
+    navigation.navigate('Workspace', {
+      bookingId: item.bookingId,
+      workspaceName: item.title,
+    });
 
   const header = <AppHeader title={COPY.title} compact />;
 
@@ -35,9 +49,9 @@ export function PaymentsScreen() {
         {header}
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={PAYMENTS_ACCENT} />
-          <EventlyText variant="body" style={styles.loadingText}>
+          <AppText variant="body" style={styles.loadingText}>
             {COPY.loading}
-          </EventlyText>
+          </AppText>
         </View>
       </SafeAreaView>
     );
@@ -48,12 +62,12 @@ export function PaymentsScreen() {
       <SafeAreaView style={styles.container} edges={['top']}>
         {header}
         <View style={styles.centered}>
-          <EventlyText variant="h2" style={styles.emptyTitle}>
+          <AppText variant="h2" style={styles.emptyTitle}>
             {COPY.errorTitle}
-          </EventlyText>
-          <EventlyText variant="body" style={styles.errorText}>
+          </AppText>
+          <AppText variant="body" style={styles.errorText}>
             {errorMessage ?? 'Something went wrong.'}
-          </EventlyText>
+          </AppText>
           <TouchableOpacity
             style={styles.retryButton}
             activeOpacity={0.8}
@@ -61,9 +75,9 @@ export function PaymentsScreen() {
             accessibilityRole="button"
           >
             <EventlyIcon name="refresh" size={16} color={PAYMENTS_ACCENT} />
-            <EventlyText variant="caption" style={styles.retryText}>
+            <AppText variant="caption" style={styles.retryText}>
               {COPY.retry}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -76,14 +90,18 @@ export function PaymentsScreen() {
         {header}
         <View style={styles.centered}>
           <View style={styles.centeredIcon}>
-            <EventlyIcon name="wallet-outline" size={28} color={PAYMENTS_ACCENT} />
+            <EventlyIcon
+              name="wallet-outline"
+              size={28}
+              color={PAYMENTS_ACCENT}
+            />
           </View>
-          <EventlyText variant="h2" style={styles.emptyTitle}>
+          <AppText variant="h2" style={styles.emptyTitle}>
             {COPY.emptyTitle}
-          </EventlyText>
-          <EventlyText variant="body" style={styles.emptyBody}>
+          </AppText>
+          <AppText variant="body" style={styles.emptyBody}>
             {COPY.emptyBody}
-          </EventlyText>
+          </AppText>
         </View>
       </SafeAreaView>
     );
@@ -96,41 +114,49 @@ export function PaymentsScreen() {
       {header}
       <FlatList
         data={items}
-        keyExtractor={(item) => item.bookingId}
+        keyExtractor={item => item.bookingId}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
+        refreshControl={
+          <RefreshControl refreshing={isLoading} onRefresh={refetch} />
+        }
         ListHeaderComponent={
           <View style={styles.summary}>
             {settled ? (
               <>
                 <View style={styles.summarySettled}>
-                  <EventlyIcon name="check-circle" size={18} color={PAYMENTS_GREEN} />
-                  <EventlyText variant="subtitle" style={styles.summarySettledText}>
+                  <EventlyIcon
+                    name="check-circle"
+                    size={18}
+                    color={PAYMENTS_GREEN}
+                  />
+                  <AppText variant="h3" style={styles.summarySettledText}>
                     {COPY.allSettled}
-                  </EventlyText>
+                  </AppText>
                 </View>
-                <EventlyText variant="caption" style={styles.summaryNote}>
+                <AppText variant="caption" style={styles.summaryNote}>
                   {COPY.allSettledNote}
-                </EventlyText>
+                </AppText>
               </>
             ) : (
               <>
-                <EventlyText variant="caption" style={styles.summaryLabel}>
+                <AppText variant="overline" style={styles.summaryLabel}>
                   {COPY.outstanding}
-                </EventlyText>
-                <EventlyText variant="h1" style={styles.summaryValue}>
+                </AppText>
+                <AppText variant="h1" style={styles.summaryValue}>
                   {summary.outstandingLabel}
-                </EventlyText>
+                </AppText>
                 {/* Said plainly: this is a sum, not a bill that can be paid here. */}
-                <EventlyText variant="caption" style={styles.summaryNote}>
+                <AppText variant="caption" style={styles.summaryNote}>
                   {COPY.outstandingNote}
-                </EventlyText>
+                </AppText>
               </>
             )}
           </View>
         }
-        renderItem={({ item }) => <PaymentRow item={item} onPress={() => openWorkspace(item)} />}
+        renderItem={({ item }) => (
+          <PaymentRow item={item} onPress={() => openWorkspace(item)} />
+        )}
       />
     </SafeAreaView>
   );

@@ -1,11 +1,9 @@
 import { Platform, StyleSheet } from 'react-native';
-import { spacing } from '../../theme';
+import { spacing, textColor, typography } from '../../theme';
 
 export const CHOICE_NAVY = '#1a2e5a';
 export const CHOICE_MUTED = '#6b7280';
 export const CHOICE_ACCENT = '#e2683c';
-const SERIF = Platform.select({ ios: 'Georgia', android: 'serif' });
-
 export const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: '#fbf6f2' },
   topBar: {
@@ -20,16 +18,12 @@ export const styles = StyleSheet.create({
     paddingTop: spacing.sm,
   },
   title: {
-    fontFamily: SERIF,
-    fontWeight: '700',
-    fontSize: 28,
-    lineHeight: 35,
-    color: CHOICE_NAVY,
+    ...typography.h1,
+    color: textColor.textPrimary,
   },
   subtitle: {
-    color: CHOICE_MUTED,
-    fontSize: 15,
-    lineHeight: 22,
+    color: textColor.textSecondary,
+    ...typography.bodyLarge,
     marginTop: spacing.sm,
   },
   cards: { gap: spacing.md, marginTop: spacing.xl },
@@ -67,12 +61,10 @@ export const styles = StyleSheet.create({
   },
   cardText: { flex: 1, gap: 4 },
   cardTitle: {
-    color: CHOICE_NAVY,
-    fontWeight: '700',
-    fontSize: 15.5,
-    lineHeight: 21,
+    color: textColor.textPrimary,
+    ...typography.h3,
   },
-  cardBody: { color: CHOICE_MUTED, fontSize: 13, lineHeight: 19 },
+  cardBody: { color: textColor.textSecondary, ...typography.bodySmall },
   radio: {
     position: 'absolute',
     top: spacing.s12,
@@ -105,9 +97,7 @@ export const styles = StyleSheet.create({
     }),
   },
   ctaText: {
-    color: '#ffffff',
-    fontWeight: '700',
-    fontSize: 16,
-    lineHeight: 21,
+    color: textColor.textOnPrimary,
+    ...typography.button,
   },
 });

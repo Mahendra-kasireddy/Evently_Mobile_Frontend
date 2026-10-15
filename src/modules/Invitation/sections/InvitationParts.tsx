@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import {
   BLOCK_ICON,
   BLOCK_ICON_FALLBACK,
@@ -74,19 +74,15 @@ export function InvitationHero({
 
   return (
     <View style={heroStyles.card}>
-      <EventlyText
-        variant="caption"
-        style={heroStyles.eyebrow}
-        numberOfLines={1}
-      >
+      <AppText variant="label" style={heroStyles.eyebrow} numberOfLines={1}>
         {COPY.eyebrow(organizerName)}
-      </EventlyText>
-      <EventlyText variant="h1" style={heroStyles.heading}>
+      </AppText>
+      <AppText variant="h2" style={heroStyles.heading}>
         {COPY.heading}
-      </EventlyText>
-      <EventlyText variant="body" style={heroStyles.sub}>
+      </AppText>
+      <AppText variant="caption" style={heroStyles.sub}>
         {COPY.sub}
-      </EventlyText>
+      </AppText>
 
       <View style={heroStyles.statusRow}>
         <View
@@ -95,9 +91,9 @@ export function InvitationHero({
             { backgroundColor: approved ? INV_GREEN : INV_ACCENT },
           ]}
         />
-        <EventlyText variant="caption" style={heroStyles.statusText}>
+        <AppText variant="label" style={heroStyles.statusText}>
           {approved ? COPY.approvedNote : COPY.awaitingNote}
-        </EventlyText>
+        </AppText>
       </View>
     </View>
   );
@@ -109,12 +105,12 @@ export function OwnerBanner() {
     <View style={bannerStyles.wrap}>
       <EventlyIcon name="creation" size={18} color={INV_ACCENT} />
       <View style={bannerStyles.text}>
-        <EventlyText variant="caption" style={bannerStyles.title}>
+        <AppText variant="bodyLarge" style={bannerStyles.title}>
           {COPY.bannerTitle}
-        </EventlyText>
-        <EventlyText variant="caption" style={bannerStyles.body}>
+        </AppText>
+        <AppText variant="body" style={bannerStyles.body}>
           {COPY.bannerBody}
-        </EventlyText>
+        </AppText>
       </View>
     </View>
   );
@@ -170,23 +166,23 @@ export function GuestPreview({ invitation, blockKey }: GuestPreviewProps) {
                 size={16}
                 color={INV_ACCENT}
               />
-              <EventlyText variant="caption" style={previewStyles.blockTitle}>
+              <AppText variant="caption" style={previewStyles.blockTitle}>
                 {block.heading || block.title}
-              </EventlyText>
+              </AppText>
             </View>
             {block.body ? (
-              <EventlyText variant="caption" style={previewStyles.blockBody}>
+              <AppText variant="caption" style={previewStyles.blockBody}>
                 {block.body}
-              </EventlyText>
+              </AppText>
             ) : null}
           </View>
         ))}
 
         {showSchedule ? (
           <>
-            <EventlyText variant="caption" style={previewStyles.scheduleTitle}>
+            <AppText variant="caption" style={previewStyles.scheduleTitle}>
               Schedule
-            </EventlyText>
+            </AppText>
             {subEvents.map(event => (
               <View key={event.id} style={previewStyles.subEvent}>
                 <View
@@ -196,16 +192,10 @@ export function GuestPreview({ invitation, blockKey }: GuestPreviewProps) {
                   ]}
                 />
                 <View>
-                  <EventlyText
-                    variant="caption"
-                    style={previewStyles.subEventName}
-                  >
+                  <AppText variant="caption" style={previewStyles.subEventName}>
                     {event.name}
-                  </EventlyText>
-                  <EventlyText
-                    variant="caption"
-                    style={previewStyles.subEventMeta}
-                  >
+                  </AppText>
+                  <AppText variant="caption" style={previewStyles.subEventMeta}>
                     {[
                       dateLabel(event.eventDate),
                       event.eventTime,
@@ -213,7 +203,7 @@ export function GuestPreview({ invitation, blockKey }: GuestPreviewProps) {
                     ]
                       .filter(Boolean)
                       .join(' · ')}
-                  </EventlyText>
+                  </AppText>
                 </View>
               </View>
             ))}
@@ -222,22 +212,22 @@ export function GuestPreview({ invitation, blockKey }: GuestPreviewProps) {
 
         {/* Nothing to render: the section exists, but not for guests. */}
         {one?.hidden ? (
-          <EventlyText variant="caption" style={previewStyles.hiddenNote}>
+          <AppText variant="caption" style={previewStyles.hiddenNote}>
             {COPY.previewHiddenSection}
-          </EventlyText>
+          </AppText>
         ) : one && !one.body ? (
-          <EventlyText variant="caption" style={previewStyles.hiddenNote}>
+          <AppText variant="caption" style={previewStyles.hiddenNote}>
             {COPY.previewEmptySection}
-          </EventlyText>
+          </AppText>
         ) : null}
 
         <View style={previewStyles.homeBar} />
       </View>
 
       {hiddenCount > 0 ? (
-        <EventlyText variant="caption" style={previewStyles.hiddenNote}>
+        <AppText variant="caption" style={previewStyles.hiddenNote}>
           {COPY.previewHiddenNote(hiddenCount)}
-        </EventlyText>
+        </AppText>
       ) : null}
     </View>
   );

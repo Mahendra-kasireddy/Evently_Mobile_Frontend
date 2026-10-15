@@ -3,7 +3,7 @@ import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import {
   EventlyIcon,
-  EventlyText,
+  AppText,
   GradientFill,
   MetalBadge,
   PressableScale,
@@ -173,9 +173,9 @@ function OrganizerCard({
             {item.logoUrl ? (
               <Image source={{ uri: item.logoUrl }} style={s.logoImage} />
             ) : (
-              <EventlyText variant="caption" style={s.logoText}>
+              <AppText variant="bodySmall" style={s.logoText}>
                 {item.initials}
-              </EventlyText>
+              </AppText>
             )}
           </View>
         </View>
@@ -184,9 +184,9 @@ function OrganizerCard({
       <View style={s.body}>
         <View style={s.nameRow}>
           {/* Their own name, as they wrote it. */}
-          <EventlyText variant="body" style={s.name} numberOfLines={1}>
+          <AppText variant="h3" style={s.name} numberOfLines={1}>
             {item.name}
-          </EventlyText>
+          </AppText>
           {item.verified ? (
             <EventlyIcon
               name="check-decagram"
@@ -206,9 +206,9 @@ function OrganizerCard({
               size={13}
               color={accent.gradient[1]}
             />
-            <EventlyText variant="caption" style={s.location} numberOfLines={1}>
+            <AppText variant="caption" style={s.location} numberOfLines={1}>
               {item.locationLabel}
-            </EventlyText>
+            </AppText>
           </View>
         ) : null}
 
@@ -217,18 +217,18 @@ function OrganizerCard({
           <View style={s.ratingLine}>
             <View style={s.ratingPill}>
               <EventlyIcon name="star" size={12} color="#e8a33a" />
-              <EventlyText variant="caption" style={s.rating}>
+              <AppText variant="label" style={s.rating}>
                 {item.rating.toFixed(1)}
-              </EventlyText>
+              </AppText>
             </View>
-            <EventlyText variant="caption" style={s.reviews}>
+            <AppText variant="caption" style={s.reviews}>
               {`(${item.reviews})`}
-            </EventlyText>
+            </AppText>
           </View>
         ) : (
-          <EventlyText variant="caption" style={s.reviews}>
+          <AppText variant="caption" style={s.reviews}>
             No reviews yet
-          </EventlyText>
+          </AppText>
         )}
 
         {item.tags.length > 0 ? (
@@ -237,13 +237,13 @@ function OrganizerCard({
               const [bg, fg] = accent.tags[t % accent.tags.length];
               return (
                 <View key={tag} style={[s.tag, { backgroundColor: bg }]}>
-                  <EventlyText
-                    variant="caption"
+                  <AppText
+                    variant="label"
                     style={[s.tagText, { color: fg }]}
                     numberOfLines={1}
                   >
                     {tag}
-                  </EventlyText>
+                  </AppText>
                 </View>
               );
             })}
@@ -301,9 +301,9 @@ export function TopOrganizers({
           onPress={onPressChangeCity}
           accessibilityRole="button"
         >
-          <EventlyText variant="caption" style={s.emptyText}>
+          <AppText variant="body" style={s.emptyText}>
             {data.scopeNote}
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
       ) : null}
 
@@ -315,11 +315,11 @@ export function TopOrganizers({
           onPress={onPressChangeCity}
           accessibilityRole="button"
         >
-          <EventlyText variant="body" style={s.emptyText}>
+          <AppText variant="body" style={s.emptyText}>
             {data.city
               ? `No organizers listed for ${data.city} yet. Change your city to look further afield.`
               : 'Set your city and we will show the organizers who serve it.'}
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
       ) : layout === 'grid' ? (
         <View style={s.grid}>{cards}</View>

@@ -1,5 +1,5 @@
 import { ScrollView, TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyImage, EventlyText } from '../../../Components';
+import { EventlyIcon, EventlyImage, AppText } from '../../../Components';
 import { colors } from '../../../theme';
 import { absoluteFileUrl } from '../../../services/urls';
 import {
@@ -48,12 +48,12 @@ export function MemoriesOffCard({
       <View style={s.bloom} pointerEvents="none">
         <CornerBloom size={96} petal={INV_BLUSH_PETAL} stem={INV_GOLD} />
       </View>
-      <EventlyText variant="subtitle" style={s.heading}>
+      <AppText variant="h2" style={s.heading}>
         {COPY.memoriesTitle}
-      </EventlyText>
-      <EventlyText variant="caption" style={s.lead}>
+      </AppText>
+      <AppText variant="caption" style={s.lead}>
         {COPY.memoriesOffLead}
-      </EventlyText>
+      </AppText>
       <TouchableOpacity
         style={s.add}
         activeOpacity={0.9}
@@ -67,13 +67,13 @@ export function MemoriesOffCard({
           size={18}
           color={colors.onPrimary}
         />
-        <EventlyText variant="subtitle" style={s.addText}>
+        <AppText variant="body" style={s.addText}>
           {busy ? COPY.memoryLoading : COPY.memoriesTurnOn}
-        </EventlyText>
+        </AppText>
       </TouchableOpacity>
-      <EventlyText variant="caption" style={s.lead}>
+      <AppText variant="caption" style={s.lead}>
         {COPY.memoriesOffNote}
-      </EventlyText>
+      </AppText>
     </View>
   );
 }
@@ -134,16 +134,16 @@ export function MemoriesBlock({
       </View>
 
       <View style={s.head}>
-        <EventlyText variant="subtitle" style={s.heading}>
+        <AppText variant="h2" style={s.heading}>
           {COPY.memoriesTitle}
-        </EventlyText>
-        <EventlyText variant="caption" style={s.tally}>
+        </AppText>
+        <AppText variant="caption" style={s.tally}>
           {COPY.memoryTally(counts.all)}
-        </EventlyText>
+        </AppText>
       </View>
-      <EventlyText variant="caption" style={s.lead}>
+      <AppText variant="caption" style={s.lead}>
         {COPY.memoriesLead}
-      </EventlyText>
+      </AppText>
 
       <ScrollView
         horizontal
@@ -163,12 +163,9 @@ export function MemoriesBlock({
               accessibilityState={{ selected: on }}
               testID={`memory-tab-${id}`}
             >
-              <EventlyText
-                variant="caption"
-                style={[s.tabText, on && s.tabTextOn]}
-              >
+              <AppText variant="label" style={[s.tabText, on && s.tabTextOn]}>
                 {label} {n}
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
           );
         })}
@@ -196,12 +193,12 @@ export function MemoriesBlock({
                 accessibilityRole="button"
                 accessibilityState={{ selected: on }}
               >
-                <EventlyText
-                  variant="caption"
+                <AppText
+                  variant="label"
                   style={[s.filterText, on && s.filterTextOn]}
                 >
                   {e.name}
-                </EventlyText>
+                </AppText>
               </TouchableOpacity>
             );
           })}
@@ -209,9 +206,9 @@ export function MemoriesBlock({
       ) : null}
 
       {items.length === 0 ? (
-        <EventlyText variant="body" style={s.empty}>
+        <AppText variant="bodySmall" style={s.empty}>
           {canUpload ? COPY.memoryEmptyCanAdd : COPY.memoryEmpty}
-        </EventlyText>
+        </AppText>
       ) : (
         <View style={s.grid}>
           {items.map((item, index) => {
@@ -245,25 +242,25 @@ export function MemoriesBlock({
                     </View>
                     {item.kind === 'reel' ? (
                       <View style={s.reelMark}>
-                        <EventlyText variant="caption" style={s.reelText}>
+                        <AppText variant="label" style={s.reelText}>
                           {COPY.memoryReel}
-                        </EventlyText>
+                        </AppText>
                       </View>
                     ) : null}
                     {item.durationSec > 0 ? (
                       <View style={s.length}>
-                        <EventlyText variant="caption" style={s.lengthText}>
+                        <AppText variant="caption" style={s.lengthText}>
                           {clock(item.durationSec)}
-                        </EventlyText>
+                        </AppText>
                       </View>
                     ) : null}
                   </>
                 ) : null}
                 {note ? (
                   <View style={s.cellNote}>
-                    <EventlyText variant="caption" style={s.cellNoteText}>
+                    <AppText variant="caption" style={s.cellNoteText}>
                       {note}
-                    </EventlyText>
+                    </AppText>
                   </View>
                 ) : null}
               </TouchableOpacity>
@@ -280,9 +277,9 @@ export function MemoriesBlock({
           disabled={paging}
           testID="memory-more"
         >
-          <EventlyText variant="subtitle" style={s.moreText}>
+          <AppText variant="label" style={s.moreText}>
             {paging ? COPY.memoryLoading : COPY.memoryMore}
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
       ) : null}
 
@@ -301,20 +298,20 @@ export function MemoriesBlock({
             size={18}
             color={colors.onPrimary}
           />
-          <EventlyText variant="subtitle" style={s.addText}>
+          <AppText variant="body" style={s.addText}>
             {COPY.memoryAdd}
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
       ) : null}
 
       {say ? (
         <View style={[s.say, sayWarn && s.sayWarn]}>
-          <EventlyText
+          <AppText
             variant="caption"
             style={[s.sayText, sayWarn && s.sayTextWarn]}
           >
             {say}
-          </EventlyText>
+          </AppText>
         </View>
       ) : null}
     </View>

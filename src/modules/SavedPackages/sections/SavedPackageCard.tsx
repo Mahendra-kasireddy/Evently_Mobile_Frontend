@@ -1,5 +1,5 @@
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText, OccasionArt } from '../../../Components';
+import { EventlyIcon, AppText, OccasionArt } from '../../../Components';
 import { SAVED_ACCENT, SAVED_COPY as COPY } from '../constants';
 import { savedCardStyles as s } from '../styles';
 import type { SavedPackageDTO } from '../types';
@@ -18,7 +18,11 @@ interface SavedPackageCardProps {
  * with separate accessible names, because a single tap target that sometimes
  * deletes and sometimes navigates is how people lose things they meant to keep.
  */
-export function SavedPackageCard({ item, onPress, onRemove }: SavedPackageCardProps) {
+export function SavedPackageCard({
+  item,
+  onPress,
+  onRemove,
+}: SavedPackageCardProps) {
   const meta = [item.budget, item.guests].filter(Boolean).join(' · ');
 
   return (
@@ -39,16 +43,18 @@ export function SavedPackageCard({ item, onPress, onRemove }: SavedPackageCardPr
           activeOpacity={0.8}
           onPress={onPress}
           accessibilityRole="button"
-          accessibilityLabel={`${item.title}${meta ? `, ${meta}` : ''}. ${COPY.explore}.`}
+          accessibilityLabel={`${item.title}${meta ? `, ${meta}` : ''}. ${
+            COPY.explore
+          }.`}
         >
-          <EventlyText variant="subtitle" style={s.title} numberOfLines={2}>
+          <AppText variant="h3" style={s.title} numberOfLines={2}>
             {item.title}
-          </EventlyText>
+          </AppText>
           {/* Dropped rather than shown blank when the package carries neither. */}
           {meta ? (
-            <EventlyText variant="caption" style={s.meta} numberOfLines={1}>
+            <AppText variant="caption" style={s.meta} numberOfLines={1}>
               {meta}
-            </EventlyText>
+            </AppText>
           ) : null}
         </TouchableOpacity>
 
@@ -65,11 +71,11 @@ export function SavedPackageCard({ item, onPress, onRemove }: SavedPackageCardPr
 
       {item.tags?.length ? (
         <View style={s.tags}>
-          {item.tags.map((tag) => (
+          {item.tags.map(tag => (
             <View key={tag} style={s.tag}>
-              <EventlyText variant="caption" style={s.tagText}>
+              <AppText variant="label" style={s.tagText}>
                 {tag}
-              </EventlyText>
+              </AppText>
             </View>
           ))}
         </View>

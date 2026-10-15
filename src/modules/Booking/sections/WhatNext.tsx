@@ -2,7 +2,7 @@ import { View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import {
   EventlyIcon,
-  EventlyText,
+  AppText,
   GradientFill,
   PressableScale,
 } from '../../../Components';
@@ -104,7 +104,9 @@ export function WhatNext({
       <View style={s.head}>
         <EventlyIcon name="star-four-points" size={22} color="#f0785a" />
         <View>
-          <EventlyText style={s.title}>Book something new</EventlyText>
+          <AppText variant="h2" style={s.title}>
+            Book something new
+          </AppText>
           {/* A hand-drawn underline under "Book". */}
           <Svg width={64} height={8} style={s.squiggle}>
             <Path
@@ -117,9 +119,9 @@ export function WhatNext({
           </Svg>
         </View>
       </View>
-      <EventlyText style={s.sub}>
+      <AppText variant="bodySmall" style={s.sub}>
         Tickets and planned events both land here.
-      </EventlyText>
+      </AppText>
 
       {CARDS.map(c => {
         const go = c.key === 'events' ? onEvents : onPlan;
@@ -140,14 +142,18 @@ export function WhatNext({
                 <GradientFill colors={c.mark} direction="diagonal" />
                 <EventlyIcon name={c.icon} size={24} color="#ffffff" />
               </View>
-              <EventlyText style={s.cardTitle} numberOfLines={1}>
+              <AppText variant="h3" style={s.cardTitle} numberOfLines={1}>
                 {c.title}
-              </EventlyText>
+              </AppText>
             </View>
-            <EventlyText style={s.cardBody}>{c.body}</EventlyText>
+            <AppText variant="caption" style={s.cardBody}>
+              {c.body}
+            </AppText>
             <View style={s.button}>
               <GradientFill colors={c.button} direction="across" />
-              <EventlyText style={s.buttonText}>{c.cta}</EventlyText>
+              <AppText variant="buttonSmall" style={s.buttonText}>
+                {c.cta}
+              </AppText>
               <EventlyIcon name="arrow-right" size={15} color="#ffffff" />
             </View>
           </PressableScale>

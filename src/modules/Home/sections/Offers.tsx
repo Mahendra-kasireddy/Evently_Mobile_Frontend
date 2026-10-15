@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FlatList, TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { HERO_ACCENT_COLOR, SECTION_TONE_GRADIENT } from '../constants';
 import { offersStyles as s } from '../styles';
 import { SectionHead } from './SectionHead';
@@ -71,22 +71,22 @@ export function OfferCard({
         {/* The code, where a category label would otherwise sit. It is the
             part the customer has to carry to a checkout, so it is the part
             the card leads with. */}
-        <EventlyText variant="caption" style={s.code} numberOfLines={1}>
+        <AppText variant="overline" style={s.code} numberOfLines={1}>
           {coupon.code}
-        </EventlyText>
+        </AppText>
 
-        <EventlyText variant="h2" style={s.title} numberOfLines={2}>
+        <AppText variant="h3" style={s.title} numberOfLines={2}>
           {coupon.title}
-        </EventlyText>
+        </AppText>
 
         {titleSaysIt ? null : (
           <View style={s.valueRow}>
-            <EventlyText variant="h1" style={s.value}>
+            <AppText variant="h1" style={s.value}>
               {coupon.valueLabel}
-            </EventlyText>
-            <EventlyText variant="caption" style={s.valueNote}>
+            </AppText>
+            <AppText variant="caption" style={s.valueNote}>
               {coupon.valueNote}
-            </EventlyText>
+            </AppText>
           </View>
         )}
 
@@ -94,15 +94,15 @@ export function OfferCard({
             a discount does — a 15% code that quietly needs a ₹1,50,000
             booking is an offer the customer finds out about at checkout. */}
         {conditions ? (
-          <EventlyText variant="caption" style={s.terms} numberOfLines={2}>
+          <AppText variant="caption" style={s.terms} numberOfLines={2}>
             {conditions}
-          </EventlyText>
+          </AppText>
         ) : null}
 
         <View style={s.cta}>
-          <EventlyText variant="caption" style={s.ctaText}>
+          <AppText variant="buttonSmall" style={s.ctaText}>
             {coupon.ctaLabel}
-          </EventlyText>
+          </AppText>
         </View>
       </View>
     </TouchableOpacity>

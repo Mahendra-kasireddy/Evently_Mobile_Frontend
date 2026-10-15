@@ -1,6 +1,6 @@
 import { Animated, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText, PressableScale } from '../../../Components';
+import { EventlyIcon, AppText, PressableScale } from '../../../Components';
 import { pinnedStyles as s } from '../premium.styles';
 import type { WorkspaceTab, WorkspaceTabItem } from '../types';
 import { WorkspaceTabs } from './WorkspaceTabs';
@@ -25,7 +25,15 @@ interface PinnedHeaderProps {
  * all the way up first. This keeps all three in reach: it fades in as the
  * in-page tabs reach the top, and out again on the way back up.
  */
-export function PinnedHeader({ opacity, active, title, onBack, tabs, tab, onSelectTab }: PinnedHeaderProps) {
+export function PinnedHeader({
+  opacity,
+  active,
+  title,
+  onBack,
+  tabs,
+  tab,
+  onSelectTab,
+}: PinnedHeaderProps) {
   const insets = useSafeAreaInsets();
   return (
     <Animated.View
@@ -33,15 +41,25 @@ export function PinnedHeader({ opacity, active, title, onBack, tabs, tab, onSele
       pointerEvents={active ? 'auto' : 'none'}
     >
       <View style={s.row}>
-        <PressableScale style={s.back} onPress={onBack} accessibilityRole="button" accessibilityLabel="Go back">
+        <PressableScale
+          style={s.back}
+          onPress={onBack}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+        >
           <EventlyIcon name="chevron-left" size={24} color="#1a1f3d" />
         </PressableScale>
-        <EventlyText variant="subtitle" style={s.title} numberOfLines={1}>
+        <AppText variant="h3" style={s.title} numberOfLines={1}>
           {title}
-        </EventlyText>
+        </AppText>
       </View>
       <View style={s.tabs}>
-        <WorkspaceTabs tabs={tabs} tab={tab} onSelectTab={onSelectTab} idSuffix="-pinned" />
+        <WorkspaceTabs
+          tabs={tabs}
+          tab={tab}
+          onSelectTab={onSelectTab}
+          idSuffix="-pinned"
+        />
       </View>
     </Animated.View>
   );

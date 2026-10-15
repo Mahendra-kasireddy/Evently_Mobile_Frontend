@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText, GradientFill } from '../../../Components';
+import { EventlyIcon, AppText, GradientFill } from '../../../Components';
 import { PROFILE_COPY as COPY, PROFILE_HEADER_GRADIENT } from '../constants';
 import { identityStyles as s } from '../styles';
 import type { ProfileViewModel } from '../types';
@@ -40,30 +40,36 @@ export function ProfileIdentity({ profile, onEdit }: ProfileIdentityProps) {
                 source={{ uri: profile.photoUrl }}
                 style={s.avatarImage}
                 onError={() => setPhotoFailed(true)}
-                accessibilityLabel={named ? `${profile.displayName}'s photo` : 'Your photo'}
+                accessibilityLabel={
+                  named ? `${profile.displayName}'s photo` : 'Your photo'
+                }
               />
             ) : (
-              <EventlyText variant="subtitle" style={s.avatarText}>
+              <AppText variant="h3" style={s.avatarText}>
                 {profile.initials}
-              </EventlyText>
+              </AppText>
             )}
           </View>
         </View>
 
         <View style={s.text}>
-          <EventlyText
-            variant="h2"
+          <AppText
+            variant="h3"
             style={[s.name, !named && s.namePrompt]}
             numberOfLines={1}
           >
             {named ? profile.displayName : COPY.noName}
-          </EventlyText>
+          </AppText>
           {profile.maskedPhone ? (
             <View style={s.phoneRow}>
-              <EventlyIcon name="phone-outline" size={13} color="rgba(255,255,255,0.85)" />
-              <EventlyText variant="caption" style={s.phone} numberOfLines={1}>
+              <EventlyIcon
+                name="phone-outline"
+                size={13}
+                color="rgba(255,255,255,0.85)"
+              />
+              <AppText variant="caption" style={s.phone} numberOfLines={1}>
                 {profile.maskedPhone}
-              </EventlyText>
+              </AppText>
             </View>
           ) : null}
         </View>
@@ -76,9 +82,9 @@ export function ProfileIdentity({ profile, onEdit }: ProfileIdentityProps) {
           accessibilityLabel="Edit your details"
         >
           <EventlyIcon name="pencil-outline" size={13} color="#ffffff" />
-          <EventlyText variant="caption" style={s.editText}>
+          <AppText variant="label" style={s.editText}>
             {COPY.edit}
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
       </View>
     </View>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Linking, TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { colors } from '../../../theme';
 import {
   INVITATION_COPY as COPY,
@@ -116,27 +116,27 @@ export function LiveBlock({ subEvents }: LiveBlockProps) {
       </View>
 
       <View style={s.head}>
-        <EventlyText variant="subtitle" style={s.heading}>
+        <AppText variant="h2" style={s.heading}>
           {COPY.liveTitle}
-        </EventlyText>
+        </AppText>
       </View>
 
       <View style={s.state}>
         <View style={s.badge}>
           <View style={s.pulse} />
-          <EventlyText variant="caption" style={s.badgeText}>
+          <AppText variant="label" style={s.badgeText}>
             {COPY.liveBadge}
-          </EventlyText>
+          </AppText>
         </View>
       </View>
 
-      <EventlyText variant="h2" style={s.name} numberOfLines={2}>
+      <AppText variant="h1" style={s.name} numberOfLines={2}>
         {sub.name}
-      </EventlyText>
+      </AppText>
       {sub.liveTitle ? (
-        <EventlyText variant="caption" style={s.lead}>
+        <AppText variant="caption" style={s.lead}>
           {sub.liveTitle}
-        </EventlyText>
+        </AppText>
       ) : null}
 
       {/* Only drawn when there is a choice to make. */}
@@ -159,12 +159,12 @@ export function LiveBlock({ subEvents }: LiveBlockProps) {
                   size={15}
                   color={on ? colors.onPrimary : colors.text}
                 />
-                <EventlyText
-                  variant="caption"
+                <AppText
+                  variant="label"
                   style={[s.modeText, on && s.modeTextOn]}
                 >
                   {m.label}
-                </EventlyText>
+                </AppText>
               </TouchableOpacity>
             );
           })}
@@ -194,13 +194,13 @@ export function LiveBlock({ subEvents }: LiveBlockProps) {
               size={18}
               color={colors.onPrimary}
             />
-            <EventlyText variant="subtitle" style={s.watchText}>
+            <AppText variant="body" style={s.watchText}>
               {COPY.liveWatch}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
-          <EventlyText variant="caption" style={s.opens}>
+          <AppText variant="caption" style={s.opens}>
             {COPY.liveOpens}
-          </EventlyText>
+          </AppText>
         </>
       )}
 
@@ -210,9 +210,9 @@ export function LiveBlock({ subEvents }: LiveBlockProps) {
             <CornerBloom size={74} petal={INV_BLUSH_PETAL} stem={INV_GOLD} />
           </View>
 
-          <EventlyText variant="subtitle" style={s.detailsHead}>
+          <AppText variant="h3" style={s.detailsHead}>
             {COPY.liveDetails}
-          </EventlyText>
+          </AppText>
           {when ? (
             <Fact
               icon="calendar-blank-outline"
@@ -250,13 +250,13 @@ function Fact({
       </View>
       <View style={s.factBody}>
         {label ? (
-          <EventlyText variant="caption" style={s.factLabel}>
+          <AppText variant="overline" style={s.factLabel}>
             {label}
-          </EventlyText>
+          </AppText>
         ) : null}
-        <EventlyText variant="body" style={s.factText}>
+        <AppText variant="bodySmall" style={s.factText}>
           {text}
-        </EventlyText>
+        </AppText>
       </View>
     </View>
   );

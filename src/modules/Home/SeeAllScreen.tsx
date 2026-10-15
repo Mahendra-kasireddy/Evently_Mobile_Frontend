@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyText } from '../../Components';
+import { AppHeader, AppText } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
 import { HERO_ACCENT_COLOR, SEE_ALL_COPY } from './constants';
 import { useHomeFeed } from './hooks';
@@ -65,28 +65,28 @@ export function SeeAllScreen() {
       <SafeAreaView style={styles.container} edges={['top']}>
         {header}
         <View style={styles.centered}>
-          <EventlyText variant="body" style={styles.errorText}>
+          <AppText variant="caption" style={styles.errorText}>
             {error.message}
-          </EventlyText>
+          </AppText>
         </View>
       </SafeAreaView>
     );
   }
 
   const listHeader = count ? (
-    <EventlyText variant="caption" style={s.count}>
+    <AppText variant="caption" style={s.count}>
       {count === 1 ? copy.countOne : `${count} ${copy.countMany}`}
-    </EventlyText>
+    </AppText>
   ) : null;
 
   const empty = (
     <View style={styles.centered}>
-      <EventlyText variant="h2" style={s.emptyTitle}>
+      <AppText variant="h2" style={s.emptyTitle}>
         {copy.emptyTitle}
-      </EventlyText>
-      <EventlyText variant="body" style={s.emptyBody}>
+      </AppText>
+      <AppText variant="body" style={s.emptyBody}>
         {copy.emptyBody}
-      </EventlyText>
+      </AppText>
     </View>
   );
 

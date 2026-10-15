@@ -2,12 +2,23 @@ import { useCallback } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ActivityIndicator, ScrollView, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText } from '../../Components';
+import { EventlyIcon, AppText } from '../../Components';
 import { useOpenWithOrganizer } from '../Chat';
 import type { RootStackParamList } from '../../navigation/types';
-import { PAYMENT_COPY as COPY, PAY_ACCENT, PAY_GREEN, PAY_NAVY_DEEP, PAY_OPTIONS } from './constants';
+import {
+  PAYMENT_COPY as COPY,
+  PAY_ACCENT,
+  PAY_GREEN,
+  PAY_NAVY_DEEP,
+  PAY_OPTIONS,
+} from './constants';
 import { usePaymentContainer } from './container';
 import { styles as s } from './styles';
 import type { PaidBookingDTO, PayOption } from './types';
@@ -41,14 +52,16 @@ function MethodRow({
         <EventlyIcon name={option.icon} size={20} color={PAY_NAVY_DEEP} />
       </View>
       <View style={s.optionText}>
-        <EventlyText variant="subtitle" style={s.optionLabel}>
+        <AppText variant="h3" style={s.optionLabel}>
           {option.label}
-        </EventlyText>
-        <EventlyText variant="caption" style={s.optionHint}>
+        </AppText>
+        <AppText variant="bodySmall" style={s.optionHint}>
           {option.hint}
-        </EventlyText>
+        </AppText>
       </View>
-      <View style={[s.radio, selected && s.radioOn]}>{selected ? <View style={s.radioDot} /> : null}</View>
+      <View style={[s.radio, selected && s.radioOn]}>
+        {selected ? <View style={s.radioDot} /> : null}
+      </View>
     </TouchableOpacity>
   );
 }
@@ -101,7 +114,7 @@ export function PaymentScreen() {
     if (!params.organizerId || openThread.loading) return;
     openThread
       .execute(params.organizerId)
-      .then((conversation) =>
+      .then(conversation =>
         navigation.navigate('Conversation', {
           conversationId: conversation.id,
           withName: c.organizerName,
@@ -123,9 +136,9 @@ export function PaymentScreen() {
       >
         <EventlyIcon name="chevron-left" size={24} color={PAY_NAVY_DEEP} />
       </TouchableOpacity>
-      <EventlyText variant="h1" style={s.title}>
+      <AppText variant="h2" style={s.title}>
         {COPY.title}
-      </EventlyText>
+      </AppText>
     </View>
   );
 
@@ -135,9 +148,9 @@ export function PaymentScreen() {
         {header}
         <View style={s.centered}>
           <ActivityIndicator size="large" color={PAY_ACCENT} />
-          <EventlyText variant="body" style={s.centeredText}>
+          <AppText variant="body" style={s.centeredText}>
             {COPY.loading}
-          </EventlyText>
+          </AppText>
         </View>
       </SafeAreaView>
     );
@@ -148,12 +161,12 @@ export function PaymentScreen() {
       <SafeAreaView style={s.container} edges={['top']}>
         {header}
         <View style={s.centered}>
-          <EventlyText variant="h2" style={s.errorTitle}>
+          <AppText variant="h2" style={s.errorTitle}>
             {COPY.errorTitle}
-          </EventlyText>
-          <EventlyText variant="body" style={s.centeredText}>
+          </AppText>
+          <AppText variant="body" style={s.centeredText}>
             {c.errorMessage ?? COPY.unavailable}
-          </EventlyText>
+          </AppText>
           <TouchableOpacity
             style={s.retry}
             activeOpacity={0.8}
@@ -161,9 +174,9 @@ export function PaymentScreen() {
             accessibilityRole="button"
           >
             <EventlyIcon name="refresh" size={16} color={PAY_ACCENT} />
-            <EventlyText variant="caption" style={s.retryText}>
+            <AppText variant="caption" style={s.retryText}>
               {COPY.retry}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -174,29 +187,32 @@ export function PaymentScreen() {
     <SafeAreaView style={s.container} edges={['top']}>
       {header}
 
-      <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={s.content}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={s.amountCard}>
-          <EventlyText variant="caption" style={s.eyebrow}>
+          <AppText variant="label" style={s.eyebrow}>
             {c.model.eyebrow}
-          </EventlyText>
-          <EventlyText variant="h1" style={s.amount}>
+          </AppText>
+          <AppText variant="display" style={s.amount}>
             {c.model.advanceLabel}
-          </EventlyText>
-          <EventlyText variant="body" style={s.totalLine}>
+          </AppText>
+          <AppText variant="body" style={s.totalLine}>
             {c.model.totalLine}
-          </EventlyText>
+          </AppText>
           {/* Only when a coupon actually moved the total — a discounted price
               that does not say why looks like a mistake. */}
           {c.model.couponLine ? (
-            <EventlyText variant="caption" style={s.couponLine}>
+            <AppText variant="bodySmall" style={s.couponLine}>
               {c.model.couponLine}
-            </EventlyText>
+            </AppText>
           ) : null}
         </View>
 
-        <EventlyText variant="h2" style={s.sectionTitle}>
+        <AppText variant="h2" style={s.sectionTitle}>
           {COPY.payWith}
-        </EventlyText>
+        </AppText>
         {/*
           With no gateway the online rows are shown but inert, rather than
           removed. A customer who came here to pay by UPI needs to see that the
@@ -205,13 +221,17 @@ export function PaymentScreen() {
         */}
         {!c.gatewayAvailable ? (
           <View style={s.gatewayOff}>
-            <EventlyIcon name="information-outline" size={16} color={PAY_NAVY_DEEP} />
-            <EventlyText variant="caption" style={s.gatewayOffText}>
+            <EventlyIcon
+              name="information-outline"
+              size={16}
+              color={PAY_NAVY_DEEP}
+            />
+            <AppText variant="bodySmall" style={s.gatewayOffText}>
               {COPY.gatewayOff}
-            </EventlyText>
+            </AppText>
           </View>
         ) : null}
-        {PAY_OPTIONS.map((option) => (
+        {PAY_OPTIONS.map(option => (
           <MethodRow
             key={option.id}
             option={option}
@@ -232,12 +252,12 @@ export function PaymentScreen() {
             size={18}
             color={c.isCash ? PAY_NAVY_DEEP : PAY_GREEN}
           />
-          <EventlyText
-            variant="caption"
+          <AppText
+            variant="bodySmall"
             style={[s.assuranceText, c.isCash && s.assuranceTextCash]}
           >
             {c.isCash ? COPY.cashAssurance : COPY.assurance}
-          </EventlyText>
+          </AppText>
         </View>
 
         {/* Dropped when the quote carries no organizer to message. */}
@@ -251,22 +271,22 @@ export function PaymentScreen() {
               accessibilityLabel={COPY.talkFirst}
             >
               <EventlyIcon name="chat-outline" size={18} color={PAY_ACCENT} />
-              <EventlyText variant="subtitle" style={s.talkText}>
+              <AppText variant="h3" style={s.talkText}>
                 {COPY.talkFirst}
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
-            <EventlyText variant="caption" style={s.talkHint}>
+            <AppText variant="bodySmall" style={s.talkHint}>
               {COPY.talkFirstHint}
-            </EventlyText>
+            </AppText>
           </>
         ) : null}
       </ScrollView>
 
       <View style={s.foot}>
         {c.payError ? (
-          <EventlyText variant="caption" style={s.payError}>
+          <AppText variant="caption" style={s.payError}>
             {c.payError}
-          </EventlyText>
+          </AppText>
         ) : null}
         <TouchableOpacity
           style={[s.pay, c.isPaying && s.payDisabled]}
@@ -276,9 +296,9 @@ export function PaymentScreen() {
           accessibilityRole="button"
           accessibilityLabel={c.ctaLabel}
         >
-          <EventlyText variant="subtitle" style={s.payText}>
+          <AppText variant="h3" style={s.payText}>
             {c.isPaying ? 'Working…' : c.ctaLabel}
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

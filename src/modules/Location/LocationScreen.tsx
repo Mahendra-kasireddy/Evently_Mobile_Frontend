@@ -1,6 +1,6 @@
 import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyText } from '../../Components';
+import { AppHeader, AppText } from '../../Components';
 import { colors } from '../../theme';
 import { getLocationTrace } from '../../services/location';
 import { useLocationContainer } from './container';
@@ -20,7 +20,8 @@ import { styles } from './styles';
 const SHOW_LOCATION_TRACE = true;
 
 export function LocationScreen() {
-  const { status, coordinates, place, errorCode, retry, openSettings } = useLocationContainer();
+  const { status, coordinates, place, errorCode, retry, openSettings } =
+    useLocationContainer();
 
   /*
    * Read straight from the service rather than through the store.
@@ -56,13 +57,17 @@ export function LocationScreen() {
           onRefresh={retry}
         />
       ) : status === 'error' ? (
-        <LocationErrorState errorCode={errorCode} onRetry={retry} onOpenSettings={openSettings} />
+        <LocationErrorState
+          errorCode={errorCode}
+          onRetry={retry}
+          onOpenSettings={openSettings}
+        />
       ) : (
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={colors.primary} />
-          <EventlyText variant="body" style={styles.loadingText}>
+          <AppText variant="body" style={styles.loadingText}>
             Getting your location…
-          </EventlyText>
+          </AppText>
         </View>
       )}
 
@@ -76,18 +81,24 @@ export function LocationScreen() {
       */}
       {SHOW_LOCATION_TRACE ? (
         <View style={styles.trace}>
-          <EventlyText variant="caption" style={styles.traceLine}>
-            {`status=${status} coords=${coordinates ? 'yes' : 'no'} error=${errorCode ?? 'none'}`}
-          </EventlyText>
+          <AppText variant="caption" style={styles.traceLine}>
+            {`status=${status} coords=${coordinates ? 'yes' : 'no'} error=${
+              errorCode ?? 'none'
+            }`}
+          </AppText>
           {trace.length === 0 ? (
-            <EventlyText variant="caption" style={styles.traceLine}>
+            <AppText variant="caption" style={styles.traceLine}>
               (no read has started)
-            </EventlyText>
+            </AppText>
           ) : (
             trace.map((line, index) => (
-              <EventlyText key={`${index}-${line}`} variant="caption" style={styles.traceLine}>
+              <AppText
+                key={`${index}-${line}`}
+                variant="caption"
+                style={styles.traceLine}
+              >
                 {line}
-              </EventlyText>
+              </AppText>
             ))
           )}
         </View>

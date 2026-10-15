@@ -1,5 +1,5 @@
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyText } from '../../../Components';
+import { AppText } from '../../../Components';
 import { PAYMENTS_COPY as COPY } from '../constants';
 import { paymentRowStyles as s } from '../styles';
 import type { PaymentItem } from '../types';
@@ -11,16 +11,24 @@ interface PaymentRowProps {
 }
 
 /** One figure, when the booking carries it. */
-function Figure({ label, value, due }: { label: string; value: string; due?: boolean }) {
+function Figure({
+  label,
+  value,
+  due,
+}: {
+  label: string;
+  value: string;
+  due?: boolean;
+}) {
   if (!value) return null;
   return (
     <View style={s.figure}>
-      <EventlyText variant="caption" style={s.figureLabel}>
+      <AppText variant="overline" style={s.figureLabel}>
         {label}
-      </EventlyText>
-      <EventlyText variant="body" style={[s.figureValue, due && s.figureValueDue]}>
+      </AppText>
+      <AppText variant="body" style={[s.figureValue, due && s.figureValueDue]}>
         {value}
-      </EventlyText>
+      </AppText>
     </View>
   );
 }
@@ -35,7 +43,11 @@ function Figure({ label, value, due }: { label: string; value: string; due?: boo
  * drops the "still due" column entirely.
  */
 export function PaymentRow({ item, onPress }: PaymentRowProps) {
-  const meta = [item.ref, item.organizerName ?? COPY.organizerTbd, item.eventDateLabel]
+  const meta = [
+    item.ref,
+    item.organizerName ?? COPY.organizerTbd,
+    item.eventDateLabel,
+  ]
     .filter(Boolean)
     .join(' · ');
 
@@ -48,32 +60,41 @@ export function PaymentRow({ item, onPress }: PaymentRowProps) {
       accessibilityLabel={
         item.settled
           ? `${item.title}. ${COPY.settled}, ${item.agreedLabel}.`
-          : `${item.title}. ${item.dueLabel} ${COPY.due.toLowerCase()} of ${item.agreedLabel}.`
+          : `${item.title}. ${item.dueLabel} ${COPY.due.toLowerCase()} of ${
+              item.agreedLabel
+            }.`
       }
     >
       <View style={s.head}>
         <View style={s.headText}>
-          <EventlyText variant="subtitle" style={s.title} numberOfLines={2}>
+          <AppText variant="h3" style={s.title} numberOfLines={2}>
             {item.title}
-          </EventlyText>
-          <EventlyText variant="caption" style={s.meta} numberOfLines={2}>
+          </AppText>
+          <AppText variant="caption" style={s.meta} numberOfLines={2}>
             {meta}
-          </EventlyText>
+          </AppText>
         </View>
         <View style={[s.chip, item.settled ? s.chipSettled : s.chipDue]}>
-          <EventlyText
-            variant="caption"
-            style={[s.chipText, item.settled ? s.chipTextSettled : s.chipTextDue]}
+          <AppText
+            variant="label"
+            style={[
+              s.chipText,
+              item.settled ? s.chipTextSettled : s.chipTextDue,
+            ]}
             numberOfLines={1}
           >
             {(item.settled ? COPY.settled : item.statusLabel).toUpperCase()}
-          </EventlyText>
+          </AppText>
         </View>
       </View>
 
       <View style={s.track}>
         <View
-          style={[s.fill, item.settled && s.fillSettled, { width: `${item.paidPercent}%` }]}
+          style={[
+            s.fill,
+            item.settled && s.fillSettled,
+            { width: `${item.paidPercent}%` },
+          ]}
         />
       </View>
 
@@ -81,7 +102,9 @@ export function PaymentRow({ item, onPress }: PaymentRowProps) {
         <Figure label={COPY.agreed} value={item.agreedLabel} />
         <Figure label={COPY.paid} value={item.paidLabel} />
         {/* No "still due" column on an event that owes nothing. */}
-        {item.settled ? null : <Figure label={COPY.due} value={item.dueLabel} due />}
+        {item.settled ? null : (
+          <Figure label={COPY.due} value={item.dueLabel} due />
+        )}
       </View>
     </TouchableOpacity>
   );

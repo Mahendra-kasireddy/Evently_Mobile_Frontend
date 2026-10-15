@@ -1,8 +1,14 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ActivityIndicator, FlatList, RefreshControl, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
+import { AppHeader, EventlyIcon, AppText } from '../../Components';
 import { colors } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
 import { SAVED_ACCENT, SAVED_COPY as COPY } from './constants';
@@ -23,11 +29,21 @@ type SavedNavigationProp = NativeStackNavigationProp<RootStackParamList>;
  */
 export function SavedPackagesScreen() {
   const navigation = useNavigation<SavedNavigationProp>();
-  const { items, isLoading, isError, errorMessage, actionError, remove, refetch } =
-    useSavedPackagesContainer();
+  const {
+    items,
+    isLoading,
+    isError,
+    errorMessage,
+    actionError,
+    remove,
+    refetch,
+  } = useSavedPackagesContainer();
 
   const openPlanner = (item: SavedPackageDTO) =>
-    navigation.navigate('Main', { screen: 'Plan', params: { occasionId: item.art } });
+    navigation.navigate('Main', {
+      screen: 'Plan',
+      params: { occasionId: item.art },
+    });
 
   const header = <AppHeader title={COPY.title} compact />;
 
@@ -37,9 +53,9 @@ export function SavedPackagesScreen() {
         {header}
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={SAVED_ACCENT} />
-          <EventlyText variant="body" style={styles.loadingText}>
+          <AppText variant="body" style={styles.loadingText}>
             {COPY.loading}
-          </EventlyText>
+          </AppText>
         </View>
       </SafeAreaView>
     );
@@ -50,12 +66,12 @@ export function SavedPackagesScreen() {
       <SafeAreaView style={styles.container} edges={['top']}>
         {header}
         <View style={styles.centered}>
-          <EventlyText variant="h2" style={styles.emptyTitle}>
+          <AppText variant="h2" style={styles.emptyTitle}>
             {COPY.errorTitle}
-          </EventlyText>
-          <EventlyText variant="body" style={styles.errorText}>
+          </AppText>
+          <AppText variant="body" style={styles.errorText}>
             {errorMessage ?? 'Something went wrong.'}
-          </EventlyText>
+          </AppText>
           <TouchableOpacity
             style={styles.retryButton}
             activeOpacity={0.8}
@@ -63,9 +79,9 @@ export function SavedPackagesScreen() {
             accessibilityRole="button"
           >
             <EventlyIcon name="refresh" size={16} color={SAVED_ACCENT} />
-            <EventlyText variant="caption" style={styles.retryText}>
+            <AppText variant="caption" style={styles.retryText}>
               {COPY.retry}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -80,12 +96,12 @@ export function SavedPackagesScreen() {
           <View style={styles.centeredIcon}>
             <EventlyIcon name="heart-outline" size={28} color={SAVED_ACCENT} />
           </View>
-          <EventlyText variant="h2" style={styles.emptyTitle}>
+          <AppText variant="h2" style={styles.emptyTitle}>
             {COPY.emptyTitle}
-          </EventlyText>
-          <EventlyText variant="body" style={styles.emptyBody}>
+          </AppText>
+          <AppText variant="body" style={styles.emptyBody}>
             {COPY.emptyBody}
-          </EventlyText>
+          </AppText>
           <TouchableOpacity
             style={styles.emptyCta}
             activeOpacity={0.85}
@@ -93,10 +109,14 @@ export function SavedPackagesScreen() {
             accessibilityRole="button"
             accessibilityLabel={COPY.emptyCta}
           >
-            <EventlyText variant="subtitle" style={styles.emptyCtaText}>
+            <AppText variant="body" weight="medium" style={styles.emptyCtaText}>
               {COPY.emptyCta}
-            </EventlyText>
-            <EventlyIcon name="chevron-right" size={18} color={colors.onPrimary} />
+            </AppText>
+            <EventlyIcon
+              name="chevron-right"
+              size={18}
+              color={colors.onPrimary}
+            />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -108,16 +128,18 @@ export function SavedPackagesScreen() {
       {header}
       <FlatList
         data={items}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} />}
+        refreshControl={
+          <RefreshControl refreshing={isLoading} onRefresh={refetch} />
+        }
         ListHeaderComponent={
           /* Shown only when a removal came back — the card is already returned. */
           actionError ? (
-            <EventlyText variant="caption" style={styles.actionError}>
+            <AppText variant="caption" style={styles.actionError}>
               {COPY.removeFailed}
-            </EventlyText>
+            </AppText>
           ) : null
         }
         renderItem={({ item }) => (

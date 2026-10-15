@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import {
   EventlyIcon,
-  EventlyText,
+  AppText,
   GradientFill,
   PressableScale,
 } from '../../../Components';
@@ -67,13 +67,13 @@ export function SectionSwitch({
               size={15}
               color={active ? '#ffffff' : '#6b6488'}
             />
-            <EventlyText
-              variant="caption"
+            <AppText
+              variant="label"
               style={[s.label, active && s.labelActive]}
               numberOfLines={1}
             >
               {item.label}
-            </EventlyText>
+            </AppText>
             {item.key === 'live' && liveNow ? (
               <View style={[s.liveDot, active && s.liveDotActive]} />
             ) : null}
@@ -108,12 +108,12 @@ export function OneLinkNote({
         <EventlyIcon name="link-variant" size={18} color="#5a35e0" />
       </View>
       <View style={s.noteText}>
-        <EventlyText variant="subtitle" style={s.noteTitle}>
+        <AppText variant="body" style={s.noteTitle}>
           {COPY.oneLinkTitle}
-        </EventlyText>
-        <EventlyText variant="caption" style={s.noteBody}>
+        </AppText>
+        <AppText variant="caption" style={s.noteBody}>
           {approved ? body : COPY.oneLinkPending}
-        </EventlyText>
+        </AppText>
         {approved ? (
           <PressableScale
             style={s.noteButton}
@@ -123,9 +123,9 @@ export function OneLinkNote({
             testID="invitation-one-link-share"
           >
             <EventlyIcon name="whatsapp" size={15} color="#128c4a" />
-            <EventlyText variant="caption" style={s.noteButtonText}>
+            <AppText variant="caption" style={s.noteButtonText}>
               {COPY.oneLinkShare}
-            </EventlyText>
+            </AppText>
           </PressableScale>
         ) : null}
       </View>
@@ -148,12 +148,12 @@ export function SectionEmpty({
       <View style={s.emptyIcon}>
         <EventlyIcon name={icon} size={26} color="#e2477a" />
       </View>
-      <EventlyText variant="subtitle" style={s.emptyTitle}>
+      <AppText variant="h2" style={s.emptyTitle}>
         {title}
-      </EventlyText>
-      <EventlyText variant="caption" style={s.emptyBody}>
+      </AppText>
+      <AppText variant="body" style={s.emptyBody}>
         {body}
-      </EventlyText>
+      </AppText>
     </View>
   );
 }

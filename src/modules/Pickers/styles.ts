@@ -1,6 +1,13 @@
 import { StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { brand, spacing } from '../../theme';
+import {
+  brand,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+  inputTypography,
+} from '../../theme';
 
 export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: brand.bg },
@@ -27,14 +34,13 @@ export const styles = StyleSheet.create({
     borderRadius: 0,
     paddingHorizontal: 0,
     paddingVertical: 0,
-    fontSize: 15,
-    lineHeight: 21,
-    color: brand.navy,
+    ...inputTypography.bodyLarge,
+    color: textColor.textPrimary,
   },
   list: { paddingBottom: spacing.xl },
   sectionHeading: {
-    color: brand.navy,
-    fontWeight: '700',
+    ...typography.h2,
+    color: textColor.textPrimary,
     paddingHorizontal: spacing.md,
     paddingTop: spacing.md,
     paddingBottom: spacing.xs,
@@ -48,8 +54,8 @@ export const styles = StyleSheet.create({
     borderBottomColor: brand.border,
   },
   rowPressed: { backgroundColor: brand.accentSoft },
-  rowLabel: { flex: 1, color: brand.navy, fontSize: 15, lineHeight: 21 },
-  rowLabelSelected: { fontWeight: '700' },
+  rowLabel: { flex: 1, color: textColor.textPrimary, ...typography.bodyLarge },
+  rowLabelSelected: { ...fontWeights.bold },
   /* A recent is removable; a listed city is not. The X only appears where it
      does something. */
   forgetButton: { padding: 6, marginRight: -6 },
@@ -81,8 +87,12 @@ export const guestsSheetStyles = StyleSheet.create({
     backgroundColor: brand.borderStrong,
     marginBottom: spacing.md,
   },
-  title: { color: brand.navy },
-  subtitle: { color: brand.textMuted, marginTop: 2, marginBottom: spacing.md },
+  title: { color: textColor.textPrimary },
+  subtitle: {
+    color: textColor.textSecondary,
+    marginTop: 2,
+    marginBottom: spacing.md,
+  },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   chip: {
     borderRadius: 999,
@@ -96,15 +106,14 @@ export const guestsSheetStyles = StyleSheet.create({
   },
   chipActive: { borderColor: brand.accent, backgroundColor: brand.accentSoft },
   chipText: {
-    color: brand.navy,
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: '600',
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
   },
   chipTextActive: { color: brand.accentDeep },
   customLabel: {
-    color: brand.navy,
-    fontWeight: '600',
+    color: textColor.textPrimary,
+    ...fontWeights.semibold,
     marginTop: spacing.lg,
     marginBottom: spacing.sm,
   },
@@ -118,9 +127,8 @@ export const guestsSheetStyles = StyleSheet.create({
     backgroundColor: brand.surface,
     paddingHorizontal: spacing.md,
     paddingVertical: 0,
-    fontSize: 15,
-    lineHeight: 21,
-    color: brand.navy,
+    ...inputTypography.bodyLarge,
+    color: textColor.textPrimary,
   },
   done: {
     height: 48,
@@ -131,6 +139,6 @@ export const guestsSheetStyles = StyleSheet.create({
     backgroundColor: brand.accent,
   },
   doneIdle: { backgroundColor: brand.disabledBg },
-  doneText: { color: brand.onAccent, fontWeight: '600' },
+  doneText: { color: textColor.textOnPrimary, ...fontWeights.semibold },
   doneTextIdle: { color: brand.textMuted },
 });

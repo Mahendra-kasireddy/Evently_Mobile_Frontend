@@ -1,5 +1,5 @@
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { WORKSPACE_ACCENT } from '../constants';
 import { summaryRowStyles as s, sectionStyles } from '../styles';
 
@@ -21,21 +21,25 @@ export function ReviewPrompt({ organizerName, onPress }: ReviewPromptProps) {
 
   return (
     <View style={sectionStyles.section}>
-      <EventlyText variant="h2" style={sectionStyles.title}>
+      <AppText variant="h3" style={sectionStyles.title}>
         How did it go?
-      </EventlyText>
+      </AppText>
       <View style={sectionStyles.card}>
         <View style={s.row}>
           <View style={s.iconChip}>
-            <EventlyIcon name="star-outline" size={22} color={WORKSPACE_ACCENT} />
+            <EventlyIcon
+              name="star-outline"
+              size={22}
+              color={WORKSPACE_ACCENT}
+            />
           </View>
           <View style={s.text}>
-            <EventlyText variant="body" style={s.title}>
+            <AppText variant="body" style={s.title}>
               {`Review ${organizer}`}
-            </EventlyText>
-            <EventlyText variant="caption" style={s.body}>
+            </AppText>
+            <AppText variant="caption" style={s.body}>
               Your event is done. A few words help the next customer choose.
-            </EventlyText>
+            </AppText>
           </View>
           <TouchableOpacity
             style={s.cta}
@@ -44,9 +48,9 @@ export function ReviewPrompt({ organizerName, onPress }: ReviewPromptProps) {
             accessibilityRole="button"
             accessibilityLabel={`Review ${organizer}`}
           >
-            <EventlyText variant="caption" style={s.ctaText}>
+            <AppText variant="buttonSmall" style={s.ctaText}>
               Review
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       </View>

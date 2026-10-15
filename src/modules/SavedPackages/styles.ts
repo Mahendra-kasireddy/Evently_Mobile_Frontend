@@ -1,14 +1,29 @@
 import { StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, spacing } from '../../theme';
-import { SAVED_ACCENT, SAVED_ACCENT_SOFT, SAVED_CANVAS, SAVED_NAVY } from './constants';
+import {
+  colors,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+} from '../../theme';
+import { SAVED_ACCENT, SAVED_ACCENT_SOFT, SAVED_CANVAS } from './constants';
 
 const HAIRLINE = '#efe9e5';
 
 export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: SAVED_CANVAS },
-  list: { paddingHorizontal: spacing.md, paddingBottom: spacing.xl, paddingTop: spacing.sm },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
+  list: {
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.xl,
+    paddingTop: spacing.sm,
+  },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.lg,
+  },
   centeredIcon: {
     width: 64,
     height: 64,
@@ -17,11 +32,29 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  loadingText: { color: colors.textMuted, marginTop: spacing.md },
-  emptyTitle: { color: SAVED_NAVY, marginTop: spacing.md, textAlign: 'center' },
-  emptyBody: { color: colors.textMuted, marginTop: spacing.sm, textAlign: 'center', lineHeight: 20 },
-  errorText: { color: colors.danger, textAlign: 'center', marginTop: spacing.sm },
-  actionError: { color: colors.danger, textAlign: 'center', marginBottom: spacing.sm },
+  loadingText: { color: textColor.textSecondary, marginTop: spacing.md },
+  emptyTitle: {
+    ...typography.h2,
+    color: textColor.textPrimary,
+    marginTop: spacing.md,
+    textAlign: 'center',
+  },
+  emptyBody: {
+    ...typography.body,
+    color: textColor.textSecondary,
+    marginTop: spacing.sm,
+    textAlign: 'center',
+  },
+  errorText: {
+    color: textColor.textError,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+  },
+  actionError: {
+    color: textColor.textError,
+    textAlign: 'center',
+    marginBottom: spacing.sm,
+  },
   retryButton: {
     ...globalStyles.row,
     gap: spacing.xs,
@@ -32,7 +65,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },
-  retryText: { color: SAVED_ACCENT, fontWeight: '700' },
+  retryText: { color: SAVED_ACCENT, ...fontWeights.bold },
   emptyCta: {
     ...globalStyles.row,
     gap: spacing.xs,
@@ -42,7 +75,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm + 4,
   },
-  emptyCtaText: { color: colors.onPrimary, fontWeight: '700' },
+  emptyCtaText: { color: textColor.textOnPrimary, ...fontWeights.bold },
 });
 
 export const savedCardStyles = StyleSheet.create({
@@ -65,8 +98,8 @@ export const savedCardStyles = StyleSheet.create({
     overflow: 'hidden',
   },
   headText: { flex: 1 },
-  title: { color: SAVED_NAVY, fontSize: 16, fontWeight: '700', lineHeight: 22 },
-  meta: { color: colors.textMuted, fontSize: 12.5, marginTop: 2, lineHeight: 18 },
+  title: { color: textColor.textPrimary, ...typography.h3 },
+  meta: { color: textColor.textSecondary, ...typography.caption, marginTop: 2 },
   /** The heart is its own control, so removing never opens the package. */
   heart: {
     width: 38,
@@ -77,6 +110,11 @@ export const savedCardStyles = StyleSheet.create({
     flexShrink: 0,
   },
   tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 12 },
-  tag: { borderRadius: 999, backgroundColor: '#f4f1ef', paddingHorizontal: 10, paddingVertical: 4 },
-  tagText: { color: '#5b6470', fontSize: 11.5, fontWeight: '500' },
+  tag: {
+    borderRadius: 999,
+    backgroundColor: '#f4f1ef',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  tagText: { color: textColor.textSecondary, ...typography.label },
 });

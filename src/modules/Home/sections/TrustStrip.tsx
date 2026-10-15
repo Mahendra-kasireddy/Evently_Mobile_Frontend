@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { TRUST_ICON_NAME } from '../constants';
 import { HOME_ACCENT } from '../design';
 import { trustStripStyles as s } from '../styles';
@@ -30,9 +30,9 @@ export function TrustStrip({ items }: TrustStripProps) {
               color={HOME_ACCENT.jade}
             />
           </View>
-          <EventlyText variant="caption" style={s.label} numberOfLines={3}>
+          <AppText variant="label" style={s.label} numberOfLines={3}>
             {item.label}
-          </EventlyText>
+          </AppText>
         </View>
       ))}
     </View>

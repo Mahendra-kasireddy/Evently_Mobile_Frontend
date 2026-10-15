@@ -1,5 +1,5 @@
 import { Linking, TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { colors } from '../../../theme';
 import { INVITATION_COPY as COPY, INV_NAVY_DEEP } from '../constants';
 import {
@@ -164,12 +164,12 @@ export function SaveTheDate({
         <View style={s.diamond} />
         <View style={s.rule} />
       </View>
-      <EventlyText variant="caption" style={s.title}>
+      <AppText variant="label" style={s.title}>
         {COPY.saveTheDateTitle.toUpperCase()}
-      </EventlyText>
-      <EventlyText variant="h2" style={s.lead}>
+      </AppText>
+      <AppText variant="h2" style={s.lead}>
         {COPY.saveTheDateLead}
-      </EventlyText>
+      </AppText>
 
       {subEvents.map((sub, index) => {
         const tone = cardTone(sub.colour, palette, INV_NAVY_DEEP);
@@ -190,13 +190,13 @@ export function SaveTheDate({
           >
             <View style={[s.edge, { backgroundColor: tone.ink }]} />
 
-            <EventlyText
+            <AppText
               variant="h2"
               style={[s.name, { color: tone.ink }]}
               numberOfLines={2}
             >
               {sub.name}
-            </EventlyText>
+            </AppText>
 
             {when ? (
               <Fact icon="calendar-blank-outline" text={when} strong />
@@ -226,9 +226,12 @@ export function SaveTheDate({
             ) : null}
 
             {sub.note ? (
-              <EventlyText variant="body" style={[s.note, { color: tone.ink }]}>
+              <AppText
+                variant="bodySmall"
+                style={[s.note, { color: tone.ink }]}
+              >
                 {sub.note}
-              </EventlyText>
+              </AppText>
             ) : null}
 
             <TouchableOpacity
@@ -247,17 +250,17 @@ export function SaveTheDate({
                 size={16}
                 color={colors.onPrimary}
               />
-              <EventlyText variant="subtitle" style={s.addText}>
+              <AppText variant="body" style={s.addText}>
                 {COPY.saveTheDateAdd}
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
 
             {/* A card with no date has nothing to put in a calendar; saying so
                 beats a button that silently does nothing. */}
             {!url ? (
-              <EventlyText variant="caption" style={s.noDate}>
+              <AppText variant="caption" style={s.noDate}>
                 {COPY.saveTheDateNoDate}
-              </EventlyText>
+              </AppText>
             ) : null}
           </View>
         );
@@ -285,22 +288,22 @@ function Fact({
       <EventlyIcon name={icon} size={14} color={colors.textMuted} />
       <View style={s.factText}>
         {label ? (
-          <EventlyText variant="caption" style={s.factLabel}>
+          <AppText variant="overline" style={s.factLabel}>
             {label}
-          </EventlyText>
+          </AppText>
         ) : null}
         {text ? (
-          <EventlyText
-            variant="body"
+          <AppText
+            variant="bodySmall"
             style={[s.factValue, strong && s.factStrong]}
           >
             {text}
-          </EventlyText>
+          </AppText>
         ) : null}
         {sub ? (
-          <EventlyText variant="caption" style={s.factSub}>
+          <AppText variant="caption" style={s.factSub}>
             {sub}
-          </EventlyText>
+          </AppText>
         ) : null}
       </View>
     </View>

@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Alert, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyText } from '../../Components';
+import { AppHeader, AppText } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
 import { LEGAL_COPY as COPY } from './constants';
 import { useLegalSupportContainer } from './container';
@@ -19,11 +19,12 @@ import type { LegalSupportItem } from './types';
  * listed as items that alert "coming soon".
  */
 export function LegalSupportScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { items } = useLegalSupportContainer();
 
-  const support = items.filter((i) => i.action === 'contact');
-  const legal = items.filter((i) => i.action === 'pending');
+  const support = items.filter(i => i.action === 'contact');
+  const legal = items.filter(i => i.action === 'pending');
 
   const onPress = (item: LegalSupportItem) => {
     if (item.action === 'contact') {
@@ -37,21 +38,34 @@ export function LegalSupportScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       <AppHeader title={COPY.title} compact />
       <ScrollView contentContainerStyle={styles.content}>
-        <EventlyText variant="caption" style={[styles.sectionTitle, styles.sectionTitleFirst]}>
+        <AppText
+          variant="overline"
+          style={[styles.sectionTitle, styles.sectionTitleFirst]}
+        >
           {COPY.supportSection}
-        </EventlyText>
+        </AppText>
         <View style={styles.card}>
           {support.map((item, index) => (
-            <LegalSupportRow key={item.key} item={item} isFirst={index === 0} onPress={() => onPress(item)} />
+            <LegalSupportRow
+              key={item.key}
+              item={item}
+              isFirst={index === 0}
+              onPress={() => onPress(item)}
+            />
           ))}
         </View>
 
-        <EventlyText variant="caption" style={styles.sectionTitle}>
+        <AppText variant="overline" style={styles.sectionTitle}>
           {COPY.legalSection}
-        </EventlyText>
+        </AppText>
         <View style={styles.card}>
           {legal.map((item, index) => (
-            <LegalSupportRow key={item.key} item={item} isFirst={index === 0} onPress={() => onPress(item)} />
+            <LegalSupportRow
+              key={item.key}
+              item={item}
+              isFirst={index === 0}
+              onPress={() => onPress(item)}
+            />
           ))}
         </View>
       </ScrollView>

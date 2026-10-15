@@ -1,5 +1,5 @@
 import { Modal, Pressable, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { brand } from '../../../theme';
 import { DIAL_CODES } from '../constants';
 import { dialSheetStyles } from '../styles';
@@ -34,9 +34,9 @@ export function DialCodeSheet({
         {/* Swallows taps so a tap inside the sheet does not close it. */}
         <Pressable style={dialSheetStyles.sheet} onPress={() => {}}>
           <View style={dialSheetStyles.grabber} />
-          <EventlyText variant="h2" style={dialSheetStyles.title}>
+          <AppText variant="display" style={dialSheetStyles.title}>
             Country code
-          </EventlyText>
+          </AppText>
 
           {DIAL_CODES.map(entry => {
             const isSelected = entry.code === selected;
@@ -52,9 +52,9 @@ export function DialCodeSheet({
                 accessibilityState={{ selected: isSelected }}
                 accessibilityLabel={`${entry.country} ${entry.code}`}
               >
-                <EventlyText style={dialSheetStyles.rowLabel}>
+                <AppText style={dialSheetStyles.rowLabel}>
                   {entry.flag} {entry.country} ({entry.code})
-                </EventlyText>
+                </AppText>
                 {isSelected ? (
                   <EventlyIcon name="check" size={18} color={brand.accent} />
                 ) : null}
@@ -62,9 +62,9 @@ export function DialCodeSheet({
             );
           })}
 
-          <EventlyText variant="caption" style={dialSheetStyles.note}>
+          <AppText variant="caption" style={dialSheetStyles.note}>
             Evently currently accepts Indian mobile numbers only.
-          </EventlyText>
+          </AppText>
         </Pressable>
       </Pressable>
     </Modal>

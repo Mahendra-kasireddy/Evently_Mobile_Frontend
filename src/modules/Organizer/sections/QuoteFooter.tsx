@@ -1,5 +1,5 @@
 import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { ORG_NAVY, ORGANIZER_COPY as COPY } from '../constants';
 import { footerStyles as s } from '../styles';
 
@@ -44,10 +44,12 @@ export function QuoteFooter({
       <View style={s.row}>
         {typicalLabel ? (
           <View style={s.typicalRow}>
-            <EventlyText variant="caption" style={s.typicalLabel}>
+            <AppText variant="caption" style={s.typicalLabel}>
               {COPY.typical.toUpperCase()}
-            </EventlyText>
-            <EventlyText style={s.typicalValue}>{typicalLabel}</EventlyText>
+            </AppText>
+            <AppText variant="h3" style={s.typicalValue}>
+              {typicalLabel}
+            </AppText>
           </View>
         ) : (
           <View />
@@ -56,9 +58,13 @@ export function QuoteFooter({
         {responseHours > 0 ? (
           <View style={s.replyRow}>
             <View style={s.dot} />
-            <EventlyText variant="small" style={s.reassurance} numberOfLines={1}>
+            <AppText
+              variant="bodySmall"
+              style={s.reassurance}
+              numberOfLines={1}
+            >
               {COPY.usuallyReplies(responseHours)}
-            </EventlyText>
+            </AppText>
           </View>
         ) : null}
       </View>
@@ -92,21 +98,28 @@ export function QuoteFooter({
           accessibilityRole="button"
           accessibilityLabel={hasRequested ? COPY.requested : COPY.requestQuote}
         >
-          <EventlyText style={[s.ctaText, hasRequested && s.ctaDoneText]}>
-            {hasRequested ? COPY.requested : isRequesting ? COPY.requesting : COPY.requestQuote}
-          </EventlyText>
+          <AppText
+            variant="button"
+            style={[s.ctaText, hasRequested && s.ctaDoneText]}
+          >
+            {hasRequested
+              ? COPY.requested
+              : isRequesting
+              ? COPY.requesting
+              : COPY.requestQuote}
+          </AppText>
           {hasRequested || isRequesting ? null : (
-            <EventlyText variant="caption" style={s.ctaNote}>
+            <AppText variant="caption" style={s.ctaNote}>
               {COPY.requestQuoteNote}
-            </EventlyText>
+            </AppText>
           )}
         </TouchableOpacity>
       </View>
 
       {errorMessage ? (
-        <EventlyText variant="caption" style={s.error}>
+        <AppText variant="caption" style={s.error}>
           {errorMessage}
-        </EventlyText>
+        </AppText>
       ) : null}
     </View>
   );

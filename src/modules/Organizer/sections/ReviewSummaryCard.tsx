@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { EventlyText } from '../../../Components';
+import { AppText } from '../../../Components';
 import { ORGANIZER_COPY as COPY } from '../constants';
 import { summaryCardStyles as s } from '../styles';
 import type { RatingBar, ReviewSummaryDTO } from '../types';
@@ -21,30 +21,30 @@ export function ReviewSummaryCard({ summary, bars }: ReviewSummaryCardProps) {
   return (
     <View style={s.card}>
       <View style={s.left}>
-        <EventlyText variant="h1" style={s.score}>
+        <AppText variant="display" style={s.score}>
           {summary.average.toFixed(1)}
-        </EventlyText>
-        <EventlyText variant="caption" style={s.total}>
+        </AppText>
+        <AppText variant="bodySmall" style={s.total}>
           {COPY.reviewsSuffix(summary.total)}
-        </EventlyText>
+        </AppText>
       </View>
 
       <View style={s.bars}>
-        {bars.map((bar) => (
+        {bars.map(bar => (
           <View
             key={bar.stars}
             style={s.barRow}
             accessibilityLabel={`${bar.stars} stars, ${bar.count}`}
           >
-            <EventlyText variant="caption" style={s.barStars}>
+            <AppText variant="bodySmall" style={s.barStars}>
               {bar.stars}
-            </EventlyText>
+            </AppText>
             <View style={s.track}>
               <View style={[s.fill, { width: `${bar.percent}%` }]} />
             </View>
-            <EventlyText variant="caption" style={s.barCount}>
+            <AppText variant="bodySmall" style={s.barCount}>
               {bar.count}
-            </EventlyText>
+            </AppText>
           </View>
         ))}
       </View>

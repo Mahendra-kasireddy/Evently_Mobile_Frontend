@@ -1,13 +1,11 @@
 import { Platform, StyleSheet } from 'react-native';
-import { spacing } from '../../theme';
+import { spacing, fontWeights, textColor, typography } from '../../theme';
 
 /*
  * The workspace's look: a poster in the occasion's colours, floating cards on
  * a soft lilac page, gradients carrying the colour.
  */
 export const WS_PAGE = '#f8f5fb';
-const INK = '#1a1f3d';
-const MUTED = '#6b6488';
 const LINE = '#efeaf6';
 
 const lift = Platform.select({
@@ -47,10 +45,28 @@ export const heroStyles = StyleSheet.create({
     height: 260,
     backgroundColor: 'rgba(255,255,255,0.08)',
   },
-  art: { position: 'absolute', top: 0, right: -40, width: 300, height: 200, opacity: 0.22 },
-  confetti: { position: 'absolute', top: 70, right: 0, width: 170, height: 150, opacity: 0.55 },
+  art: {
+    position: 'absolute',
+    top: 0,
+    right: -40,
+    width: 300,
+    height: 200,
+    opacity: 0.22,
+  },
+  confetti: {
+    position: 'absolute',
+    top: 70,
+    right: 0,
+    width: 170,
+    height: 150,
+    opacity: 0.55,
+  },
 
-  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   glassButton: {
     width: 40,
     height: 40,
@@ -63,10 +79,7 @@ export const heroStyles = StyleSheet.create({
   },
   topTitle: {
     color: 'rgba(255,255,255,0.85)',
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 1.6,
-    textTransform: 'uppercase',
+    ...typography.overline,
   },
   topSpacer: { width: 40 },
   refChip: {
@@ -79,10 +92,15 @@ export const heroStyles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: 'rgba(255,255,255,0.16)',
   },
-  refText: { color: 'rgba(255,255,255,0.92)', fontSize: 11, fontWeight: '700', letterSpacing: 0.4 },
+  refText: { color: 'rgba(255,255,255,0.92)', ...typography.label },
 
-  eyebrowRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 22 },
-  emoji: { fontSize: 26, lineHeight: 32 },
+  eyebrowRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 22,
+  },
+  emoji: { ...typography.h1 },
   statusPill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -94,24 +112,34 @@ export const heroStyles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.92)',
   },
   statusDot: { width: 8, height: 8, borderRadius: 4 },
-  statusText: { color: INK, fontSize: 12, fontWeight: '700', flexShrink: 1 },
+  statusText: {
+    color: textColor.textPrimary,
+    ...typography.label,
+    flexShrink: 1,
+  },
   title: {
-    color: '#ffffff',
-    fontSize: 36,
-    lineHeight: 44,
-    fontWeight: '800',
-    letterSpacing: -0.8,
+    color: textColor.textOnPrimary,
+    ...typography.display,
     marginTop: 10,
   },
 
-  countRow: { flexDirection: 'row', alignItems: 'center', gap: 18, marginTop: 18 },
+  countRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 18,
+    marginTop: 18,
+  },
   countInner: { alignItems: 'center', justifyContent: 'center' },
-  countNumber: { color: '#ffffff', fontSize: 34, lineHeight: 38, fontWeight: '800' },
-  countLabel: { color: 'rgba(255,255,255,0.85)', fontSize: 11, fontWeight: '600', marginTop: -2 },
+  countNumber: { color: textColor.textOnPrimary, ...typography.display },
+  countLabel: {
+    color: 'rgba(255,255,255,0.85)',
+    ...typography.label,
+    marginTop: -2,
+  },
   countToday: {
-    color: '#ffffff',
-    fontSize: 13,
-    fontWeight: '800',
+    color: textColor.textOnPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
     textAlign: 'center',
     paddingHorizontal: 10,
   },
@@ -123,8 +151,8 @@ export const heroStyles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.18)',
   },
-  dateMonth: { color: 'rgba(255,255,255,0.85)', fontSize: 12, fontWeight: '700', letterSpacing: 1 },
-  dateDay: { color: '#ffffff', fontSize: 34, lineHeight: 40, fontWeight: '800' },
+  dateMonth: { color: 'rgba(255,255,255,0.85)', ...typography.label },
+  dateDay: { color: textColor.textOnPrimary, ...typography.display },
   facts: { flex: 1, gap: 10 },
   fact: { flexDirection: 'row', alignItems: 'flex-start', gap: 9 },
   factIcon: {
@@ -135,8 +163,13 @@ export const heroStyles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.18)',
   },
-  factText: { flex: 1, color: 'rgba(255,255,255,0.95)', fontSize: 13.5, lineHeight: 19, paddingTop: 3 },
-  factStrong: { fontWeight: '700', color: '#ffffff' },
+  factText: {
+    flex: 1,
+    color: 'rgba(255,255,255,0.95)',
+    ...typography.bodySmall,
+    paddingTop: 3,
+  },
+  factStrong: { ...fontWeights.bold, color: textColor.textOnPrimary },
 
   organizerBar: {
     flexDirection: 'row',
@@ -158,10 +191,14 @@ export const heroStyles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.6)',
   },
-  avatarText: { color: '#ffffff', fontSize: 14, fontWeight: '800' },
+  avatarText: {
+    color: textColor.textOnPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
   organizerText: { flex: 1, minWidth: 0 },
-  organizerLead: { color: 'rgba(255,255,255,0.75)', fontSize: 11 },
-  organizerName: { color: '#ffffff', fontSize: 15, fontWeight: '700' },
+  organizerLead: { color: 'rgba(255,255,255,0.75)', ...typography.caption },
+  organizerName: { color: textColor.textOnPrimary, ...typography.h3 },
   messageButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -171,7 +208,7 @@ export const heroStyles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: '#ffffff',
   },
-  messageText: { fontSize: 13, fontWeight: '700' },
+  messageText: { ...typography.bodySmall, ...fontWeights.semibold },
 
   statsCard: {
     flexDirection: 'row',
@@ -185,8 +222,12 @@ export const heroStyles = StyleSheet.create({
     ...lift,
   },
   stat: { alignItems: 'center', gap: 6, flex: 1 },
-  statValue: { color: INK, fontSize: 13, fontWeight: '800' },
-  statLabel: { color: MUTED, fontSize: 12, fontWeight: '600' },
+  statValue: {
+    color: textColor.textPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
+  statLabel: { color: textColor.textSecondary, ...typography.label },
 
   tabs: { marginTop: 18 },
   tabsRow: { paddingHorizontal: spacing.md, gap: 8 },
@@ -203,13 +244,18 @@ export const heroStyles = StyleSheet.create({
     borderColor: LINE,
   },
   tabActive: { borderColor: 'transparent' },
-  tabLabel: { color: MUTED, fontSize: 14, fontWeight: '600' },
-  tabLabelActive: { color: '#ffffff', fontWeight: '700' },
+  tabLabel: { color: textColor.textSecondary, ...typography.label },
+  tabLabelActive: { color: textColor.textOnPrimary, ...fontWeights.bold },
 });
 
 export const sectionUi = StyleSheet.create({
   section: { marginTop: 22, paddingHorizontal: spacing.md },
-  head: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
+  head: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 10,
+  },
   headMark: {
     width: 30,
     height: 30,
@@ -218,11 +264,10 @@ export const sectionUi = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headTitle: { flex: 1, color: INK, fontSize: 18, fontWeight: '800', letterSpacing: -0.2 },
+  headTitle: { flex: 1, color: textColor.textPrimary, ...typography.h3 },
   headAside: {
     color: '#7c5cdb',
-    fontSize: 12,
-    fontWeight: '700',
+    ...typography.label,
     paddingVertical: 3,
     paddingHorizontal: 9,
     borderRadius: 999,
@@ -245,7 +290,12 @@ export const sectionUi = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  emptyText: { color: MUTED, fontSize: 14, lineHeight: 20, textAlign: 'center', paddingHorizontal: 12 },
+  emptyText: {
+    color: textColor.textSecondary,
+    ...typography.body,
+    textAlign: 'center',
+    paddingHorizontal: 12,
+  },
 
   step: { flexDirection: 'row', gap: 12 },
   stepRail: { alignItems: 'center', width: 26 },
@@ -257,13 +307,34 @@ export const sectionUi = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  stepMarkTodo: { borderWidth: 2, borderColor: '#e2dcef', backgroundColor: '#ffffff' },
-  stepLine: { width: 2, flex: 1, minHeight: 18, marginVertical: 3, borderRadius: 1, backgroundColor: '#ece7f6' },
+  stepMarkTodo: {
+    borderWidth: 2,
+    borderColor: '#e2dcef',
+    backgroundColor: '#ffffff',
+  },
+  stepLine: {
+    width: 2,
+    flex: 1,
+    minHeight: 18,
+    marginVertical: 3,
+    borderRadius: 1,
+    backgroundColor: '#ece7f6',
+  },
   stepLineDone: { backgroundColor: '#8fe0c4' },
-  stepBody: { flex: 1, flexDirection: 'row', alignItems: 'flex-start', gap: 8, paddingBottom: 16 },
-  stepLabel: { color: '#a29cbc', fontSize: 15, lineHeight: 22, fontWeight: '500' },
-  stepLabelDone: { color: INK, fontWeight: '700' },
-  stepLabelNow: { color: '#e2477a', fontWeight: '800' },
+  stepBody: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    paddingBottom: 16,
+  },
+  stepLabel: {
+    color: textColor.textDisabled,
+    ...typography.bodyLarge,
+    ...fontWeights.medium,
+  },
+  stepLabelDone: { color: textColor.textPrimary, ...fontWeights.bold },
+  stepLabelNow: { color: '#e2477a', ...fontWeights.bold },
   nowHalo: {
     position: 'absolute',
     width: 26,
@@ -286,11 +357,20 @@ export const sectionUi = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: '#ffe9e0',
   },
-  nowTagText: { color: '#d4552e', fontSize: 11, fontWeight: '800' },
+  nowTagText: { color: '#d4552e', ...typography.label },
 
-  payHead: { flexDirection: 'row', alignItems: 'flex-end', flexWrap: 'wrap', gap: 6 },
-  payBig: { color: INK, fontSize: 30, lineHeight: 36, fontWeight: '800', letterSpacing: -0.6 },
-  payOf: { color: MUTED, fontSize: 14, marginBottom: 5 },
+  payHead: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  payBig: { color: textColor.textPrimary, ...typography.display },
+  payOf: {
+    color: textColor.textSecondary,
+    ...typography.body,
+    marginBottom: 5,
+  },
   payTrack: {
     height: 10,
     marginTop: 12,
@@ -303,10 +383,16 @@ export const sectionUi = StyleSheet.create({
   payTile: { flex: 1, padding: 12, borderRadius: 16, gap: 4 },
   payTileAdvance: { backgroundColor: '#fff6ef' },
   payTileBalance: { backgroundColor: '#f4f0ff' },
-  payTileLabel: { color: MUTED, fontSize: 12, fontWeight: '600' },
-  payTileValue: { color: INK, fontSize: 17, lineHeight: 22, fontWeight: '800' },
-  tag: { alignSelf: 'flex-start', marginTop: 2, paddingVertical: 2, paddingHorizontal: 8, borderRadius: 6 },
-  tagText: { fontSize: 11, fontWeight: '800' },
+  payTileLabel: { color: textColor.textSecondary, ...typography.label },
+  payTileValue: { color: textColor.textPrimary, ...typography.h3 },
+  tag: {
+    alignSelf: 'flex-start',
+    marginTop: 2,
+    paddingVertical: 2,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+  },
+  tagText: { ...typography.label },
   tagPaid: { backgroundColor: '#dff6ec' },
   tagPaidText: { color: '#0e8a68' },
   tagCash: { backgroundColor: '#ffe9cc' },
@@ -324,17 +410,25 @@ export const sectionUi = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: LINE,
   },
-  payFootText: { flex: 1, color: MUTED, fontSize: 13 },
+  payFootText: {
+    flex: 1,
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+  },
 
   task: { flexDirection: 'row', gap: 12, paddingVertical: 10 },
   taskDivider: { borderTopWidth: 1, borderTopColor: LINE },
   taskBar: { width: 4, borderRadius: 2 },
   taskBody: { flex: 1 },
   taskHead: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
-  taskTitle: { flex: 1, color: INK, fontSize: 15, fontWeight: '600' },
+  taskTitle: { flex: 1, color: textColor.textPrimary, ...typography.h3 },
   taskPill: { paddingVertical: 3, paddingHorizontal: 9, borderRadius: 999 },
-  taskPillText: { fontSize: 11, fontWeight: '800' },
-  taskMeta: { color: MUTED, fontSize: 12.5, marginTop: 3 },
+  taskPillText: { ...typography.label },
+  taskMeta: {
+    color: textColor.textSecondary,
+    ...typography.caption,
+    marginTop: 3,
+  },
 
   log: { flexDirection: 'row', gap: 12 },
   logRail: { alignItems: 'center', width: 14, paddingTop: 5 },
@@ -348,14 +442,19 @@ export const sectionUi = StyleSheet.create({
   logDotLatest: { width: 14, height: 14, borderRadius: 7 },
   logLine: { width: 2, flex: 1, marginVertical: 3, backgroundColor: LINE },
   logBody: { flex: 1, paddingBottom: 14 },
-  logLabel: { color: INK, fontSize: 14.5, fontWeight: '600' },
-  logLabelLatest: { fontWeight: '800' },
-  logNote: { color: MUTED, fontSize: 13, marginTop: 2 },
-  logAt: { color: '#a29cbc', fontSize: 12, marginTop: 3 },
+  logLabel: {
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
+  logLabelLatest: { ...fontWeights.bold },
+  logNote: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    marginTop: 2,
+  },
+  logAt: { color: textColor.textDisabled, ...typography.caption, marginTop: 3 },
 });
-
-/* The Guest invitation tab. */
-const SERIF = Platform.select({ ios: 'Georgia', android: 'serif' });
 
 export const inviteUi = StyleSheet.create({
   wrap: { paddingHorizontal: spacing.md, paddingTop: 22, gap: 16 },
@@ -370,7 +469,10 @@ export const inviteUi = StyleSheet.create({
   },
   posterFill: { ...StyleSheet.absoluteFill },
   posterImage: { ...StyleSheet.absoluteFill, width: '100%', height: '100%' },
-  posterShade: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(20,10,40,0.45)' },
+  posterShade: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: 'rgba(20,10,40,0.45)',
+  },
   posterBorder: {
     position: 'absolute',
     top: 10,
@@ -381,28 +483,44 @@ export const inviteUi = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: 'rgba(196,160,110,0.55)',
   },
-  posterConfetti: { position: 'absolute', top: -6, right: -6, width: 150, height: 120, opacity: 0.8 },
-  posterBody: { alignItems: 'center', paddingVertical: 34, paddingHorizontal: 30 },
+  posterConfetti: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    width: 150,
+    height: 120,
+    opacity: 0.8,
+  },
+  posterBody: {
+    alignItems: 'center',
+    paddingVertical: 34,
+    paddingHorizontal: 30,
+  },
   posterEyebrow: {
     color: '#b08a55',
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 2.4,
+    ...typography.label,
     textAlign: 'center',
   },
   posterHosts: {
-    fontFamily: SERIF,
-    fontSize: 30,
-    lineHeight: 38,
-    fontWeight: '700',
+    ...typography.display,
     textAlign: 'center',
     marginTop: 10,
-    color: INK,
+    color: textColor.textPrimary,
   },
   posterRule: { width: 46, height: 2, borderRadius: 1, marginVertical: 12 },
   posterRuleOnPhoto: { backgroundColor: 'rgba(255,255,255,0.8)' },
-  posterMeta: { color: INK, fontSize: 14, fontWeight: '700', textAlign: 'center' },
-  posterVenue: { color: MUTED, fontSize: 13, textAlign: 'center', marginTop: 4 },
+  posterMeta: {
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+    textAlign: 'center',
+  },
+  posterVenue: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    textAlign: 'center',
+    marginTop: 4,
+  },
   onPhoto: { color: '#ffffff' },
   onPhotoMuted: { color: 'rgba(255,255,255,0.85)' },
   videoBadge: {
@@ -417,7 +535,7 @@ export const inviteUi = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: 'rgba(20,10,40,0.6)',
   },
-  videoBadgeText: { color: '#ffffff', fontSize: 11, fontWeight: '700' },
+  videoBadgeText: { color: textColor.textOnPrimary, ...typography.label },
 
   ribbon: {
     flexDirection: 'row',
@@ -428,7 +546,12 @@ export const inviteUi = StyleSheet.create({
     backgroundColor: '#ffffff',
     ...lift,
   },
-  statusLine: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 4 },
+  statusLine: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: 4,
+  },
   mainButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -439,7 +562,7 @@ export const inviteUi = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: '#f47b4d',
   },
-  mainButtonText: { color: '#ffffff', fontSize: 16, fontWeight: '800' },
+  mainButtonText: { color: textColor.textOnPrimary, ...typography.button },
   ribbonIcon: {
     width: 42,
     height: 42,
@@ -449,26 +572,42 @@ export const inviteUi = StyleSheet.create({
     justifyContent: 'center',
   },
   ribbonText: { flex: 1 },
-  ribbonTitle: { color: INK, fontSize: 15.5, fontWeight: '800' },
-  ribbonBody: { color: MUTED, fontSize: 13, lineHeight: 18, marginTop: 2 },
+  ribbonTitle: { color: textColor.textPrimary, ...typography.h3 },
+  ribbonBody: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    marginTop: 2,
+  },
 
-  card: { borderRadius: 22, padding: spacing.md, backgroundColor: '#ffffff', ...lift },
-  cardHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  cardTitle: { color: INK, fontSize: 17, fontWeight: '800' },
+  card: {
+    borderRadius: 22,
+    padding: spacing.md,
+    backgroundColor: '#ffffff',
+    ...lift,
+  },
+  cardHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  cardTitle: { color: textColor.textPrimary, ...typography.h3 },
   cardAside: {
     color: '#0e8a68',
-    fontSize: 12,
-    fontWeight: '800',
+    ...typography.label,
     paddingVertical: 3,
     paddingHorizontal: 9,
     borderRadius: 999,
     backgroundColor: '#dff6ec',
     overflow: 'hidden',
   },
-  statRow: { flexDirection: 'row', justifyContent: 'space-around', marginTop: 14 },
+  statRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 14,
+  },
   statCell: { alignItems: 'center', gap: 6 },
-  statNum: { color: INK, fontSize: 15, fontWeight: '800' },
-  statLabel: { color: MUTED, fontSize: 12, fontWeight: '600' },
+  statNum: { color: textColor.textPrimary, ...typography.h3 },
+  statLabel: { color: textColor.textSecondary, ...typography.label },
   hint: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -478,7 +617,7 @@ export const inviteUi = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#fff4e6',
   },
-  hintText: { flex: 1, color: '#8a4a0a', fontSize: 12.5 },
+  hintText: { flex: 1, color: '#8a4a0a', ...typography.caption },
   emptyGuests: { alignItems: 'center', gap: 10, paddingTop: 12 },
   emptyIcon: {
     width: 60,
@@ -488,7 +627,12 @@ export const inviteUi = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  emptyText: { color: MUTED, fontSize: 14, lineHeight: 20, textAlign: 'center', paddingHorizontal: 8 },
+  emptyText: {
+    color: textColor.textSecondary,
+    ...typography.body,
+    textAlign: 'center',
+    paddingHorizontal: 8,
+  },
 
   actions: { flexDirection: 'row', gap: 12 },
   action: {
@@ -510,16 +654,33 @@ export const inviteUi = StyleSheet.create({
     justifyContent: 'center',
   },
   actionIconPrimary: { backgroundColor: 'rgba(255,255,255,0.22)' },
-  actionTitle: { color: INK, fontSize: 15, fontWeight: '800', marginTop: 12 },
-  actionBody: { color: MUTED, fontSize: 12.5, lineHeight: 17, marginTop: 3 },
+  actionTitle: {
+    color: textColor.textPrimary,
+    ...typography.h3,
+    marginTop: 12,
+  },
+  actionBody: {
+    color: textColor.textSecondary,
+    ...typography.caption,
+    marginTop: 3,
+  },
   actionArrow: { position: 'absolute', top: 14, right: 14 },
 
-  sub: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 11 },
+  sub: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 11,
+  },
   subDivider: { borderTopWidth: 1, borderTopColor: LINE },
   subDot: { width: 12, height: 12, borderRadius: 6, overflow: 'hidden' },
   subText: { flex: 1 },
-  subName: { color: INK, fontSize: 15, fontWeight: '700' },
-  subMeta: { color: MUTED, fontSize: 12.5, marginTop: 2 },
+  subName: { color: textColor.textPrimary, ...typography.h3 },
+  subMeta: {
+    color: textColor.textSecondary,
+    ...typography.caption,
+    marginTop: 2,
+  },
 });
 
 /* The pinned header: a frosted bar with the way back, the name and the tabs. */
@@ -543,9 +704,19 @@ export const pinnedStyles = StyleSheet.create({
       android: { elevation: 4 },
     }),
   },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: spacing.sm },
-  back: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  title: { flex: 1, color: INK, fontSize: 17, fontWeight: '800' },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: spacing.sm,
+  },
+  back: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: { flex: 1, color: textColor.textPrimary, ...typography.h3 },
   tabs: { marginTop: 6 },
 });
 

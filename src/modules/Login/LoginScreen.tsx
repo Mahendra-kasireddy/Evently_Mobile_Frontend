@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText, KeyboardAvoider } from '../../Components';
+import { EventlyIcon, AppText, KeyboardAvoider } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
 import { OTP_COPY, PHONE_COPY } from './constants';
 import { useLoginContainer } from './container';
@@ -193,9 +193,9 @@ export function LoginScreen() {
                   size={16}
                   color="#b3261e"
                 />
-                <EventlyText variant="body" style={styles.errorText}>
+                <AppText variant="caption" style={styles.errorText}>
                   {errorMessage}
-                </EventlyText>
+                </AppText>
               </View>
             ) : null}
           </Animated.View>

@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import {
   CURRENT_EVENT_STAGE_COLOR,
   CURRENT_EVENT_STAGE_LABEL,
@@ -27,13 +27,13 @@ export function CurrentEventCard({ data }: CurrentEventCardProps) {
               color={colors.onPrimary}
             />
           </View>
-          <EventlyText
-            variant="subtitle"
+          <AppText
+            variant="h2"
             style={currentEventStyles.title}
             numberOfLines={1}
           >
             {data.title}
-          </EventlyText>
+          </AppText>
         </View>
         <View style={currentEventStyles.stageRow}>
           <View style={currentEventStyles.stagePill}>
@@ -43,12 +43,12 @@ export function CurrentEventCard({ data }: CurrentEventCardProps) {
                 { backgroundColor: stageColor },
               ]}
             />
-            <EventlyText
-              variant="caption"
+            <AppText
+              variant="overline"
               style={[currentEventStyles.stageText, { color: stageColor }]}
             >
               {stageLabel}
-            </EventlyText>
+            </AppText>
           </View>
         </View>
         <View style={currentEventStyles.progressTrack}>
@@ -60,20 +60,14 @@ export function CurrentEventCard({ data }: CurrentEventCardProps) {
           />
         </View>
         <View style={currentEventStyles.footerRow}>
-          <EventlyText
-            variant="caption"
-            style={currentEventStyles.progressLabel}
-          >
+          <AppText variant="label" style={currentEventStyles.progressLabel}>
             {data.progress}% complete
-          </EventlyText>
+          </AppText>
           {data.daysToGo != null ? (
             <View style={currentEventStyles.daysToGoBadge}>
-              <EventlyText
-                variant="caption"
-                style={currentEventStyles.daysToGo}
-              >
+              <AppText variant="caption" style={currentEventStyles.daysToGo}>
                 {data.daysToGo} days to go
-              </EventlyText>
+              </AppText>
             </View>
           ) : null}
         </View>

@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText } from '../../Components';
+import { EventlyIcon, AppText } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
 import {
   COMPARE_ACCENT,
@@ -28,16 +28,16 @@ function ColumnHead({ column }: { column: CompareColumn }) {
   return (
     <View style={s.column}>
       <View style={[s.columnAvatar, { backgroundColor: column.avatarColor }]}>
-        <EventlyText variant="subtitle" style={s.columnAvatarText}>
+        <AppText variant="body" style={s.columnAvatarText}>
           {column.initials}
-        </EventlyText>
+        </AppText>
       </View>
-      <EventlyText variant="caption" style={s.columnName} numberOfLines={1}>
+      <AppText variant="body" style={s.columnName} numberOfLines={1}>
         {column.shortName}
-      </EventlyText>
-      <EventlyText variant="subtitle" style={s.columnTotal} numberOfLines={1}>
+      </AppText>
+      <AppText variant="h3" style={s.columnTotal} numberOfLines={1}>
         {column.totalLabel}
-      </EventlyText>
+      </AppText>
     </View>
   );
 }
@@ -46,26 +46,23 @@ function Cell({ cell }: { cell: CompareCell }) {
   if (!cell.included) {
     return (
       <View style={s.cell}>
-        <EventlyText variant="caption" style={s.cellMissing}>
+        <AppText variant="bodySmall" style={s.cellMissing}>
           {COPY.notIncluded}
-        </EventlyText>
+        </AppText>
       </View>
     );
   }
 
   return (
     <View style={s.cell}>
-      <EventlyText
-        variant="subtitle"
-        style={[s.cellPrice, cell.isLower && s.cellLower]}
-      >
+      <AppText variant="h3" style={[s.cellPrice, cell.isLower && s.cellLower]}>
         {cell.priceLabel}
-      </EventlyText>
+      </AppText>
       {/* Only where both sides priced the line — see `mapLineByLine`. */}
       {cell.isLower ? (
-        <EventlyText variant="caption" style={s.lowerTag}>
+        <AppText variant="label" style={s.lowerTag}>
           {COPY.lower}
-        </EventlyText>
+        </AppText>
       ) : null}
     </View>
   );
@@ -128,9 +125,9 @@ export function LineByLineScreen() {
       >
         <EventlyIcon name="chevron-left" size={24} color={COMPARE_NAVY} />
       </TouchableOpacity>
-      <EventlyText variant="h1" style={s.title}>
+      <AppText variant="h2" style={s.title}>
         {COPY.title}
-      </EventlyText>
+      </AppText>
     </View>
   );
 
@@ -150,9 +147,9 @@ export function LineByLineScreen() {
       <SafeAreaView style={s.container} edges={['top']}>
         {header}
         <View style={s.centered}>
-          <EventlyText variant="body" style={s.centeredText}>
+          <AppText variant="body" style={s.centeredText}>
             {COPY.empty}
-          </EventlyText>
+          </AppText>
         </View>
       </SafeAreaView>
     );
@@ -175,21 +172,17 @@ export function LineByLineScreen() {
         {model.rows.map(row => (
           <View key={row.key} style={s.row}>
             <View style={s.rowLabel}>
-              <EventlyText
-                variant="subtitle"
-                style={s.rowTitle}
-                numberOfLines={2}
-              >
+              <AppText variant="h3" style={s.rowTitle} numberOfLines={2}>
                 {row.title}
-              </EventlyText>
+              </AppText>
               {row.subtitle ? (
-                <EventlyText
-                  variant="caption"
+                <AppText
+                  variant="bodySmall"
                   style={s.rowSubtitle}
                   numberOfLines={2}
                 >
                   {row.subtitle}
-                </EventlyText>
+                </AppText>
               ) : null}
             </View>
             <Cell cell={row.left} />
@@ -201,16 +194,16 @@ export function LineByLineScreen() {
             and a customer reading only the totals will not notice. */}
         <View style={s.note}>
           <EventlyIcon name="alert-outline" size={17} color="#a07a1f" />
-          <EventlyText variant="caption" style={s.noteText}>
+          <AppText variant="bodySmall" style={s.noteText}>
             {COPY.scopeNote}
-          </EventlyText>
+          </AppText>
         </View>
       </ScrollView>
 
       {error ? (
-        <EventlyText variant="caption" style={s.error}>
+        <AppText variant="caption" style={s.error}>
           {error}
-        </EventlyText>
+        </AppText>
       ) : null}
 
       <View style={s.foot}>
@@ -228,15 +221,11 @@ export function LineByLineScreen() {
             accessibilityRole="button"
             accessibilityLabel={`${COPY.accept} ${column.fullName}, ${column.totalLabel}`}
           >
-            <EventlyText
-              variant="subtitle"
-              style={s.acceptText}
-              numberOfLines={1}
-            >
+            <AppText variant="h3" style={s.acceptText} numberOfLines={1}>
               {acceptingId === column.id
                 ? COPY.accepting
                 : `${COPY.accept} ${column.shortName}`}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         ))}
       </View>

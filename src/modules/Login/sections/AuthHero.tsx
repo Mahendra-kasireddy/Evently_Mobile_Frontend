@@ -1,5 +1,5 @@
-import { Image, Text, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { Image, View } from 'react-native';
+import { EventlyIcon, AppText } from '../../../Components';
 import { LOGIN_COPY } from '../constants';
 import { AUTH_ACCENT, heroStyles } from '../styles';
 
@@ -17,21 +17,37 @@ const LOGO_MARK = require('../../../assets/images/logo_mark.png');
 export function AuthHero() {
   return (
     <View style={heroStyles.brand}>
-      <View style={heroStyles.logoRow} accessible accessibilityRole="header" accessibilityLabel={LOGIN_COPY.wordmark}>
-        <Image source={LOGO_MARK} style={heroStyles.logoMark} resizeMode="contain" />
-        <EventlyText style={heroStyles.wordmark}>{LOGIN_COPY.wordmark}</EventlyText>
+      <View
+        style={heroStyles.logoRow}
+        accessible
+        accessibilityRole="header"
+        accessibilityLabel={LOGIN_COPY.wordmark}
+      >
+        <Image
+          source={LOGO_MARK}
+          style={heroStyles.logoMark}
+          resizeMode="contain"
+        />
+        <AppText variant="display" style={heroStyles.wordmark}>
+          {LOGIN_COPY.wordmark}
+        </AppText>
       </View>
 
-      <View style={heroStyles.divider} importantForAccessibility="no-hide-descendants">
+      <View
+        style={heroStyles.divider}
+        importantForAccessibility="no-hide-descendants"
+      >
         <View style={heroStyles.rule} />
         <EventlyIcon name="spa" size={20} color={AUTH_ACCENT} />
         <View style={heroStyles.rule} />
       </View>
 
-      <Text style={heroStyles.title}>{LOGIN_COPY.title}</Text>
-      <EventlyText variant="body" style={heroStyles.subtitle}>
+      <AppText variant="display" style={heroStyles.title}>
+        {LOGIN_COPY.title}
+      </AppText>
+      <AppText variant="bodyLarge" style={heroStyles.subtitle}>
         {LOGIN_COPY.subtitle}
-      </EventlyText>
+      </AppText>
     </View>
   );
 }

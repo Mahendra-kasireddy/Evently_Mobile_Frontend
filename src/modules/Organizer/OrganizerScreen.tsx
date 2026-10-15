@@ -2,9 +2,14 @@ import { useCallback } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ActivityIndicator, ScrollView, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText } from '../../Components';
+import { EventlyIcon, AppText } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
 import { useOpenWithOrganizer } from '../Chat';
 import { ORGANIZER_COPY as COPY, ORG_ACCENT } from './constants';
@@ -40,8 +45,16 @@ type OrganizerNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 export function OrganizerScreen() {
   const navigation = useNavigation<OrganizerNavigationProp>();
   const { params } = useRoute<OrganizerRouteProp>();
-  const { organizer, summary, bars, latestReview, isLoading, isError, errorMessage, refetch } =
-    useOrganizerContainer(params.organizerId);
+  const {
+    organizer,
+    summary,
+    bars,
+    latestReview,
+    isLoading,
+    isError,
+    errorMessage,
+    refetch,
+  } = useOrganizerContainer(params.organizerId);
 
   /*
    * "Request a quote" opens the plan wizard with this organizer already
@@ -58,7 +71,10 @@ export function OrganizerScreen() {
       if (!organizer) return;
       navigation.navigate('Main', {
         screen: 'Plan',
-        params: { organizerId: organizer.id, ...(eventDate ? { eventDate } : {}) },
+        params: {
+          organizerId: organizer.id,
+          ...(eventDate ? { eventDate } : {}),
+        },
       });
     },
     [navigation, organizer],
@@ -77,7 +93,7 @@ export function OrganizerScreen() {
     if (!organizer || openThread.loading) return;
     openThread
       .execute(organizer.id)
-      .then((conversation) =>
+      .then(conversation =>
         navigation.navigate('Conversation', {
           conversationId: conversation.id,
           withName: organizer.name,
@@ -100,9 +116,9 @@ export function OrganizerScreen() {
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={ORG_ACCENT} />
-          <EventlyText variant="body" style={styles.loadingText}>
+          <AppText variant="body" style={styles.loadingText}>
             {COPY.loading}
-          </EventlyText>
+          </AppText>
         </View>
       </SafeAreaView>
     );
@@ -112,13 +128,13 @@ export function OrganizerScreen() {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.centered}>
-          <EventlyText variant="sectionTitle" style={styles.errorTitle}>
+          <AppText variant="h2" style={styles.errorTitle}>
             {COPY.errorTitle}
-          </EventlyText>
+          </AppText>
           {isError ? (
-            <EventlyText variant="body" style={styles.errorText}>
+            <AppText variant="body" style={styles.errorText}>
               {errorMessage ?? 'Something went wrong.'}
-            </EventlyText>
+            </AppText>
           ) : null}
           <TouchableOpacity
             style={styles.retryButton}
@@ -127,9 +143,9 @@ export function OrganizerScreen() {
             accessibilityRole="button"
           >
             <EventlyIcon name="refresh" size={16} color={ORG_ACCENT} />
-            <EventlyText variant="label" style={styles.retryText}>
+            <AppText variant="label" style={styles.retryText}>
               {COPY.retry}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -138,7 +154,10 @@ export function OrganizerScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         <CoverBanner
           name={organizer.name}
           coverUrl={organizer.coverUrl}

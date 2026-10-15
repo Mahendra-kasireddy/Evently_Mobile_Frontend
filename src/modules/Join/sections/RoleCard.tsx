@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import {
   EventlyIcon,
-  EventlyText,
+  AppText,
   GradientFill,
   PressableScale,
 } from '../../../Components';
@@ -35,17 +35,20 @@ export function RoleCard({ data, onPress }: RoleCardProps) {
       </View>
 
       <View style={s.body}>
-        <EventlyText style={s.title} numberOfLines={1}>
+        <AppText variant="h3" style={s.title} numberOfLines={1}>
           {data.title}
-        </EventlyText>
-        <EventlyText style={s.description} numberOfLines={2}>
+        </AppText>
+        <AppText variant="bodySmall" style={s.description} numberOfLines={2}>
           {data.description}
-        </EventlyText>
+        </AppText>
         <View style={[s.tag, { backgroundColor: `${data.gradient[1]}14` }]}>
           <EventlyIcon name="clock-fast" size={13} color={data.gradient[1]} />
-          <EventlyText style={[s.tagText, { color: data.gradient[1] }]}>
+          <AppText
+            variant="label"
+            style={[s.tagText, { color: data.gradient[1] }]}
+          >
             {data.requirement}
-          </EventlyText>
+          </AppText>
         </View>
       </View>
 

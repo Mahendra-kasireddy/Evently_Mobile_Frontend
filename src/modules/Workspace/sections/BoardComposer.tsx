@@ -1,7 +1,12 @@
 import { useState } from 'react';
-import { ActivityIndicator, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
-import { EventlyIcon, EventlyImage, EventlyText } from '../../../Components';
+import { EventlyIcon, EventlyImage, AppText } from '../../../Components';
 import { absoluteFileUrl } from '../../../services/urls';
 import { colors } from '../../../theme';
 import {
@@ -28,7 +33,11 @@ interface BoardComposerProps {
 }
 
 async function pickImage(): Promise<PickedImage | null> {
-  const result = await launchImageLibrary({ mediaType: 'photo', quality: 0.8, selectionLimit: 1 });
+  const result = await launchImageLibrary({
+    mediaType: 'photo',
+    quality: 0.8,
+    selectionLimit: 1,
+  });
   if (result.didCancel || !result.assets?.length) return null;
   const asset = result.assets[0];
   if (!asset.uri) return null;
@@ -84,7 +93,7 @@ export function BoardComposer({
     if (!picked) return;
     try {
       const uploaded = await onUpload(picked);
-      setImages((prev) => [...prev, uploaded]);
+      setImages(prev => [...prev, uploaded]);
     } catch {
       setLocalError(IDEAS_COPY.photoError);
     }
@@ -104,9 +113,9 @@ export function BoardComposer({
     <View style={s.composer}>
       <View style={s.composerTop}>
         <View style={s.avatar}>
-          <EventlyText variant="caption" style={s.avatarText}>
+          <AppText variant="bodySmall" style={s.avatarText}>
             {initials(authorName)}
-          </EventlyText>
+          </AppText>
         </View>
         <TextInput
           style={s.input}
@@ -115,7 +124,9 @@ export function BoardComposer({
           maxLength={IDEA_TEXT_MAX}
           multiline
           placeholder={
-            confidential ? IDEAS_COPY.placeholderSurprise : IDEAS_COPY.placeholder(organizerName)
+            confidential
+              ? IDEAS_COPY.placeholderSurprise
+              : IDEAS_COPY.placeholder(organizerName)
           }
           placeholderTextColor={colors.textMuted}
           accessibilityLabel={IDEAS_COPY.placeholder(organizerName)}
@@ -124,14 +135,19 @@ export function BoardComposer({
 
       {images.length > 0 ? (
         <View style={s.thumbs}>
-          {images.map((image) => (
+          {images.map(image => (
             <View key={image.url} style={s.thumb}>
               {/* Already uploaded — `onUpload` returns the server's own
                   root-relative path, not the picker's local file. */}
-              <EventlyImage source={{ uri: absoluteFileUrl(image.url) }} style={s.thumbImage} />
+              <EventlyImage
+                source={{ uri: absoluteFileUrl(image.url) }}
+                style={s.thumbImage}
+              />
               <TouchableOpacity
                 style={s.thumbRemove}
-                onPress={() => setImages((prev) => prev.filter((i) => i.url !== image.url))}
+                onPress={() =>
+                  setImages(prev => prev.filter(i => i.url !== image.url))
+                }
                 accessibilityRole="button"
                 accessibilityLabel={`Remove ${image.originalName || 'photo'}`}
               >
@@ -143,7 +159,7 @@ export function BoardComposer({
       ) : null}
 
       <View style={s.typeRow}>
-        {CUSTOMER_IDEA_TYPES.map((value) => {
+        {CUSTOMER_IDEA_TYPES.map(value => {
           const meta = IDEA_TYPE_META[value];
           const on = type === value;
           return (
@@ -156,10 +172,17 @@ export function BoardComposer({
               accessibilityState={{ selected: on }}
               accessibilityLabel={meta.label}
             >
-              <EventlyIcon name={meta.icon} size={13} color={on ? meta.color : colors.textMuted} />
-              <EventlyText variant="caption" style={[s.typeChipText, on && { color: meta.color }]}>
+              <EventlyIcon
+                name={meta.icon}
+                size={13}
+                color={on ? meta.color : colors.textMuted}
+              />
+              <AppText
+                variant="label"
+                style={[s.typeChipText, on && { color: meta.color }]}
+              >
                 {meta.label}
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
           );
         })}
@@ -168,9 +191,9 @@ export function BoardComposer({
       {confidential ? (
         <View style={s.secretNote}>
           <EventlyIcon name="lock-outline" size={13} color={colors.textMuted} />
-          <EventlyText variant="caption" style={s.secretNoteText}>
+          <AppText variant="caption" style={s.secretNoteText}>
             {IDEAS_COPY.confidentialNote(organizerName)}
-          </EventlyText>
+          </AppText>
         </View>
       ) : null}
 
@@ -186,11 +209,15 @@ export function BoardComposer({
           {isUploading ? (
             <ActivityIndicator size="small" color={colors.textMuted} />
           ) : (
-            <EventlyIcon name="camera-outline" size={18} color={colors.textMuted} />
+            <EventlyIcon
+              name="camera-outline"
+              size={18}
+              color={colors.textMuted}
+            />
           )}
-          <EventlyText variant="caption" style={s.photoText}>
+          <AppText variant="caption" style={s.photoText}>
             {isUploading ? IDEAS_COPY.uploading : IDEAS_COPY.photo}
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -206,23 +233,23 @@ export function BoardComposer({
           ) : (
             <EventlyIcon name="plus" size={16} color={colors.onPrimary} />
           )}
-          <EventlyText variant="caption" style={s.postButtonText}>
+          <AppText variant="caption" style={s.postButtonText}>
             {isPosting ? IDEAS_COPY.posting : IDEAS_COPY.post}
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
       </View>
 
       {/* Only near the cap: a counter on an empty box is noise. */}
       {text.length > IDEA_TEXT_MAX - 200 ? (
-        <EventlyText variant="caption" style={s.counter}>
+        <AppText variant="caption" style={s.counter}>
           {text.length} / {IDEA_TEXT_MAX}
-        </EventlyText>
+        </AppText>
       ) : null}
 
       {localError || postErrorMessage ? (
-        <EventlyText variant="caption" style={s.composerError}>
+        <AppText variant="caption" style={s.composerError}>
           {localError || postErrorMessage}
-        </EventlyText>
+        </AppText>
       ) : null}
     </View>
   );

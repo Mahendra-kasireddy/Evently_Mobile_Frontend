@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { EventlyText } from '../../../Components';
+import { AppText } from '../../../Components';
 import { stepperStyles } from '../styles';
 import type { PlanStepDTO } from '../types';
 
@@ -46,32 +46,32 @@ export function Stepper({ steps, current }: StepperProps) {
       </View>
 
       <View style={stepperStyles.caption}>
-        <EventlyText variant="caption" style={stepperStyles.captionCount}>
+        <AppText variant="caption" style={stepperStyles.captionCount}>
           {`Step ${current + 1} of ${total}`}
-        </EventlyText>
-        <EventlyText variant="caption" style={stepperStyles.captionDivider}>
+        </AppText>
+        <AppText variant="caption" style={stepperStyles.captionDivider}>
           ·
-        </EventlyText>
-        <EventlyText
+        </AppText>
+        <AppText
           variant="caption"
           style={stepperStyles.captionLabel}
           numberOfLines={1}
         >
           {currentLabel}
-        </EventlyText>
+        </AppText>
 
         <View style={stepperStyles.captionSpacer} />
 
         {/* Named rather than numbered: "Next: Categories" tells somebody
             deciding whether to finish this step what finishing it buys. */}
         {nextLabel ? (
-          <EventlyText
+          <AppText
             variant="caption"
             style={stepperStyles.captionNext}
             numberOfLines={1}
           >
             {`Next: ${nextLabel}`}
-          </EventlyText>
+          </AppText>
         ) : null}
       </View>
     </View>

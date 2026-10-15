@@ -1,5 +1,5 @@
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { NOTIFICATION_LOOK } from '../constants';
 import { notificationRowStyles as s } from '../styles';
 import type { NotificationItem } from '../types';
@@ -44,24 +44,24 @@ export function NotificationRow({ item, onPress }: NotificationRowProps) {
       </View>
 
       <View style={s.content}>
-        <EventlyText
-          variant="subtitle"
+        <AppText
+          variant="body"
           style={[s.title, item.read && s.titleRead]}
           numberOfLines={2}
         >
           {item.title}
-        </EventlyText>
+        </AppText>
         {/* Dropped rather than left as an empty line — some notices are a
             headline and nothing more. */}
         {item.body ? (
-          <EventlyText variant="body" style={s.body} numberOfLines={2}>
+          <AppText variant="caption" style={s.body} numberOfLines={2}>
             {item.body}
-          </EventlyText>
+          </AppText>
         ) : null}
         {item.relativeTime ? (
-          <EventlyText variant="caption" style={s.time}>
+          <AppText variant="caption" style={s.time}>
             {item.relativeTime}
-          </EventlyText>
+          </AppText>
         ) : null}
       </View>
 

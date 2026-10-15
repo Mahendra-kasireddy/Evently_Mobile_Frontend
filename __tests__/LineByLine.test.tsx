@@ -13,7 +13,15 @@ import ReactTestRenderer from 'react-test-renderer';
 
 jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => {
   const { Text } = require('react-native');
-  return function MockIcon({ name, size, color }: { name: string; size?: number; color?: string }) {
+  return function MockIcon({
+    name,
+    size,
+    color,
+  }: {
+    name: string;
+    size?: number;
+    color?: string;
+  }) {
     return <Text style={{ fontSize: size, color }}>{` icon:${name}`}</Text>;
   };
 });
@@ -31,8 +39,10 @@ import type {
 } from '../src/modules/CompareQuotes/types';
 
 declare const process: { env: Record<string, string | undefined> };
-const fs: { writeFileSync(p: string, d: string, e: string): void; existsSync(p: string): boolean } =
-  require('fs');
+const fs: {
+  writeFileSync(p: string, d: string, e: string): void;
+  existsSync(p: string): boolean;
+} = require('fs');
 
 const line = (key: string, title: string, subtitle: string, price: number) => ({
   key,
@@ -49,7 +59,12 @@ const quotation = (over: Partial<QuotationDTO> = {}): QuotationDTO =>
     status: 'sent',
     lineItems: [
       line('decor', 'Decor & flowers', 'Stage, entrance, seating', 145000),
-      line('photo', 'Photo & video', '2 photographers, 1 cinematographer', 94000),
+      line(
+        'photo',
+        'Photo & video',
+        '2 photographers, 1 cinematographer',
+        94000,
+      ),
       line('music', 'Music & DJ', 'Sound, lights, 4 hours', 48000),
       line('priest', 'Priest & rituals', 'Samagri included', 22000),
       line('transport', 'Transport', 'Guest pickup, 2 vehicles', 38000),
@@ -71,7 +86,7 @@ const quotation = (over: Partial<QuotationDTO> = {}): QuotationDTO =>
       reviews: 62,
     },
     ...over,
-  }) as QuotationDTO;
+  } as QuotationDTO);
 
 const right = quotation({
   id: 'q2',
@@ -104,7 +119,7 @@ const request = (quotations: QuotationDTO[]): QuoteRequestDTO =>
     guests: '150',
     status: 'quoted',
     quotations,
-  }) as QuoteRequestDTO;
+  } as QuoteRequestDTO);
 
 const model = (quotations: QuotationDTO[] = [quotation(), right]) =>
   mapLineByLine(request(quotations), 'q1', 'q2');
@@ -124,11 +139,11 @@ describe('mapLineByLine', () => {
 
   it('marks the cheaper side of each line, and only one of them', () => {
     const m = model()!;
-    const decor = m.rows.find((r) => r.key === 'decor')!;
+    const decor = m.rows.find(r => r.key === 'decor')!;
     expect(decor.left.isLower).toBe(true);
     expect(decor.right.isLower).toBe(false);
 
-    const photo = m.rows.find((r) => r.key === 'photo')!;
+    const photo = m.rows.find(r => r.key === 'photo')!;
     expect(photo.left.isLower).toBe(false);
     expect(photo.right.isLower).toBe(true);
   });
@@ -143,7 +158,7 @@ describe('mapLineByLine', () => {
       ],
     });
     const m = mapLineByLine(request([shuffled, right]), 'q1', 'q2')!;
-    const decor = m.rows.find((r) => r.key === 'decor')!;
+    const decor = m.rows.find(r => r.key === 'decor')!;
     expect(decor.left.priceLabel).toBe('₹1,45,000');
     expect(decor.right.priceLabel).toBe('₹2,10,000');
   });
@@ -152,10 +167,10 @@ describe('mapLineByLine', () => {
     // "The cheaper one did not include transport" is the most useful thing
     // this screen can say, and it cannot say it by leaving the row out.
     const withoutTransport = quotation({
-      lineItems: quotation().lineItems.filter((l) => l.key !== 'transport'),
+      lineItems: quotation().lineItems.filter(l => l.key !== 'transport'),
     });
     const m = mapLineByLine(request([withoutTransport, right]), 'q1', 'q2')!;
-    const transport = m.rows.find((r) => r.key === 'transport')!;
+    const transport = m.rows.find(r => r.key === 'transport')!;
 
     expect(transport.left.included).toBe(false);
     expect(transport.left.priceLabel).toBe('Not included');
@@ -165,19 +180,21 @@ describe('mapLineByLine', () => {
   it('never calls an unquoted line the cheaper one', () => {
     // Not covering something is a difference in scope, not a better price.
     const withoutTransport = quotation({
-      lineItems: quotation().lineItems.filter((l) => l.key !== 'transport'),
+      lineItems: quotation().lineItems.filter(l => l.key !== 'transport'),
     });
     const m = mapLineByLine(request([withoutTransport, right]), 'q1', 'q2')!;
-    const transport = m.rows.find((r) => r.key === 'transport')!;
+    const transport = m.rows.find(r => r.key === 'transport')!;
 
     expect(transport.left.isLower).toBe(false);
     expect(transport.right.isLower).toBe(false);
   });
 
   it('marks neither side when two prices are equal', () => {
-    const same = quotation({ lineItems: [line('music', 'Music & DJ', '', 52000)] });
+    const same = quotation({
+      lineItems: [line('music', 'Music & DJ', '', 52000)],
+    });
     const m = mapLineByLine(request([same, right]), 'q1', 'q2')!;
-    const music = m.rows.find((r) => r.key === 'music')!;
+    const music = m.rows.find(r => r.key === 'music')!;
     expect(music.left.isLower).toBe(false);
     expect(music.right.isLower).toBe(false);
   });
@@ -188,7 +205,9 @@ describe('mapLineByLine', () => {
 
   it('ignores a withdrawn quote, which is not an option any more', () => {
     const pulled = quotation({ id: 'q2', status: 'withdrawn' });
-    expect(mapLineByLine(request([quotation(), pulled]), 'q1', 'q2')).toBeNull();
+    expect(
+      mapLineByLine(request([quotation(), pulled]), 'q1', 'q2'),
+    ).toBeNull();
   });
 });
 
@@ -210,7 +229,11 @@ describe('render dump', () => {
     const Cell = ({ cell }: { cell: CompareCell }) =>
       cell.included ? (
         <View style={s.cell}>
-          <EventlyText variant="subtitle" style={[s.cellPrice, cell.isLower && s.cellLower]}>
+          <EventlyText
+            variant="body"
+            weight="medium"
+            style={[s.cellPrice, cell.isLower && s.cellLower]}
+          >
             {cell.priceLabel}
           </EventlyText>
           {cell.isLower ? (
@@ -242,27 +265,40 @@ describe('render dump', () => {
 
           <View style={s.columns}>
             <View style={s.columnSpacer} />
-            {[m.left, m.right].map((column) => (
+            {[m.left, m.right].map(column => (
               <View key={column.id} style={s.column}>
-                <View style={[s.columnAvatar, { backgroundColor: column.avatarColor }]}>
-                  <EventlyText variant="subtitle" style={s.columnAvatarText}>
+                <View
+                  style={[
+                    s.columnAvatar,
+                    { backgroundColor: column.avatarColor },
+                  ]}
+                >
+                  <EventlyText
+                    variant="body"
+                    weight="medium"
+                    style={s.columnAvatarText}
+                  >
                     {column.initials}
                   </EventlyText>
                 </View>
                 <EventlyText variant="caption" style={s.columnName}>
                   {column.shortName}
                 </EventlyText>
-                <EventlyText variant="subtitle" style={s.columnTotal}>
+                <EventlyText
+                  variant="body"
+                  weight="medium"
+                  style={s.columnTotal}
+                >
                   {column.totalLabel}
                 </EventlyText>
               </View>
             ))}
           </View>
 
-          {m.rows.map((row) => (
+          {m.rows.map(row => (
             <View key={row.key} style={s.row}>
               <View style={s.rowLabel}>
-                <EventlyText variant="subtitle" style={s.rowTitle}>
+                <EventlyText variant="body" weight="medium" style={s.rowTitle}>
                   {row.title}
                 </EventlyText>
                 {row.subtitle ? (
@@ -285,12 +321,12 @@ describe('render dump', () => {
 
           <View style={s.foot}>
             <View style={[s.accept, s.acceptLeft]}>
-              <EventlyText variant="subtitle" style={s.acceptText}>
+              <EventlyText variant="body" weight="medium" style={s.acceptText}>
                 {`${COPY.accept} ${m.left.shortName}`}
               </EventlyText>
             </View>
             <View style={[s.accept, s.acceptRight]}>
-              <EventlyText variant="subtitle" style={s.acceptText}>
+              <EventlyText variant="body" weight="medium" style={s.acceptText}>
                 {`${COPY.accept} ${m.right.shortName}`}
               </EventlyText>
             </View>

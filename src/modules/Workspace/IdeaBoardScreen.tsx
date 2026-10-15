@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   AppHeader,
   EventlyIcon,
-  EventlyText,
+  AppText,
   KeyboardAvoider,
 } from '../../Components';
 import { colors } from '../../theme';
@@ -104,9 +104,9 @@ export function IdeaBoardScreen() {
         {header}
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={colors.primary} />
-          <EventlyText variant="body" style={styles.loadingText}>
+          <AppText variant="body" style={styles.loadingText}>
             {IDEAS_COPY.loading}
-          </EventlyText>
+          </AppText>
         </View>
       </SafeAreaView>
     );
@@ -117,9 +117,9 @@ export function IdeaBoardScreen() {
       <SafeAreaView style={styles.container} edges={['top']}>
         {header}
         <View style={styles.centered}>
-          <EventlyText variant="body" style={styles.errorText}>
+          <AppText variant="body" style={styles.errorText}>
             {IDEAS_COPY.loadError}
-          </EventlyText>
+          </AppText>
           <TouchableOpacity
             style={styles.retryButton}
             activeOpacity={0.8}
@@ -127,9 +127,9 @@ export function IdeaBoardScreen() {
             accessibilityRole="button"
           >
             <EventlyIcon name="refresh" size={16} color={WORKSPACE_ACCENT} />
-            <EventlyText variant="caption" style={styles.retryText}>
+            <AppText variant="caption" style={styles.retryText}>
               {IDEAS_COPY.retry}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

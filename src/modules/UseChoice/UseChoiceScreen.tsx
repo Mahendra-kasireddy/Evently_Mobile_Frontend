@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Pressable, ScrollView, StatusBar, Text, View } from 'react-native';
+import { Pressable, ScrollView, StatusBar, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText } from '../../Components';
+import { EventlyIcon, AppText } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
 import { CHOICE_ACCENT, CHOICE_NAVY, styles as s } from './styles';
 
@@ -84,12 +84,12 @@ export function UseChoiceScreen() {
       >
         {/* Serif heading through the platform Text: the app's text component
             always swaps in a Poppins face. */}
-        <Text style={s.title} accessibilityRole="header">
+        <AppText variant="h1" style={s.title} accessibilityRole="header">
           How do you want{'\n'}to use Evently?
-        </Text>
-        <EventlyText variant="body" style={s.subtitle}>
+        </AppText>
+        <AppText variant="bodyLarge" style={s.subtitle}>
           You can change this anytime.
-        </EventlyText>
+        </AppText>
 
         <View style={s.cards} accessibilityRole="radiogroup">
           {CHOICES.map(c => {
@@ -117,12 +117,12 @@ export function UseChoiceScreen() {
                   </View>
                 </View>
                 <View style={s.cardText}>
-                  <EventlyText variant="body" style={s.cardTitle}>
+                  <AppText variant="h3" style={s.cardTitle}>
                     {c.title}
-                  </EventlyText>
-                  <EventlyText variant="caption" style={s.cardBody}>
+                  </AppText>
+                  <AppText variant="bodySmall" style={s.cardBody}>
                     {c.body}
-                  </EventlyText>
+                  </AppText>
                 </View>
                 <View style={[s.radio, on && s.radioOn]}>
                   {on ? (
@@ -142,9 +142,9 @@ export function UseChoiceScreen() {
           accessibilityRole="button"
           testID="use-choice-continue"
         >
-          <EventlyText variant="body" style={s.ctaText}>
+          <AppText variant="button" style={s.ctaText}>
             Continue
-          </EventlyText>
+          </AppText>
         </Pressable>
       </ScrollView>
     </View>

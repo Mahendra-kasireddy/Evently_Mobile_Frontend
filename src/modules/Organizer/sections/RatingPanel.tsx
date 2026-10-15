@@ -1,5 +1,5 @@
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyText } from '../../../Components';
+import { AppText } from '../../../Components';
 import { ORGANIZER_COPY as COPY } from '../constants';
 import { ratingStyles as s, styles } from '../styles';
 import { Stars } from './Stars';
@@ -25,7 +25,12 @@ interface RatingPanelProps {
  * as invisible hairlines, and "one person gave this two stars" is exactly
  * what somebody reading a rating is looking for.
  */
-export function RatingPanel({ rating, reviews, bars, onPressReviews }: RatingPanelProps) {
+export function RatingPanel({
+  rating,
+  reviews,
+  bars,
+  onPressReviews,
+}: RatingPanelProps) {
   const hasReviews = reviews > 0;
 
   return (
@@ -39,43 +44,45 @@ export function RatingPanel({ rating, reviews, bars, onPressReviews }: RatingPan
         {hasReviews ? (
           <>
             <View style={s.left}>
-              <EventlyText style={s.score}>{rating.toFixed(1)}</EventlyText>
+              <AppText variant="display" style={s.score}>
+                {rating.toFixed(1)}
+              </AppText>
               <Stars rating={rating} size={15} style={s.stars} />
               <TouchableOpacity
                 onPress={onPressReviews}
                 accessibilityRole="button"
                 accessibilityLabel={`Read all ${COPY.reviewsSuffix(reviews)}`}
               >
-                <EventlyText variant="label" style={s.reviews}>
+                <AppText variant="label" style={s.reviews}>
                   {COPY.reviewsSuffix(reviews)}
-                </EventlyText>
+                </AppText>
               </TouchableOpacity>
             </View>
 
             <View style={s.bars}>
-              {bars.map((bar) => (
+              {bars.map(bar => (
                 <View
                   key={bar.stars}
                   style={s.barRow}
                   accessibilityLabel={`${bar.stars} stars, ${bar.count}`}
                 >
-                  <EventlyText variant="small" style={s.barStars}>
+                  <AppText variant="bodySmall" style={s.barStars}>
                     {bar.stars}
-                  </EventlyText>
+                  </AppText>
                   <View style={s.track}>
                     <View style={[s.fill, { width: `${bar.percent}%` }]} />
                   </View>
-                  <EventlyText variant="small" style={s.barCount}>
+                  <AppText variant="bodySmall" style={s.barCount}>
                     {bar.count}
-                  </EventlyText>
+                  </AppText>
                 </View>
               ))}
             </View>
           </>
         ) : (
-          <EventlyText variant="body" style={s.emptyBody}>
+          <AppText variant="body" style={s.emptyBody}>
             {COPY.noReviewsBody}
-          </EventlyText>
+          </AppText>
         )}
       </View>
     </View>

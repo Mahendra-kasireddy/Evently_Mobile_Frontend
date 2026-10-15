@@ -4,9 +4,9 @@ import type { CompositeNavigationProp } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { FlatList, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { FlatList, RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EventlyText, FadeInUp, ThinkingOrbs } from '../../Components';
+import { AppText, FadeInUp, ThinkingOrbs } from '../../Components';
 import type {
   MainTabParamList,
   RootStackParamList,
@@ -49,6 +49,7 @@ import {
   sectionStyles,
   styles,
 } from './styles';
+import { useScrollTopOnBlur } from '../../hooks/useScrollTopOnBlur';
 
 type HomeNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<MainTabParamList, 'Home'>,
@@ -60,6 +61,8 @@ type HomeNavigationProp = CompositeNavigationProp<
 const LIVE_TONE: readonly [string, string] = ['#ff6b7d', '#d93b3b'];
 
 export function HomeScreen() {
+  /* Leaving the tab puts it back at the top for next time. */
+  const scrollRef = useScrollTopOnBlur();
   const navigation = useNavigation<HomeNavigationProp>();
   /* The coupon whose terms are open, or null. Local because it is a reading
      state, not something the feed needs to know about. */
@@ -288,10 +291,12 @@ export function HomeScreen() {
             colors={HOME_ORB_COLORS}
             label="Loading your home"
           />
-          <Text style={styles.loadingTitle}>Setting the stage</Text>
-          <EventlyText variant="body" style={styles.loadingText}>
+          <AppText variant="h2" style={styles.loadingTitle}>
+            Setting the stage
+          </AppText>
+          <AppText variant="body" style={styles.loadingText}>
             Loading your home…
-          </EventlyText>
+          </AppText>
         </View>
       </SafeAreaView>,
     );
@@ -302,9 +307,9 @@ export function HomeScreen() {
       <SafeAreaView style={styles.container} edges={['top']}>
         <HomeHeader {...headerProps} />
         <View style={styles.centered}>
-          <EventlyText variant="body" style={styles.errorText}>
+          <AppText variant="caption" style={styles.errorText}>
             {errorMessage ?? 'Something went wrong.'}
-          </EventlyText>
+          </AppText>
         </View>
       </SafeAreaView>,
     );
@@ -319,6 +324,7 @@ export function HomeScreen() {
      */
     <View style={styles.container}>
       <ScrollView
+        ref={scrollRef as never}
         style={styles.scroll}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}

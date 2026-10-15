@@ -1,6 +1,12 @@
 import { Platform, StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, spacing } from '../../theme';
+import {
+  colors,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+} from '../../theme';
 import {
   COMPARE_ACCENT,
   COMPARE_ACCENT_SOFT,
@@ -9,7 +15,6 @@ import {
   COMPARE_GREEN_SOFT,
   COMPARE_LINE_HAIRLINE,
   COMPARE_LOWER_GREEN,
-  COMPARE_NAVY,
   COMPARE_NAVY_DEEP,
 } from './constants';
 
@@ -32,20 +37,21 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  loadingText: { color: colors.textMuted, marginTop: spacing.md },
+  loadingText: { color: textColor.textSecondary, marginTop: spacing.md },
   emptyTitle: {
-    color: COMPARE_NAVY,
+    ...typography.h2,
+    color: textColor.textPrimary,
     marginTop: spacing.md,
     textAlign: 'center',
   },
   emptyBody: {
-    color: colors.textMuted,
+    ...typography.body,
+    color: textColor.textSecondary,
     marginTop: spacing.sm,
     textAlign: 'center',
-    lineHeight: 20,
   },
   errorText: {
-    color: colors.danger,
+    color: textColor.textError,
     textAlign: 'center',
     marginTop: spacing.sm,
   },
@@ -59,35 +65,31 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },
-  retryText: { color: COMPARE_ACCENT, fontWeight: '700' },
+  retryText: { color: COMPARE_ACCENT, ...fontWeights.bold },
 
   brief: { paddingHorizontal: spacing.md, paddingBottom: spacing.sm },
   briefTitle: {
-    color: COMPARE_NAVY,
-    fontSize: 21,
-    fontWeight: '700',
-    letterSpacing: -0.3,
+    color: textColor.textPrimary,
+    ...typography.h2,
   },
   briefFacts: {
-    color: colors.textMuted,
-    fontSize: 13.5,
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
     marginTop: 2,
-    lineHeight: 19,
   },
   spread: {
     color: COMPARE_ACCENT,
-    fontSize: 13.5,
-    fontWeight: '600',
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
     marginTop: 6,
   },
   decidedNote: {
     color: COMPARE_GREEN,
-    fontSize: 13.5,
+    ...typography.bodySmall,
     marginTop: 8,
-    lineHeight: 19,
   },
   acceptError: {
-    color: colors.danger,
+    color: textColor.textError,
     paddingHorizontal: spacing.md,
     marginBottom: spacing.sm,
   },
@@ -113,17 +115,19 @@ export const quoteCardStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { color: colors.onPrimary, fontSize: 15, fontWeight: '700' },
+  avatarText: { color: textColor.textOnPrimary, ...typography.h3 },
   headText: { flex: 1 },
   name: {
-    color: COMPARE_NAVY,
-    fontSize: 16,
-    fontWeight: '700',
-    lineHeight: 22,
+    color: textColor.textPrimary,
+    ...typography.h3,
   },
   metaRow: { ...globalStyles.row, gap: 5, marginTop: 2 },
-  meta: { color: colors.textMuted, fontSize: 13 },
-  rating: { color: COMPARE_NAVY, fontSize: 13, fontWeight: '600' },
+  meta: { color: textColor.textSecondary, ...typography.bodySmall },
+  rating: {
+    color: textColor.textPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
   chip: {
     flexShrink: 0,
     borderRadius: 999,
@@ -132,7 +136,7 @@ export const quoteCardStyles = StyleSheet.create({
   },
   chipLowest: { backgroundColor: COMPARE_ACCENT_SOFT },
   chipAccepted: { backgroundColor: COMPARE_GREEN_SOFT },
-  chipText: { fontSize: 9.5, fontWeight: '700', letterSpacing: 0.5 },
+  chipText: { ...typography.label },
   chipTextLowest: { color: COMPARE_ACCENT },
   chipTextAccepted: { color: COMPARE_GREEN },
 
@@ -145,21 +149,16 @@ export const quoteCardStyles = StyleSheet.create({
     borderTopColor: HAIRLINE,
   },
   totalLabel: {
-    color: colors.textMuted,
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
+    color: textColor.textSecondary,
+    ...typography.overline,
   },
   totalValue: {
-    color: COMPARE_NAVY,
-    fontSize: 23,
-    fontWeight: '700',
-    letterSpacing: -0.4,
+    color: textColor.textPrimary,
+    ...typography.h2,
   },
   advance: {
-    color: colors.textMuted,
-    fontSize: 13,
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
     marginTop: 2,
     textAlign: 'right',
   },
@@ -167,8 +166,8 @@ export const quoteCardStyles = StyleSheet.create({
   breakdownToggle: { ...globalStyles.row, gap: 4, marginTop: 12 },
   breakdownToggleText: {
     color: COMPARE_ACCENT,
-    fontSize: 14,
-    fontWeight: '600',
+    ...typography.body,
+    ...fontWeights.semibold,
   },
   line: {
     ...globalStyles.row,
@@ -176,14 +175,21 @@ export const quoteCardStyles = StyleSheet.create({
     marginTop: 10,
   },
   lineText: { flex: 1 },
-  lineTitle: { color: '#141c2b', fontSize: 14, fontWeight: '500' },
-  lineSubtitle: {
-    color: colors.textMuted,
-    fontSize: 12.5,
-    marginTop: 1,
-    lineHeight: 17,
+  lineTitle: {
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.medium,
   },
-  linePrice: { color: COMPARE_NAVY, fontSize: 14, fontWeight: '600' },
+  lineSubtitle: {
+    color: textColor.textSecondary,
+    ...typography.caption,
+    marginTop: 1,
+  },
+  linePrice: {
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
 
   accept: {
     alignItems: 'center',
@@ -194,12 +200,11 @@ export const quoteCardStyles = StyleSheet.create({
     marginTop: 14,
   },
   acceptDisabled: { opacity: 0.5 },
-  acceptText: { color: colors.onPrimary, fontSize: 15.5, fontWeight: '600' },
+  acceptText: { color: textColor.textOnPrimary, ...typography.h3 },
   acceptNote: {
-    color: colors.textMuted,
-    fontSize: 12,
+    color: textColor.textSecondary,
+    ...typography.caption,
     marginTop: 8,
-    lineHeight: 17,
   },
 });
 
@@ -218,7 +223,7 @@ export const compareEntryStyles = StyleSheet.create({
     borderColor: COMPARE_ACCENT,
     paddingVertical: 12,
   },
-  label: { color: COMPARE_ACCENT, fontSize: 14.5, fontWeight: '700' },
+  label: { color: COMPARE_ACCENT, ...typography.body, ...fontWeights.semibold },
 });
 
 export const lineByLineStyles = StyleSheet.create({
@@ -242,10 +247,8 @@ export const lineByLineStyles = StyleSheet.create({
     marginLeft: -10,
   },
   title: {
-    color: COMPARE_NAVY,
-    fontSize: 22,
-    fontWeight: '700',
-    letterSpacing: -0.3,
+    color: textColor.textPrimary,
+    ...typography.h2,
   },
 
   /* The two organizers stay above the rows: a price column means nothing once
@@ -268,15 +271,18 @@ export const lineByLineStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   columnAvatarText: {
-    color: colors.onPrimary,
-    fontSize: 14,
-    fontWeight: '700',
+    color: textColor.textOnPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
   },
-  columnName: { color: colors.textMuted, fontSize: 14, marginTop: 8 },
+  columnName: {
+    color: textColor.textSecondary,
+    ...typography.body,
+    marginTop: 8,
+  },
   columnTotal: {
-    color: COMPARE_NAVY,
-    fontSize: 17,
-    fontWeight: '700',
+    color: textColor.textPrimary,
+    ...typography.h3,
     marginTop: 2,
   },
 
@@ -291,28 +297,27 @@ export const lineByLineStyles = StyleSheet.create({
   },
   rowLabel: { flex: 1.25, paddingRight: 10 },
   rowTitle: {
-    color: COMPARE_NAVY,
-    fontSize: 15.5,
-    fontWeight: '700',
-    lineHeight: 21,
+    color: textColor.textPrimary,
+    ...typography.h3,
   },
   rowSubtitle: {
-    color: colors.textMuted,
-    fontSize: 13,
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
     marginTop: 3,
-    lineHeight: 18,
   },
   cell: { flex: 1, alignItems: 'center' },
-  cellPrice: { color: COMPARE_NAVY, fontSize: 16, fontWeight: '600' },
+  cellPrice: { color: textColor.textPrimary, ...typography.h3 },
   cellLower: { color: COMPARE_LOWER_GREEN },
   /* Stated, not left blank: a line one organizer did not quote is a difference
      in what you get, and a blank cell reads as a price of nothing. */
-  cellMissing: { color: colors.textMuted, fontSize: 13.5, fontStyle: 'italic' },
+  cellMissing: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    fontStyle: 'italic',
+  },
   lowerTag: {
     color: COMPARE_LOWER_GREEN,
-    fontSize: 11.5,
-    fontWeight: '700',
-    letterSpacing: 0.6,
+    ...typography.label,
     marginTop: 3,
   },
 
@@ -325,7 +330,7 @@ export const lineByLineStyles = StyleSheet.create({
     backgroundColor: '#fdf6e7',
     padding: 14,
   },
-  noteText: { color: '#7a5d1f', flex: 1, fontSize: 13.5, lineHeight: 19 },
+  noteText: { color: '#7a5d1f', flex: 1, ...typography.bodySmall },
 
   foot: {
     ...globalStyles.row,
@@ -348,10 +353,10 @@ export const lineByLineStyles = StyleSheet.create({
   acceptLeft: { backgroundColor: COMPARE_ACCENT },
   acceptRight: { backgroundColor: COMPARE_NAVY_DEEP },
   acceptDisabled: { opacity: 0.5 },
-  acceptText: { color: colors.onPrimary, fontSize: 15.5, fontWeight: '700' },
+  acceptText: { color: textColor.textOnPrimary, ...typography.h3 },
   error: {
-    color: colors.danger,
-    fontSize: 13,
+    color: textColor.textError,
+    ...typography.caption,
     paddingHorizontal: spacing.md,
     paddingBottom: 6,
   },
@@ -362,9 +367,8 @@ export const lineByLineStyles = StyleSheet.create({
     padding: spacing.lg,
   },
   centeredText: {
-    color: colors.textMuted,
+    color: textColor.textSecondary,
     textAlign: 'center',
-    lineHeight: 20,
   },
 });
 
@@ -404,16 +408,14 @@ export const waitingStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    color: COMPARE_NAVY_DEEP,
-    fontSize: 26,
-    lineHeight: 34,
+    color: textColor.textPrimary,
+    ...typography.h1,
     textAlign: 'center',
     marginTop: spacing.md,
   },
   lead: {
-    color: colors.textMuted,
+    color: textColor.textSecondary,
     textAlign: 'center',
-    lineHeight: 21,
     marginTop: 6,
     paddingHorizontal: spacing.md,
   },
@@ -429,10 +431,8 @@ export const waitingStyles = StyleSheet.create({
   },
   cardHead: { ...globalStyles.row, justifyContent: 'space-between' },
   cardLabel: {
-    color: '#9a93a8',
-    fontSize: 11.5,
-    letterSpacing: 1.2,
-    fontWeight: '700',
+    color: textColor.textDisabled,
+    ...typography.label,
   },
   statusPill: {
     ...globalStyles.row,
@@ -448,8 +448,8 @@ export const waitingStyles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: '#f0a020',
   },
-  statusText: { color: '#a86400', fontWeight: '700', fontSize: 12 },
-  cardTitle: { color: COMPARE_NAVY_DEEP, marginTop: 6 },
+  statusText: { color: '#a86400', ...typography.label },
+  cardTitle: { color: textColor.textPrimary, marginTop: 6 },
   facts: { marginTop: spacing.sm, gap: 12 },
   fact: { ...globalStyles.row, alignItems: 'center', gap: 12 },
   factIcon: {
@@ -461,10 +461,10 @@ export const waitingStyles = StyleSheet.create({
     backgroundColor: COMPARE_ACCENT_SOFT,
   },
   factText: { flex: 1 },
-  factLabel: { color: '#9a93a8', fontSize: 12 },
-  factValue: { color: COMPARE_NAVY_DEEP, fontSize: 15 },
+  factLabel: { color: textColor.textDisabled, ...typography.label },
+  factValue: { color: textColor.textPrimary, ...typography.bodyLarge },
 
-  sentToCount: { color: COMPARE_NAVY_DEEP, fontWeight: '700' },
+  sentToCount: { color: textColor.textPrimary, ...fontWeights.bold },
   recipient: {
     ...globalStyles.row,
     alignItems: 'center',
@@ -482,18 +482,26 @@ export const waitingStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarOpen: { backgroundColor: COMPARE_ACCENT_SOFT },
-  avatarText: { color: '#ffffff', fontWeight: '700', fontSize: 14 },
+  avatarText: {
+    color: textColor.textOnPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
   recipientText: { flex: 1 },
-  recipientName: { color: COMPARE_NAVY_DEEP, fontSize: 15 },
-  recipientMeta: { color: colors.textMuted, marginTop: 2, lineHeight: 18 },
+  recipientName: { color: textColor.textPrimary, ...typography.bodyLarge },
+  recipientMeta: { color: textColor.textSecondary, marginTop: 2 },
   waitingPill: {
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 999,
     backgroundColor: '#fff4e5',
   },
-  waitingText: { color: '#a86400', fontSize: 11.5, fontWeight: '700' },
-  moreText: { color: colors.textMuted, marginTop: 8, fontWeight: '600' },
+  waitingText: { color: '#a86400', ...typography.label },
+  moreText: {
+    color: textColor.textSecondary,
+    marginTop: 8,
+    ...fontWeights.semibold,
+  },
 
   steps: { marginTop: spacing.sm },
   step: { flexDirection: 'row', gap: 12 },
@@ -525,9 +533,9 @@ export const waitingStyles = StyleSheet.create({
   },
   lineDone: { backgroundColor: '#13a06f' },
   stepText: { flex: 1, paddingBottom: spacing.md },
-  stepTitle: { color: COMPARE_NAVY_DEEP, fontSize: 15 },
+  stepTitle: { color: textColor.textPrimary, ...typography.bodyLarge },
   stepTitleNext: { color: '#8f8a9c' },
-  stepBody: { color: colors.textMuted, marginTop: 2, lineHeight: 18 },
+  stepBody: { color: textColor.textSecondary, marginTop: 2 },
 
   footer: {
     paddingHorizontal: spacing.md,
@@ -545,5 +553,5 @@ export const waitingStyles = StyleSheet.create({
     borderRadius: 27,
     overflow: 'hidden',
   },
-  ctaText: { color: '#ffffff', fontSize: 16 },
+  ctaText: { color: textColor.textOnPrimary, ...typography.button },
 });

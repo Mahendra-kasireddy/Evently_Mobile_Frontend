@@ -2,10 +2,11 @@ import { useId, useState } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { EventlyIcon } from '../EventlyIcon';
-import { EventlyText } from '../EventlyText';
+import { AppText } from '../AppText';
 import { useReducedMotion } from '../Motion';
 import { useLoop } from './useLoop';
 
+import { typography } from '../../theme';
 export type MetalTone = 'gold' | 'platinum' | 'silver';
 
 /** Each metal as a run of highlights and shadows, left to right. */
@@ -96,7 +97,9 @@ export function MetalBadge({ label, tone, icon = 'medal' }: MetalBadgeProps) {
         />
       ) : null}
       <EventlyIcon name={icon} size={11} color={metal.ink} />
-      <EventlyText style={[s.text, { color: metal.ink }]}>{label}</EventlyText>
+      <AppText variant="label" style={[s.text, { color: metal.ink }]}>
+        {label}
+      </AppText>
     </View>
   );
 }
@@ -121,10 +124,7 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.7)',
   },
   text: {
-    fontSize: 10,
-    lineHeight: 13,
-    fontWeight: '700',
-    letterSpacing: 0.4,
+    ...typography.label,
   },
 });
 

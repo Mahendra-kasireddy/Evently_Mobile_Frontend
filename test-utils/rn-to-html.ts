@@ -36,7 +36,11 @@ const AXIS: Record<string, string[]> = {
   marginHorizontal: ['margin-left', 'margin-right'],
 };
 
-const ESCAPES: Record<string, string> = { '<': '&lt;', '>': '&gt;', '&': '&amp;' };
+const ESCAPES: Record<string, string> = {
+  '<': '&lt;',
+  '>': '&gt;',
+  '&': '&amp;',
+};
 
 /** MaterialCommunityIcons stand-ins, by glyph name. */
 const ICONS: Record<string, string> = {
@@ -47,48 +51,67 @@ const ICONS: Record<string, string> = {
   'currency-inr': 'M7 5h10M7 9h10M9 5c4 0 4 8 0 8H7l7 7',
   'arrow-right': 'M5 12h14M13 6l6 6-6 6',
   medal: 'M8 3l2 5M16 3l-2 5M12 9a5 5 0 100 10 5 5 0 000-10',
-  'check-decagram': 'M12 3l2.2 1.6 2.7-.2.8 2.6 2.2 1.6-1 2.4 1 2.4-2.2 1.6-.8 2.6-2.7-.2L12 21l-2.2-1.6-2.7.2-.8-2.6L4.1 15.4l1-2.4-1-2.4 2.2-1.6.8-2.6 2.7.2zM9 12l2 2 4-4',
+  'check-decagram':
+    'M12 3l2.2 1.6 2.7-.2.8 2.6 2.2 1.6-1 2.4 1 2.4-2.2 1.6-.8 2.6-2.7-.2L12 21l-2.2-1.6-2.7.2-.8-2.6L4.1 15.4l1-2.4-1-2.4 2.2-1.6.8-2.6 2.7.2zM9 12l2 2 4-4',
   'wallet-outline': 'M4 7h15v12H4zM4 7l11-3v3M15 13h2',
   'lightning-bolt-outline': 'M13 3L5 14h6l-1 7 8-11h-6z',
   'party-popper': 'M4 20l5-13 8 8zM14 4l1 2M19 9l2-1M17 3l-1 3',
   'home-variant': 'M4 11l8-7 8 7v9h-5v-6H9v6H4z',
   'home-variant-outline': 'M4 11l8-7 8 7v9h-5v-6H9v6H4z',
   'calendar-check-outline': 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4M9 15l2 2 4-4',
-  'ticket-confirmation-outline': 'M3 8a2 2 0 002-2h14a2 2 0 002 2v8a2 2 0 00-2 2H5a2 2 0 00-2-2z',
-  'account-circle-outline': 'M12 3a9 9 0 100 18 9 9 0 000-18zM12 7a3 3 0 100 6 3 3 0 000-6M6.5 18a6 6 0 0111 0',
+  'ticket-confirmation-outline':
+    'M3 8a2 2 0 002-2h14a2 2 0 002 2v8a2 2 0 00-2 2H5a2 2 0 00-2-2z',
+  'account-circle-outline':
+    'M12 3a9 9 0 100 18 9 9 0 000-18zM12 7a3 3 0 100 6 3 3 0 000-6M6.5 18a6 6 0 0111 0',
   'chevron-right': 'M9 6l6 6-6 6',
   'chevron-down': 'M6 9l6 6 6-6',
   check: 'M5 13l4 4L19 7',
   // Added for the auth screens' review dump.
   'chevron-left': 'M15 6l-6 6 6 6',
-  'star-four-points': 'M12 3l2.2 6.8L21 12l-6.8 2.2L12 21l-2.2-6.8L3 12l6.8-2.2z',
+  'star-four-points':
+    'M12 3l2.2 6.8L21 12l-6.8 2.2L12 21l-2.2-6.8L3 12l6.8-2.2z',
   'briefcase-outline': 'M4 8h16v11H4zM9 8V6h6v2M4 13h16',
   'pencil-outline': 'M4 20h4L19 9l-4-4L4 16z',
   'message-text-outline': 'M4 5h16v11H9l-5 4z M8 9h8M8 12h5',
-  'shield-check-outline': 'M12 3l7 3v5c0 4.4-3 8-7 10-4-2-7-5.6-7-10V6z M9 12l2 2 4-4',
+  'shield-check-outline':
+    'M12 3l7 3v5c0 4.4-3 8-7 10-4-2-7-5.6-7-10V6z M9 12l2 2 4-4',
   'backspace-outline': 'M9 5h11v14H9l-6-7zM12 9l5 6M17 9l-5 6',
-  'account-switch-outline': 'M7 10a2.5 2.5 0 100-5 2.5 2.5 0 000 5M3 17a4 4 0 018 0M17 19a2.5 2.5 0 100-5 2.5 2.5 0 000 5M13 8h6l-2-2M19 8l-2 2',
+  'account-switch-outline':
+    'M7 10a2.5 2.5 0 100-5 2.5 2.5 0 000 5M3 17a4 4 0 018 0M17 19a2.5 2.5 0 100-5 2.5 2.5 0 000 5M13 8h6l-2-2M19 8l-2 2',
   'alert-circle-outline': 'M12 3a9 9 0 100 18 9 9 0 000-18zM12 8v5M12 16h.01',
-  'heart-outline': 'M12 20s-7-4.4-7-9a4 4 0 017-2.6A4 4 0 0119 11c0 4.6-7 9-7 9z',
+  'heart-outline':
+    'M12 20s-7-4.4-7-9a4 4 0 017-2.6A4 4 0 0119 11c0 4.6-7 9-7 9z',
   'calendar-blank-outline': 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
-  'map-marker-outline': 'M12 21s6-5.7 6-10a6 6 0 10-12 0c0 4.3 6 10 6 10zM12 11h.01',
-  'account-group-outline': 'M4 19a4 4 0 018 0M8 11a3 3 0 100-6 3 3 0 000 6M14 19a4 4 0 016-3.4M17 11a2.5 2.5 0 100-5',
+  'map-marker-outline':
+    'M12 21s6-5.7 6-10a6 6 0 10-12 0c0 4.3 6 10 6 10zM12 11h.01',
+  'account-group-outline':
+    'M4 19a4 4 0 018 0M8 11a3 3 0 100-6 3 3 0 000 6M14 19a4 4 0 016-3.4M17 11a2.5 2.5 0 100-5',
   'calendar-plus': 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4M12 13v4M10 15h4',
-  'cloud-off-outline': 'M4 4l16 16M7 18a4 4 0 01-.6-8A6 6 0 0117 8M19 12a4 4 0 01-2 6',
+  'cloud-off-outline':
+    'M4 4l16 16M7 18a4 4 0 01-.6-8A6 6 0 0117 8M19 12a4 4 0 01-2 6',
   refresh: 'M20 12a8 8 0 11-2.3-5.7M20 4v5h-5',
-  'account-tie-outline': 'M12 4a3 3 0 100 6 3 3 0 000-6M10 10l2 3 2-3M12 13l-1 7M12 13l1 7M6 20a6 6 0 0112 0',
+  'account-tie-outline':
+    'M12 4a3 3 0 100 6 3 3 0 000-6M10 10l2 3 2-3M12 13l-1 7M12 13l1 7M6 20a6 6 0 0112 0',
   pound: 'M6 9h13M5 15h13M11 4l-2 16M17 4l-2 16',
-  creation: 'M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8zM18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z',
-  'lightbulb-on-outline': 'M9 18h6M10 21h4M12 3a6 6 0 00-3.5 10.9V16h7v-2.1A6 6 0 0012 3z',
-  'image-outline': 'M4 5h16v14H4zM8 11a1.5 1.5 0 100-3 1.5 1.5 0 000 3M4 16l5-4 4 3 3-2 4 3',
-  'help-circle-outline': 'M12 3a9 9 0 100 18 9 9 0 000-18zM9.6 9.5a2.5 2.5 0 114.4 2c-.9.9-2 1.4-2 2.8M12 17h.01',
-  'gift-outline': 'M3 11h18v9H3zM3 7h18v4H3zM12 7v13M12 7S9.5 3 7.5 4.5 10 7 12 7zM12 7s2.5-4 4.5-2.5S14 7 12 7z',
+  creation:
+    'M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8zM18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z',
+  'lightbulb-on-outline':
+    'M9 18h6M10 21h4M12 3a6 6 0 00-3.5 10.9V16h7v-2.1A6 6 0 0012 3z',
+  'image-outline':
+    'M4 5h16v14H4zM8 11a1.5 1.5 0 100-3 1.5 1.5 0 000 3M4 16l5-4 4 3 3-2 4 3',
+  'help-circle-outline':
+    'M12 3a9 9 0 100 18 9 9 0 000-18zM9.6 9.5a2.5 2.5 0 114.4 2c-.9.9-2 1.4-2 2.8M12 17h.01',
+  'gift-outline':
+    'M3 11h18v9H3zM3 7h18v4H3zM12 7v13M12 7S9.5 3 7.5 4.5 10 7 12 7zM12 7s2.5-4 4.5-2.5S14 7 12 7z',
   'bullhorn-outline': 'M4 10v4h3l7 4V6l-7 4zM18 10a3 3 0 010 4',
-  'camera-outline': 'M4 8h3l2-2h6l2 2h3v11H4zM12 16.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7',
+  'camera-outline':
+    'M4 8h3l2-2h6l2 2h3v11H4zM12 16.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7',
   plus: 'M12 5v14M5 12h14',
   close: 'M6 6l12 12M18 6L6 18',
-  'palette-outline': 'M12 3a9 9 0 000 18c1.1 0 1.5-.8 1.5-1.5 0-1.4 1-2 2-2H18a3 3 0 003-3c0-6-4-11.5-9-11.5M7.5 12a1 1 0 100-2 1 1 0 000 2M10 8.5a1 1 0 100-2 1 1 0 000 2M14.5 8a1 1 0 100-2 1 1 0 000 2',
-  'silverware-fork-knife': 'M5 3v7a2 2 0 004 0V3M7 10v11M16 3c-1.5 1.5-2 3-2 5s.5 2 1.5 2H17V3zM17 10v11',
+  'palette-outline':
+    'M12 3a9 9 0 000 18c1.1 0 1.5-.8 1.5-1.5 0-1.4 1-2 2-2H18a3 3 0 003-3c0-6-4-11.5-9-11.5M7.5 12a1 1 0 100-2 1 1 0 000 2M10 8.5a1 1 0 100-2 1 1 0 000 2M14.5 8a1 1 0 100-2 1 1 0 000 2',
+  'silverware-fork-knife':
+    'M5 3v7a2 2 0 004 0V3M7 10v11M16 3c-1.5 1.5-2 3-2 5s.5 2 1.5 2H17V3zM17 10v11',
   'filter-variant': 'M4 6h16M7 12h10M10 18h4',
   'lock-outline': 'M6 11h12v9H6zM9 11V8a3 3 0 016 0v3',
   'clock-outline': 'M12 3a9 9 0 100 18 9 9 0 000-18zM12 7v5l3.5 2',
@@ -96,7 +119,8 @@ const ICONS: Record<string, string> = {
   reply: 'M9 7L4 12l5 5M4 12h9a6 6 0 016 6v1',
   send: 'M4 12l16-8-6 8 6 8z',
   star: 'M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z',
-  'star-outline': 'M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z',
+  'star-outline':
+    'M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z',
   'medal-outline': 'M12 3a4 4 0 100 8 4 4 0 000-8zM9 11l-2 9 5-3 5 3-2-9',
   'check-circle': 'M12 3a9 9 0 100 18 9 9 0 000-18zM8 12l3 3 5-6',
   'compass-outline': 'M12 3a9 9 0 100 18 9 9 0 000-18zM15.5 8.5l-2 5-5 2 2-5z',
@@ -108,12 +132,15 @@ const FILLED_ICONS = new Set(['star', 'check-circle']);
 /** The marker the icon mock emits as an element's only text child. */
 export const ICON_MARKER = ' icon:';
 
-function flatten(style: Json, into: Record<string, Json> = {}): Record<string, Json> {
+function flatten(
+  style: Json,
+  into: Record<string, Json> = {},
+): Record<string, Json> {
   if (!style) {
     return into;
   }
   if (Array.isArray(style)) {
-    style.forEach((s) => flatten(s, into));
+    style.forEach(s => flatten(s, into));
     return into;
   }
   Object.assign(into, style);
@@ -141,10 +168,10 @@ function css(style: Record<string, Json>): string {
     }
     const px = typeof value === 'number' ? `${value}px` : String(value);
     if (AXIS[key]) {
-      AXIS[key].forEach((prop) => decls.push(`${prop}:${px}`));
+      AXIS[key].forEach(prop => decls.push(`${prop}:${px}`));
       return;
     }
-    const prop = key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+    const prop = key.replace(/[A-Z]/g, c => `-${c.toLowerCase()}`);
     decls.push(`${prop}:${UNITLESS.has(key) ? String(value) : px}`);
   });
 
@@ -155,15 +182,19 @@ function css(style: Record<string, Json>): string {
    * give the other three sides CSS's `medium` default and box the element in.
    */
   Object.keys(style)
-    .filter((k) => k.startsWith('border') && k.endsWith('Width'))
-    .forEach((k) => {
+    .filter(k => k.startsWith('border') && k.endsWith('Width'))
+    .forEach(k => {
       const side = k.slice('border'.length, -'Width'.length).toLowerCase();
       decls.push(side ? `border-${side}-style:solid` : 'border-style:solid');
     });
 
   if (style.shadowOpacity) {
     const y = style.shadowOffset?.height ?? 2;
-    decls.push(`box-shadow:0 ${y}px ${style.shadowRadius ?? 8}px rgba(0,0,0,${style.shadowOpacity})`);
+    decls.push(
+      `box-shadow:0 ${y}px ${style.shadowRadius ?? 8}px rgba(0,0,0,${
+        style.shadowOpacity
+      })`,
+    );
   }
   return decls.join(';');
 }
@@ -219,8 +250,10 @@ function svgAttrs(p: Json): string {
   paint('stroke');
   if (p.strokeWidth != null) out.push(`stroke-width="${p.strokeWidth}"`);
   if (p.strokeLinecap) out.push('stroke-linecap="round"');
-  if (p.strokeDasharray) out.push(`stroke-dasharray="${p.strokeDasharray.join(' ')}"`);
-  if (p.strokeDashoffset != null) out.push(`stroke-dashoffset="${p.strokeDashoffset}"`);
+  if (p.strokeDasharray)
+    out.push(`stroke-dasharray="${p.strokeDasharray.join(' ')}"`);
+  if (p.strokeDashoffset != null)
+    out.push(`stroke-dashoffset="${p.strokeDashoffset}"`);
   if (p.opacity != null && p.opacity !== 1) out.push(`opacity="${p.opacity}"`);
   return out.length ? ` ${out.join(' ')}` : '';
 }
@@ -236,27 +269,43 @@ function aspect(p: Json): string {
 
 function svgNode(node: Json): string {
   const p = node.props ?? {};
-  const kids = (Array.isArray(node.children) ? node.children : []).map(svgNode).join('');
+  const kids = (Array.isArray(node.children) ? node.children : [])
+    .map(svgNode)
+    .join('');
   const a = svgAttrs(p);
 
   switch (node.type) {
     case 'RNSVGSvgView':
-      return `<svg width="${p.width ?? '100%'}" height="${p.height ?? '100%'}" viewBox="${p.minX != null ? `${p.minX} ${p.minY} ${p.vbWidth} ${p.vbHeight}` : `0 0 ${p.bbWidth ?? p.width} ${p.bbHeight ?? p.height}`}" preserveAspectRatio="${aspect(p)}">${kids}</svg>`;
+      return `<svg width="${p.width ?? '100%'}" height="${
+        p.height ?? '100%'
+      }" viewBox="${
+        p.minX != null
+          ? `${p.minX} ${p.minY} ${p.vbWidth} ${p.vbHeight}`
+          : `0 0 ${p.bbWidth ?? p.width} ${p.bbHeight ?? p.height}`
+      }" preserveAspectRatio="${aspect(p)}">${kids}</svg>`;
     case 'RNSVGGroup':
       // Carries through whatever transform react-native-svg resolved.
-      return p.matrix ? `<g${a} transform="matrix(${p.matrix.join(',')})">${kids}</g>` : `<g${a}>${kids}</g>`;
+      return p.matrix
+        ? `<g${a} transform="matrix(${p.matrix.join(',')})">${kids}</g>`
+        : `<g${a}>${kids}</g>`;
     case 'RNSVGDefs':
       return `<defs>${kids}</defs>`;
     case 'RNSVGLinearGradient':
-      return `<linearGradient id="${p.name}" x1="${p.x1}" y1="${p.y1}" x2="${p.x2}" y2="${p.y2}">${gradientStops(p)}</linearGradient>`;
+      return `<linearGradient id="${p.name}" x1="${p.x1}" y1="${p.y1}" x2="${
+        p.x2
+      }" y2="${p.y2}">${gradientStops(p)}</linearGradient>`;
     case 'RNSVGRadialGradient':
-      return `<radialGradient id="${p.name}" cx="${p.cx}" cy="${p.cy}" r="${p.rx ?? p.r}">${gradientStops(p)}</radialGradient>`;
+      return `<radialGradient id="${p.name}" cx="${p.cx}" cy="${p.cy}" r="${
+        p.rx ?? p.r
+      }">${gradientStops(p)}</radialGradient>`;
     case 'RNSVGCircle':
       return `<circle cx="${p.cx}" cy="${p.cy}" r="${p.r}"${a}/>`;
     case 'RNSVGEllipse':
       return `<ellipse cx="${p.cx}" cy="${p.cy}" rx="${p.rx}" ry="${p.ry}"${a}/>`;
     case 'RNSVGRect':
-      return `<rect x="${p.x}" y="${p.y}" width="${p.width}" height="${p.height}"${p.rx ? ` rx="${p.rx}"` : ''}${a}/>`;
+      return `<rect x="${p.x}" y="${p.y}" width="${p.width}" height="${
+        p.height
+      }"${p.rx ? ` rx="${p.rx}"` : ''}${a}/>`;
     case 'RNSVGLine':
       return `<line x1="${p.x1}" y1="${p.y1}" x2="${p.x2}" y2="${p.y2}"${a}/>`;
     case 'RNSVGPath':
@@ -275,7 +324,7 @@ export function toHtml(node: Json): string {
     return '';
   }
   if (typeof node === 'string') {
-    return node.replace(/[<>&]/g, (c) => ESCAPES[c]);
+    return node.replace(/[<>&]/g, c => ESCAPES[c]);
   }
   if (Array.isArray(node)) {
     return node.map(toHtml).join('');
@@ -303,7 +352,9 @@ export function toHtml(node: Json): string {
    * without this the cards of a carousel stack vertically in the picture.
    */
   const isHorizontalScroller = node.props?.horizontal === true;
-  const scroller = isHorizontalScroller ? 'flex-direction:row;overflow-x:auto' : '';
+  const scroller = isHorizontalScroller
+    ? 'flex-direction:row;overflow-x:auto'
+    : '';
 
   /*
    * A TextInput's content lives in props, not children, so without this a
@@ -312,9 +363,9 @@ export function toHtml(node: Json): string {
   if (node.type === 'TextInput') {
     const shown = node.props?.value || node.props?.placeholder || '';
     const muted = !node.props?.value;
-    return `<div style="${css(style)};${muted ? `color:${node.props?.placeholderTextColor ?? '#6B7280'}` : ''}">${toHtml(
-      String(shown),
-    )}</div>`;
+    return `<div style="${css(style)};${
+      muted ? `color:${node.props?.placeholderTextColor ?? '#6B7280'}` : ''
+    }">${toHtml(String(shown))}</div>`;
   }
 
   /*
@@ -326,9 +377,7 @@ export function toHtml(node: Json): string {
    */
   if (node.type === 'Image') {
     const src: string =
-      node.props?.source?.uri ??
-      node.props?.source?.testUri ??
-      '';
+      node.props?.source?.uri ?? node.props?.source?.testUri ?? '';
     const base = assetBase();
     const href = /^(https?:|data:|file:)/.test(src)
       ? src
@@ -341,7 +390,9 @@ export function toHtml(node: Json): string {
      * wide inside a 390px phone and the preview showed its blank corner.
      * Yoga sizes an absolute box from its insets; a div does too.
      */
-    return `<div style="${css(style)};overflow:hidden"><img src="${href}" style="display:block;width:100%;height:100%;object-fit:${fit}" /></div>`;
+    return `<div style="${css(
+      style,
+    )};overflow:hidden"><img src="${href}" style="display:block;width:100%;height:100%;object-fit:${fit}" /></div>`;
   }
 
   const isText = node.type === 'Text';
@@ -358,9 +409,16 @@ export function toHtml(node: Json): string {
     .map(toHtml)
     .join('')
     // The content container is that scroller's only child.
-    .replace(/^<div style="display:flex;flex-direction:column/, '<div style="display:flex;flex-direction:row');
-  return `<div style="${[box, css(style), clip, scroller].filter(Boolean).join(';')}">${
-    isHorizontalScroller ? inner : (Array.isArray(kids) ? kids : [kids]).map(toHtml).join('')
+    .replace(
+      /^<div style="display:flex;flex-direction:column/,
+      '<div style="display:flex;flex-direction:row',
+    );
+  return `<div style="${[box, css(style), clip, scroller]
+    .filter(Boolean)
+    .join(';')}">${
+    isHorizontalScroller
+      ? inner
+      : (Array.isArray(kids) ? kids : [kids]).map(toHtml).join('')
   }</div>`;
 }
 
@@ -373,7 +431,10 @@ interface PageOptions {
   padding?: number;
 }
 
-export function page(panels: Array<[string, string]>, opts: PageOptions): string {
+export function page(
+  panels: Array<[string, string]>,
+  opts: PageOptions,
+): string {
   const body = panels
     .map(
       ([label, html]) =>
@@ -382,20 +443,24 @@ export function page(panels: Array<[string, string]>, opts: PageOptions): string
     .join('\n');
 
   /*
-   * The bundled Poppins faces, by the same names the app asks for. Without
-   * these the preview falls back to a system font and every judgement made
-   * from it — line breaks, how heavy a heading looks, whether a label fits on
-   * one line — is a judgement about the wrong typeface. The files are expected
-   * beside the written HTML in ./fonts.
+   * The bundled Inter faces, under both names the app asks for (iOS
+   * PostScript names and Android asset names). Without these the preview
+   * falls back to a system font and every judgement made from it is a
+   * judgement about the wrong typeface. Files are expected in ./fonts beside
+   * the written HTML.
    */
   const faces = [
-    'Poppins-Regular',
-    'Poppins-Medium',
-    'Poppins-SemiBold',
-    'Poppins-Bold',
-    'Poppins-ExtraBold',
+    ['Inter-Regular', 'Inter_400Regular'],
+    ['Inter-Medium', 'Inter_500Medium'],
+    ['Inter-SemiBold', 'Inter_600SemiBold'],
+    ['Inter-Bold', 'Inter_700Bold'],
   ]
-    .map((face) => `@font-face{font-family:'${face}';src:url('fonts/${face}.ttf') format('truetype')}`)
+    .flatMap(([ios, file]) =>
+      [ios, file].map(
+        name =>
+          `@font-face{font-family:'${name}';src:url('fonts/${file}.ttf') format('truetype')}`,
+      ),
+    )
     .join('\n  ');
 
   return `<!doctype html><meta charset="utf-8"><title>${opts.title}</title>
@@ -404,9 +469,15 @@ export function page(panels: Array<[string, string]>, opts: PageOptions): string
   body{margin:0;padding:28px;background:#eef0f4;font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
        display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
   .phone{margin:0}
-  figcaption{font:600 12px/1.4 inherit;color:#4b5563;margin-bottom:8px;max-width:${opts.width ?? 390}px}
-  .screen{width:${opts.width ?? 390}px;background:${opts.background ?? '#fff'};border-radius:20px;
-          padding:${opts.padding ?? 20}px;box-shadow:0 10px 30px rgba(0,0,0,.15);overflow:hidden}
+  figcaption{font:600 12px/1.4 inherit;color:#4b5563;margin-bottom:8px;max-width:${
+    opts.width ?? 390
+  }px}
+  .screen{width:${opts.width ?? 390}px;background:${
+    opts.background ?? '#fff'
+  };border-radius:20px;
+          padding:${
+            opts.padding ?? 20
+          }px;box-shadow:0 10px 30px rgba(0,0,0,.15);overflow:hidden}
   .screen *{box-sizing:border-box}
 </style>
 ${body}`;

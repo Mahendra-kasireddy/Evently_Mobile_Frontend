@@ -1,6 +1,6 @@
 import { TouchableOpacity, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
-import { EventlyIcon, EventlyText, OccasionArt } from '../../../Components';
+import { EventlyIcon, AppText, OccasionArt } from '../../../Components';
 import { CATEGORY_GRADIENT, HERO_ACCENT_COLOR } from '../constants';
 import { eventRowStyles as s } from '../styles';
 import { eventArtFor, eventDateChip } from '../utils';
@@ -93,32 +93,32 @@ export function EventRow({ event, onPress, onEdit }: EventRowProps) {
         {/* Dropped rather than drawn empty for an event with no date yet. */}
         {chip ? (
           <View style={s.dateChip}>
-            <EventlyText variant="caption" style={s.dateMonth}>
+            <AppText variant="label" style={s.dateMonth}>
               {chip.month}
-            </EventlyText>
-            <EventlyText variant="subtitle" style={s.dateDay}>
+            </AppText>
+            <AppText variant="h3" style={s.dateDay}>
               {chip.day}
-            </EventlyText>
+            </AppText>
           </View>
         ) : null}
       </View>
 
       <View style={s.body}>
-        <EventlyText variant="subtitle" style={s.title} numberOfLines={2}>
+        <AppText variant="h3" style={s.title} numberOfLines={2}>
           {event.title}
-        </EventlyText>
+        </AppText>
 
         <View style={s.stageRow}>
           <View style={s.stageDot} />
-          <EventlyText variant="caption" style={s.stageText} numberOfLines={1}>
+          <AppText variant="overline" style={s.stageText} numberOfLines={1}>
             {stageLine}
-          </EventlyText>
+          </AppText>
         </View>
 
         {fact ? (
-          <EventlyText variant="caption" style={s.fact} numberOfLines={1}>
+          <AppText variant="bodySmall" style={s.fact} numberOfLines={1}>
             {fact}
-          </EventlyText>
+          </AppText>
         ) : null}
 
         <View style={s.actionRow}>
@@ -128,9 +128,9 @@ export function EventRow({ event, onPress, onEdit }: EventRowProps) {
             way to be told the same news.
           */}
           <View style={s.cta}>
-            <EventlyText variant="caption" style={s.ctaText} numberOfLines={1}>
+            <AppText variant="buttonSmall" style={s.ctaText} numberOfLines={1}>
               {event.ctaLabel}
-            </EventlyText>
+            </AppText>
           </View>
 
           {/* Its own target: the row opens the event, the pencil opens the

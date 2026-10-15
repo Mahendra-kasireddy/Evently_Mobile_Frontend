@@ -1,5 +1,5 @@
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText, GradientFill } from '../../../Components';
+import { EventlyIcon, AppText, GradientFill } from '../../../Components';
 import { BOOKING_COPY as COPY } from '../constants';
 import { jumpToStyles as s } from '../styles';
 import type { JumpKey, JumpTile } from '../types';
@@ -55,9 +55,9 @@ export function JumpToGrid({ tiles, onPress }: JumpToGridProps) {
       <View style={s.headRow}>
         <View style={s.headLine} />
         <EventlyIcon name="star-four-points" size={13} color="#f0607e" />
-        <EventlyText variant="subtitle" style={s.heading}>
+        <AppText variant="overline" style={s.heading}>
           {COPY.jumpTo}
-        </EventlyText>
+        </AppText>
         <View style={s.headLine} />
       </View>
       <View style={s.grid}>
@@ -80,17 +80,17 @@ export function JumpToGrid({ tiles, onPress }: JumpToGridProps) {
                 <GradientFill colors={look.mark} direction="diagonal" />
                 <EventlyIcon name={tile.icon} size={22} color="#ffffff" />
               </View>
-              <EventlyText variant="body" style={s.tileTitle} numberOfLines={1}>
+              <AppText variant="h3" style={s.tileTitle} numberOfLines={1}>
                 {tile.title}
-              </EventlyText>
+              </AppText>
               <View style={s.tileFoot}>
-                <EventlyText
+                <AppText
                   variant="caption"
                   style={s.tileSubtitle}
                   numberOfLines={1}
                 >
                   {tile.subtitle}
-                </EventlyText>
+                </AppText>
                 <View style={s.tileGo}>
                   <GradientFill colors={look.mark} direction="diagonal" />
                   <EventlyIcon name="arrow-right" size={14} color="#ffffff" />

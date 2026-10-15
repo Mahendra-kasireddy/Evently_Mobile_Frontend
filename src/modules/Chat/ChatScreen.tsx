@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText } from '../../Components';
+import { EventlyIcon, AppText } from '../../Components';
 import { colors } from '../../theme';
 import type {
   MainTabParamList,
@@ -20,6 +20,7 @@ import { CHAT_ACCENT, CHAT_COPY as COPY, CHAT_NAVY_DEEP } from './constants';
 import { useInboxContainer } from './container';
 import { ConversationRow } from './sections/ConversationRow';
 import { styles as s } from './styles';
+import { useScrollTopOnBlur } from '../../hooks/useScrollTopOnBlur';
 
 type ChatNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<MainTabParamList, 'Chat'>,
@@ -34,6 +35,8 @@ type ChatNavigationProp = CompositeNavigationProp<
  * unread counts a week later.
  */
 export function ChatScreen() {
+  /* Leaving the tab puts it back at the top for next time. */
+  const scrollRef = useScrollTopOnBlur();
   const navigation = useNavigation<ChatNavigationProp>();
   const { items, isLoading, isError, errorMessage, refetch } =
     useInboxContainer();
@@ -54,9 +57,9 @@ export function ChatScreen() {
       >
         <EventlyIcon name="chevron-left" size={26} color={CHAT_NAVY_DEEP} />
       </TouchableOpacity>
-      <EventlyText variant="h1" style={s.title}>
+      <AppText variant="h1" style={s.title}>
         {COPY.title}
-      </EventlyText>
+      </AppText>
     </View>
   );
 
@@ -66,9 +69,9 @@ export function ChatScreen() {
         {header}
         <View style={s.centered}>
           <ActivityIndicator size="large" color={CHAT_ACCENT} />
-          <EventlyText variant="body" style={s.loadingText}>
+          <AppText variant="body" style={s.loadingText}>
             {COPY.loading}
-          </EventlyText>
+          </AppText>
         </View>
       </SafeAreaView>
     );
@@ -79,12 +82,12 @@ export function ChatScreen() {
       <SafeAreaView style={s.container} edges={['top']}>
         {header}
         <View style={s.centered}>
-          <EventlyText variant="h2" style={s.emptyTitle}>
+          <AppText variant="h2" style={s.emptyTitle}>
             {COPY.errorTitle}
-          </EventlyText>
-          <EventlyText variant="body" style={s.errorText}>
+          </AppText>
+          <AppText variant="body" style={s.errorText}>
             {errorMessage ?? 'Something went wrong.'}
-          </EventlyText>
+          </AppText>
           <TouchableOpacity
             style={s.retryButton}
             activeOpacity={0.8}
@@ -92,9 +95,9 @@ export function ChatScreen() {
             accessibilityRole="button"
           >
             <EventlyIcon name="refresh" size={16} color={CHAT_ACCENT} />
-            <EventlyText variant="caption" style={s.retryText}>
+            <AppText variant="caption" style={s.retryText}>
               {COPY.retry}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -109,12 +112,12 @@ export function ChatScreen() {
           <View style={s.centeredIcon}>
             <EventlyIcon name="chat-outline" size={28} color={CHAT_ACCENT} />
           </View>
-          <EventlyText variant="h2" style={s.emptyTitle}>
+          <AppText variant="h2" style={s.emptyTitle}>
             {COPY.emptyTitle}
-          </EventlyText>
-          <EventlyText variant="body" style={s.emptyBody}>
+          </AppText>
+          <AppText variant="body" style={s.emptyBody}>
             {COPY.emptyBody}
-          </EventlyText>
+          </AppText>
           <TouchableOpacity
             style={s.emptyCta}
             activeOpacity={0.85}
@@ -124,9 +127,9 @@ export function ChatScreen() {
             accessibilityRole="button"
             accessibilityLabel={COPY.emptyCta}
           >
-            <EventlyText variant="subtitle" style={s.emptyCtaText}>
+            <AppText variant="body" weight="medium" style={s.emptyCtaText}>
               {COPY.emptyCta}
-            </EventlyText>
+            </AppText>
             <EventlyIcon
               name="chevron-right"
               size={18}
@@ -142,6 +145,7 @@ export function ChatScreen() {
     <SafeAreaView style={s.container} edges={['top']}>
       {header}
       <FlatList
+        ref={scrollRef as never}
         data={items}
         keyExtractor={item => item.id}
         contentContainerStyle={s.list}

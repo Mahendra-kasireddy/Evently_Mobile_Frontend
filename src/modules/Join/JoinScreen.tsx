@@ -2,12 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Pressable, ScrollView, StatusBar, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import {
-  EventlyIcon,
-  EventlyText,
-  FadeInUp,
-  GradientFill,
-} from '../../Components';
+import { EventlyIcon, AppText, FadeInUp, GradientFill } from '../../Components';
 import type { JoinRole, RootStackParamList } from '../../navigation/types';
 import { selectAuthToken } from '../../store/authSlice';
 import { useAppSelector } from '../../store/hooks';
@@ -78,19 +73,23 @@ export function JoinScreen() {
           <EventlyIcon name="close" size={18} color={brand.onNavy} />
         </Pressable>
 
-        <EventlyText style={styles.eyebrow}>{JOIN_COPY.eyebrow}</EventlyText>
-        <EventlyText variant="h1" style={styles.title}>
+        <AppText variant="label" style={styles.eyebrow}>
+          {JOIN_COPY.eyebrow}
+        </AppText>
+        <AppText variant="display" style={styles.title}>
           {JOIN_COPY.title}
-        </EventlyText>
-        <EventlyText variant="caption" style={styles.subtitle}>
+        </AppText>
+        <AppText variant="body" style={styles.subtitle}>
           {JOIN_COPY.subtitle}
-        </EventlyText>
+        </AppText>
 
         <View style={styles.chips}>
           {JOIN_COPY.chips.map(chip => (
             <View key={chip.label} style={styles.chip}>
               <EventlyIcon name={chip.icon} size={12} color="#ffd2c2" />
-              <EventlyText style={styles.chipText}>{chip.label}</EventlyText>
+              <AppText variant="label" style={styles.chipText}>
+                {chip.label}
+              </AppText>
             </View>
           ))}
         </View>
@@ -103,7 +102,9 @@ export function JoinScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <EventlyText style={styles.pick}>{JOIN_COPY.pick}</EventlyText>
+        <AppText variant="h3" style={styles.pick}>
+          {JOIN_COPY.pick}
+        </AppText>
         {ROLE_CARDS.map((role, i) => (
           <FadeInUp key={role.key} delay={80 + i * 80}>
             <RoleCard data={role} onPress={handleSelectRole} />
@@ -113,9 +114,9 @@ export function JoinScreen() {
         <FadeInUp delay={260}>
           <RequirementNote />
         </FadeInUp>
-        <EventlyText style={styles.sameNumber}>
+        <AppText variant="caption" style={styles.sameNumber}>
           {JOIN_COPY.sameNumber}
-        </EventlyText>
+        </AppText>
       </ScrollView>
     </View>
   );

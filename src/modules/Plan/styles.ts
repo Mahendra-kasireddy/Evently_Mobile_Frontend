@@ -1,6 +1,13 @@
 import { Platform, StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, spacing } from '../../theme';
+import {
+  colors,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+  inputTypography,
+} from '../../theme';
 import {
   PLAN_ACCENT,
   PLAN_ACCENT_SOFT,
@@ -27,8 +34,8 @@ export const styles = StyleSheet.create({
     gap: spacing.s12,
   },
   shortlistFooterText: { flex: 1 },
-  shortlistFooterCount: { color: PLAN_NAVY, fontWeight: '700' },
-  shortlistFooterHint: { color: PLAN_TEXT_MUTED, marginTop: 1 },
+  shortlistFooterCount: { color: textColor.textPrimary, ...fontWeights.bold },
+  shortlistFooterHint: { color: textColor.textSecondary, marginTop: 1 },
   shortlistFooterButton: { paddingHorizontal: spacing.md },
   content: { padding: spacing.md, paddingBottom: spacing.xl },
   centered: {
@@ -38,8 +45,8 @@ export const styles = StyleSheet.create({
     padding: spacing.lg,
     backgroundColor: PLAN_BG,
   },
-  loadingText: { color: PLAN_TEXT_MUTED, marginTop: spacing.md },
-  errorText: { color: colors.danger, textAlign: 'center' },
+  loadingText: { color: textColor.textSecondary, marginTop: spacing.md },
+  errorText: { color: textColor.textError, textAlign: 'center' },
   retryButton: { marginTop: spacing.lg },
   /* The continue button, as the last thing on the page. */
   inlineContinue: { marginTop: spacing.lg },
@@ -119,12 +126,12 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   successTitle: {
-    color: PLAN_NAVY,
+    color: textColor.textPrimary,
     marginTop: spacing.md,
     textAlign: 'center',
   },
   successSubtitle: {
-    color: PLAN_TEXT_MUTED,
+    color: textColor.textSecondary,
     textAlign: 'center',
     marginTop: spacing.sm,
   },
@@ -140,7 +147,7 @@ export const stepPillStyles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  stepPillText: { color: PLAN_ACCENT, fontWeight: '700', fontSize: 12 },
+  stepPillText: { color: PLAN_ACCENT, ...typography.label },
   labelPill: {
     backgroundColor: colors.background,
     borderRadius: 999,
@@ -149,7 +156,7 @@ export const stepPillStyles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
   },
-  labelPillText: { color: PLAN_NAVY, fontWeight: '600', fontSize: 12 },
+  labelPillText: { color: textColor.textPrimary, ...typography.label },
 });
 
 // The Details step hero: step pills, a two-line heading and a floral corner.
@@ -181,28 +188,23 @@ export const heroStyles = StyleSheet.create({
   },
   artFade: { position: 'absolute', top: 0, left: 0 },
   heading: {
-    color: PLAN_NAVY,
-    fontSize: 26,
-    lineHeight: 32,
-    fontWeight: '800',
+    color: textColor.textPrimary,
+    ...typography.h1,
     marginTop: spacing.md,
     maxWidth: 260,
   },
   headingAccent: {
     color: PLAN_ACCENT,
-    fontSize: 26,
-    lineHeight: 32,
-    fontWeight: '800',
+    ...typography.h1,
   },
   subtitle: {
-    color: PLAN_TEXT_MUTED,
+    color: textColor.textSecondary,
     marginTop: spacing.sm,
     maxWidth: 250,
-    lineHeight: 20,
   },
   plainSection: { marginBottom: spacing.lg },
-  plainHeading: { color: PLAN_NAVY },
-  plainSubtitle: { color: PLAN_TEXT_MUTED, marginTop: spacing.xs },
+  plainHeading: { color: textColor.textPrimary },
+  plainSubtitle: { color: textColor.textSecondary, marginTop: spacing.xs },
 });
 
 /*
@@ -225,17 +227,21 @@ export const stepperStyles = StyleSheet.create({
   },
   segmentDone: { backgroundColor: PLAN_ACCENT },
   caption: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
-  captionCount: { color: PLAN_ACCENT, fontWeight: '700' },
+  captionCount: { color: PLAN_ACCENT, ...fontWeights.bold },
   captionDivider: { color: PLAN_BORDER },
-  captionLabel: { color: PLAN_NAVY, fontWeight: '600', flexShrink: 1 },
+  captionLabel: {
+    color: textColor.textPrimary,
+    ...fontWeights.semibold,
+    flexShrink: 1,
+  },
   captionSpacer: { flex: 1 },
   captionNext: { color: PLAN_TEXT_MUTED },
 });
 
 export const occasionPickerStyles = StyleSheet.create({
   section: { marginBottom: spacing.lg },
-  sectionTitle: { color: PLAN_NAVY, fontWeight: '800' },
-  sectionSubtitle: { color: PLAN_TEXT_MUTED, marginTop: 2 },
+  sectionTitle: { ...typography.h2, color: textColor.textPrimary },
+  sectionSubtitle: { color: textColor.textSecondary, marginTop: 2 },
   /* Three to a row, sized to the screen, so all six fit without scrolling. */
   grid: {
     flexDirection: 'row',
@@ -276,8 +282,8 @@ export const occasionPickerStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  label: { color: PLAN_NAVY, fontWeight: '600', fontSize: 12 },
-  labelSelected: { fontWeight: '800' },
+  label: { color: textColor.textPrimary, ...typography.label },
+  labelSelected: { ...fontWeights.bold },
   sheetOverlay: {
     flex: 1,
     backgroundColor: 'rgba(14,26,51,0.45)',
@@ -298,9 +304,13 @@ export const occasionPickerStyles = StyleSheet.create({
     backgroundColor: PLAN_BORDER,
     marginBottom: spacing.md,
   },
-  sheetTitle: { color: PLAN_NAVY, fontWeight: '800', textAlign: 'center' },
+  sheetTitle: {
+    color: textColor.textPrimary,
+    ...fontWeights.bold,
+    textAlign: 'center',
+  },
   sheetSubtitle: {
-    color: PLAN_TEXT_MUTED,
+    color: textColor.textSecondary,
     textAlign: 'center',
     marginTop: 2,
     marginBottom: spacing.xs,
@@ -314,7 +324,7 @@ export const occasionPickerStyles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: spacing.md,
   },
-  sheetCancelText: { color: PLAN_NAVY, fontWeight: '700' },
+  sheetCancelText: { color: textColor.textPrimary, ...fontWeights.bold },
 });
 
 // Web's EventDetailsForm.module.css `.control`: a single bordered pill with an
@@ -323,13 +333,17 @@ export const occasionPickerStyles = StyleSheet.create({
 // padding so controlRow supplies the one visible outline.
 export const eventDetailsStyles = StyleSheet.create({
   section: { marginBottom: spacing.lg, gap: spacing.sm },
-  sectionTitle: { color: PLAN_NAVY, fontWeight: '700' },
+  sectionTitle: { ...typography.h2, color: textColor.textPrimary },
   field: { marginBottom: 0 },
   /* Two half-width fields side by side. Date and guest count are both short
      answers, and pairing them buys back a whole field's height. */
   pair: { flexDirection: 'row', gap: spacing.sm },
   pairItem: { flex: 1 },
-  label: { color: PLAN_NAVY, marginBottom: spacing.xs, fontWeight: '600' },
+  label: {
+    color: textColor.textPrimary,
+    marginBottom: spacing.xs,
+    ...fontWeights.semibold,
+  },
   /*
    * The field's name, inside the field.
    *
@@ -339,16 +353,11 @@ export const eventDetailsStyles = StyleSheet.create({
    * seeing the whole step and scrolling through it.
    */
   caption: {
-    color: PLAN_TEXT_MUTED,
-    fontSize: 9.5,
-    lineHeight: 12,
-    fontWeight: '600',
-    letterSpacing: 0.7,
-    textTransform: 'uppercase',
+    color: textColor.textSecondary,
+    ...typography.overline,
   },
   captionOptional: {
-    fontWeight: '500',
-    letterSpacing: 0,
+    ...fontWeights.medium,
     textTransform: 'none',
   },
   control: {
@@ -378,17 +387,20 @@ export const eventDetailsStyles = StyleSheet.create({
   controlRowFocused: { borderColor: PLAN_ACCENT },
   controlInput: {
     flex: 1,
-    color: PLAN_NAVY,
-    fontSize: 15,
-    fontWeight: '600',
+    color: textColor.textPrimary,
+    ...inputTypography.bodyLarge,
     borderWidth: 0,
     borderRadius: 0,
     backgroundColor: 'transparent',
     paddingHorizontal: 0,
     paddingVertical: 0,
   },
-  dateValue: { flex: 1, color: PLAN_NAVY, fontWeight: '600' },
-  dateValuePlaceholder: { flex: 1, color: PLAN_TEXT_MUTED, fontWeight: '400' },
+  dateValue: { flex: 1, color: textColor.textPrimary, ...fontWeights.semibold },
+  dateValuePlaceholder: {
+    flex: 1,
+    color: textColor.textSecondary,
+    ...fontWeights.regular,
+  },
   /* The grouped details card from the design: one white card, a row per
      answer, hairline dividers between them. */
   card: {
@@ -426,13 +438,12 @@ export const eventDetailsStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   rowBody: { flex: 1, gap: 2 },
-  rowCaption: { color: PLAN_TEXT_MUTED, fontSize: 12, lineHeight: 16 },
-  rowValue: { color: PLAN_NAVY, fontSize: 16, fontWeight: '700' },
-  rowPlaceholder: { color: PLAN_TEXT_MUTED, fontSize: 15, fontWeight: '400' },
+  rowCaption: { color: textColor.textSecondary, ...typography.caption },
+  rowValue: { color: textColor.textPrimary, ...typography.h3 },
+  rowPlaceholder: { color: textColor.textSecondary, ...typography.bodyLarge },
   rowInput: {
-    color: PLAN_NAVY,
-    fontSize: 16,
-    fontWeight: '700',
+    color: textColor.textPrimary,
+    ...inputTypography.bodyLarge,
     borderWidth: 0,
     borderRadius: 0,
     backgroundColor: 'transparent',
@@ -459,8 +470,8 @@ export const eventDetailsStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  bannerText: { color: PLAN_TEXT_MUTED, flex: 1, lineHeight: 19 },
-  bannerBold: { fontWeight: '700', color: PLAN_NAVY },
+  bannerText: { color: textColor.textSecondary, flex: 1 },
+  bannerBold: { ...fontWeights.bold, color: textColor.textPrimary },
 });
 
 export const dateModalStyles = StyleSheet.create({
@@ -480,7 +491,7 @@ export const dateModalStyles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: spacing.md,
   },
-  monthLabel: { color: PLAN_NAVY },
+  monthLabel: { color: textColor.textPrimary },
   navButton: {
     width: 32,
     height: 32,
@@ -507,9 +518,9 @@ export const dateModalStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   daySelected: { backgroundColor: PLAN_ACCENT },
-  dayText: { color: PLAN_NAVY },
+  dayText: { color: textColor.textPrimary },
   dayTextDisabled: { color: PLAN_BORDER },
-  dayTextSelected: { color: colors.onPrimary, fontWeight: '700' },
+  dayTextSelected: { color: textColor.textOnPrimary, ...fontWeights.bold },
   doneButton: { marginTop: spacing.lg },
 });
 
@@ -534,7 +545,7 @@ export const selectModalStyles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: spacing.md,
   },
-  title: { color: PLAN_NAVY },
+  title: { color: textColor.textPrimary },
   closeButton: {
     width: 32,
     height: 32,
@@ -556,8 +567,8 @@ export const selectModalStyles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    color: PLAN_NAVY,
-    fontSize: 15,
+    color: textColor.textPrimary,
+    ...inputTypography.bodyLarge,
     borderWidth: 0,
     borderRadius: 0,
     backgroundColor: 'transparent',
@@ -572,8 +583,8 @@ export const selectModalStyles = StyleSheet.create({
     borderTopColor: PLAN_BORDER,
   },
   optionRowFirst: { borderTopWidth: 0 },
-  optionText: { color: PLAN_NAVY },
-  optionTextSelected: { color: PLAN_ACCENT, fontWeight: '700' },
+  optionText: { color: textColor.textPrimary },
+  optionTextSelected: { color: PLAN_ACCENT, ...fontWeights.bold },
   clearRow: {
     ...globalStyles.row,
     gap: spacing.xs,
@@ -582,9 +593,10 @@ export const selectModalStyles = StyleSheet.create({
     borderBottomColor: PLAN_BORDER,
     marginBottom: spacing.xs,
   },
-  clearText: { color: PLAN_TEXT_MUTED, fontStyle: 'italic' },
+  clearText: { color: textColor.textSecondary, fontStyle: 'italic' },
   emptyText: {
-    color: PLAN_TEXT_MUTED,
+    ...typography.body,
+    color: textColor.textSecondary,
     textAlign: 'center',
     paddingVertical: spacing.lg,
   },
@@ -602,8 +614,8 @@ export const ideasStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   headText: { flex: 1 },
-  title: { color: PLAN_NAVY, fontWeight: '800' },
-  subtitle: { color: PLAN_TEXT_MUTED, marginTop: 2, lineHeight: 15 },
+  title: { color: textColor.textPrimary, ...fontWeights.bold },
+  subtitle: { color: textColor.textSecondary, marginTop: 2 },
   chipRow: { marginTop: spacing.s12, marginHorizontal: -spacing.md },
   chipRowContent: { gap: spacing.sm, paddingHorizontal: spacing.md },
   chip: {
@@ -617,7 +629,7 @@ export const ideasStyles = StyleSheet.create({
     height: 34,
     backgroundColor: colors.background,
   },
-  chipText: { color: PLAN_NAVY, fontWeight: '500' },
+  chipText: { color: textColor.textPrimary, ...fontWeights.medium },
   textareaBox: {
     marginTop: spacing.s12,
     borderWidth: 1,
@@ -696,8 +708,8 @@ export const categoriesStepStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   bannerText: { flex: 1 },
-  bannerTitle: { color: PLAN_NAVY, fontWeight: '700' },
-  bannerSubtitle: { color: PLAN_TEXT_MUTED, marginTop: 2, lineHeight: 15 },
+  bannerTitle: { color: textColor.textPrimary, ...fontWeights.bold },
+  bannerSubtitle: { color: textColor.textSecondary, marginTop: 2 },
   bannerScript: {
     color: PLAN_ACCENT_WARM,
     fontSize: 15,
@@ -748,12 +760,11 @@ export const categoriesStepStyles = StyleSheet.create({
   },
   radioOn: { backgroundColor: PLAN_ACCENT, borderColor: PLAN_ACCENT },
   tileTitle: {
-    color: PLAN_NAVY,
-    fontWeight: '700',
-    fontSize: 13,
-    lineHeight: 17,
+    color: textColor.textPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
   },
-  tileSubtitle: { color: PLAN_TEXT_MUTED, marginTop: 1 },
+  tileSubtitle: { color: textColor.textSecondary, marginTop: 1 },
   addRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -769,8 +780,8 @@ export const categoriesStepStyles = StyleSheet.create({
   },
   addInput: {
     flex: 1,
-    color: PLAN_NAVY,
-    fontSize: 14,
+    color: textColor.textPrimary,
+    ...inputTypography.body,
     borderWidth: 0,
     borderRadius: 0,
     backgroundColor: 'transparent',
@@ -803,8 +814,8 @@ export const organizersStyles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    color: PLAN_NAVY,
-    fontSize: 14,
+    color: textColor.textPrimary,
+    ...inputTypography.body,
     borderWidth: 0,
     borderRadius: 0,
     backgroundColor: 'transparent',
@@ -840,8 +851,8 @@ export const organizersStyles = StyleSheet.create({
     borderColor: PLAN_BORDER,
   },
   sortChipActive: { backgroundColor: PLAN_ACCENT, borderColor: PLAN_ACCENT },
-  sortChipText: { color: PLAN_NAVY, fontWeight: '500' },
-  sortChipTextActive: { color: colors.onPrimary, fontWeight: '700' },
+  sortChipText: { color: textColor.textPrimary, ...fontWeights.medium },
+  sortChipTextActive: { color: textColor.textOnPrimary, ...fontWeights.bold },
   multiHint: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -853,7 +864,11 @@ export const organizersStyles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: PLAN_ACCENT_SOFT,
   },
-  multiHintText: { flex: 1, color: PLAN_NAVY, fontWeight: '500' },
+  multiHintText: {
+    flex: 1,
+    color: textColor.textPrimary,
+    ...fontWeights.medium,
+  },
   loading: {
     alignItems: 'center',
     gap: spacing.sm,
@@ -896,7 +911,7 @@ export const organizersStyles = StyleSheet.create({
     paddingHorizontal: 7,
     paddingVertical: 2,
   },
-  verifiedText: { color: PLAN_GREEN, fontWeight: '700', fontSize: 10 },
+  verifiedText: { color: PLAN_GREEN, ...typography.label },
   conciergePill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -907,13 +922,13 @@ export const organizersStyles = StyleSheet.create({
     paddingHorizontal: 7,
     paddingVertical: 2,
   },
-  conciergeText: { color: colors.onPrimary, fontWeight: '700', fontSize: 10 },
-  name: { color: PLAN_NAVY, fontWeight: '700' },
+  conciergeText: { color: textColor.textOnPrimary, ...typography.label },
+  name: { color: textColor.textPrimary, ...fontWeights.bold },
   ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  ratingText: { color: PLAN_NAVY, fontWeight: '700' },
-  reviewsText: { color: PLAN_TEXT_MUTED },
+  ratingText: { color: textColor.textPrimary, ...fontWeights.bold },
+  reviewsText: { color: textColor.textSecondary },
   locationRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  metaText: { color: PLAN_TEXT_MUTED, flexShrink: 1 },
+  metaText: { color: textColor.textSecondary, flexShrink: 1 },
   tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 2 },
   tag: {
     backgroundColor: PLAN_BG,
@@ -921,9 +936,13 @@ export const organizersStyles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
   },
-  tagText: { color: PLAN_TEXT_MUTED, fontSize: 10 },
+  tagText: { color: textColor.textSecondary, ...typography.label },
   side: { alignItems: 'flex-end', justifyContent: 'space-between' },
-  price: { color: PLAN_NAVY, fontWeight: '700', fontSize: 13 },
+  price: {
+    color: textColor.textPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
   unavailText: { color: colors.danger, textAlign: 'right' },
   quoteButton: {
     flexDirection: 'row',
@@ -936,19 +955,26 @@ export const organizersStyles = StyleSheet.create({
   },
   quoteButtonOn: { backgroundColor: PLAN_ACCENT },
   quoteButtonBlocked: { opacity: 0.45 },
-  quoteButtonText: { color: PLAN_ACCENT, fontWeight: '700', fontSize: 11 },
+  quoteButtonText: { color: PLAN_ACCENT, ...typography.buttonSmall },
   quoteButtonTextOn: {
-    color: colors.onPrimary,
-    fontWeight: '700',
-    fontSize: 11,
+    color: textColor.textOnPrimary,
+    ...typography.buttonSmall,
   },
   emptyState: {
     alignItems: 'center',
     paddingVertical: spacing.xl,
     gap: spacing.sm,
   },
-  emptyTitle: { color: PLAN_NAVY, textAlign: 'center' },
-  emptyMessage: { color: PLAN_TEXT_MUTED, textAlign: 'center' },
+  emptyTitle: {
+    ...typography.h2,
+    color: textColor.textPrimary,
+    textAlign: 'center',
+  },
+  emptyMessage: {
+    ...typography.body,
+    color: textColor.textSecondary,
+    textAlign: 'center',
+  },
   emptyButton: { marginTop: spacing.sm },
 });
 
@@ -970,7 +996,7 @@ export const filterModalStyles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: spacing.md,
   },
-  title: { color: PLAN_NAVY },
+  title: { color: textColor.textPrimary },
   closeButton: {
     width: 32,
     height: 32,
@@ -980,8 +1006,7 @@ export const filterModalStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   groupLabel: {
-    color: PLAN_TEXT_MUTED,
-    letterSpacing: 0.5,
+    color: textColor.textSecondary,
     marginTop: spacing.md,
     marginBottom: spacing.sm,
   },
@@ -1000,7 +1025,7 @@ export const filterModalStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkboxOn: { backgroundColor: PLAN_ACCENT, borderColor: PLAN_ACCENT },
-  checkLabel: { color: PLAN_NAVY },
+  checkLabel: { color: textColor.textPrimary },
   pillRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   pill: {
     borderWidth: 1.5,
@@ -1010,7 +1035,7 @@ export const filterModalStyles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   pillOn: { borderColor: PLAN_ACCENT, backgroundColor: PLAN_ACCENT },
-  pillText: { color: PLAN_NAVY },
+  pillText: { color: textColor.textPrimary },
   pillTextOn: { color: colors.onPrimary },
   footerRow: { ...globalStyles.row, gap: spacing.md, marginTop: spacing.lg },
   clearButton: { flex: 1 },
@@ -1031,7 +1056,7 @@ export const reviewStyles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: spacing.sm,
   },
-  panelTitle: { color: PLAN_NAVY },
+  panelTitle: { color: textColor.textPrimary },
   editButton: { ...globalStyles.row, gap: 4 },
   editText: { color: PLAN_ACCENT },
   // A 2-column key/value grid reads like a checkout summary — lighter than a
@@ -1043,9 +1068,9 @@ export const reviewStyles = StyleSheet.create({
     paddingRight: spacing.sm,
   },
   detailItemFull: { width: '100%', marginBottom: spacing.sm },
-  rowLabel: { color: PLAN_TEXT_MUTED },
-  rowValue: { color: PLAN_NAVY, marginTop: 1 },
-  rowValueMuted: { color: PLAN_TEXT_MUTED },
+  rowLabel: { color: textColor.textSecondary },
+  rowValue: { color: textColor.textPrimary, marginTop: 1 },
+  rowValueMuted: { color: textColor.textSecondary },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
   chip: {
     ...globalStyles.row,
@@ -1055,8 +1080,8 @@ export const reviewStyles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
   },
-  chipText: { color: PLAN_NAVY },
-  emptyText: { color: PLAN_TEXT_MUTED },
+  chipText: { color: textColor.textPrimary },
+  emptyText: { ...typography.body, color: textColor.textSecondary },
   orgRow: { ...globalStyles.row, gap: spacing.sm, marginTop: spacing.sm },
   orgAvatar: {
     width: 40,
@@ -1065,25 +1090,25 @@ export const reviewStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  orgAvatarText: { color: colors.onPrimary },
+  orgAvatarText: { color: textColor.textOnPrimary },
   orgMeta: { flex: 1 },
-  orgName: { color: PLAN_NAVY },
-  orgSub: { ...globalStyles.row, gap: 4, color: PLAN_TEXT_MUTED },
-  orgSubText: { color: PLAN_TEXT_MUTED },
+  orgName: { color: textColor.textPrimary },
+  orgSub: { ...globalStyles.row, gap: 4, color: textColor.textSecondary },
+  orgSubText: { color: textColor.textSecondary },
   orgTag: {
     backgroundColor: PLAN_ACCENT_SOFT,
     color: PLAN_ACCENT,
     borderRadius: 999,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
-    fontWeight: '700',
+    ...fontWeights.bold,
   },
   nextPanel: {
     ...globalStyles.card,
     padding: spacing.md,
     marginBottom: spacing.md,
   },
-  nextPanelTitle: { color: PLAN_NAVY, marginBottom: spacing.sm },
+  nextPanelTitle: { color: textColor.textPrimary, marginBottom: spacing.sm },
   nextRow: {
     ...globalStyles.row,
     alignItems: 'flex-start',
@@ -1099,8 +1124,8 @@ export const reviewStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  nextTitle: { color: PLAN_NAVY },
-  nextDesc: { color: PLAN_TEXT_MUTED, marginTop: 1 },
+  nextTitle: { color: textColor.textPrimary },
+  nextDesc: { color: textColor.textSecondary, marginTop: 1 },
   quoteBox: {
     ...globalStyles.row,
     alignItems: 'flex-start',
@@ -1111,12 +1136,12 @@ export const reviewStyles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   quoteTextCol: { flex: 1 },
-  quoteTitle: { color: PLAN_NAVY },
-  quoteText: { color: PLAN_TEXT_MUTED, marginTop: 1 },
+  quoteTitle: { color: textColor.textPrimary },
+  quoteText: { color: textColor.textSecondary, marginTop: 1 },
   submitCard: { ...globalStyles.card, padding: spacing.md },
-  submitTitle: { color: PLAN_NAVY },
+  submitTitle: { color: textColor.textPrimary },
   submitText: {
-    color: PLAN_TEXT_MUTED,
+    color: textColor.textSecondary,
     marginTop: spacing.xs,
     marginBottom: spacing.md,
   },
@@ -1131,7 +1156,7 @@ export const reviewStyles = StyleSheet.create({
     padding: spacing.sm,
     marginBottom: spacing.md,
   },
-  errorText: { color: colors.danger, flex: 1 },
+  errorText: { color: textColor.textError, flex: 1 },
   submitButton: {
     borderRadius: 999,
     ...Platform.select({
@@ -1145,5 +1170,5 @@ export const reviewStyles = StyleSheet.create({
     }),
   },
   footnoteRow: { ...globalStyles.row, gap: spacing.xs, marginTop: spacing.md },
-  footnoteText: { color: PLAN_TEXT_MUTED, flex: 1 },
+  footnoteText: { color: textColor.textSecondary, flex: 1 },
 });

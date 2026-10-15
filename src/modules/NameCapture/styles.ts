@@ -1,13 +1,14 @@
 import { Platform, StyleSheet } from 'react-native';
-import { colors, spacing } from '../../theme';
 import {
-  NAME_GATE_ACCENT,
-  NAME_GATE_BORDER,
-  NAME_GATE_NAVY,
-  NAME_GATE_TEXT_MUTED,
-} from './constants';
+  colors,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+  inputTypography,
+} from '../../theme';
+import { NAME_GATE_ACCENT, NAME_GATE_BORDER } from './constants';
 
-const SERIF = Platform.select({ ios: 'Georgia', android: 'serif' });
 const AVATAR = 150;
 
 const softShadow = Platform.select({
@@ -88,23 +89,19 @@ export const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     ...softShadow,
   },
-  bubbleText: { fontSize: 17, fontWeight: '700', color: NAME_GATE_NAVY },
+  bubbleText: { ...typography.h3, color: textColor.textPrimary },
   photoLink: { alignSelf: 'center', marginTop: spacing.xs, paddingVertical: 4 },
-  photoLinkText: { color: NAME_GATE_ACCENT, fontWeight: '700' },
+  photoLinkText: { color: NAME_GATE_ACCENT, ...fontWeights.bold },
 
   /* Words, left-aligned as designed. */
   heading: {
-    fontFamily: SERIF,
-    fontWeight: '700',
-    fontSize: 30,
-    lineHeight: 38,
-    color: NAME_GATE_NAVY,
+    ...typography.display,
+    color: textColor.textPrimary,
     marginTop: spacing.lg,
   },
   subtitle: {
-    color: NAME_GATE_TEXT_MUTED,
-    fontSize: 15,
-    lineHeight: 22,
+    color: textColor.textSecondary,
+    ...typography.bodyLarge,
     marginTop: spacing.xs,
   },
 
@@ -128,10 +125,10 @@ export const styles = StyleSheet.create({
     paddingVertical: 0,
     borderWidth: 0,
     backgroundColor: 'transparent',
-    fontSize: 16,
-    color: NAME_GATE_NAVY,
+    ...inputTypography.bodyLarge,
+    color: textColor.textPrimary,
   },
-  errorText: { color: colors.danger, marginTop: spacing.sm },
+  errorText: { color: textColor.textError, marginTop: spacing.sm },
 
   cta: {
     height: 56,
@@ -144,6 +141,6 @@ export const styles = StyleSheet.create({
   },
   ctaIdle: { opacity: 0.6 },
   ctaPressed: { opacity: 0.88 },
-  ctaLabel: { color: '#ffffff', fontSize: 17, fontWeight: '700', lineHeight: 22 },
+  ctaLabel: { color: textColor.textOnPrimary, ...typography.button },
   ctaArrow: { position: 'absolute', right: 22 },
 });

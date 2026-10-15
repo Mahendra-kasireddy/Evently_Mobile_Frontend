@@ -1,6 +1,6 @@
 import { Image, TouchableOpacity, View } from 'react-native';
 import type { ImageSourcePropType } from 'react-native';
-import { EventlyIcon, EventlyText, GradientFill } from '../../../Components';
+import { EventlyIcon, AppText, GradientFill } from '../../../Components';
 import {
   BOOKING_COPY as COPY,
   STATUS_TONE_COLOR,
@@ -82,8 +82,12 @@ export function EventCard({ item, focused, onPress }: EventCardProps) {
             <Image source={photo} style={s.photo} resizeMode="cover" />
             {item.eventDay ? (
               <View style={s.dateBadge}>
-                <EventlyText style={s.dateDay}>{item.eventDay}</EventlyText>
-                <EventlyText style={s.dateMonth}>{item.eventMonth}</EventlyText>
+                <AppText variant="h3" style={s.dateDay}>
+                  {item.eventDay}
+                </AppText>
+                <AppText variant="label" style={s.dateMonth}>
+                  {item.eventMonth}
+                </AppText>
               </View>
             ) : null}
           </View>
@@ -92,35 +96,31 @@ export function EventCard({ item, focused, onPress }: EventCardProps) {
             <View style={s.chipRow}>
               <View style={s.kindChip}>
                 <EventlyIcon name="calendar-heart" size={11} color="#6d4df2" />
-                <EventlyText variant="caption" style={s.kindText}>
+                <AppText variant="label" style={s.kindText}>
                   Planned Event
-                </EventlyText>
+                </AppText>
               </View>
               <View style={[s.statusChip, { backgroundColor: toneSoft }]}>
                 <EventlyIcon name="check-circle" size={11} color={toneColor} />
-                <EventlyText
-                  variant="caption"
+                <AppText
+                  variant="label"
                   style={[s.statusText, { color: toneColor }]}
                   numberOfLines={1}
                 >
                   {item.statusPill}
-                </EventlyText>
+                </AppText>
               </View>
             </View>
 
-            <EventlyText variant="subtitle" style={s.title} numberOfLines={1}>
+            <AppText variant="h3" style={s.title} numberOfLines={2}>
               {item.title}
-            </EventlyText>
+            </AppText>
 
             <View style={s.metaRow}>
               <EventlyIcon name="clock-outline" size={13} color="#e2552f" />
-              <EventlyText
-                variant="caption"
-                style={s.subtitle}
-                numberOfLines={1}
-              >
+              <AppText variant="caption" style={s.subtitle} numberOfLines={1}>
                 {`${item.ref} · ${who}`}
-              </EventlyText>
+              </AppText>
             </View>
 
             <View style={s.progressRow}>
@@ -131,9 +131,9 @@ export function EventCard({ item, focused, onPress }: EventCardProps) {
               </View>
               {/* No countdown on an event that is over, or one with no date. */}
               {item.daysLabel ? (
-                <EventlyText variant="caption" style={s.daysLabel}>
+                <AppText variant="label" style={s.daysLabel}>
                   {item.daysLabel}
-                </EventlyText>
+                </AppText>
               ) : null}
             </View>
           </View>
@@ -144,9 +144,9 @@ export function EventCard({ item, focused, onPress }: EventCardProps) {
             <View style={s.nextIcon}>
               <EventlyIcon name="wallet-outline" size={14} color="#6d4df2" />
             </View>
-            <EventlyText variant="caption" style={s.nextText} numberOfLines={1}>
+            <AppText variant="caption" style={s.nextText} numberOfLines={1}>
               {COPY.next + item.nextStep}
-            </EventlyText>
+            </AppText>
             <EventlyIcon name="chevron-right" size={18} color="#1b1438" />
           </View>
         ) : null}

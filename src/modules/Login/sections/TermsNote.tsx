@@ -1,4 +1,4 @@
-import { EventlyText } from '../../../Components';
+import { AppText } from '../../../Components';
 import { TERMS_COPY } from '../constants';
 import { termsStyles } from '../styles';
 
@@ -13,17 +13,17 @@ import { termsStyles } from '../styles';
  */
 export function TermsNote() {
   return (
-    <EventlyText variant="caption" style={termsStyles.text}>
+    <AppText variant="caption" style={termsStyles.text}>
       {TERMS_COPY.lead}{' '}
-      <EventlyText variant="caption" style={termsStyles.link}>
+      <AppText variant="caption" style={termsStyles.link}>
         {TERMS_COPY.terms}
-      </EventlyText>{' '}
+      </AppText>{' '}
       {TERMS_COPY.conjunction}{' '}
-      <EventlyText variant="caption" style={termsStyles.link}>
+      <AppText variant="caption" style={termsStyles.link}>
         {TERMS_COPY.privacy}
-      </EventlyText>
+      </AppText>
       .
-    </EventlyText>
+    </AppText>
   );
 }
 

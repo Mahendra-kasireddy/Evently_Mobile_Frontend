@@ -1,12 +1,18 @@
 import { StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, fontFor, spacing } from '../../theme';
+import {
+  colors,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+  inputTypography,
+} from '../../theme';
 import {
   CHAT_ACCENT,
   CHAT_CANVAS,
   CHAT_GREEN,
   CHAT_HAIRLINE,
-  CHAT_NAVY,
   CHAT_NAVY_DEEP,
   CHAT_THEIRS,
 } from './constants';
@@ -44,11 +50,8 @@ export const styles = StyleSheet.create({
    * with it; 26 is also nearer the rest of the app's screen titles.
    */
   title: {
-    color: CHAT_NAVY_DEEP,
-    fontSize: 26,
-    lineHeight: 34,
-    fontWeight: '700',
-    letterSpacing: -0.6,
+    color: textColor.textPrimary,
+    ...typography.h1,
   },
 
   /* Rows own their own left padding so the separators can be inset to the
@@ -69,16 +72,21 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  loadingText: { color: colors.textMuted, marginTop: spacing.md },
-  emptyTitle: { color: CHAT_NAVY, marginTop: spacing.md, textAlign: 'center' },
+  loadingText: { color: textColor.textSecondary, marginTop: spacing.md },
+  emptyTitle: {
+    ...typography.h2,
+    color: textColor.textPrimary,
+    marginTop: spacing.md,
+    textAlign: 'center',
+  },
   emptyBody: {
-    color: colors.textMuted,
+    ...typography.body,
+    color: textColor.textSecondary,
     marginTop: spacing.sm,
     textAlign: 'center',
-    lineHeight: 20,
   },
   errorText: {
-    color: colors.danger,
+    color: textColor.textError,
     textAlign: 'center',
     marginTop: spacing.sm,
   },
@@ -92,7 +100,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },
-  retryText: { color: CHAT_ACCENT, fontWeight: '700' },
+  retryText: { color: CHAT_ACCENT, ...fontWeights.bold },
   emptyCta: {
     ...globalStyles.row,
     gap: spacing.xs,
@@ -102,7 +110,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm + 4,
   },
-  emptyCtaText: { color: colors.onPrimary, fontWeight: '700' },
+  emptyCtaText: { color: textColor.textOnPrimary, ...fontWeights.bold },
 });
 
 export const rowStyles = StyleSheet.create({
@@ -131,40 +139,35 @@ export const rowStyles = StyleSheet.create({
     flexShrink: 0,
   },
   avatarText: {
-    color: colors.onPrimary,
-    fontSize: 15,
-    fontWeight: '700',
-    letterSpacing: 0.3,
+    color: textColor.textOnPrimary,
+    ...typography.h3,
   },
   text: { flex: 1 },
   headRow: { ...globalStyles.row, alignItems: 'center', gap: 10 },
   /* Set in caps: it is the name of a business, and it keeps a one-line name
      from reading as the first line of the message under it. */
   name: {
-    color: CHAT_NAVY_DEEP,
-    fontSize: 14.5,
-    lineHeight: 19,
-    fontWeight: '700',
-    letterSpacing: 0.2,
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
     textTransform: 'uppercase',
     flexShrink: 1,
   },
   when: {
-    color: colors.textMuted,
-    fontSize: 12.5,
+    color: textColor.textSecondary,
+    ...typography.caption,
     flexShrink: 0,
     marginLeft: 'auto',
   },
   preview: {
-    color: colors.textMuted,
-    fontSize: 14,
+    color: textColor.textSecondary,
+    ...typography.body,
     marginTop: 2,
-    lineHeight: 19,
   },
   /* A thread nobody has written in yet. Set apart from a real message, so the
      row never reads as a message that failed to load. */
   previewEmpty: { color: colors.textMuted, fontStyle: 'italic' },
-  previewUnread: { color: '#141c2b', fontWeight: '600' },
+  previewUnread: { color: textColor.textPrimary, ...fontWeights.semibold },
   badge: {
     minWidth: 24,
     height: 24,
@@ -175,7 +178,7 @@ export const rowStyles = StyleSheet.create({
     paddingHorizontal: 7,
     flexShrink: 0,
   },
-  badgeText: { color: colors.onPrimary, fontSize: 12, fontWeight: '700' },
+  badgeText: { color: textColor.textOnPrimary, ...typography.label },
 });
 
 export const threadStyles = StyleSheet.create({
@@ -214,9 +217,9 @@ export const threadStyles = StyleSheet.create({
     flexShrink: 0,
   },
   headerAvatarText: {
-    color: colors.onPrimary,
-    fontSize: 13,
-    fontWeight: '700',
+    color: textColor.textOnPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
   },
   headerText: { flex: 1 },
   /*
@@ -228,18 +231,14 @@ export const threadStyles = StyleSheet.create({
    * like a page.
    */
   headerName: {
-    color: CHAT_NAVY_DEEP,
-    fontSize: 15.5,
-    lineHeight: 20,
-    fontWeight: '700',
-    letterSpacing: -0.3,
+    color: textColor.textPrimary,
+    ...typography.h3,
   },
   /* Green because it is a reassurance, and only rendered when it is measured —
      see `replyLabel`. */
   headerReply: {
     color: CHAT_GREEN,
-    fontSize: 12.5,
-    lineHeight: 16,
+    ...typography.caption,
     marginTop: 1,
   },
   quote: {
@@ -251,14 +250,17 @@ export const threadStyles = StyleSheet.create({
     paddingVertical: 8,
     flexShrink: 0,
   },
-  quoteText: { color: CHAT_NAVY_DEEP, fontSize: 13, fontWeight: '700' },
+  quoteText: {
+    color: textColor.textPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
 
   list: { padding: spacing.md, paddingBottom: spacing.sm },
   spinner: { marginTop: 40 },
   dayLabel: {
-    color: colors.textMuted,
-    fontSize: 11.5,
-    fontWeight: '600',
+    color: textColor.textSecondary,
+    ...typography.label,
     textAlign: 'center',
     marginTop: spacing.md,
     marginBottom: spacing.sm,
@@ -272,23 +274,22 @@ export const threadStyles = StyleSheet.create({
   },
   mine: { alignSelf: 'flex-end', backgroundColor: CHAT_NAVY_DEEP },
   theirs: { alignSelf: 'flex-start', backgroundColor: CHAT_THEIRS },
-  mineText: { color: colors.onPrimary, fontSize: 14.5, lineHeight: 20 },
-  theirsText: { color: '#141c2b', fontSize: 14.5, lineHeight: 20 },
-  time: { fontSize: 11, marginTop: 6 },
+  mineText: { color: textColor.textOnPrimary, ...typography.body },
+  theirsText: { color: textColor.textPrimary, ...typography.body },
+  time: { ...typography.caption, marginTop: 6 },
   mineTime: { color: 'rgba(255,255,255,0.55)' },
-  theirsTime: { color: colors.textMuted },
+  theirsTime: { color: textColor.textSecondary },
   emptyText: {
-    color: colors.textMuted,
+    ...typography.body,
+    color: textColor.textSecondary,
     textAlign: 'center',
-    lineHeight: 20,
     marginTop: spacing.xl,
     paddingHorizontal: spacing.lg,
   },
   note: {
-    color: colors.textMuted,
-    fontSize: 12,
+    color: textColor.textSecondary,
+    ...typography.caption,
     textAlign: 'center',
-    lineHeight: 18,
     marginTop: spacing.sm,
   },
 
@@ -318,7 +319,7 @@ export const threadStyles = StyleSheet.create({
        question over four lines and stop being a chip. */
     flexShrink: 0,
   },
-  chipText: { color: CHAT_NAVY_DEEP, fontSize: 12.5, lineHeight: 16 },
+  chipText: { color: textColor.textPrimary, ...typography.label },
 
   composer: {
     ...globalStyles.row,
@@ -355,9 +356,8 @@ export const threadStyles = StyleSheet.create({
     padding: 0,
     margin: 0,
     maxHeight: 80,
-    color: colors.text,
-    fontSize: 14,
-    fontFamily: fontFor('400'),
+    color: textColor.textPrimary,
+    ...inputTypography.body,
   },
   send: {
     width: 40,
@@ -370,8 +370,8 @@ export const threadStyles = StyleSheet.create({
   },
   sendDisabled: { opacity: 0.4 },
   sendError: {
-    color: colors.danger,
-    fontSize: 12,
+    color: textColor.textError,
+    ...typography.caption,
     paddingHorizontal: spacing.md,
     paddingBottom: 6,
   },

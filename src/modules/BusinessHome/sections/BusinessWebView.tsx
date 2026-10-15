@@ -1,8 +1,24 @@
-import { type ComponentRef, useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, BackHandler, Linking, Platform, View } from 'react-native';
-import { WebView, type WebViewMessageEvent, type WebViewNavigation } from 'react-native-webview';
+import {
+  type ComponentRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import {
+  ActivityIndicator,
+  BackHandler,
+  Linking,
+  Platform,
+  View,
+} from 'react-native';
+import {
+  WebView,
+  type WebViewMessageEvent,
+  type WebViewNavigation,
+} from 'react-native-webview';
 import type { ShouldStartLoadRequest } from 'react-native-webview/lib/WebViewTypes';
-import { EventlyButton, EventlyText } from '../../../Components';
+import { EventlyButton, AppText } from '../../../Components';
 import { decodeJwtRoles, isJwtFresh } from '../../../services/jwt';
 import { refreshSession } from '../../../services/sessionRefresh';
 import {
@@ -25,7 +41,13 @@ import {
 import { logoutOnServer } from '../services';
 import { styles } from '../styles';
 import type { BusinessRole } from '../types';
-import { buildInjectedScript, isWebAppUrl, parseAppMessage, webPathOf, webUrl } from '../utils';
+import {
+  buildInjectedScript,
+  isWebAppUrl,
+  parseAppMessage,
+  webPathOf,
+  webUrl,
+} from '../utils';
 
 /**
  * Last page shown per portal, for this run of the app. A remount — a session
@@ -84,7 +106,10 @@ export function BusinessWebView({ role, path }: BusinessWebViewProps) {
   useEffect(() => {
     let alive = true;
     const current = storeTokenRef.current;
-    (current && isJwtFresh(current) ? Promise.resolve(current) : refreshSession()).then(token => {
+    (current && isJwtFresh(current)
+      ? Promise.resolve(current)
+      : refreshSession()
+    ).then(token => {
       // null: the session is over and has been cleared; the navigator takes
       // the person back to sign-in and this screen unmounts.
       if (alive && token) setPageToken(token);
@@ -106,7 +131,10 @@ export function BusinessWebView({ role, path }: BusinessWebViewProps) {
   const handleExpired = useCallback(() => {
     if (loggingOut.current) return;
     const now = Date.now();
-    expiries.current = [...expiries.current.filter(t => now - t < SESSION_RETRY_WINDOW_MS), now];
+    expiries.current = [
+      ...expiries.current.filter(t => now - t < SESSION_RETRY_WINDOW_MS),
+      now,
+    ];
     if (expiries.current.length > MAX_SESSION_RETRIES) {
       setFailed(true);
       return;
@@ -139,9 +167,12 @@ export function BusinessWebView({ role, path }: BusinessWebViewProps) {
           // The server reissued the pair (a business registration does), so
           // the refresh token the app held is dead — adopt the new one. The
           // page already has the access token; no reload needed.
-          dispatch(setSession({ token: msg.token, refreshToken: msg.refreshToken }));
+          dispatch(
+            setSession({ token: msg.token, refreshToken: msg.refreshToken }),
+          );
           setPageToken(msg.token);
-          if (decodeJwtRoles(msg.token).includes(role)) dispatch(setActiveView(role));
+          if (decodeJwtRoles(msg.token).includes(role))
+            dispatch(setActiveView(role));
           return;
         case 'switchRole':
           // The page has already made it the account's default on the server.
@@ -203,12 +234,12 @@ export function BusinessWebView({ role, path }: BusinessWebViewProps) {
   if (failed) {
     return (
       <View style={styles.center}>
-        <EventlyText variant="h2" style={styles.errorTitle}>
+        <AppText variant="h2" style={styles.errorTitle}>
           {COPY.errorTitle}
-        </EventlyText>
-        <EventlyText variant="body" style={styles.muted}>
+        </AppText>
+        <AppText variant="body" style={styles.muted}>
           {COPY.errorBody}
-        </EventlyText>
+        </AppText>
         <EventlyButton
           title={COPY.retry}
           accentColor={brand.accent}
@@ -231,7 +262,10 @@ export function BusinessWebView({ role, path }: BusinessWebViewProps) {
           ref={webRef}
           source={{ uri: startUrl }}
           style={styles.web}
-          injectedJavaScriptBeforeContentLoaded={buildInjectedScript(pageToken, Platform.OS)}
+          injectedJavaScriptBeforeContentLoaded={buildInjectedScript(
+            pageToken,
+            Platform.OS,
+          )}
           onMessage={handleMessage}
           onNavigationStateChange={handleNavigationChange}
           onShouldStartLoadWithRequest={handleShouldStartLoad}
@@ -254,9 +288,9 @@ export function BusinessWebView({ role, path }: BusinessWebViewProps) {
       {loading ? (
         <View style={styles.overlay} pointerEvents="none">
           <ActivityIndicator size="large" color={brand.accent} />
-          <EventlyText variant="body" style={styles.muted}>
+          <AppText variant="body" style={styles.muted}>
             {COPY.loading}
-          </EventlyText>
+          </AppText>
         </View>
       ) : null}
     </View>

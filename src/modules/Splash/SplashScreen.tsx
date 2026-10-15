@@ -1,5 +1,5 @@
 import { ActivityIndicator, View } from 'react-native';
-import { EventlyText } from '../../Components';
+import { AppText } from '../../Components';
 import { SPLASH_ACCENT, SPLASH_TAGLINE } from './constants';
 import { styles } from './styles';
 
@@ -8,13 +8,21 @@ export function SplashScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.wordmarkRow}>
-        <EventlyText style={styles.wordmarkAccent}>e</EventlyText>
-        <EventlyText style={styles.wordmark}>vently</EventlyText>
+        <AppText variant="display" style={styles.wordmarkAccent}>
+          e
+        </AppText>
+        <AppText variant="display" style={styles.wordmark}>
+          vently
+        </AppText>
       </View>
-      <EventlyText variant="body" style={styles.tagline}>
+      <AppText variant="body" style={styles.tagline}>
         {SPLASH_TAGLINE}
-      </EventlyText>
-      <ActivityIndicator size="small" color={SPLASH_ACCENT} style={styles.loader} />
+      </AppText>
+      <ActivityIndicator
+        size="small"
+        color={SPLASH_ACCENT}
+        style={styles.loader}
+      />
     </View>
   );
 }

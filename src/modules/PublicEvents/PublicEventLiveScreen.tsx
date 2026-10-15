@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
+import { AppHeader, EventlyIcon, AppText } from '../../Components';
 import { absoluteFileUrl } from '../../services/urls';
 import { LivePlayer, canEmbedStream } from '../Invitation/sections/LivePlayer';
 import type { RootStackParamList } from '../../navigation/types';
@@ -55,13 +55,13 @@ export function PublicEventLiveScreen() {
       <SafeAreaView style={ui.screen} edges={['top']}>
         <AppHeader title="Live Stream" onBackPress={navigation.goBack} />
         <View style={ui.centre}>
-          <EventlyText variant="body" style={ui.muted}>
+          <AppText variant="body" style={ui.muted}>
             {error?.message ?? 'There is no stream for this event.'}
-          </EventlyText>
+          </AppText>
           <TouchableOpacity style={[ui.outline, ui.retry]} onPress={refetch}>
-            <EventlyText variant="body" style={ui.outlineText}>
+            <AppText variant="body" style={ui.outlineText}>
               {PUBLIC_EVENTS_COPY.retry}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -127,16 +127,16 @@ export function PublicEventLiveScreen() {
           ) : null}
         </View>
 
-        <EventlyText variant="h2" style={s.title}>
+        <AppText variant="h3" style={s.title}>
           {`${data.title} – ${live.state === 'ended' ? 'Replay' : 'Live'}`}
-        </EventlyText>
-        <EventlyText variant="body" style={ui.muted}>
+        </AppText>
+        <AppText variant="body" style={ui.muted}>
           {live.state === 'live'
             ? 'Watch the live stream of the event happening right now.'
             : live.state === 'upcoming'
             ? 'The live stream will appear here when the event starts.'
             : 'A recording of the event.'}
-        </EventlyText>
+        </AppText>
 
         <View style={s.access}>
           <View style={s.accessHead}>
@@ -148,12 +148,12 @@ export function PublicEventLiveScreen() {
               />
             </View>
             <View style={ui.flex}>
-              <EventlyText variant="caption" style={ui.muted}>
+              <AppText variant="caption" style={ui.muted}>
                 Access
-              </EventlyText>
-              <EventlyText variant="body" style={s.accessTitle}>
+              </AppText>
+              <AppText variant="body" style={s.accessTitle}>
                 {accessLine}
-              </EventlyText>
+              </AppText>
             </View>
           </View>
           <View style={s.ok}>
@@ -162,12 +162,12 @@ export function PublicEventLiveScreen() {
               size={16}
               color={watchable ? PE_GREEN : PE_PURPLE}
             />
-            <EventlyText
-              variant="caption"
+            <AppText
+              variant="label"
               style={[s.okText, !watchable && { color: PE_PURPLE }]}
             >
               {statusLine}
-            </EventlyText>
+            </AppText>
           </View>
           {watchable ? (
             <TouchableOpacity
@@ -180,9 +180,9 @@ export function PublicEventLiveScreen() {
                 size={18}
                 color="#ffffff"
               />
-              <EventlyText variant="body" style={ui.primaryText}>
+              <AppText variant="h3" style={ui.primaryText}>
                 {live.state === 'ended' ? 'Watch Replay' : 'Watch Live'}
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
           ) : live.access === 'ticketed' && data.canBook ? (
             <TouchableOpacity
@@ -194,23 +194,23 @@ export function PublicEventLiveScreen() {
               }
               accessibilityRole="button"
             >
-              <EventlyText variant="body" style={ui.primaryText}>
+              <AppText variant="h3" style={ui.primaryText}>
                 Book a Ticket
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
           ) : null}
         </View>
 
-        <EventlyText variant="subtitle" style={[ui.cardTitle, ui.sectionTitle]}>
+        <AppText variant="h2" style={[ui.cardTitle, ui.sectionTitle]}>
           About Live Stream
-        </EventlyText>
-        <EventlyText variant="body" style={ui.muted}>
+        </AppText>
+        <AppText variant="body" style={ui.muted}>
           {`Experience the event from anywhere. ${LIVE_LABEL[live.state]}${
             live.access === 'ticketed'
               ? ' for ticket holders only.'
               : ' — free for everyone.'
           }`}
-        </EventlyText>
+        </AppText>
       </ScrollView>
     </SafeAreaView>
   );

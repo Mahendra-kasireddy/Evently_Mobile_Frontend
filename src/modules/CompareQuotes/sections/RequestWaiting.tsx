@@ -1,7 +1,7 @@
 import { ScrollView, View } from 'react-native';
 import {
   EventlyIcon,
-  EventlyText,
+  AppText,
   FadeInUp,
   GradientFill,
   PopIn,
@@ -31,12 +31,12 @@ function Fact({
         <EventlyIcon name={icon} size={18} color="#e2552f" />
       </View>
       <View style={s.factText}>
-        <EventlyText variant="caption" style={s.factLabel}>
+        <AppText variant="label" style={s.factLabel}>
           {label}
-        </EventlyText>
-        <EventlyText variant="subtitle" style={s.factValue} numberOfLines={1}>
+        </AppText>
+        <AppText variant="bodyLarge" style={s.factValue} numberOfLines={1}>
           {value}
-        </EventlyText>
+        </AppText>
       </View>
     </View>
   );
@@ -75,15 +75,15 @@ function Step({
         )}
       </View>
       <View style={s.stepText}>
-        <EventlyText
-          variant="subtitle"
+        <AppText
+          variant="bodyLarge"
           style={[s.stepTitle, state === 'next' && s.stepTitleNext]}
         >
           {title}
-        </EventlyText>
-        <EventlyText variant="caption" style={s.stepBody}>
+        </AppText>
+        <AppText variant="caption" style={s.stepBody}>
           {body}
-        </EventlyText>
+        </AppText>
       </View>
     </View>
   );
@@ -108,9 +108,9 @@ function SentTo({
   if (count === 0) {
     return (
       <View style={s.card}>
-        <EventlyText variant="caption" style={s.cardLabel}>
+        <AppText variant="label" style={s.cardLabel}>
           {C.sentToLabel}
-        </EventlyText>
+        </AppText>
         <View style={[s.recipient, s.recipientFirst]}>
           <View style={[s.avatar, s.avatarOpen]}>
             <EventlyIcon
@@ -120,12 +120,12 @@ function SentTo({
             />
           </View>
           <View style={s.recipientText}>
-            <EventlyText variant="subtitle" style={s.recipientName}>
+            <AppText variant="bodyLarge" style={s.recipientName}>
               {C.sentToOpen}
-            </EventlyText>
-            <EventlyText variant="caption" style={s.recipientMeta}>
+            </AppText>
+            <AppText variant="caption" style={s.recipientMeta}>
               {C.sentToOpenBody}
-            </EventlyText>
+            </AppText>
           </View>
         </View>
       </View>
@@ -136,32 +136,32 @@ function SentTo({
   return (
     <View style={s.card}>
       <View style={s.cardHead}>
-        <EventlyText variant="caption" style={s.cardLabel}>
+        <AppText variant="label" style={s.cardLabel}>
           {C.sentToLabel}
-        </EventlyText>
-        <EventlyText variant="caption" style={s.sentToCount}>
+        </AppText>
+        <AppText variant="caption" style={s.sentToCount}>
           {C.sentToCount(count)}
-        </EventlyText>
+        </AppText>
       </View>
       {shown.map((r, i) => (
         <View key={r.id} style={[s.recipient, i === 0 && s.recipientFirst]}>
           <View
             style={[s.avatar, { backgroundColor: r.avatarColor || '#e8633a' }]}
           >
-            <EventlyText variant="caption" style={s.avatarText}>
+            <AppText variant="body" style={s.avatarText}>
               {r.initials}
-            </EventlyText>
+            </AppText>
           </View>
           <View style={s.recipientText}>
-            <EventlyText
-              variant="subtitle"
+            <AppText
+              variant="bodyLarge"
               style={s.recipientName}
               numberOfLines={1}
             >
               {r.name}
-            </EventlyText>
+            </AppText>
             {r.rating > 0 || r.tier ? (
-              <EventlyText
+              <AppText
                 variant="caption"
                 style={s.recipientMeta}
                 numberOfLines={1}
@@ -169,20 +169,20 @@ function SentTo({
                 {[r.rating > 0 ? `★ ${r.rating.toFixed(1)}` : '', r.tier]
                   .filter(Boolean)
                   .join(' · ')}
-              </EventlyText>
+              </AppText>
             ) : null}
           </View>
           <View style={s.waitingPill}>
-            <EventlyText variant="caption" style={s.waitingText}>
+            <AppText variant="label" style={s.waitingText}>
               {C.awaitingQuote}
-            </EventlyText>
+            </AppText>
           </View>
         </View>
       ))}
       {more > 0 ? (
-        <EventlyText variant="caption" style={s.moreText}>
+        <AppText variant="caption" style={s.moreText}>
           {C.sentToMore(more)}
-        </EventlyText>
+        </AppText>
       ) : null}
     </View>
   );
@@ -225,16 +225,16 @@ export function RequestWaiting({
             </View>
           </PopIn>
           <FadeInUp delay={120}>
-            <EventlyText variant="h1" style={s.title}>
+            <AppText variant="h1" style={s.title}>
               {justSent ? C.sentTitle : C.waitingTitle}
-            </EventlyText>
-            <EventlyText variant="body" style={s.lead}>
+            </AppText>
+            <AppText variant="body" style={s.lead}>
               {model?.title && model.sentToCount > 0
                 ? C.leadSent(model.sentToCount, model.title)
                 : model?.title
                 ? C.lead(model.title)
                 : C.leadPlain}
-            </EventlyText>
+            </AppText>
           </FadeInUp>
         </View>
 
@@ -242,19 +242,19 @@ export function RequestWaiting({
           <FadeInUp delay={220}>
             <View style={s.card}>
               <View style={s.cardHead}>
-                <EventlyText variant="caption" style={s.cardLabel}>
+                <AppText variant="label" style={s.cardLabel}>
                   {C.briefLabel}
-                </EventlyText>
+                </AppText>
                 <View style={s.statusPill}>
                   <View style={s.statusDot} />
-                  <EventlyText variant="caption" style={s.statusText}>
+                  <AppText variant="label" style={s.statusText}>
                     {C.statusOpen}
-                  </EventlyText>
+                  </AppText>
                 </View>
               </View>
-              <EventlyText variant="h2" style={s.cardTitle} numberOfLines={1}>
+              <AppText variant="h2" style={s.cardTitle} numberOfLines={1}>
                 {model.title}
-              </EventlyText>
+              </AppText>
               <View style={s.facts}>
                 <Fact
                   icon="calendar-blank-outline"
@@ -284,9 +284,9 @@ export function RequestWaiting({
 
         <FadeInUp delay={340}>
           <View style={s.card}>
-            <EventlyText variant="caption" style={s.cardLabel}>
+            <AppText variant="label" style={s.cardLabel}>
               {C.nextLabel}
-            </EventlyText>
+            </AppText>
             <View style={s.steps}>
               <Step state="done" title={C.step1Title} body={C.step1Body} />
               <Step state="now" title={C.step2Title} body={C.step2Body} />
@@ -306,9 +306,9 @@ export function RequestWaiting({
         >
           <GradientFill colors={CTA_GRADIENT} direction="across" />
           <EventlyIcon name="home-variant-outline" size={18} color="#ffffff" />
-          <EventlyText variant="subtitle" style={s.ctaText}>
+          <AppText variant="button" style={s.ctaText}>
             {C.home}
-          </EventlyText>
+          </AppText>
         </PressableScale>
       </View>
     </View>

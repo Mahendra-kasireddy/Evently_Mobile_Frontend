@@ -1,5 +1,5 @@
 import { ScrollView, TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText, EventlyTextInput } from '../../../Components';
+import { EventlyIcon, AppText, EventlyTextInput } from '../../../Components';
 import { ideasStyles } from '../styles';
 import { PLAN_ACCENT, PLAN_TEXT_MUTED } from '../constants';
 import type { IdeasConfigDTO } from '../types';
@@ -14,7 +14,12 @@ interface IdeasRequestsProps {
   onChange: (value: string) => void;
 }
 
-export function IdeasRequests({ config, value, onAdd, onChange }: IdeasRequestsProps) {
+export function IdeasRequests({
+  config,
+  value,
+  onAdd,
+  onChange,
+}: IdeasRequestsProps) {
   return (
     <View style={ideasStyles.section}>
       <View style={ideasStyles.head}>
@@ -22,13 +27,13 @@ export function IdeasRequests({ config, value, onAdd, onChange }: IdeasRequestsP
           <EventlyIcon name="creation" size={18} color={PLAN_ACCENT} />
         </View>
         <View style={ideasStyles.headText}>
-          <EventlyText variant="h2" style={ideasStyles.title}>
+          <AppText variant="h2" style={ideasStyles.title}>
             {config.title}
-          </EventlyText>
+          </AppText>
           {config.subtitle ? (
-            <EventlyText variant="caption" style={ideasStyles.subtitle}>
+            <AppText variant="caption" style={ideasStyles.subtitle}>
               {config.subtitle}
-            </EventlyText>
+            </AppText>
           ) : null}
         </View>
       </View>
@@ -40,12 +45,16 @@ export function IdeasRequests({ config, value, onAdd, onChange }: IdeasRequestsP
           style={ideasStyles.chipRow}
           contentContainerStyle={ideasStyles.chipRowContent}
         >
-          {config.suggestions.map((suggestion) => (
-            <TouchableOpacity key={suggestion} style={ideasStyles.chip} onPress={() => onAdd(suggestion)}>
+          {config.suggestions.map(suggestion => (
+            <TouchableOpacity
+              key={suggestion}
+              style={ideasStyles.chip}
+              onPress={() => onAdd(suggestion)}
+            >
               <EventlyIcon name="plus" size={14} color={PLAN_ACCENT} />
-              <EventlyText variant="caption" style={ideasStyles.chipText}>
+              <AppText variant="caption" style={ideasStyles.chipText}>
                 {suggestion}
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -62,9 +71,9 @@ export function IdeasRequests({ config, value, onAdd, onChange }: IdeasRequestsP
           multiline
         />
         <View style={ideasStyles.textareaFooter}>
-          <EventlyText variant="caption" style={ideasStyles.counter}>
+          <AppText variant="caption" style={ideasStyles.counter}>
             {`${value.length}/${IDEAS_MAX_LENGTH}`}
-          </EventlyText>
+          </AppText>
           <View style={ideasStyles.pencil}>
             <EventlyIcon name="pencil-outline" size={13} color={PLAN_ACCENT} />
           </View>

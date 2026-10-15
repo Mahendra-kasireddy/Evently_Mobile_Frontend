@@ -1,5 +1,5 @@
 import { ActivityIndicator, Pressable, View } from 'react-native';
-import { EventlyIcon, EventlyText, GradientFill } from '../../../Components';
+import { EventlyIcon, AppText, GradientFill } from '../../../Components';
 import { AUTH_CTA_GRADIENT, ctaStyles } from '../styles';
 
 interface AuthCtaProps {
@@ -48,7 +48,9 @@ export function AuthCta({
         <ActivityIndicator color="#ffffff" />
       ) : (
         <>
-          <EventlyText style={ctaStyles.label}>{ready ? readyLabel : idleLabel}</EventlyText>
+          <AppText variant="h3" style={ctaStyles.label}>
+            {ready ? readyLabel : idleLabel}
+          </AppText>
           <View style={ctaStyles.arrow}>
             <EventlyIcon name="arrow-right" size={20} color="#ffffff" />
           </View>

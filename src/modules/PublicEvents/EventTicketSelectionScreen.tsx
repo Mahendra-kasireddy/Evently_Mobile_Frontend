@@ -12,7 +12,7 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
+import { AppHeader, EventlyIcon, AppText } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
 import {
   PUBLIC_EVENTS_COPY,
@@ -76,13 +76,13 @@ export function EventTicketSelectionScreen() {
       <SafeAreaView style={ui.screen} edges={['top']}>
         <AppHeader title="Select Tickets" onBackPress={navigation.goBack} />
         <View style={ui.centre}>
-          <EventlyText variant="body" style={ui.muted}>
+          <AppText variant="body" style={ui.muted}>
             {error?.message ?? 'We could not load the tickets.'}
-          </EventlyText>
+          </AppText>
           <TouchableOpacity style={[ui.outline, ui.retry]} onPress={refetch}>
-            <EventlyText variant="body" style={ui.outlineText}>
+            <AppText variant="body" style={ui.outlineText}>
               {PUBLIC_EVENTS_COPY.retry}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -125,14 +125,14 @@ export function EventTicketSelectionScreen() {
           />
         </View>
 
-        <EventlyText variant="subtitle" style={[ui.cardTitle, ui.gapTop]}>
+        <AppText variant="body" style={[ui.cardTitle, ui.gapTop]}>
           Available Tickets
-        </EventlyText>
+        </AppText>
 
         {data.ticketTypes.length === 0 ? (
-          <EventlyText variant="body" style={ui.muted}>
+          <AppText variant="body" style={ui.muted}>
             No tickets are listed for this event yet.
-          </EventlyText>
+          </AppText>
         ) : null}
 
         {data.ticketTypes.map(option => {
@@ -146,26 +146,23 @@ export function EventTicketSelectionScreen() {
               testID={`ticket-type-${option.id}`}
             >
               <View style={s.head}>
-                <EventlyText variant="body" style={s.name} numberOfLines={2}>
+                <AppText variant="h3" style={s.name} numberOfLines={2}>
                   {option.name}
-                </EventlyText>
-                <EventlyText variant="body" style={s.price}>
+                </AppText>
+                <AppText variant="h3" style={s.price}>
                   {formatPrice(option.price)}
-                </EventlyText>
+                </AppText>
               </View>
               {option.description ? (
-                <EventlyText variant="caption" style={s.note}>
+                <AppText variant="caption" style={s.note}>
                   {option.description}
-                </EventlyText>
+                </AppText>
               ) : null}
 
               <View style={s.foot}>
-                <EventlyText
-                  variant="caption"
-                  style={buyable ? s.left : s.note}
-                >
+                <AppText variant="caption" style={buyable ? s.left : s.note}>
                   {ticketAvailability(option, data.timezone)}
-                </EventlyText>
+                </AppText>
                 {buyable ? (
                   <View style={s.stepper}>
                     <TouchableOpacity
@@ -177,9 +174,9 @@ export function EventTicketSelectionScreen() {
                     >
                       <EventlyIcon name="minus" size={16} color={PE_NAVY} />
                     </TouchableOpacity>
-                    <EventlyText variant="body" style={s.count}>
+                    <AppText variant="h3" style={s.count}>
                       {n}
-                    </EventlyText>
+                    </AppText>
                     <TouchableOpacity
                       style={[s.stepBtn, s.stepBtnOn]}
                       disabled={n >= option.maxForYou}
@@ -192,13 +189,13 @@ export function EventTicketSelectionScreen() {
                   </View>
                 ) : (
                   <View style={s.stateTag}>
-                    <EventlyText variant="caption" style={s.stateTagText}>
+                    <AppText variant="label" style={s.stateTagText}>
                       {option.available <= 0
                         ? 'Sold Out'
                         : option.onSale && option.maxForYou <= 0
                         ? 'Limit Reached'
                         : 'Unavailable'}
-                    </EventlyText>
+                    </AppText>
                   </View>
                 )}
               </View>
@@ -210,21 +207,21 @@ export function EventTicketSelectionScreen() {
       <View style={[ui.bar, { paddingBottom: Math.max(insets.bottom, 12) }]}>
         {chosen && count > 0 ? (
           <View style={s.sumRow}>
-            <EventlyText variant="caption" style={s.sumLabel}>
+            <AppText variant="label" style={s.sumLabel}>
               {`${count} × ${chosen.name}`}
-            </EventlyText>
-            <EventlyText variant="caption" style={s.sumValue}>
+            </AppText>
+            <AppText variant="bodySmall" style={s.sumValue}>
               {formatPrice(total)}
-            </EventlyText>
+            </AppText>
           </View>
         ) : null}
         <View style={s.sumRow}>
-          <EventlyText variant="body" style={s.totalLabel}>
+          <AppText variant="h3" style={s.totalLabel}>
             Total Amount
-          </EventlyText>
-          <EventlyText variant="body" style={s.totalValue}>
+          </AppText>
+          <AppText variant="h3" style={s.totalValue}>
             {chosen && count > 0 ? formatPrice(total) : '—'}
-          </EventlyText>
+          </AppText>
         </View>
         <TouchableOpacity
           style={[ui.primary, !(chosen && count > 0) && ui.primaryOff]}
@@ -240,9 +237,9 @@ export function EventTicketSelectionScreen() {
           accessibilityRole="button"
           testID="continue-to-payment"
         >
-          <EventlyText variant="body" style={ui.primaryText}>
+          <AppText variant="h3" style={ui.primaryText}>
             Continue to Payment
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

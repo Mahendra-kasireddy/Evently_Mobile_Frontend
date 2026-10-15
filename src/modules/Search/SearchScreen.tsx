@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText } from '../../Components';
+import { EventlyIcon, AppText } from '../../Components';
 import { colors } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
 import { Packages } from '../Home/sections/Packages';
@@ -99,9 +99,9 @@ export function SearchScreen() {
         <EventlyIcon name="tune-variant" size={18} color={colors.onPrimary} />
         {container.activeFilterCount > 0 ? (
           <View style={s.filterBadge}>
-            <EventlyText variant="caption" style={s.filterBadgeText}>
+            <AppText variant="label" style={s.filterBadgeText}>
               {container.activeFilterCount}
-            </EventlyText>
+            </AppText>
           </View>
         ) : null}
       </TouchableOpacity>
@@ -121,12 +121,9 @@ export function SearchScreen() {
             accessibilityRole="tab"
             accessibilityState={{ selected: on }}
           >
-            <EventlyText
-              variant="caption"
-              style={[s.tabText, on && s.tabTextOn]}
-            >
+            <AppText variant="bodySmall" style={[s.tabText, on && s.tabTextOn]}>
               {tab.label}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         );
       })}
@@ -147,12 +144,12 @@ export function SearchScreen() {
     if (errorMessage) {
       return (
         <View style={s.centered}>
-          <EventlyText variant="h2" style={s.emptyTitle}>
+          <AppText variant="h2" style={s.emptyTitle}>
             {COPY.errorTitle}
-          </EventlyText>
-          <EventlyText variant="body" style={s.errorText}>
+          </AppText>
+          <AppText variant="body" style={s.errorText}>
             {errorMessage}
-          </EventlyText>
+          </AppText>
           <TouchableOpacity
             style={s.retryButton}
             activeOpacity={0.8}
@@ -160,9 +157,9 @@ export function SearchScreen() {
             accessibilityRole="button"
           >
             <EventlyIcon name="refresh" size={16} color={SEARCH_ACCENT} />
-            <EventlyText variant="caption" style={s.retryText}>
+            <AppText variant="caption" style={s.retryText}>
               {COPY.retry}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       );
@@ -176,12 +173,12 @@ export function SearchScreen() {
           <View style={s.centeredIcon}>
             <EventlyIcon name="magnify" size={28} color={SEARCH_ACCENT} />
           </View>
-          <EventlyText variant="h2" style={s.emptyTitle}>
+          <AppText variant="h2" style={s.emptyTitle}>
             {COPY.idleTitle}
-          </EventlyText>
-          <EventlyText variant="body" style={s.emptyBody}>
+          </AppText>
+          <AppText variant="body" style={s.emptyBody}>
             {COPY.idleBody}
-          </EventlyText>
+          </AppText>
         </View>
       );
     }
@@ -189,12 +186,12 @@ export function SearchScreen() {
     if (results.total === 0) {
       return (
         <View style={s.centered}>
-          <EventlyText variant="h2" style={s.emptyTitle}>
+          <AppText variant="h2" style={s.emptyTitle}>
             {COPY.emptyTitle}
-          </EventlyText>
-          <EventlyText variant="body" style={s.emptyBody}>
+          </AppText>
+          <AppText variant="body" style={s.emptyBody}>
             {COPY.emptyBody}
-          </EventlyText>
+          </AppText>
         </View>
       );
     }

@@ -1,6 +1,6 @@
 import { TouchableOpacity, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
-import { CornerBloom, EventlyIcon, EventlyText } from '../../../Components';
+import { CornerBloom, EventlyIcon, AppText } from '../../../Components';
 import { colors } from '../../../theme';
 import {
   IDEA_TYPE_META,
@@ -11,7 +11,6 @@ import {
 } from '../constants';
 import { ideasCardStyles as c } from '../styles';
 import type { IdeaCounts, IdeaDTO } from '../types';
-
 
 interface IdeasSummaryProps {
   counts: IdeaCounts | null;
@@ -33,15 +32,20 @@ interface IdeasSummaryProps {
  * many are waiting on the customer's sign-off. Before anything has been
  * shared it says what the board is for instead of reporting three zeros.
  */
-export function IdeasSummary({ counts, organizerName, latest, onPress }: IdeasSummaryProps) {
+export function IdeasSummary({
+  counts,
+  organizerName,
+  latest,
+  onPress,
+}: IdeasSummaryProps) {
   const organizer = organizerName ?? 'your organizer';
   const shared = counts?.shared ?? 0;
   const started = shared > 0;
 
   const body = started
-    ? `${shared} ${shared === 1 ? 'idea' : 'ideas'} shared · ${counts?.planned ?? 0} planned · ${
-        counts?.awaitingApproval ?? 0
-      } awaiting your approval`
+    ? `${shared} ${shared === 1 ? 'idea' : 'ideas'} shared · ${
+        counts?.planned ?? 0
+      } planned · ${counts?.awaitingApproval ?? 0} awaiting your approval`
     : WORKSPACE_COPY.ideasBlurb;
 
   const meta = latest ? IDEA_TYPE_META[latest.type] : null;
@@ -57,11 +61,13 @@ export function IdeasSummary({ counts, organizerName, latest, onPress }: IdeasSu
       activeOpacity={0.85}
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`${started ? 'Open' : 'Start'} the ideas and planning board`}
+      accessibilityLabel={`${
+        started ? 'Open' : 'Start'
+      } the ideas and planning board`}
     >
-      <EventlyText variant="subtitle" style={c.ctaText}>
+      <AppText variant="buttonSmall" style={c.ctaText}>
         {started ? WORKSPACE_COPY.ideasOpen : WORKSPACE_COPY.ideasStart}
-      </EventlyText>
+      </AppText>
       <EventlyIcon name="chevron-right" size={16} color={colors.onPrimary} />
     </TouchableOpacity>
   );
@@ -82,20 +88,28 @@ export function IdeasSummary({ counts, organizerName, latest, onPress }: IdeasSu
         </Svg>
       </View>
       <View style={c.bloom} pointerEvents="none">
-        <CornerBloom size={120} petal={WORKSPACE_ACCENT} stem={WORKSPACE_GREEN} />
+        <CornerBloom
+          size={120}
+          petal={WORKSPACE_ACCENT}
+          stem={WORKSPACE_GREEN}
+        />
       </View>
 
       <View style={c.row}>
         <View style={c.badge}>
-          <EventlyIcon name="lightbulb-on-outline" size={24} color={WORKSPACE_ACCENT} />
+          <EventlyIcon
+            name="lightbulb-on-outline"
+            size={24}
+            color={WORKSPACE_ACCENT}
+          />
         </View>
         <View style={c.text}>
-          <EventlyText variant="h2" style={c.title}>
+          <AppText variant="h3" style={c.title}>
             {WORKSPACE_COPY.ideas}
-          </EventlyText>
-          <EventlyText variant="caption" style={c.body}>
+          </AppText>
+          <AppText variant="caption" style={c.body}>
             {body}
-          </EventlyText>
+          </AppText>
         </View>
         {latest ? null : explore}
       </View>
@@ -113,26 +127,37 @@ export function IdeasSummary({ counts, organizerName, latest, onPress }: IdeasSu
           <View style={c.latestHead}>
             <View style={[c.typeChip, { backgroundColor: meta.bg }]}>
               <EventlyIcon name={meta.icon} size={12} color={meta.color} />
-              <EventlyText variant="caption" style={[c.typeChipText, { color: meta.color }]}>
+              <AppText
+                variant="label"
+                style={[c.typeChipText, { color: meta.color }]}
+              >
                 {meta.label}
-              </EventlyText>
+              </AppText>
             </View>
-            <EventlyText variant="caption" style={c.latestWhen}>
+            <AppText variant="caption" style={c.latestWhen}>
               {relativeTime(latest.createdAt)}
-            </EventlyText>
+            </AppText>
           </View>
 
-          <EventlyText variant="body" style={c.latestText} numberOfLines={3}>
+          <AppText variant="bodySmall" style={c.latestText} numberOfLines={3}>
             {latest.text}
-          </EventlyText>
+          </AppText>
 
           <View style={c.latestFoot}>
             <EventlyIcon
-              name={latest.approval === 'approved' ? 'check-circle' : 'clock-outline'}
+              name={
+                latest.approval === 'approved'
+                  ? 'check-circle'
+                  : 'clock-outline'
+              }
               size={13}
-              color={latest.approval === 'approved' ? WORKSPACE_GREEN : colors.textMuted}
+              color={
+                latest.approval === 'approved'
+                  ? WORKSPACE_GREEN
+                  : colors.textMuted
+              }
             />
-            <EventlyText
+            <AppText
               variant="caption"
               style={[
                 c.latestFootText,
@@ -143,7 +168,7 @@ export function IdeasSummary({ counts, organizerName, latest, onPress }: IdeasSu
               {latest.approval === 'none'
                 ? `From ${latest.authorName || organizer}`
                 : latest.approvalLabel}
-            </EventlyText>
+            </AppText>
           </View>
         </View>
       ) : null}

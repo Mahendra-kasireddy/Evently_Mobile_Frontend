@@ -1,11 +1,37 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Image, Modal, Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
-import { EventlyButton, EventlyIcon, EventlyText, EventlyTextInput } from '../../../Components';
-import { MAX_ORGANIZERS, PLAN_ACCENT, PLAN_GREEN, PLAN_NAVY, PLAN_TEXT_MUTED, SORT_OPTIONS } from '../constants';
+import {
+  ActivityIndicator,
+  Image,
+  Modal,
+  Pressable,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {
+  EventlyButton,
+  EventlyIcon,
+  AppText,
+  EventlyTextInput,
+} from '../../../Components';
+import {
+  MAX_ORGANIZERS,
+  PLAN_ACCENT,
+  PLAN_GREEN,
+  PLAN_NAVY,
+  PLAN_TEXT_MUTED,
+  SORT_OPTIONS,
+} from '../constants';
 import { filterModalStyles, organizersStyles } from '../styles';
 import { colors } from '../../../theme';
 import { ratingThreshold } from '../utils';
-import type { PlanDraft, PlanFiltersDTO, PlanOrganizerDTO, RecommendationArgs, RecommendationSort } from '../types';
+import type {
+  PlanDraft,
+  PlanFiltersDTO,
+  PlanOrganizerDTO,
+  RecommendationArgs,
+  RecommendationSort,
+} from '../types';
 
 interface FindOrganizersProps {
   filters: PlanFiltersDTO;
@@ -58,60 +84,91 @@ function OrganizerCard({
       ]}
     >
       {organizer.imageUrl ? (
-        <Image source={{ uri: organizer.imageUrl }} style={organizersStyles.photo} resizeMode="cover" />
+        <Image
+          source={{ uri: organizer.imageUrl }}
+          style={organizersStyles.photo}
+          resizeMode="cover"
+        />
       ) : (
-        <View style={[organizersStyles.photo, organizersStyles.photoFallback, { backgroundColor: organizer.avatarColor }]}>
-          <EventlyText variant="h2" style={organizersStyles.photoInitials}>
+        <View
+          style={[
+            organizersStyles.photo,
+            organizersStyles.photoFallback,
+            { backgroundColor: organizer.avatarColor },
+          ]}
+        >
+          <AppText variant="h2" style={organizersStyles.photoInitials}>
             {organizer.initials}
-          </EventlyText>
+          </AppText>
         </View>
       )}
 
       <View style={organizersStyles.body}>
         {organizer.concierge ? (
           <View style={organizersStyles.conciergePill}>
-            <EventlyIcon name="shield-star-outline" size={10} color={colors.onPrimary} />
-            <EventlyText variant="caption" style={organizersStyles.conciergeText}>
+            <EventlyIcon
+              name="shield-star-outline"
+              size={10}
+              color={colors.onPrimary}
+            />
+            <AppText variant="label" style={organizersStyles.conciergeText}>
               Evently Managed
-            </EventlyText>
+            </AppText>
           </View>
         ) : organizer.verified ? (
           <View style={organizersStyles.verifiedPill}>
             <EventlyIcon name="shield-check" size={10} color={PLAN_GREEN} />
-            <EventlyText variant="caption" style={organizersStyles.verifiedText}>
+            <AppText variant="label" style={organizersStyles.verifiedText}>
               Verified
-            </EventlyText>
+            </AppText>
           </View>
         ) : null}
 
-        <EventlyText variant="subtitle" style={organizersStyles.name} numberOfLines={1}>
+        <AppText
+          variant="body"
+          weight="medium"
+          style={organizersStyles.name}
+          numberOfLines={1}
+        >
           {organizer.name}
-        </EventlyText>
+        </AppText>
 
         <View style={organizersStyles.ratingRow}>
           <EventlyIcon name="star" size={13} color={colors.accent} />
-          <EventlyText variant="caption" style={organizersStyles.ratingText}>
+          <AppText variant="caption" style={organizersStyles.ratingText}>
             {organizer.rating}
-          </EventlyText>
-          <EventlyText variant="caption" style={organizersStyles.reviewsText}>
+          </AppText>
+          <AppText variant="caption" style={organizersStyles.reviewsText}>
             ({organizer.reviews})
-          </EventlyText>
+          </AppText>
         </View>
 
         <View style={organizersStyles.locationRow}>
-          <EventlyIcon name="map-marker-outline" size={12} color={PLAN_TEXT_MUTED} />
-          <EventlyText variant="caption" style={organizersStyles.metaText} numberOfLines={1}>
+          <EventlyIcon
+            name="map-marker-outline"
+            size={12}
+            color={PLAN_TEXT_MUTED}
+          />
+          <AppText
+            variant="caption"
+            style={organizersStyles.metaText}
+            numberOfLines={1}
+          >
             {organizer.location}
-          </EventlyText>
+          </AppText>
         </View>
 
         {organizer.tags.length > 0 ? (
           <View style={organizersStyles.tagRow}>
-            {organizer.tags.slice(0, 3).map((tag) => (
+            {organizer.tags.slice(0, 3).map(tag => (
               <View key={tag} style={organizersStyles.tag}>
-                <EventlyText variant="caption" style={organizersStyles.tagText} numberOfLines={1}>
+                <AppText
+                  variant="label"
+                  style={organizersStyles.tagText}
+                  numberOfLines={1}
+                >
                   {tag}
-                </EventlyText>
+                </AppText>
               </View>
             ))}
           </View>
@@ -123,19 +180,31 @@ function OrganizerCard({
           onPress={onToggleFavourite}
           hitSlop={8}
           accessibilityRole="button"
-          accessibilityLabel={isFavourite ? `Remove ${organizer.name} from favourites` : `Save ${organizer.name}`}
+          accessibilityLabel={
+            isFavourite
+              ? `Remove ${organizer.name} from favourites`
+              : `Save ${organizer.name}`
+          }
         >
-          <EventlyIcon name={isFavourite ? 'heart' : 'heart-outline'} size={20} color={PLAN_ACCENT} />
+          <EventlyIcon
+            name={isFavourite ? 'heart' : 'heart-outline'}
+            size={20}
+            color={PLAN_ACCENT}
+          />
         </TouchableOpacity>
 
         {unavailable ? (
-          <EventlyText variant="caption" style={organizersStyles.unavailText}>
+          <AppText variant="caption" style={organizersStyles.unavailText}>
             Booked on{'\n'}your date
-          </EventlyText>
+          </AppText>
         ) : (
-          <EventlyText variant="subtitle" style={organizersStyles.price} numberOfLines={1}>
+          <AppText
+            variant="bodySmall"
+            style={organizersStyles.price}
+            numberOfLines={1}
+          >
             {formatStartingPrice(organizer)}
-          </EventlyText>
+          </AppText>
         )}
 
         <TouchableOpacity
@@ -150,13 +219,19 @@ function OrganizerCard({
           accessibilityState={{ checked: isSelected, disabled: blocked }}
           accessibilityLabel={`Request quote from ${organizer.name}`}
         >
-          {isSelected ? <EventlyIcon name="check" size={12} color={colors.onPrimary} /> : null}
-          <EventlyText
+          {isSelected ? (
+            <EventlyIcon name="check" size={12} color={colors.onPrimary} />
+          ) : null}
+          <AppText
             variant="caption"
-            style={isSelected ? organizersStyles.quoteButtonTextOn : organizersStyles.quoteButtonText}
+            style={
+              isSelected
+                ? organizersStyles.quoteButtonTextOn
+                : organizersStyles.quoteButtonText
+            }
           >
             {isSelected ? 'Added' : 'Request Quote'}
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
       </View>
     </View>
@@ -187,68 +262,117 @@ function FilterModal({
   onClear: () => void;
 }) {
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+    >
       <Pressable style={filterModalStyles.overlay} onPress={onClose}>
         <Pressable style={filterModalStyles.card} onPress={() => undefined}>
           <View style={filterModalStyles.headRow}>
-            <EventlyText variant="h2" style={filterModalStyles.title}>
+            <AppText variant="h2" style={filterModalStyles.title}>
               Filters
-            </EventlyText>
-            <TouchableOpacity style={filterModalStyles.closeButton} onPress={onClose} accessibilityLabel="Close filters">
+            </AppText>
+            <TouchableOpacity
+              style={filterModalStyles.closeButton}
+              onPress={onClose}
+              accessibilityLabel="Close filters"
+            >
               <EventlyIcon name="close" size={18} color={PLAN_NAVY} />
             </TouchableOpacity>
           </View>
           <ScrollView keyboardShouldPersistTaps="handled">
-            <EventlyText variant="caption" style={filterModalStyles.groupLabel}>
+            <AppText variant="caption" style={filterModalStyles.groupLabel}>
               BADGE TIER
-            </EventlyText>
-            {filters.tiers.map((tier) => {
+            </AppText>
+            {filters.tiers.map(tier => {
               const on = tiers.includes(tier);
               return (
-                <TouchableOpacity key={tier} style={filterModalStyles.checkRow} onPress={() => onToggleTier(tier)}>
-                  <View style={[filterModalStyles.checkbox, on && filterModalStyles.checkboxOn]}>
-                    {on ? <EventlyIcon name="check" size={12} color={colors.onPrimary} /> : null}
+                <TouchableOpacity
+                  key={tier}
+                  style={filterModalStyles.checkRow}
+                  onPress={() => onToggleTier(tier)}
+                >
+                  <View
+                    style={[
+                      filterModalStyles.checkbox,
+                      on && filterModalStyles.checkboxOn,
+                    ]}
+                  >
+                    {on ? (
+                      <EventlyIcon
+                        name="check"
+                        size={12}
+                        color={colors.onPrimary}
+                      />
+                    ) : null}
                   </View>
-                  <EventlyText variant="body" style={filterModalStyles.checkLabel}>
+                  <AppText variant="body" style={filterModalStyles.checkLabel}>
                     {tier}
-                  </EventlyText>
+                  </AppText>
                 </TouchableOpacity>
               );
             })}
 
-            <EventlyText variant="caption" style={filterModalStyles.groupLabel}>
+            <AppText variant="caption" style={filterModalStyles.groupLabel}>
               MINIMUM RATING
-            </EventlyText>
+            </AppText>
             <View style={filterModalStyles.pillRow}>
-              {filters.ratings.map((r) => {
+              {filters.ratings.map(r => {
                 const on = r === rating;
                 return (
                   <TouchableOpacity
                     key={r}
-                    style={[filterModalStyles.pill, on && filterModalStyles.pillOn]}
+                    style={[
+                      filterModalStyles.pill,
+                      on && filterModalStyles.pillOn,
+                    ]}
                     onPress={() => onSelectRating(on ? '' : r)}
                   >
-                    <EventlyText variant="body" style={on ? filterModalStyles.pillTextOn : filterModalStyles.pillText}>
+                    <AppText
+                      variant="body"
+                      style={
+                        on
+                          ? filterModalStyles.pillTextOn
+                          : filterModalStyles.pillText
+                      }
+                    >
                       {r}
-                    </EventlyText>
+                    </AppText>
                   </TouchableOpacity>
                 );
               })}
             </View>
 
-            <EventlyText variant="caption" style={filterModalStyles.groupLabel}>
+            <AppText variant="caption" style={filterModalStyles.groupLabel}>
               CATEGORIES
-            </EventlyText>
-            {filters.categories.map((category) => {
+            </AppText>
+            {filters.categories.map(category => {
               const on = categoryFilters.includes(category);
               return (
-                <TouchableOpacity key={category} style={filterModalStyles.checkRow} onPress={() => onToggleCategory(category)}>
-                  <View style={[filterModalStyles.checkbox, on && filterModalStyles.checkboxOn]}>
-                    {on ? <EventlyIcon name="check" size={12} color={colors.onPrimary} /> : null}
+                <TouchableOpacity
+                  key={category}
+                  style={filterModalStyles.checkRow}
+                  onPress={() => onToggleCategory(category)}
+                >
+                  <View
+                    style={[
+                      filterModalStyles.checkbox,
+                      on && filterModalStyles.checkboxOn,
+                    ]}
+                  >
+                    {on ? (
+                      <EventlyIcon
+                        name="check"
+                        size={12}
+                        color={colors.onPrimary}
+                      />
+                    ) : null}
                   </View>
-                  <EventlyText variant="body" style={filterModalStyles.checkLabel}>
+                  <AppText variant="body" style={filterModalStyles.checkLabel}>
                     {category}
-                  </EventlyText>
+                  </AppText>
                 </TouchableOpacity>
               );
             })}
@@ -261,7 +385,12 @@ function FilterModal({
               style={filterModalStyles.clearButton}
               accentColor={PLAN_ACCENT}
             />
-            <EventlyButton title="Done" onPress={onClose} style={filterModalStyles.applyButton} accentColor={PLAN_ACCENT} />
+            <EventlyButton
+              title="Done"
+              onPress={onClose}
+              style={filterModalStyles.applyButton}
+              accentColor={PLAN_ACCENT}
+            />
           </View>
         </Pressable>
       </Pressable>
@@ -286,7 +415,9 @@ export function FindOrganizers({
   // Session-only for now: there is no saved-organizers API yet.
   const [favourites, setFavourites] = useState<string[]>([]);
   const toggleFavourite = (id: string) =>
-    setFavourites((prev) => (prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]));
+    setFavourites(prev =>
+      prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id],
+    );
 
   const [organizers, setOrganizers] = useState<PlanOrganizerDTO[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -306,10 +437,12 @@ export function FindOrganizers({
       sort,
       minRating: rating ? ratingThreshold(rating) : undefined,
       tiers: tiers.length ? tiers : undefined,
-      requireCategories: categoryFilters.length ? categoryFilters.map((c) => c.toLowerCase()) : undefined,
+      requireCategories: categoryFilters.length
+        ? categoryFilters.map(c => c.toLowerCase())
+        : undefined,
     };
     searchOrganizers(args)
-      .then((result) => {
+      .then(result => {
         if (requestIdRef.current === requestId) {
           setOrganizers(result);
           setIsLoading(false);
@@ -343,17 +476,27 @@ export function FindOrganizers({
     setSort('best');
   };
 
-  const toggleTier = (tier: string) => setTiers((prev) => (prev.includes(tier) ? prev.filter((t) => t !== tier) : [...prev, tier]));
+  const toggleTier = (tier: string) =>
+    setTiers(prev =>
+      prev.includes(tier) ? prev.filter(t => t !== tier) : [...prev, tier],
+    );
   const toggleCategoryFilter = (category: string) =>
-    setCategoryFilters((prev) => (prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]));
+    setCategoryFilters(prev =>
+      prev.includes(category)
+        ? prev.filter(c => c !== category)
+        : [...prev, category],
+    );
 
-  const activeFilterCount = tiers.length + (rating ? 1 : 0) + categoryFilters.length;
+  const activeFilterCount =
+    tiers.length + (rating ? 1 : 0) + categoryFilters.length;
   const selectedCount = selectedOrganizerIds.length;
 
   const query = search.trim().toLowerCase();
   const visibleOrganizers = query
-    ? organizers.filter((o) =>
-        [o.name, o.location, ...o.tags].some((field) => field.toLowerCase().includes(query)),
+    ? organizers.filter(o =>
+        [o.name, o.location, ...o.tags].some(field =>
+          field.toLowerCase().includes(query),
+        ),
       )
     : organizers;
 
@@ -373,10 +516,20 @@ export function FindOrganizers({
           style={organizersStyles.filterIcon}
           onPress={() => setFilterModalVisible(true)}
           accessibilityRole="button"
-          accessibilityLabel={activeFilterCount > 0 ? `Filters, ${activeFilterCount} on` : 'Filters'}
+          accessibilityLabel={
+            activeFilterCount > 0
+              ? `Filters, ${activeFilterCount} on`
+              : 'Filters'
+          }
         >
-          <EventlyIcon name="tune-variant" size={20} color={activeFilterCount > 0 ? PLAN_ACCENT : PLAN_NAVY} />
-          {activeFilterCount > 0 ? <View style={organizersStyles.filterDot} /> : null}
+          <EventlyIcon
+            name="tune-variant"
+            size={20}
+            color={activeFilterCount > 0 ? PLAN_ACCENT : PLAN_NAVY}
+          />
+          {activeFilterCount > 0 ? (
+            <View style={organizersStyles.filterDot} />
+          ) : null}
         </TouchableOpacity>
       </View>
 
@@ -386,18 +539,34 @@ export function FindOrganizers({
         style={organizersStyles.sortRow}
         contentContainerStyle={organizersStyles.sortRowContent}
       >
-        {SORT_OPTIONS.map((option) => {
+        {SORT_OPTIONS.map(option => {
           const on = option.value === sort;
           return (
             <TouchableOpacity
               key={option.value}
-              style={[organizersStyles.sortChip, on && organizersStyles.sortChipActive]}
+              style={[
+                organizersStyles.sortChip,
+                on && organizersStyles.sortChipActive,
+              ]}
               onPress={() => setSort(option.value)}
             >
-              {on ? <EventlyIcon name="star-outline" size={13} color={colors.onPrimary} /> : null}
-              <EventlyText variant="caption" style={on ? organizersStyles.sortChipTextActive : organizersStyles.sortChipText}>
+              {on ? (
+                <EventlyIcon
+                  name="star-outline"
+                  size={13}
+                  color={colors.onPrimary}
+                />
+              ) : null}
+              <AppText
+                variant="caption"
+                style={
+                  on
+                    ? organizersStyles.sortChipTextActive
+                    : organizersStyles.sortChipText
+                }
+              >
                 {option.label}
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
           );
         })}
@@ -406,32 +575,42 @@ export function FindOrganizers({
       {/* Says up front that one brief can go to several organizers — each
           quotes separately, so the customer can compare. */}
       <View style={organizersStyles.multiHint}>
-        <EventlyIcon name="account-multiple-plus-outline" size={16} color={PLAN_ACCENT} />
-        <EventlyText variant="caption" style={organizersStyles.multiHintText}>
+        <EventlyIcon
+          name="account-multiple-plus-outline"
+          size={16}
+          color={PLAN_ACCENT}
+        />
+        <AppText variant="caption" style={organizersStyles.multiHintText}>
           {selectedCount > 0
-            ? `${selectedCount} of ${MAX_ORGANIZERS} selected \u00b7 ${canAddOrganizer ? 'add more to compare quotes' : 'that is the most one request can go to'}`
+            ? `${selectedCount} of ${MAX_ORGANIZERS} selected \u00b7 ${
+                canAddOrganizer
+                  ? 'add more to compare quotes'
+                  : 'that is the most one request can go to'
+              }`
             : `Request quotes from up to ${MAX_ORGANIZERS} organizers at once and compare.`}
-        </EventlyText>
+        </AppText>
       </View>
 
       {isLoading ? (
         <View style={organizersStyles.loading}>
           <ActivityIndicator color={PLAN_ACCENT} />
-          <EventlyText variant="caption" style={organizersStyles.metaText}>
+          <AppText variant="caption" style={organizersStyles.metaText}>
             Finding organizers…
-          </EventlyText>
+          </AppText>
         </View>
       ) : visibleOrganizers.length === 0 ? (
         <View style={organizersStyles.emptyState}>
           <EventlyIcon name="magnify-close" size={40} color={PLAN_TEXT_MUTED} />
-          <EventlyText variant="subtitle" style={organizersStyles.emptyTitle}>
-            {query ? `No organizers match \u201c${search.trim()}\u201d` : 'No organizers match your event yet'}
-          </EventlyText>
-          <EventlyText variant="body" style={organizersStyles.emptyMessage}>
+          <AppText variant="h2" style={organizersStyles.emptyTitle}>
+            {query
+              ? `No organizers match \u201c${search.trim()}\u201d`
+              : 'No organizers match your event yet'}
+          </AppText>
+          <AppText variant="body" style={organizersStyles.emptyMessage}>
             {query
               ? 'Try a different name, service or location.'
               : 'We couldn\u2019t find organizers for these services in your city. Try broadening your categories or checking back soon.'}
-          </EventlyText>
+          </AppText>
           <EventlyButton
             title={query ? 'Clear search' : 'Clear filters'}
             onPress={query ? () => setSearch('') : clearFilters}
@@ -442,7 +621,7 @@ export function FindOrganizers({
         </View>
       ) : (
         <View style={organizersStyles.list}>
-          {visibleOrganizers.map((organizer) => (
+          {visibleOrganizers.map(organizer => (
             <OrganizerCard
               key={organizer.id}
               organizer={organizer}

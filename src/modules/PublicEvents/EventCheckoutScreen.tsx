@@ -1,6 +1,10 @@
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
-import { CommonActions, useNavigation, useRoute } from '@react-navigation/native';
+import {
+  CommonActions,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import {
   ActivityIndicator,
   ScrollView,
@@ -11,7 +15,7 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
+import { AppHeader, EventlyIcon, AppText } from '../../Components';
 import type { RootStackParamList } from '../../navigation/types';
 import { PUBLIC_EVENTS_COPY, formatPrice, initialsOf } from './constants';
 import { useCustomerContact, useEventDetail } from './hooks';
@@ -26,12 +30,12 @@ type Route = RouteProp<RootStackParamList, 'EventCheckout'>;
 function KeyValue({ k, v }: { k: string; v: string }) {
   return (
     <View style={s.kv}>
-      <EventlyText variant="caption" style={s.key}>
+      <AppText variant="bodySmall" style={s.key}>
         {k}
-      </EventlyText>
-      <EventlyText variant="caption" style={s.value}>
+      </AppText>
+      <AppText variant="bodySmall" style={s.value}>
         {v}
-      </EventlyText>
+      </AppText>
     </View>
   );
 }
@@ -67,13 +71,13 @@ export function EventCheckoutScreen() {
       <SafeAreaView style={ui.screen} edges={['top']}>
         <AppHeader title="Checkout" onBackPress={navigation.goBack} />
         <View style={ui.centre}>
-          <EventlyText variant="body" style={ui.muted}>
+          <AppText variant="body" style={ui.muted}>
             {error?.message ?? 'That ticket is no longer available.'}
-          </EventlyText>
+          </AppText>
           <TouchableOpacity style={[ui.outline, ui.retry]} onPress={refetch}>
-            <EventlyText variant="body" style={ui.outlineText}>
+            <AppText variant="body" style={ui.outlineText}>
               {PUBLIC_EVENTS_COPY.retry}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -111,7 +115,11 @@ export function EventCheckoutScreen() {
           r => r.name !== 'EventTicketSelection' && r.name !== 'EventCheckout',
         );
         const routes = [...kept, success];
-        return CommonActions.reset({ ...state, routes, index: routes.length - 1 });
+        return CommonActions.reset({
+          ...state,
+          routes,
+          index: routes.length - 1,
+        });
       });
     }
   };
@@ -124,9 +132,9 @@ export function EventCheckoutScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={ui.card}>
-          <EventlyText variant="subtitle" style={ui.cardTitle}>
+          <AppText variant="body" style={ui.cardTitle}>
             Event Details
-          </EventlyText>
+          </AppText>
           <EventMini
             coverUrl={data.coverUrl}
             title={data.title}
@@ -137,68 +145,60 @@ export function EventCheckoutScreen() {
         </View>
 
         <View style={ui.card}>
-          <EventlyText variant="subtitle" style={ui.cardTitle}>
+          <AppText variant="body" style={ui.cardTitle}>
             Ticket Details
-          </EventlyText>
+          </AppText>
           <KeyValue k={ticket.name} v={formatPrice(ticket.price)} />
           <KeyValue k="Quantity" v={String(quantity)} />
         </View>
 
         <View style={ui.card}>
-          <EventlyText variant="subtitle" style={ui.cardTitle}>
+          <AppText variant="body" style={ui.cardTitle}>
             Customer Details
-          </EventlyText>
+          </AppText>
           <View style={s.customer}>
             <View style={s.avatar}>
-              <EventlyText variant="caption" style={s.avatarText}>
+              <AppText variant="bodySmall" style={s.avatarText}>
                 {initialsOf(person.name ?? '')}
-              </EventlyText>
+              </AppText>
             </View>
             <View style={ui.flex}>
-              <EventlyText
-                variant="body"
-                style={s.customerName}
-                numberOfLines={1}
-              >
+              <AppText variant="body" style={s.customerName} numberOfLines={1}>
                 {person.name || 'You'}
-              </EventlyText>
+              </AppText>
               {person.email || person.phone ? (
-                <EventlyText
-                  variant="caption"
-                  style={ui.muted}
-                  numberOfLines={1}
-                >
+                <AppText variant="caption" style={ui.muted} numberOfLines={1}>
                   {person.email || person.phone}
-                </EventlyText>
+                </AppText>
               ) : null}
             </View>
           </View>
         </View>
 
         <View style={ui.card}>
-          <EventlyText variant="subtitle" style={ui.cardTitle}>
+          <AppText variant="body" style={ui.cardTitle}>
             Price Summary
-          </EventlyText>
+          </AppText>
           <KeyValue
             k={`Subtotal (${quantity} × ${formatPrice(ticket.price)})`}
             v={formatPrice(total)}
           />
           <View style={ui.divider} />
           <View style={sum.sumRow}>
-            <EventlyText variant="body" style={sum.totalLabel}>
+            <AppText variant="h3" style={sum.totalLabel}>
               Total Amount
-            </EventlyText>
-            <EventlyText variant="body" style={sum.totalValue}>
+            </AppText>
+            <AppText variant="h3" style={sum.totalValue}>
               {formatPrice(total)}
-            </EventlyText>
+            </AppText>
           </View>
         </View>
 
         {free ? null : (
           <View style={ui.card}>
-            <EventlyText variant="subtitle" style={ui.cardTitle}>
+            <AppText variant="body" style={ui.cardTitle}>
               Payment Method
-            </EventlyText>
+            </AppText>
             <View style={s.method}>
               <View style={s.methodIcon}>
                 <EventlyIcon
@@ -208,12 +208,12 @@ export function EventCheckoutScreen() {
                 />
               </View>
               <View style={s.methodText}>
-                <EventlyText variant="body" style={s.methodTitle}>
+                <AppText variant="bodySmall" style={s.methodTitle}>
                   UPI / Cards / Netbanking
-                </EventlyText>
-                <EventlyText variant="caption" style={ui.muted}>
+                </AppText>
+                <AppText variant="caption" style={ui.muted}>
                   Secure payment via Razorpay
-                </EventlyText>
+                </AppText>
               </View>
               <EventlyIcon
                 name="shield-check-outline"
@@ -225,9 +225,9 @@ export function EventCheckoutScreen() {
         )}
 
         {purchase.error ? (
-          <EventlyText variant="caption" style={ui.error}>
+          <AppText variant="caption" style={ui.error}>
             {purchase.error}
-          </EventlyText>
+          </AppText>
         ) : null}
       </ScrollView>
 
@@ -244,9 +244,9 @@ export function EventCheckoutScreen() {
           {purchase.busy ? (
             <ActivityIndicator color="#ffffff" />
           ) : (
-            <EventlyText variant="body" style={ui.primaryText}>
+            <AppText variant="h3" style={ui.primaryText}>
               {free ? 'Confirm Booking' : `Pay ${formatPrice(total)}`}
-            </EventlyText>
+            </AppText>
           )}
         </TouchableOpacity>
       </View>

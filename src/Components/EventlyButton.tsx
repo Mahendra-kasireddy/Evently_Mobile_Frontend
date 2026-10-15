@@ -5,7 +5,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { colors } from '../theme';
-import { EventlyText } from './EventlyText';
+import { AppText } from './AppText';
 import { eventlyButtonStyles } from './styles';
 
 export type EventlyButtonVariant = 'primary' | 'outline' | 'danger';
@@ -72,12 +72,12 @@ export function EventlyButton({
           }
         />
       ) : (
-        <EventlyText
+        <AppText
           variant="button"
           style={[TEXT_STYLE_BY_VARIANT[variant], accentTextStyle]}
         >
           {title}
-        </EventlyText>
+        </AppText>
       )}
     </TouchableOpacity>
   );

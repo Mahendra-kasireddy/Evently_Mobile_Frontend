@@ -1,5 +1,5 @@
-import { Text, TouchableOpacity, View } from 'react-native';
-import { EventlyText } from '../../../Components';
+import { TouchableOpacity, View } from 'react-native';
+import { AppText } from '../../../Components';
 import { sectionStyles as s } from '../styles';
 
 interface SectionHeadProps {
@@ -36,9 +36,14 @@ export function SectionHead({
     <View>
       <View style={s.headRow}>
         <View style={s.headLeft}>
-          <Text style={s.title} numberOfLines={1} accessibilityRole="header">
+          <AppText
+            variant="h3"
+            style={s.title}
+            numberOfLines={1}
+            accessibilityRole="header"
+          >
             {title}
-          </Text>
+          </AppText>
         </View>
         {actionLabel ? (
           onPressAction ? (
@@ -49,19 +54,21 @@ export function SectionHead({
               accessibilityLabel={`${actionLabel}: ${title}`}
               testID={testID}
             >
-              <EventlyText style={s.action}>{actionLabel}</EventlyText>
+              <AppText variant="bodySmall" style={s.action}>
+                {actionLabel}
+              </AppText>
             </TouchableOpacity>
           ) : (
-            <EventlyText style={[s.action, s.actionStatic]}>
+            <AppText variant="bodySmall" style={[s.action, s.actionStatic]}>
               {actionLabel}
-            </EventlyText>
+            </AppText>
           )
         ) : null}
       </View>
       {subtitle ? (
-        <EventlyText variant="body" style={s.subtitle}>
+        <AppText variant="bodySmall" style={s.subtitle}>
           {subtitle}
-        </EventlyText>
+        </AppText>
       ) : null}
     </View>
   );

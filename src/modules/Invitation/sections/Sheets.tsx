@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { colors } from '../../../theme';
 import {
   INVITATION_COPY as COPY,
@@ -86,9 +86,9 @@ export function MenuSheet({
 }: MenuSheetProps) {
   return (
     <Sheet visible={visible} onClose={onClose}>
-      <EventlyText variant="h2" style={s.title}>
+      <AppText variant="h2" style={s.title}>
         {COPY.menuTitle}
-      </EventlyText>
+      </AppText>
 
       <TouchableOpacity
         style={sh.menuRow}
@@ -102,12 +102,12 @@ export function MenuSheet({
           <EventlyIcon name="eye-outline" size={19} color={INV_ACCENT} />
         </View>
         <View style={sh.menuText}>
-          <EventlyText variant="subtitle" style={sh.menuLabel}>
+          <AppText variant="label" style={sh.menuLabel}>
             {COPY.menuPreview}
-          </EventlyText>
-          <EventlyText variant="caption" style={sh.menuNote}>
+          </AppText>
+          <AppText variant="caption" style={sh.menuNote}>
             {COPY.menuPreviewNote}
-          </EventlyText>
+          </AppText>
         </View>
         <EventlyIcon name="chevron-right" size={18} color={INV_ACCENT} />
       </TouchableOpacity>
@@ -128,12 +128,12 @@ export function MenuSheet({
           />
         </View>
         <View style={sh.menuText}>
-          <EventlyText variant="subtitle" style={sh.menuLabel}>
+          <AppText variant="label" style={sh.menuLabel}>
             {COPY.menuGuests}
-          </EventlyText>
-          <EventlyText variant="caption" style={sh.menuNote}>
+          </AppText>
+          <AppText variant="caption" style={sh.menuNote}>
             {COPY.menuGuestsNote}
-          </EventlyText>
+          </AppText>
         </View>
         <EventlyIcon name="chevron-right" size={18} color={INV_ACCENT} />
       </TouchableOpacity>
@@ -185,12 +185,12 @@ export function PreviewSheet({
     <Sheet visible={visible} onClose={onClose}>
       <View style={p.head}>
         <View style={p.headText}>
-          <EventlyText variant="h2" style={p.title} numberOfLines={2}>
+          <AppText variant="h2" style={p.title} numberOfLines={2}>
             {block ? COPY.previewSectionTitle(block.title) : COPY.previewTitle}
-          </EventlyText>
+          </AppText>
           <View style={p.meta}>
             {block ? (
-              <EventlyText
+              <AppText
                 variant="caption"
                 style={
                   block.owner === 'customer' ? p.ownerCustomer : p.metaText
@@ -199,11 +199,11 @@ export function PreviewSheet({
                 {block.owner === 'customer'
                   ? COPY.previewOwnerCustomer
                   : COPY.previewOwnerOrganizer}
-              </EventlyText>
+              </AppText>
             ) : (
-              <EventlyText variant="caption" style={p.metaText}>
+              <AppText variant="caption" style={p.metaText}>
                 {invitation.blocks.filter(b => !b.hidden).length} sections
-              </EventlyText>
+              </AppText>
             )}
           </View>
         </View>
@@ -231,9 +231,9 @@ export function PreviewSheet({
           }
         >
           <EventlyIcon name="whatsapp" size={18} color={colors.onPrimary} />
-          <EventlyText variant="subtitle" style={p.shareText}>
+          <AppText variant="h3" style={p.shareText}>
             {block ? COPY.previewShareSection : COPY.previewShareAll}
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
       ) : (
         <View style={p.blockedNote}>
@@ -242,9 +242,9 @@ export function PreviewSheet({
             size={14}
             color={colors.textMuted}
           />
-          <EventlyText variant="caption" style={p.blockedText}>
+          <AppText variant="caption" style={p.blockedText}>
             {hidden ? COPY.previewShareHidden : COPY.previewShareNotApproved}
-          </EventlyText>
+          </AppText>
         </View>
       )}
     </Sheet>
@@ -276,16 +276,16 @@ export function RequestChangeSheet({
 
   return (
     <Sheet visible={visible} onClose={onClose}>
-      <EventlyText variant="h2" style={s.title}>
+      <AppText variant="h2" style={s.title}>
         {COPY.requestTitle}
-      </EventlyText>
-      <EventlyText variant="caption" style={s.subtitle}>
+      </AppText>
+      <AppText variant="caption" style={s.subtitle}>
         {blockTitle ? `${blockTitle} · ${COPY.requestSub}` : COPY.requestSub}
-      </EventlyText>
+      </AppText>
 
-      <EventlyText variant="body" style={s.label}>
+      <AppText variant="label" style={s.label}>
         {COPY.requestField}
-      </EventlyText>
+      </AppText>
       <TextInput
         style={[s.input, s.inputMultiline]}
         value={note}
@@ -298,9 +298,9 @@ export function RequestChangeSheet({
       />
 
       {errorMessage ? (
-        <EventlyText variant="caption" style={s.errorText}>
+        <AppText variant="caption" style={s.errorText}>
           {errorMessage}
-        </EventlyText>
+        </AppText>
       ) : null}
 
       <TouchableOpacity
@@ -314,9 +314,9 @@ export function RequestChangeSheet({
         {isSending ? (
           <ActivityIndicator size="small" color={colors.onPrimary} />
         ) : (
-          <EventlyText variant="subtitle" style={s.primaryText}>
+          <AppText variant="h3" style={s.primaryText}>
             {COPY.requestSend}
-          </EventlyText>
+          </AppText>
         )}
       </TouchableOpacity>
     </Sheet>
@@ -405,12 +405,12 @@ export function ShareSheet({
     <Sheet visible={visible} onClose={onClose}>
       <View style={s.shareHead}>
         <View style={s.shareHeadText}>
-          <EventlyText variant="h2" style={s.title}>
+          <AppText variant="h2" style={s.title}>
             {COPY.shareHeading(sectionTitle)}
-          </EventlyText>
-          <EventlyText variant="caption" style={s.subtitle}>
+          </AppText>
+          <AppText variant="caption" style={s.subtitle}>
             {COPY.shareLead}
-          </EventlyText>
+          </AppText>
         </View>
         <TouchableOpacity
           style={s.shareClose}
@@ -445,21 +445,21 @@ export function ShareSheet({
                     : INV_ACCENT
                 }
               />
-              <EventlyText variant="body" style={s.outcomeText}>
+              <AppText variant="body" style={s.outcomeText}>
                 {outcome.guest.name}
                 {outcome.status === 'failed'
                   ? ` — ${outcome.error || COPY.shareFailed}`
                   : ''}
-              </EventlyText>
+              </AppText>
               {outcome.status === 'handoff' && outcome.handoffUrl ? (
                 <TouchableOpacity
                   onPress={() => onOpenHandoff(outcome.handoffUrl as string)}
                   accessibilityRole="button"
                   accessibilityLabel={`${COPY.shareOpenWhatsapp} — ${outcome.guest.name}`}
                 >
-                  <EventlyText variant="caption" style={s.outcomeLink}>
+                  <AppText variant="caption" style={s.outcomeLink}>
                     {COPY.shareOpenWhatsapp}
-                  </EventlyText>
+                  </AppText>
                 </TouchableOpacity>
               ) : null}
             </View>
@@ -472,9 +472,9 @@ export function ShareSheet({
                 size={14}
                 color={colors.textMuted}
               />
-              <EventlyText variant="caption" style={s.caveatText}>
+              <AppText variant="caption" style={s.caveatText}>
                 {COPY.shareHandoff}
-              </EventlyText>
+              </AppText>
             </View>
           ) : null}
 
@@ -484,9 +484,9 @@ export function ShareSheet({
             onPress={onClose}
             accessibilityRole="button"
           >
-            <EventlyText variant="subtitle" style={s.primaryText}>
+            <AppText variant="h3" style={s.primaryText}>
               {COPY.shareDone}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </>
       ) : (
@@ -500,9 +500,9 @@ export function ShareSheet({
           />
 
           <View style={s.selectRow}>
-            <EventlyText variant="caption" style={s.selectCount}>
+            <AppText variant="caption" style={s.selectCount}>
               {COPY.shareSelected(selected.length)}
-            </EventlyText>
+            </AppText>
             {shown.length > 0 ? (
               <TouchableOpacity
                 onPress={toggleAll}
@@ -511,9 +511,9 @@ export function ShareSheet({
                   allShown ? COPY.shareClearAll : COPY.shareSelectAll
                 }
               >
-                <EventlyText variant="caption" style={s.selectAll}>
+                <AppText variant="caption" style={s.selectAll}>
                   {allShown ? COPY.shareClearAll : COPY.shareSelectAll}
-                </EventlyText>
+                </AppText>
               </TouchableOpacity>
             ) : null}
           </View>
@@ -525,12 +525,12 @@ export function ShareSheet({
               style={s.guestsLoading}
             />
           ) : shown.length === 0 ? (
-            <EventlyText variant="body" style={s.emptyGuests}>
+            <AppText variant="body" style={s.emptyGuests}>
               {/* Which empty is it — nobody at all, or nobody under this chip? */}
               {guests.length === 0
                 ? COPY.shareNoGuests
                 : COPY.shareEmptyGroup(activeLabel)}
-            </EventlyText>
+            </AppText>
           ) : (
             shown.map(guest => {
               const on = selected.includes(guest.id);
@@ -553,33 +553,33 @@ export function ShareSheet({
                       { backgroundColor: avatarColorFor(guest.name) },
                     ]}
                   >
-                    <EventlyText variant="caption" style={s.guestAvatarText}>
+                    <AppText variant="caption" style={s.guestAvatarText}>
                       {initialsOf(guest.name)}
-                    </EventlyText>
+                    </AppText>
                   </View>
                   <View style={s.guestText}>
-                    <EventlyText
+                    <AppText
                       variant="body"
                       style={s.guestName}
                       numberOfLines={1}
                     >
                       {guest.name}
-                    </EventlyText>
-                    <EventlyText
+                    </AppText>
+                    <AppText
                       variant="caption"
                       style={s.guestMeta}
                       numberOfLines={1}
                     >
                       {guest.phoneDisplay}
-                    </EventlyText>
+                    </AppText>
                   </View>
                   {/* Said on the row rather than as a badge column: it is the
                       one fact that changes whether ticking them again is a
                       duplicate message or a first one. */}
                   {already ? (
-                    <EventlyText variant="caption" style={s.guestSent}>
+                    <AppText variant="caption" style={s.guestSent}>
                       {COPY.shareAlreadySent}
-                    </EventlyText>
+                    </AppText>
                   ) : null}
                   <View style={[s.checkbox, on && s.checkboxOn]}>
                     {on ? (
@@ -601,15 +601,15 @@ export function ShareSheet({
               size={14}
               color={colors.textMuted}
             />
-            <EventlyText variant="caption" style={s.caveatText}>
+            <AppText variant="caption" style={s.caveatText}>
               {COPY.shareWhatsappCaveat}
-            </EventlyText>
+            </AppText>
           </View>
 
           {errorMessage ? (
-            <EventlyText variant="caption" style={s.errorText}>
+            <AppText variant="caption" style={s.errorText}>
               {errorMessage}
-            </EventlyText>
+            </AppText>
           ) : null}
 
           {/*
@@ -643,8 +643,8 @@ export function ShareSheet({
                 }
               />
             )}
-            <EventlyText
-              variant="subtitle"
+            <AppText
+              variant="h3"
               style={[
                 s.primaryText,
                 selected.length === 0 && s.primaryTextDisabled,
@@ -655,7 +655,7 @@ export function ShareSheet({
                 : selected.length === 0
                 ? COPY.sharePickFirst
                 : COPY.shareSendTo(selected.length)}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
 
           {/* Adding and correcting guests belongs on its own screen, which
@@ -667,9 +667,9 @@ export function ShareSheet({
             accessibilityRole="button"
             accessibilityLabel={COPY.shareManageGuests}
           >
-            <EventlyText variant="subtitle" style={s.manageGuestsText}>
+            <AppText variant="body" weight="medium" style={s.manageGuestsText}>
               {COPY.shareManageGuests}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </>
       )}

@@ -1,6 +1,6 @@
 import { Image, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
-import { EventlyText } from '../../../Components';
+import { AppText } from '../../../Components';
 import { PLAN_BG } from '../constants';
 import { heroStyles } from '../styles';
 import type { PlanTrustDTO } from '../types';
@@ -35,14 +35,14 @@ export function PlanHero({
     return (
       <View style={heroStyles.plainSection}>
         {heading ? (
-          <EventlyText variant="h2" style={heroStyles.plainHeading}>
+          <AppText variant="h2" style={heroStyles.plainHeading}>
             {heading}
-          </EventlyText>
+          </AppText>
         ) : null}
         {subtitle ? (
-          <EventlyText variant="body" style={heroStyles.plainSubtitle}>
+          <AppText variant="body" style={heroStyles.plainSubtitle}>
             {subtitle}
-          </EventlyText>
+          </AppText>
         ) : null}
       </View>
     );
@@ -92,20 +92,20 @@ export function PlanHero({
         stepLabel={stepLabel}
       />
 
-      <EventlyText variant="h1" style={heroStyles.heading}>
+      <AppText variant="h1" style={heroStyles.heading}>
         {/* Names the chosen occasion, so picking Birthday below retitles
             the step instead of leaving a generic "event". */}
         {'Let\u2019s start with\nyour '}
-        <EventlyText variant="h1" style={heroStyles.headingAccent}>
+        <AppText variant="h1" style={heroStyles.headingAccent}>
           {occasionLabel.toLowerCase()}
-        </EventlyText>
+        </AppText>
         {' details'}
-      </EventlyText>
+      </AppText>
 
-      <EventlyText variant="body" style={heroStyles.subtitle}>
+      <AppText variant="body" style={heroStyles.subtitle}>
         Tell us a little about your event so we can create the perfect plan for
         you.
-      </EventlyText>
+      </AppText>
     </View>
   );
 }

@@ -1,16 +1,39 @@
 import { StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, fontFor, spacing } from '../../theme';
-import { SETTINGS_ACCENT, SETTINGS_ACCENT_SOFT, SETTINGS_GREEN, SETTINGS_NAVY } from './constants';
+import {
+  colors,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+} from '../../theme';
+import {
+  SETTINGS_ACCENT,
+  SETTINGS_ACCENT_SOFT,
+  SETTINGS_GREEN,
+} from './constants';
 
 export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   scroll: { flex: 1 },
   content: { padding: spacing.md, paddingBottom: spacing.xl },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
-  loadingText: { color: colors.textMuted, marginTop: spacing.md },
-  errorTitle: { color: SETTINGS_NAVY, marginTop: spacing.md, textAlign: 'center' },
-  errorText: { color: colors.danger, textAlign: 'center', marginTop: spacing.sm },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.lg,
+  },
+  loadingText: { color: textColor.textSecondary, marginTop: spacing.md },
+  errorTitle: {
+    color: textColor.textPrimary,
+    marginTop: spacing.md,
+    textAlign: 'center',
+  },
+  errorText: {
+    color: textColor.textError,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+  },
   retryButton: {
     ...globalStyles.row,
     gap: spacing.xs,
@@ -21,13 +44,11 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },
-  retryText: { color: SETTINGS_ACCENT, fontWeight: '700' },
+  retryText: { color: SETTINGS_ACCENT, ...fontWeights.bold },
 
   sectionTitle: {
-    color: colors.textMuted,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    fontWeight: '700',
+    ...typography.overline,
+    color: textColor.textSecondary,
     marginBottom: spacing.sm,
   },
   card: {
@@ -40,19 +61,19 @@ export const styles = StyleSheet.create({
 
   field: { marginTop: spacing.md },
   fieldFirst: { marginTop: 0 },
-  label: { color: SETTINGS_NAVY, fontWeight: '700' },
-  hint: { color: colors.textMuted, marginTop: 1 },
+  label: { color: textColor.textPrimary, ...fontWeights.bold },
+  hint: { color: textColor.textSecondary, marginTop: 1 },
   input: {
     borderRadius: 14,
     // A TextInput resolves no face of its own — see Components/EventlyText.
-    fontFamily: fontFor('400'),
+    ...fontWeights.regular,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surface,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm + 4,
     marginTop: spacing.sm,
-    color: colors.text,
+    color: textColor.textPrimary,
   },
   inputInvalid: { borderColor: colors.danger },
 
@@ -74,10 +95,14 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   phoneText: { flex: 1 },
-  phoneValue: { color: SETTINGS_NAVY, fontWeight: '700', marginTop: 1 },
+  phoneValue: {
+    color: textColor.textPrimary,
+    ...fontWeights.bold,
+    marginTop: 1,
+  },
   verified: { ...globalStyles.row, gap: 3 },
-  verifiedText: { fontWeight: '700', fontSize: 11 },
-  phoneNote: { color: colors.textMuted, marginTop: spacing.sm, lineHeight: 18 },
+  verifiedText: { ...typography.label },
+  phoneNote: { color: textColor.textSecondary, marginTop: spacing.sm },
 
   save: {
     ...globalStyles.row,
@@ -89,8 +114,17 @@ export const styles = StyleSheet.create({
     marginTop: spacing.lg,
   },
   saveDisabled: { opacity: 0.45 },
-  saveText: { color: colors.onPrimary, fontSize: 16, fontWeight: '700' },
-  savedRow: { ...globalStyles.row, justifyContent: 'center', gap: spacing.xs, marginTop: spacing.md },
-  savedText: { color: SETTINGS_GREEN, fontWeight: '700' },
-  saveError: { color: colors.danger, marginTop: spacing.sm, textAlign: 'center' },
+  saveText: { color: textColor.textOnPrimary, ...typography.h3 },
+  savedRow: {
+    ...globalStyles.row,
+    justifyContent: 'center',
+    gap: spacing.xs,
+    marginTop: spacing.md,
+  },
+  savedText: { color: SETTINGS_GREEN, ...fontWeights.bold },
+  saveError: {
+    color: textColor.textError,
+    marginTop: spacing.sm,
+    textAlign: 'center',
+  },
 });

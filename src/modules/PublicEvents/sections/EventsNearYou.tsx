@@ -2,7 +2,7 @@ import { useMemo, useState, type ReactNode } from 'react';
 import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
 import {
   EventlyIcon,
-  EventlyText,
+  AppText,
   GradientFill,
   PressableScale,
 } from '../../../Components';
@@ -56,12 +56,48 @@ const CARD_ACCENTS: Array<{
   altInk: string;
   altSoft: string;
 }> = [
-  { gradient: ['#ff8a5c', '#e8433a'], ink: '#e2552f', soft: '#fff0e8', altInk: '#7c5cdb', altSoft: '#f1ecff' },
-  { gradient: ['#9b7dff', '#5a35e0'], ink: '#6d4df2', soft: '#f1ecff', altInk: '#e2552f', altSoft: '#fff0e8' },
-  { gradient: ['#3cc9a1', '#0e8a68'], ink: '#0f8a68', soft: '#e6f7f1', altInk: '#3b6fd8', altSoft: '#e9f0fd' },
-  { gradient: ['#ffb547', '#e8791a'], ink: '#d36b0c', soft: '#fff4e2', altInk: '#c2416b', altSoft: '#fdeef3' },
-  { gradient: ['#ff6f9f', '#c2416b'], ink: '#c2416b', soft: '#fdeef3', altInk: '#0f8a68', altSoft: '#e6f7f1' },
-  { gradient: ['#5b9bff', '#2554b8'], ink: '#2b5aa8', soft: '#e9f0fd', altInk: '#d36b0c', altSoft: '#fff4e2' },
+  {
+    gradient: ['#ff8a5c', '#e8433a'],
+    ink: '#e2552f',
+    soft: '#fff0e8',
+    altInk: '#7c5cdb',
+    altSoft: '#f1ecff',
+  },
+  {
+    gradient: ['#9b7dff', '#5a35e0'],
+    ink: '#6d4df2',
+    soft: '#f1ecff',
+    altInk: '#e2552f',
+    altSoft: '#fff0e8',
+  },
+  {
+    gradient: ['#3cc9a1', '#0e8a68'],
+    ink: '#0f8a68',
+    soft: '#e6f7f1',
+    altInk: '#3b6fd8',
+    altSoft: '#e9f0fd',
+  },
+  {
+    gradient: ['#ffb547', '#e8791a'],
+    ink: '#d36b0c',
+    soft: '#fff4e2',
+    altInk: '#c2416b',
+    altSoft: '#fdeef3',
+  },
+  {
+    gradient: ['#ff6f9f', '#c2416b'],
+    ink: '#c2416b',
+    soft: '#fdeef3',
+    altInk: '#0f8a68',
+    altSoft: '#e6f7f1',
+  },
+  {
+    gradient: ['#5b9bff', '#2554b8'],
+    ink: '#2b5aa8',
+    soft: '#e9f0fd',
+    altInk: '#d36b0c',
+    altSoft: '#fff4e2',
+  },
 ];
 
 /** "Oct 18" — the short date on the picture. */
@@ -76,7 +112,10 @@ function shortDate(iso: string | null, timezone: string): string {
       timeZone: timezone || undefined,
     }).format(at);
   } catch {
-    return new Intl.DateTimeFormat('en-IN', { day: 'numeric', month: 'short' }).format(at);
+    return new Intl.DateTimeFormat('en-IN', {
+      day: 'numeric',
+      month: 'short',
+    }).format(at);
   }
 }
 
@@ -102,14 +141,18 @@ function FilterChip({
       accessibilityHint="Changes the filter"
     >
       <EventlyIcon name={icon} size={13} color={on ? PE_ACCENT : PE_MUTED} />
-      <EventlyText
-        variant="caption"
+      <AppText
+        variant="label"
         style={[s.chipText, on && s.chipTextOn]}
         numberOfLines={1}
       >
         {label}
-      </EventlyText>
-      <EventlyIcon name="chevron-down" size={13} color={on ? PE_ACCENT : PE_MUTED} />
+      </AppText>
+      <EventlyIcon
+        name="chevron-down"
+        size={13}
+        color={on ? PE_ACCENT : PE_MUTED}
+      />
     </TouchableOpacity>
   );
 }
@@ -129,7 +172,11 @@ function FilterChip({
  * coordinates the app already holds, the date window, and the order. Without
  * coordinates the distance chip says so rather than pretending to measure.
  */
-export function EventsNearYou({ header, coordinates, onOpenEvent }: EventsNearYouProps) {
+export function EventsNearYou({
+  header,
+  coordinates,
+  onOpenEvent,
+}: EventsNearYouProps) {
   const [distance, setDistance] = useState(0);
   const [when, setWhen] = useState<WhenKey>('any');
   const [sort, setSort] = useState<SortKey>('popular');
@@ -160,7 +207,7 @@ export function EventsNearYou({ header, coordinates, onOpenEvent }: EventsNearYo
     options[(options.indexOf(current) + 1) % options.length];
 
   const distanceLabel =
-    DISTANCE_OPTIONS.find((d) => d.km === distance)?.label ?? 'Distance';
+    DISTANCE_OPTIONS.find(d => d.km === distance)?.label ?? 'Distance';
 
   const filtered = when !== 'any' || distance > 0;
 
@@ -186,20 +233,33 @@ export function EventsNearYou({ header, coordinates, onOpenEvent }: EventsNearYo
           on={distance > 0}
           onPress={() => {
             if (!coordinates) return;
-            setDistance(cycle(DISTANCE_OPTIONS, DISTANCE_OPTIONS.find((d) => d.km === distance)!).km);
+            setDistance(
+              cycle(
+                DISTANCE_OPTIONS,
+                DISTANCE_OPTIONS.find(d => d.km === distance)!,
+              ).km,
+            );
           }}
         />
         <FilterChip
           icon="calendar-blank-outline"
-          label={WHEN_OPTIONS.find((w) => w.key === when)?.label ?? 'Date'}
+          label={WHEN_OPTIONS.find(w => w.key === when)?.label ?? 'Date'}
           on={when !== 'any'}
-          onPress={() => setWhen(cycle(WHEN_OPTIONS, WHEN_OPTIONS.find((w) => w.key === when)!).key)}
+          onPress={() =>
+            setWhen(
+              cycle(WHEN_OPTIONS, WHEN_OPTIONS.find(w => w.key === when)!).key,
+            )
+          }
         />
         <FilterChip
           icon="sort-variant"
-          label={SORT_OPTIONS.find((o) => o.key === sort)?.label ?? 'Popular'}
+          label={SORT_OPTIONS.find(o => o.key === sort)?.label ?? 'Popular'}
           on={sort !== 'popular'}
-          onPress={() => setSort(cycle(SORT_OPTIONS, SORT_OPTIONS.find((o) => o.key === sort)!).key)}
+          onPress={() =>
+            setSort(
+              cycle(SORT_OPTIONS, SORT_OPTIONS.find(o => o.key === sort)!).key,
+            )
+          }
         />
       </View>
 
@@ -209,15 +269,15 @@ export function EventsNearYou({ header, coordinates, onOpenEvent }: EventsNearYo
          * your filters" sent to somebody whose connection dropped is a wrong
          * answer, and so is silence.
          */
-        <EventlyText variant="caption" style={s.note}>
+        <AppText variant="caption" style={s.note}>
           {loading
             ? 'Looking for events…'
             : error
-              ? "We couldn't load events just now. Pull down to try again."
-              : filtered
-                ? 'Nothing matches those filters. Try a wider distance or date.'
-                : 'No public events are on sale near you yet.'}
-        </EventlyText>
+            ? "We couldn't load events just now. Pull down to try again."
+            : filtered
+            ? 'Nothing matches those filters. Try a wider distance or date.'
+            : 'No public events are on sale near you yet.'}
+        </AppText>
       ) : (
         /* One row that swipes, with wide cards: a 2-up grid made each card
            half a phone and its words too small to read at a glance. */
@@ -255,85 +315,125 @@ export function EventsNearYou({ header, coordinates, onOpenEvent }: EventsNearYo
                   <View style={s.coverTop} pointerEvents="none">
                     {event.category ? (
                       <View style={[ui.pill, { backgroundColor: tint.bg }]}>
-                        <EventlyText
-                          variant="caption"
+                        <AppText
+                          variant="label"
                           style={[ui.pillText, { color: tint.fg }]}
                           numberOfLines={1}
                         >
                           {event.category}
-                        </EventlyText>
+                        </AppText>
                       </View>
                     ) : (
                       <View />
                     )}
                     <View style={s.dateChip}>
-                      <EventlyIcon name="calendar-blank-outline" size={11} color={PE_NAVY} />
-                      <EventlyText variant="caption" style={s.dateChipText}>
+                      <EventlyIcon
+                        name="calendar-blank-outline"
+                        size={11}
+                        color={PE_NAVY}
+                      />
+                      <AppText variant="label" style={s.dateChipText}>
                         {shortDate(event.startDateTime, event.timezone)}
-                      </EventlyText>
+                      </AppText>
                     </View>
                   </View>
                 </View>
 
                 <View style={s.body}>
-                  <EventlyText variant="body" style={s.title} numberOfLines={2}>
+                  <AppText variant="h3" style={s.title} numberOfLines={2}>
                     {event.title}
-                  </EventlyText>
+                  </AppText>
                   {/* The organizer's own category and city. Nothing invented:
                       the catalogue has no sub-genre to print under the name. */}
-                  <EventlyText variant="caption" style={s.kind} numberOfLines={1}>
+                  <AppText variant="caption" style={s.kind} numberOfLines={1}>
                     {[event.category, event.city].filter(Boolean).join(' · ')}
-                  </EventlyText>
+                  </AppText>
 
                   <View style={s.metaLine}>
-                    <View style={[s.metaIcon, { backgroundColor: accent.soft }]}>
-                      <EventlyIcon name="calendar-month-outline" size={12} color={accent.ink} />
+                    <View
+                      style={[s.metaIcon, { backgroundColor: accent.soft }]}
+                    >
+                      <EventlyIcon
+                        name="calendar-month-outline"
+                        size={12}
+                        color={accent.ink}
+                      />
                     </View>
-                    <EventlyText variant="caption" style={s.kind} numberOfLines={1}>
+                    <AppText variant="caption" style={s.kind} numberOfLines={1}>
                       {formatEventWhen(event.startDateTime, event.timezone)}
-                    </EventlyText>
+                    </AppText>
                   </View>
                   {event.venueName ? (
                     <View style={s.metaLine}>
-                      <View style={[s.metaIcon, { backgroundColor: accent.altSoft }]}>
-                        <EventlyIcon name="map-marker" size={12} color={accent.altInk} />
+                      <View
+                        style={[
+                          s.metaIcon,
+                          { backgroundColor: accent.altSoft },
+                        ]}
+                      >
+                        <EventlyIcon
+                          name="map-marker"
+                          size={12}
+                          color={accent.altInk}
+                        />
                       </View>
-                      <EventlyText variant="caption" style={s.kind} numberOfLines={1}>
+                      <AppText
+                        variant="caption"
+                        style={s.kind}
+                        numberOfLines={1}
+                      >
                         {event.venueName}
-                      </EventlyText>
+                      </AppText>
                     </View>
                   ) : null}
 
                   <View style={s.foot}>
                     {/* The price on its own tinted pill, in the card's colour. */}
-                    <View style={[s.pricePill, { backgroundColor: accent.soft }]}>
+                    <View
+                      style={[s.pricePill, { backgroundColor: accent.soft }]}
+                    >
                       {event.soldOut || event.startingPrice <= 0 ? (
-                        <EventlyText
-                          variant="caption"
+                        <AppText
+                          variant="bodySmall"
                           style={[s.priceAmount, { color: accent.ink }]}
                           numberOfLines={1}
                         >
                           {event.soldOut ? PUBLIC_EVENTS_COPY.soldOut : 'Free'}
-                        </EventlyText>
+                        </AppText>
                       ) : (
-                        <EventlyText variant="caption" style={s.priceFrom} numberOfLines={1}>
+                        <AppText
+                          variant="label"
+                          style={s.priceFrom}
+                          numberOfLines={1}
+                        >
                           {`${PUBLIC_EVENTS_COPY.from} `}
-                          <EventlyText
-                            variant="caption"
+                          <AppText
+                            variant="bodySmall"
                             style={[s.priceAmount, { color: accent.ink }]}
                           >
                             {formatPrice(event.startingPrice)}
-                          </EventlyText>
-                        </EventlyText>
+                          </AppText>
+                        </AppText>
                       )}
                     </View>
                     {/* Drawn as a button, pressed as part of the card. */}
                     <View style={s.view}>
-                      <GradientFill colors={accent.gradient} direction="across" />
-                      <EventlyText variant="caption" style={s.viewText} numberOfLines={1}>
+                      <GradientFill
+                        colors={accent.gradient}
+                        direction="across"
+                      />
+                      <AppText
+                        variant="label"
+                        style={s.viewText}
+                        numberOfLines={1}
+                      >
                         {PUBLIC_EVENTS_COPY.viewEvent}
-                      </EventlyText>
-                      <EventlyIcon name="chevron-right" size={12} color="#ffffff" />
+                      </AppText>
+                      <EventlyIcon
+                        name="chevron-right"
+                        size={12}
+                        color="#ffffff"
+                      />
                     </View>
                   </View>
                 </View>

@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText, GradientFill } from '../../Components';
+import { EventlyIcon, AppText, GradientFill } from '../../Components';
 import { absoluteFileUrl } from '../../services/urls';
 import type { RootStackParamList } from '../../navigation/types';
 import {
@@ -38,7 +38,13 @@ import { detailUi as s, ui } from './ui.styles';
 type Nav = NativeStackNavigationProp<RootStackParamList, 'PublicEventDetail'>;
 
 /** A white icon on a small gradient tile — every fact and feature row's mark. */
-function IconTile({ icon, gradient }: { icon: string; gradient: [string, string] }) {
+function IconTile({
+  icon,
+  gradient,
+}: {
+  icon: string;
+  gradient: [string, string];
+}) {
   return (
     <View style={s.iconTile}>
       <GradientFill colors={gradient} direction="diagonal" />
@@ -93,13 +99,13 @@ export function PublicEventDetailScreen() {
   if (error || !data) {
     return (
       <View style={[ui.screen, ui.centre]}>
-        <EventlyText variant="body" style={ui.muted}>
+        <AppText variant="body" style={ui.muted}>
           {error?.message ?? 'We could not open that event.'}
-        </EventlyText>
+        </AppText>
         <TouchableOpacity style={[ui.outline, ui.retry]} onPress={refetch}>
-          <EventlyText variant="body" style={ui.outlineText}>
+          <AppText variant="body" style={ui.outlineText}>
             {PUBLIC_EVENTS_COPY.retry}
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
       </View>
     );
@@ -184,31 +190,28 @@ export function PublicEventDetailScreen() {
               <LivePill />
             ) : data.soldOut ? (
               <View style={[ui.pill, ui.whitePill]}>
-                <EventlyText
-                  variant="caption"
-                  style={[ui.pillText, ui.soldOutText]}
-                >
+                <AppText variant="label" style={[ui.pillText, ui.soldOutText]}>
                   {PUBLIC_EVENTS_COPY.soldOut}
-                </EventlyText>
+                </AppText>
               </View>
             ) : null}
           </View>
         </View>
 
         <View style={s.sheet}>
-          <EventlyText variant="h1" style={s.title}>
+          <AppText variant="h2" style={s.title}>
             {data.title}
-          </EventlyText>
+          </AppText>
 
           <View style={s.fact}>
             <IconTile icon="calendar-month" gradient={['#ff8a5c', '#e8433a']} />
             <View style={s.factText}>
-              <EventlyText variant="caption" style={s.factLabel}>
+              <AppText variant="label" style={s.factLabel}>
                 Date & time
-              </EventlyText>
-              <EventlyText variant="body" style={s.factValue}>
+              </AppText>
+              <AppText variant="bodySmall" style={s.factValue}>
                 {formatEventWhen(data.startDateTime, data.timezone)}
-              </EventlyText>
+              </AppText>
             </View>
           </View>
 
@@ -216,20 +219,20 @@ export function PublicEventDetailScreen() {
             <View style={s.fact}>
               <IconTile icon="map-marker" gradient={['#a084ff', '#5a35e0']} />
               <View style={s.factText}>
-                <EventlyText variant="caption" style={s.factLabel}>
+                <AppText variant="label" style={s.factLabel}>
                   Venue
-                </EventlyText>
-                <EventlyText variant="body" style={s.factValue}>
+                </AppText>
+                <AppText variant="bodySmall" style={s.factValue}>
                   {venueLine}
-                </EventlyText>
+                </AppText>
                 {data.venue?.address ? (
-                  <EventlyText
+                  <AppText
                     variant="caption"
                     style={s.factNote}
                     numberOfLines={3}
                   >
                     {data.venue.address}
-                  </EventlyText>
+                  </AppText>
                 ) : null}
               </View>
             </View>
@@ -239,26 +242,33 @@ export function PublicEventDetailScreen() {
             <View style={s.organizer}>
               {/* Initials in a ring of the brand's gradient. */}
               <View style={s.avatarRing}>
-                <GradientFill colors={['#ff8a5c', '#7c5cdb']} direction="diagonal" />
+                <GradientFill
+                  colors={['#ff8a5c', '#7c5cdb']}
+                  direction="diagonal"
+                />
                 <View style={s.avatar}>
-                  <EventlyText variant="caption" style={s.avatarText}>
+                  <AppText variant="bodySmall" style={s.avatarText}>
                     {initialsOf(data.contactName)}
-                  </EventlyText>
+                  </AppText>
                 </View>
               </View>
               <View style={s.organizerText}>
-                <EventlyText variant="caption" style={s.factLabel}>
+                <AppText variant="label" style={s.factLabel}>
                   Hosted by
-                </EventlyText>
-                <EventlyText variant="body" style={s.organizerName} numberOfLines={1}>
+                </AppText>
+                <AppText
+                  variant="body"
+                  style={s.organizerName}
+                  numberOfLines={1}
+                >
                   {data.contactName}
-                </EventlyText>
+                </AppText>
               </View>
               <View style={s.organizerBadge}>
                 <EventlyIcon name="check-decagram" size={13} color="#2554b8" />
-                <EventlyText variant="caption" style={s.organizerBadgeText}>
+                <AppText variant="label" style={s.organizerBadgeText}>
                   Organizer
-                </EventlyText>
+                </AppText>
               </View>
             </View>
           ) : null}
@@ -266,53 +276,57 @@ export function PublicEventDetailScreen() {
           {/* Already booked: say so first, and where the ticket lives. */}
           {holder ? (
             <View style={s.going}>
-              <GradientFill colors={['#3cc9a1', '#0e8a68']} direction="diagonal" />
+              <GradientFill
+                colors={['#3cc9a1', '#0e8a68']}
+                direction="diagonal"
+              />
               <View style={s.goingIcon}>
-                <EventlyIcon name="ticket-confirmation" size={20} color="#0e8a68" />
+                <EventlyIcon
+                  name="ticket-confirmation"
+                  size={20}
+                  color="#0e8a68"
+                />
               </View>
               <View style={s.featureText}>
-                <EventlyText variant="body" style={s.goingTitle}>
+                <AppText variant="body" style={s.goingTitle}>
                   {data.you.checkedIn ? 'You’re checked in!' : 'You’re going!'}
-                </EventlyText>
-                <EventlyText variant="caption" style={s.goingBody}>
+                </AppText>
+                <AppText variant="caption" style={s.goingBody}>
                   Your ticket is saved in My Tickets.
-                </EventlyText>
+                </AppText>
               </View>
               <TouchableOpacity
                 style={s.goingButton}
                 onPress={() => navigation.navigate('MyTickets')}
                 accessibilityRole="button"
               >
-                <EventlyText variant="caption" style={s.goingButtonText}>
+                <AppText variant="buttonSmall" style={s.goingButtonText}>
                   View Ticket
-                </EventlyText>
+                </AppText>
               </TouchableOpacity>
             </View>
           ) : null}
 
           {data.description ? (
             <>
-              <EventlyText
-                variant="subtitle"
-                style={[s.sectionTitle, ui.gapTop]}
-              >
+              <AppText variant="h2" style={[s.sectionTitle, ui.gapTop]}>
                 About this event
-              </EventlyText>
-              <EventlyText
-                variant="body"
+              </AppText>
+              <AppText
+                variant="bodySmall"
                 style={s.about}
                 numberOfLines={aboutOpen ? undefined : 4}
               >
                 {data.description}
-              </EventlyText>
+              </AppText>
               {data.description.length > 180 ? (
                 <TouchableOpacity
                   onPress={() => setAboutOpen(v => !v)}
                   accessibilityRole="button"
                 >
-                  <EventlyText variant="caption" style={s.link}>
+                  <AppText variant="buttonSmall" style={s.link}>
                     {aboutOpen ? 'Show less' : 'Read more'}
-                  </EventlyText>
+                  </AppText>
                 </TouchableOpacity>
               ) : null}
             </>
@@ -333,29 +347,32 @@ export function PublicEventDetailScreen() {
                 gradient={['#ff7a7a', '#d93b3b']}
               />
               <View style={s.featureText}>
-                <EventlyText variant="body" style={s.featureTitle}>
+                <AppText variant="bodySmall" style={s.featureTitle}>
                   Live Stream · {LIVE_LABEL[live.state]}
-                </EventlyText>
-                <EventlyText variant="caption" style={ui.muted}>
+                </AppText>
+                <AppText variant="caption" style={ui.muted}>
                   {live.canWatch
                     ? 'You can watch this one.'
                     : live.access === 'ticketed'
                     ? 'Book a ticket to watch the stream.'
                     : 'Open to everyone once it starts.'}
-                </EventlyText>
+                </AppText>
               </View>
               <EventlyIcon name="chevron-right" size={20} color={PE_NAVY} />
             </TouchableOpacity>
           ) : holder ? (
             <View style={[s.feature, s.featureOff]}>
-              <IconTile icon="television-off" gradient={['#b8c0cc', '#8a93a3']} />
+              <IconTile
+                icon="television-off"
+                gradient={['#b8c0cc', '#8a93a3']}
+              />
               <View style={s.featureText}>
-                <EventlyText variant="body" style={s.featureTitle}>
+                <AppText variant="bodySmall" style={s.featureTitle}>
                   Live Stream
-                </EventlyText>
-                <EventlyText variant="caption" style={ui.muted}>
+                </AppText>
+                <AppText variant="caption" style={ui.muted}>
                   The organizer hasn’t set up a live stream for this event.
-                </EventlyText>
+                </AppText>
               </View>
             </View>
           ) : null}
@@ -369,39 +386,45 @@ export function PublicEventDetailScreen() {
               }
               accessibilityRole="button"
             >
-              <IconTile icon="image-multiple" gradient={['#a084ff', '#5a35e0']} />
+              <IconTile
+                icon="image-multiple"
+                gradient={['#a084ff', '#5a35e0']}
+              />
               <View style={s.featureText}>
-                <EventlyText variant="body" style={s.featureTitle}>
+                <AppText variant="bodySmall" style={s.featureTitle}>
                   Event Memories
-                </EventlyText>
-                <EventlyText variant="caption" style={ui.muted}>
+                </AppText>
+                <AppText variant="caption" style={ui.muted}>
                   {data.memories.canUpload
                     ? 'See the photos and add your own.'
                     : 'See the photos from the event.'}
-                </EventlyText>
+                </AppText>
               </View>
               <EventlyIcon name="chevron-right" size={20} color={PE_NAVY} />
             </TouchableOpacity>
           ) : holder ? (
             <View style={[s.feature, s.featureOff]}>
-              <IconTile icon="image-off-outline" gradient={['#b8c0cc', '#8a93a3']} />
+              <IconTile
+                icon="image-off-outline"
+                gradient={['#b8c0cc', '#8a93a3']}
+              />
               <View style={s.featureText}>
-                <EventlyText variant="body" style={s.featureTitle}>
+                <AppText variant="bodySmall" style={s.featureTitle}>
                   Event Memories
-                </EventlyText>
-                <EventlyText variant="caption" style={ui.muted}>
+                </AppText>
+                <AppText variant="caption" style={ui.muted}>
                   {data.memories.enabled
                     ? 'The gallery opens to attendees once the organizer allows it.'
                     : 'The organizer hasn’t turned on shared memories for this event.'}
-                </EventlyText>
+                </AppText>
               </View>
             </View>
           ) : null}
 
           <View style={s.sectionHead}>
-            <EventlyText variant="subtitle" style={s.sectionTitle}>
+            <AppText variant="h2" style={s.sectionTitle}>
               Ticket Types
-            </EventlyText>
+            </AppText>
             {data.ticketTypes.length > 1 ? (
               <TouchableOpacity
                 onPress={() =>
@@ -411,9 +434,9 @@ export function PublicEventDetailScreen() {
                 }
                 accessibilityRole="button"
               >
-                <EventlyText variant="caption" style={s.link}>
+                <AppText variant="buttonSmall" style={s.link}>
                   View all
-                </EventlyText>
+                </AppText>
               </TouchableOpacity>
             ) : null}
           </View>
@@ -432,39 +455,38 @@ export function PublicEventDetailScreen() {
               accessibilityRole="button"
             >
               <View style={s.ticketStrip}>
-                <GradientFill colors={['#ff8a5c', '#7c5cdb']} direction="down" />
+                <GradientFill
+                  colors={['#ff8a5c', '#7c5cdb']}
+                  direction="down"
+                />
               </View>
               <View style={s.ticketHead}>
-                <EventlyText
-                  variant="body"
-                  style={s.ticketName}
-                  numberOfLines={1}
-                >
+                <AppText variant="body" style={s.ticketName} numberOfLines={1}>
                   {featured.name}
-                </EventlyText>
+                </AppText>
                 <View style={s.ticketPricePill}>
-                  <EventlyText variant="body" style={s.ticketPrice}>
+                  <AppText variant="bodySmall" style={s.ticketPrice}>
                     {formatPrice(featured.price)}
-                  </EventlyText>
+                  </AppText>
                 </View>
               </View>
               {featured.description ? (
-                <EventlyText
+                <AppText
                   variant="caption"
                   style={s.ticketNote}
                   numberOfLines={2}
                 >
                   {featured.description}
-                </EventlyText>
+                </AppText>
               ) : null}
-              <EventlyText variant="caption" style={s.ticketNote}>
+              <AppText variant="caption" style={s.ticketNote}>
                 {ticketAvailability(featured, data.timezone)}
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
           ) : (
-            <EventlyText variant="caption" style={ui.muted}>
+            <AppText variant="caption" style={ui.muted}>
               No tickets are listed for this event yet.
-            </EventlyText>
+            </AppText>
           )}
         </View>
       </ScrollView>
@@ -492,20 +514,20 @@ export function PublicEventDetailScreen() {
 
       <View style={[ui.bar, { paddingBottom: Math.max(insets.bottom, 12) }]}>
         {limitReached ? (
-          <EventlyText variant="caption" style={[ui.muted, ui.centerText]}>
+          <AppText variant="caption" style={[ui.muted, ui.centerText]}>
             You’ve booked the most tickets allowed per person for this event.
-          </EventlyText>
+          </AppText>
         ) : null}
         <View style={s.barRow}>
           {/* What it costs from, beside the button that buys it. */}
           {lowestPrice !== null && canBookMore ? (
             <View style={s.barPrice}>
-              <EventlyText variant="caption" style={s.barPriceLabel}>
+              <AppText variant="label" style={s.barPriceLabel}>
                 Starting at
-              </EventlyText>
-              <EventlyText variant="h2" style={s.barPriceValue}>
+              </AppText>
+              <AppText variant="h3" style={s.barPriceValue}>
                 {formatPrice(lowestPrice)}
-              </EventlyText>
+              </AppText>
             </View>
           ) : null}
           <TouchableOpacity
@@ -519,7 +541,9 @@ export function PublicEventDetailScreen() {
             testID="book-ticket"
           >
             <GradientFill
-              colors={canBookMore ? ['#ff8a5c', '#e8433a'] : ['#c4cad4', '#9aa3b2']}
+              colors={
+                canBookMore ? ['#ff8a5c', '#e8433a'] : ['#c4cad4', '#9aa3b2']
+              }
               direction="across"
             />
             <EventlyIcon
@@ -527,7 +551,7 @@ export function PublicEventDetailScreen() {
               size={17}
               color="#ffffff"
             />
-            <EventlyText variant="body" style={s.bookText} numberOfLines={1}>
+            <AppText variant="body" style={s.bookText} numberOfLines={1}>
               {data.soldOut
                 ? PUBLIC_EVENTS_COPY.soldOut
                 : limitReached
@@ -537,7 +561,7 @@ export function PublicEventDetailScreen() {
                 : holder
                 ? 'Book More Tickets'
                 : PUBLIC_EVENTS_COPY.bookCta}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       </View>

@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { brand } from '../../../theme';
 import { JOIN_COPY } from '../constants';
 import { footnoteStyles as s } from '../styles';
@@ -12,7 +12,9 @@ import { footnoteStyles as s } from '../styles';
 export function RequirementNote() {
   return (
     <View style={s.card}>
-      <EventlyText style={s.title}>{JOIN_COPY.howTitle}</EventlyText>
+      <AppText variant="h3" style={s.title}>
+        {JOIN_COPY.howTitle}
+      </AppText>
       <View style={s.row}>
         {JOIN_COPY.steps.map((step, i) => (
           <View key={step.title} style={s.step}>
@@ -21,15 +23,17 @@ export function RequirementNote() {
                 <EventlyIcon name={step.icon} size={20} color={brand.navy} />
               </View>
               <View style={s.num}>
-                <EventlyText style={s.numText}>{i + 1}</EventlyText>
+                <AppText variant="label" style={s.numText}>
+                  {i + 1}
+                </AppText>
               </View>
             </View>
-            <EventlyText style={s.stepTitle} numberOfLines={1}>
+            <AppText variant="bodySmall" style={s.stepTitle} numberOfLines={1}>
               {step.title}
-            </EventlyText>
-            <EventlyText style={s.stepBody} numberOfLines={1}>
+            </AppText>
+            <AppText variant="caption" style={s.stepBody} numberOfLines={1}>
               {step.body}
-            </EventlyText>
+            </AppText>
           </View>
         ))}
         {/* The dotted thread between the three, behind them. */}

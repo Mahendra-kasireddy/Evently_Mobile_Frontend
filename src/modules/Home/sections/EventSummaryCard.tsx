@@ -1,5 +1,5 @@
 import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { colors } from '../../../theme';
 import {
   EVENT_SUMMARY_DRAFT_CTA,
@@ -72,9 +72,9 @@ export function EventSummaryCard({
   onRetry,
 }: EventSummaryCardProps) {
   const heading = (
-    <EventlyText variant="caption" style={s.label} numberOfLines={1}>
+    <AppText variant="label" style={s.label} numberOfLines={1}>
       {label}
-    </EventlyText>
+    </AppText>
   );
 
   if (isLoading && !event && !draft) {
@@ -107,12 +107,12 @@ export function EventSummaryCard({
               size={28}
               color={colors.textMuted}
             />
-            <EventlyText variant="subtitle" style={s.errorTitle}>
+            <AppText variant="body" weight="medium" style={s.errorTitle}>
               {EVENT_SUMMARY_ERROR.title}
-            </EventlyText>
-            <EventlyText variant="body" style={s.errorText}>
+            </AppText>
+            <AppText variant="caption" style={s.errorText}>
               {errorMessage}
-            </EventlyText>
+            </AppText>
             <TouchableOpacity
               style={s.retryButton}
               activeOpacity={0.8}
@@ -121,9 +121,9 @@ export function EventSummaryCard({
               accessibilityLabel={EVENT_SUMMARY_ERROR.cta}
             >
               <EventlyIcon name="refresh" size={16} color={HERO_ACCENT_COLOR} />
-              <EventlyText variant="caption" style={s.retryText}>
+              <AppText variant="caption" style={s.retryText}>
                 {EVENT_SUMMARY_ERROR.cta}
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
           </View>
         </View>
@@ -144,12 +144,12 @@ export function EventSummaryCard({
                 color={HERO_ACCENT_COLOR}
               />
             </View>
-            <EventlyText variant="subtitle" style={s.emptyTitle}>
+            <AppText variant="h2" style={s.emptyTitle}>
               {EVENT_SUMMARY_EMPTY.title}
-            </EventlyText>
-            <EventlyText variant="body" style={s.emptyText}>
+            </AppText>
+            <AppText variant="body" style={s.emptyText}>
               {EVENT_SUMMARY_EMPTY.body}
-            </EventlyText>
+            </AppText>
           </View>
         </View>
       </View>
@@ -210,16 +210,16 @@ export function EventSummaryCard({
                 />
               </View>
               <View style={s.rowText}>
-                <EventlyText variant="caption" style={s.rowLabel}>
+                <AppText variant="label" style={s.rowLabel}>
                   {HERO_FIELD_LABEL[field]}
-                </EventlyText>
-                <EventlyText
-                  variant="subtitle"
+                </AppText>
+                <AppText
+                  variant="h3"
                   numberOfLines={1}
                   style={[s.rowValue, isEmpty && s.rowValueEmpty]}
                 >
                   {value || EVENT_SUMMARY_FIELD_EMPTY[field]}
-                </EventlyText>
+                </AppText>
               </View>
               {/* The direction is the affordance: right means the row leaves
                   for the event, down means it opens a picker in place. */}
@@ -248,11 +248,11 @@ export function EventSummaryCard({
             <ActivityIndicator size="small" color={colors.onPrimary} />
           ) : (
             <>
-              <EventlyText variant="subtitle" style={s.ctaText}>
+              <AppText variant="button" style={s.ctaText}>
                 {isReal
                   ? EVENT_SUMMARY_OPEN_CTA[event.source]
                   : EVENT_SUMMARY_DRAFT_CTA}
-              </EventlyText>
+              </AppText>
               <EventlyIcon
                 name="chevron-right"
                 size={20}

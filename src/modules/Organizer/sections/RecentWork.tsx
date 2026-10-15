@@ -1,7 +1,12 @@
 import { ScrollView, View } from 'react-native';
-import { EventlyImage, EventlyText } from '../../../Components';
+import { EventlyImage, AppText } from '../../../Components';
 import { ORGANIZER_COPY as COPY } from '../constants';
-import { styles, WORK_TILE_HEIGHT, WORK_TILE_WIDTH, workStyles as s } from '../styles';
+import {
+  styles,
+  WORK_TILE_HEIGHT,
+  WORK_TILE_WIDTH,
+  workStyles as s,
+} from '../styles';
 import { CoverArt } from './CoverArt';
 import type { WorkTile } from '../types';
 
@@ -31,13 +36,13 @@ export function RecentWork({ tiles, isPlaceholder, events }: RecentWorkProps) {
   return (
     <View>
       <View style={styles.sectionHead}>
-        <EventlyText variant="sectionTitle" style={styles.sectionTitle}>
+        <AppText variant="h2" style={styles.sectionTitle}>
           {COPY.recentWork}
-        </EventlyText>
+        </AppText>
         {events > 0 ? (
-          <EventlyText variant="small" style={styles.sectionMeta}>
+          <AppText variant="bodySmall" style={styles.sectionMeta}>
             {COPY.eventsRun(events)}
-          </EventlyText>
+          </AppText>
         ) : null}
       </View>
 
@@ -46,10 +51,14 @@ export function RecentWork({ tiles, isPlaceholder, events }: RecentWorkProps) {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={s.strip}
       >
-        {tiles.map((tile) => (
+        {tiles.map(tile => (
           <View key={tile.key} style={s.tile}>
             {tile.photo ? (
-              <EventlyImage source={{ uri: tile.photo }} style={s.photo} resizeMode="cover" />
+              <EventlyImage
+                source={{ uri: tile.photo }}
+                style={s.photo}
+                resizeMode="cover"
+              />
             ) : (
               <CoverArt
                 width={WORK_TILE_WIDTH}
@@ -65,9 +74,9 @@ export function RecentWork({ tiles, isPlaceholder, events }: RecentWorkProps) {
       </ScrollView>
 
       {isPlaceholder ? (
-        <EventlyText variant="small" style={styles.note}>
+        <AppText variant="bodySmall" style={styles.note}>
           {COPY.workPlaceholderNote}
-        </EventlyText>
+        </AppText>
       ) : null}
     </View>
   );

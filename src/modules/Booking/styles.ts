@@ -1,6 +1,12 @@
 import { Platform, StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, spacing } from '../../theme';
+import {
+  colors,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+} from '../../theme';
 import {
   BOOKING_ACCENT,
   BOOKING_ACCENT_SOFT,
@@ -31,22 +37,23 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  loadingText: { color: colors.textMuted, marginTop: spacing.md },
+  loadingText: { color: textColor.textSecondary, marginTop: spacing.md },
   errorText: {
-    color: colors.danger,
+    color: textColor.textError,
     textAlign: 'center',
     marginTop: spacing.sm,
   },
   emptyTitle: {
-    color: BOOKING_NAVY,
+    ...typography.h2,
+    color: textColor.textPrimary,
     marginTop: spacing.md,
     textAlign: 'center',
   },
   emptySubtitle: {
-    color: colors.textMuted,
+    ...typography.body,
+    color: textColor.textSecondary,
     marginTop: spacing.sm,
     textAlign: 'center',
-    lineHeight: 20,
   },
   emptyCta: {
     ...globalStyles.row,
@@ -57,7 +64,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm + 4,
   },
-  emptyCtaText: { color: colors.onPrimary, fontWeight: '700' },
+  emptyCtaText: { color: textColor.textOnPrimary, ...fontWeights.bold },
   retryButton: {
     ...globalStyles.row,
     gap: spacing.xs,
@@ -68,7 +75,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },
-  retryText: { color: BOOKING_ACCENT, fontWeight: '700' },
+  retryText: { color: BOOKING_ACCENT, ...fontWeights.bold },
 
   /** The screen's own title, in place of a header bar — this is a tab. */
   headerRow: {
@@ -85,11 +92,8 @@ export const styles = StyleSheet.create({
    * wider letterforms already give the line the weight the design wanted.
    */
   screenTitle: {
-    color: BOOKING_NAVY,
-    fontSize: 27,
-    fontWeight: '700',
-    lineHeight: 34,
-    letterSpacing: -0.5,
+    color: textColor.textPrimary,
+    ...typography.h1,
   },
 
   /** Empty-list body inside the scroller, so the tabs stay reachable above it. */
@@ -120,7 +124,11 @@ export const eventTabsStyles = StyleSheet.create({
   },
   spark: { position: 'absolute', top: 5, right: 9 },
   // SemiBold: Poppins Bold inside a small pill closes up the counters.
-  tabText: { color: '#8a8590', fontSize: 14, fontWeight: '600' },
+  tabText: {
+    color: textColor.textSecondary,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
   tabTextOn: { color: colors.onPrimary },
   sprig: { marginLeft: 'auto', transform: [{ rotate: '-20deg' }] },
 });
@@ -173,16 +181,11 @@ export const eventCardStyles = StyleSheet.create({
   },
   dateDay: {
     color: '#c42f6a',
-    fontSize: 17,
-    fontWeight: '800',
-    lineHeight: 20,
+    ...typography.h3,
   },
   dateMonth: {
     color: '#c42f6a',
-    fontSize: 9.5,
-    fontWeight: '700',
-    letterSpacing: 0.6,
-    lineHeight: 12,
+    ...typography.label,
   },
 
   body: { flex: 1, justifyContent: 'center', paddingVertical: 2 },
@@ -196,7 +199,7 @@ export const eventCardStyles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#f1ecff',
   },
-  kindText: { color: '#6d4df2', fontSize: 10.5, fontWeight: '700' },
+  kindText: { color: '#6d4df2', ...typography.label },
   chipRow: {
     ...globalStyles.row,
     justifyContent: 'space-between',
@@ -204,16 +207,13 @@ export const eventCardStyles = StyleSheet.create({
     marginBottom: 6,
   },
   title: {
-    color: '#1b1438',
-    fontSize: 15.5,
-    fontWeight: '800',
-    lineHeight: 20,
+    color: textColor.textPrimary,
+    ...typography.h3,
   },
   metaRow: { ...globalStyles.row, gap: 5, marginTop: 6 },
   subtitle: {
-    color: '#6b7385',
-    fontSize: 11.5,
-    lineHeight: 16,
+    color: textColor.textSecondary,
+    ...typography.caption,
     flexShrink: 1,
   },
 
@@ -230,7 +230,7 @@ export const eventCardStyles = StyleSheet.create({
    * The longest label this can hold is "EXPIRED — NO RESPONSE". Poppins sets
    * wide, so the caps run small and a little tracked.
    */
-  statusText: { fontSize: 8.5, fontWeight: '700', letterSpacing: 0.4 },
+  statusText: { ...typography.label },
 
   progressRow: { ...globalStyles.row, gap: 10, marginTop: 12 },
   progressTrack: {
@@ -241,7 +241,7 @@ export const eventCardStyles = StyleSheet.create({
     overflow: 'hidden',
   },
   progressFill: { height: '100%', borderRadius: 3, overflow: 'hidden' },
-  daysLabel: { color: '#1b1438', fontSize: 12.5, fontWeight: '700' },
+  daysLabel: { color: textColor.textPrimary, ...typography.label },
 
   next: {
     flexDirection: 'row',
@@ -261,7 +261,7 @@ export const eventCardStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  nextText: { flex: 1, color: '#3a3550', fontSize: 12, lineHeight: 17 },
+  nextText: { flex: 1, color: textColor.textSecondary, ...typography.caption },
 });
 
 export const jumpToStyles = StyleSheet.create({
@@ -283,11 +283,7 @@ export const jumpToStyles = StyleSheet.create({
   },
   heading: {
     color: '#c2476d',
-    fontSize: 12.5,
-    fontWeight: '700',
-    letterSpacing: 2.2,
-    textTransform: 'uppercase',
-    lineHeight: 17,
+    ...typography.overline,
   },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   tile: {
@@ -317,18 +313,15 @@ export const jumpToStyles = StyleSheet.create({
     transform: [{ rotate: '-8deg' }],
   },
   tileTitle: {
-    color: '#1b1438',
-    fontSize: 15,
-    fontWeight: '800',
-    lineHeight: 20,
+    color: textColor.textPrimary,
+    ...typography.h3,
     marginTop: 14,
   },
   tileFoot: { ...globalStyles.row, gap: 8, marginTop: 2 },
   tileSubtitle: {
     flex: 1,
-    color: '#6b7385',
-    fontSize: 12,
-    lineHeight: 17,
+    color: textColor.textSecondary,
+    ...typography.caption,
   },
   tileGo: {
     width: 28,
@@ -359,10 +352,8 @@ export const sectionHeadStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    color: BOOKING_NAVY,
-    fontWeight: '800',
-    fontSize: 16,
-    lineHeight: 21,
+    color: textColor.textPrimary,
+    ...typography.h3,
     flexShrink: 1,
   },
   count: {
@@ -374,8 +365,8 @@ export const sectionHeadStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  countText: { fontWeight: '800', fontSize: 11.5, lineHeight: 15 },
-  seeAll: { fontWeight: '700', fontSize: 13, lineHeight: 18 },
+  countText: { ...typography.label },
+  seeAll: { ...typography.bodySmall, ...fontWeights.semibold },
 });
 
 /* The event tickets: each a little ticket, with a perforation and a stub. */
@@ -430,31 +421,28 @@ export const ticketSectionStyles = StyleSheet.create({
     paddingVertical: 4,
   },
   thumbDay: {
-    color: BOOKING_NAVY,
-    fontWeight: '800',
-    fontSize: 17,
-    lineHeight: 19,
+    color: textColor.textPrimary,
+    ...typography.h3,
   },
   thumbMonth: {
     color: BOOKING_ACCENT,
-    fontWeight: '800',
-    fontSize: 10,
-    lineHeight: 12,
-    letterSpacing: 0.5,
+    ...typography.label,
   },
   body: { flex: 1, gap: 7, paddingLeft: spacing.md, paddingRight: 8 },
   rowTitle: {
-    color: BOOKING_NAVY,
-    fontWeight: '800',
-    fontSize: 15.5,
-    lineHeight: 20,
+    color: textColor.textPrimary,
+    ...typography.h3,
   },
   line: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  lineText: { color: '#6b7385', fontSize: 13, lineHeight: 18, flexShrink: 1 },
+  lineText: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    flexShrink: 1,
+  },
   pillsScroll: { flexGrow: 0, marginTop: 4 },
   pills: { flexDirection: 'row', gap: 6 },
   pill: { borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 },
-  pillText: { fontWeight: '700', fontSize: 12, lineHeight: 16 },
+  pillText: { ...typography.label },
   typePill: { backgroundColor: BOOKING_ACCENT_SOFT },
   typePillText: { color: BOOKING_ACCENT },
   /* The perforation: notches cut from the top and bottom edges in the page's
@@ -506,7 +494,7 @@ export const ticketSectionStyles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: '#fde8ef',
   },
-  kindChipText: { color: '#c2335f', fontSize: 11, fontWeight: '700' },
+  kindChipText: { color: '#c2335f', ...typography.label },
   more: {
     position: 'absolute',
     top: 6,
@@ -543,7 +531,11 @@ export const ticketSectionStyles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 14,
   },
-  menuText: { color: '#1b1438', fontSize: 13.5, fontWeight: '600' },
+  menuText: {
+    color: textColor.textPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
   qr: {
     width: 52,
     height: 52,
@@ -553,19 +545,15 @@ export const ticketSectionStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   stubText: {
-    color: '#6b7385',
-    fontWeight: '700',
-    fontSize: 12,
-    lineHeight: 15,
+    color: textColor.textSecondary,
+    ...typography.label,
   },
 });
 
 export const bookingStateStyles = StyleSheet.create({
   sectionTitle: {
-    color: BOOKING_NAVY,
-    fontWeight: '800',
-    fontSize: 16,
-    lineHeight: 22,
+    color: textColor.textPrimary,
+    ...typography.h2,
     paddingHorizontal: spacing.md,
     marginBottom: spacing.s12,
   },
@@ -589,12 +577,11 @@ export const bookingStateStyles = StyleSheet.create({
   },
   inlineText: { flex: 1, gap: 2 },
   inlineTitle: {
-    color: BOOKING_NAVY,
-    fontWeight: '800',
-    fontSize: 14,
-    lineHeight: 19,
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
   },
-  inlineBody: { color: colors.textMuted, fontSize: 12, lineHeight: 17 },
+  inlineBody: { color: textColor.textSecondary, ...typography.caption },
   inlineCta: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -606,10 +593,8 @@ export const bookingStateStyles = StyleSheet.create({
     paddingVertical: 8,
   },
   inlineCtaText: {
-    color: '#ffffff',
-    fontWeight: '800',
-    fontSize: 12.5,
-    lineHeight: 16,
+    color: textColor.textOnPrimary,
+    ...typography.buttonSmall,
   },
   /* Nothing booked at all. */
   empty: {
@@ -634,10 +619,8 @@ export const bookingStateStyles = StyleSheet.create({
     overflow: 'hidden',
   },
   primaryText: {
-    color: colors.onPrimary,
-    fontWeight: '700',
-    fontSize: 15,
-    lineHeight: 20,
+    color: textColor.textOnPrimary,
+    ...typography.h3,
   },
   secondary: {
     flexDirection: 'row',
@@ -652,9 +635,7 @@ export const bookingStateStyles = StyleSheet.create({
   },
   secondaryText: {
     color: BOOKING_ACCENT,
-    fontWeight: '700',
-    fontSize: 15,
-    lineHeight: 20,
+    ...typography.h3,
   },
   scroll: { paddingTop: spacing.sm, paddingBottom: spacing.xl },
   headPad: { paddingHorizontal: spacing.md },
@@ -698,10 +679,8 @@ export const bookingStateStyles = StyleSheet.create({
     paddingHorizontal: 6,
   },
   segText: {
-    color: colors.textMuted,
-    fontWeight: '700',
-    fontSize: 12.5,
-    lineHeight: 16,
+    color: textColor.textSecondary,
+    ...typography.label,
     flexShrink: 1,
   },
   segTextOn: { color: '#ffffff' },
@@ -716,10 +695,8 @@ export const bookingStateStyles = StyleSheet.create({
   },
   segCountOn: { backgroundColor: 'rgba(255,255,255,0.28)' },
   segCountText: {
-    color: colors.textMuted,
-    fontWeight: '800',
-    fontSize: 10.5,
-    lineHeight: 13,
+    color: textColor.textSecondary,
+    ...typography.label,
   },
   segCountTextOn: { color: '#ffffff' },
 });
@@ -728,9 +705,14 @@ export const bookingStateStyles = StyleSheet.create({
 export const nextStyles = StyleSheet.create({
   wrap: { marginTop: 26, paddingHorizontal: spacing.md, gap: 14 },
   head: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
-  title: { color: '#1b1438', fontSize: 19, fontWeight: '800', lineHeight: 24 },
+  title: { color: textColor.textPrimary, ...typography.h2 },
   squiggle: { marginTop: -2 },
-  sub: { color: '#6f6a85', fontSize: 13, marginTop: -8, marginLeft: 30 },
+  sub: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    marginTop: -8,
+    marginLeft: 30,
+  },
   card: {
     minHeight: 150,
     padding: 16,
@@ -757,12 +739,14 @@ export const nextStyles = StyleSheet.create({
   },
   cardTitle: {
     flexShrink: 1,
-    color: '#1b1438',
-    fontSize: 16,
-    fontWeight: '800',
-    lineHeight: 21,
+    color: textColor.textPrimary,
+    ...typography.h3,
   },
-  cardBody: { color: '#5d5873', fontSize: 12.5, marginTop: 6, lineHeight: 18 },
+  cardBody: {
+    color: textColor.textSecondary,
+    ...typography.caption,
+    marginTop: 6,
+  },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -774,7 +758,7 @@ export const nextStyles = StyleSheet.create({
     borderRadius: 999,
     overflow: 'hidden',
   },
-  buttonText: { color: '#ffffff', fontSize: 13, fontWeight: '700' },
+  buttonText: { color: textColor.textOnPrimary, ...typography.buttonSmall },
   /* The illustration, pinned to the card's right side. */
   art: { position: 'absolute', right: 0, bottom: 0, width: 160, height: 150 },
   blob: {

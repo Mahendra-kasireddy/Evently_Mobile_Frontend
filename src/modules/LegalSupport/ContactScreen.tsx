@@ -9,7 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   AppHeader,
   EventlyIcon,
-  EventlyText,
+  AppText,
   KeyboardAvoider,
 } from '../../Components';
 import { colors } from '../../theme';
@@ -41,9 +41,9 @@ function Field({
 }: FieldProps) {
   return (
     <>
-      <EventlyText variant="body" style={[s.label, first && s.labelFirst]}>
+      <AppText variant="body" style={[s.label, first && s.labelFirst]}>
         {label}
-      </EventlyText>
+      </AppText>
       <TextInput
         style={[
           s.input,
@@ -60,9 +60,9 @@ function Field({
         accessibilityLabel={label}
       />
       {error ? (
-        <EventlyText variant="caption" style={s.fieldError}>
+        <AppText variant="caption" style={s.fieldError}>
           {error}
-        </EventlyText>
+        </AppText>
       ) : null}
     </>
   );
@@ -106,12 +106,12 @@ export function ContactScreen() {
                   color={LEGAL_GREEN}
                 />
               </View>
-              <EventlyText variant="h2" style={s.sentTitle}>
+              <AppText variant="h2" style={s.sentTitle}>
                 {COPY.sentTitle}
-              </EventlyText>
-              <EventlyText variant="body" style={s.sentBody}>
+              </AppText>
+              <AppText variant="body" style={s.sentBody}>
                 {COPY.sentBody}
-              </EventlyText>
+              </AppText>
               <TouchableOpacity
                 style={s.sentAgain}
                 activeOpacity={0.8}
@@ -123,16 +123,16 @@ export function ContactScreen() {
                   size={15}
                   color={LEGAL_GREEN}
                 />
-                <EventlyText variant="caption" style={s.sentAgainText}>
+                <AppText variant="caption" style={s.sentAgainText}>
                   {COPY.sentAgain}
-                </EventlyText>
+                </AppText>
               </TouchableOpacity>
             </View>
           ) : (
             <>
-              <EventlyText variant="body" style={s.intro}>
+              <AppText variant="body" style={s.intro}>
                 {COPY.intro}
-              </EventlyText>
+              </AppText>
 
               {/* Name, email and phone arrive already filled from the account. */}
               <Field
@@ -157,9 +157,9 @@ export function ContactScreen() {
                 onChange={v => setField('phone', v)}
               />
 
-              <EventlyText variant="body" style={s.label}>
+              <AppText variant="body" style={s.label}>
                 {COPY.subject}
-              </EventlyText>
+              </AppText>
               <View style={s.subjects}>
                 {subjects.map(subject => {
                   const on = draft.subject === subject.value;
@@ -173,20 +173,20 @@ export function ContactScreen() {
                       accessibilityState={{ selected: on }}
                       accessibilityLabel={subject.label}
                     >
-                      <EventlyText
+                      <AppText
                         variant="caption"
                         style={on ? s.subjectTextOn : s.subjectText}
                       >
                         {subject.label}
-                      </EventlyText>
+                      </AppText>
                     </TouchableOpacity>
                   );
                 })}
               </View>
               {errors.subject ? (
-                <EventlyText variant="caption" style={s.fieldError}>
+                <AppText variant="caption" style={s.fieldError}>
                   {errors.subject}
-                </EventlyText>
+                </AppText>
               ) : null}
 
               <Field
@@ -213,15 +213,15 @@ export function ContactScreen() {
                 ) : (
                   <EventlyIcon name="send" size={18} color={colors.onPrimary} />
                 )}
-                <EventlyText variant="subtitle" style={s.sendText}>
+                <AppText variant="h3" style={s.sendText}>
                   {isSending ? COPY.sending : COPY.send}
-                </EventlyText>
+                </AppText>
               </TouchableOpacity>
 
               {sendErrorMessage ? (
-                <EventlyText variant="caption" style={s.sendError}>
+                <AppText variant="caption" style={s.sendError}>
                   {sendErrorMessage}
-                </EventlyText>
+                </AppText>
               ) : null}
             </>
           )}

@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { EventlyText } from '../../../Components';
+import { AppText } from '../../../Components';
 import { BUDGET_CEILINGS, SEARCH_COPY as COPY } from '../constants';
 import { filterSheetStyles as s } from '../styles';
 import type { SearchFilters } from '../types';
@@ -37,9 +37,9 @@ function ChipGroup({
 
   return (
     <View style={s.group}>
-      <EventlyText variant="caption" style={s.groupTitle}>
+      <AppText variant="overline" style={s.groupTitle}>
         {title}
-      </EventlyText>
+      </AppText>
       <View style={s.chips}>
         {options.map(option => {
           const on = selected === option.key;
@@ -53,12 +53,12 @@ function ChipGroup({
               accessibilityState={{ selected: on }}
               accessibilityLabel={`${title}: ${option.label}`}
             >
-              <EventlyText
-                variant="caption"
+              <AppText
+                variant="bodySmall"
                 style={[s.chipText, on && s.chipTextOn]}
               >
                 {option.label}
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
           );
         })}
@@ -96,13 +96,13 @@ export function FilterSheet({
         <Pressable style={s.sheet} onPress={e => e.stopPropagation()}>
           <View style={s.grabber} />
           <View style={s.head}>
-            <EventlyText variant="h2" style={s.title}>
+            <AppText variant="h2" style={s.title}>
               {COPY.filters}
-            </EventlyText>
+            </AppText>
             <TouchableOpacity onPress={onClear} accessibilityRole="button">
-              <EventlyText variant="body" style={s.clear}>
+              <AppText variant="body" style={s.clear}>
                 {COPY.clear}
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
           </View>
 
@@ -135,9 +135,9 @@ export function FilterSheet({
               onPress={onClose}
               accessibilityRole="button"
             >
-              <EventlyText variant="subtitle" style={s.applyText}>
+              <AppText variant="h3" style={s.applyText}>
                 {COPY.apply}
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
           </ScrollView>
         </Pressable>

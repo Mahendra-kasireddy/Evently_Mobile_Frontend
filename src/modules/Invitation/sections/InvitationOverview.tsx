@@ -1,5 +1,5 @@
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { colors } from '../../../theme';
 import {
   INVITATION_COPY as COPY,
@@ -46,12 +46,12 @@ export function InsideList({
       {/* The heading answers "how much of this is there", so the list under it
           does not have to be counted row by row. */}
       <View style={s.insideHead}>
-        <EventlyText variant="subtitle" style={s.insideTitle}>
+        <AppText variant="h3" style={s.insideTitle}>
           {COPY.insideTitle}
-        </EventlyText>
-        <EventlyText variant="caption" style={s.insideCount}>
+        </AppText>
+        <AppText variant="caption" style={s.insideCount}>
           {COPY.insideCount(blocks.length, yoursToWrite)}
-        </EventlyText>
+        </AppText>
       </View>
 
       <View style={s.insideCard}>
@@ -105,15 +105,15 @@ export function InsideList({
                 />
               </View>
 
-              <EventlyText
-                variant="body"
+              <AppText
+                variant="bodySmall"
                 style={s.insideName}
                 numberOfLines={1}
               >
                 {name}
-              </EventlyText>
+              </AppText>
 
-              <EventlyText
+              <AppText
                 variant="caption"
                 style={[
                   s.insideState,
@@ -123,7 +123,7 @@ export function InsideList({
                 numberOfLines={1}
               >
                 {state}
-              </EventlyText>
+              </AppText>
               <EventlyIcon
                 name="chevron-right"
                 size={16}
@@ -170,13 +170,13 @@ export function PrimaryAction({
         testID="invitation-primary"
       >
         <EventlyIcon name={icon} size={17} color={colors.onPrimary} />
-        <EventlyText variant="subtitle" style={s.ctaText}>
+        <AppText variant="buttonSmall" style={s.ctaText}>
           {COPY.stageCta[stage]}
-        </EventlyText>
+        </AppText>
       </TouchableOpacity>
-      <EventlyText variant="caption" style={s.ctaNote}>
+      <AppText variant="buttonSmall" style={s.ctaNote}>
         {COPY.stageCtaNote[stage]}
-      </EventlyText>
+      </AppText>
     </View>
   );
 }

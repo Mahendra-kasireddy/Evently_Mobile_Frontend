@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { INV_GOLD } from '../constants';
 import { INVITATION_COPY as COPY } from '../constants';
 import { colors } from '../../../theme';
@@ -69,13 +69,13 @@ export function CountdownBlock({
         <View style={s.rule} />
       </View>
 
-      <EventlyText variant="caption" style={s.eyebrow}>
+      <AppText variant="label" style={s.eyebrow}>
         {COPY.countdownTo.toUpperCase()}
-      </EventlyText>
+      </AppText>
       {countdown.name ? (
-        <EventlyText variant="h2" style={s.title} numberOfLines={2}>
+        <AppText variant="h1" style={s.title} numberOfLines={2}>
           {countdown.name}
-        </EventlyText>
+        </AppText>
       ) : null}
 
       {passed ? (
@@ -84,13 +84,13 @@ export function CountdownBlock({
            is the note under it. */
         <View style={s.afterWrap}>
           <EventlyIcon name="heart-outline" size={22} color={INV_GOLD} />
-          <EventlyText variant="h2" style={s.afterHead}>
+          <AppText variant="h2" style={s.afterHead}>
             {headline}
-          </EventlyText>
+          </AppText>
           {rest ? (
-            <EventlyText variant="body" style={s.afterBody}>
+            <AppText variant="bodySmall" style={s.afterBody}>
               {rest}
-            </EventlyText>
+            </AppText>
           ) : null}
         </View>
       ) : (
@@ -123,9 +123,9 @@ export function CountdownBlock({
                 size={14}
                 color={colors.textMuted}
               />
-              <EventlyText variant="body" style={s.factText}>
+              <AppText variant="bodySmall" style={s.factText}>
                 {when}
-              </EventlyText>
+              </AppText>
             </View>
           ) : null}
           {venue ? (
@@ -135,9 +135,9 @@ export function CountdownBlock({
                 size={14}
                 color={colors.textMuted}
               />
-              <EventlyText variant="body" style={s.factText} numberOfLines={3}>
+              <AppText variant="bodySmall" style={s.factText} numberOfLines={3}>
                 {venue}
-              </EventlyText>
+              </AppText>
             </View>
           ) : null}
         </>
@@ -149,12 +149,12 @@ export function CountdownBlock({
 function Unit({ value, label }: { value: string; label: string }) {
   return (
     <View style={s.unit}>
-      <EventlyText variant="h2" style={s.value}>
+      <AppText variant="h1" style={s.value}>
         {value}
-      </EventlyText>
-      <EventlyText variant="caption" style={s.unitLabel}>
+      </AppText>
+      <AppText variant="overline" style={s.unitLabel}>
         {label}
-      </EventlyText>
+      </AppText>
     </View>
   );
 }

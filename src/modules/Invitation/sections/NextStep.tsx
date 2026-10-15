@@ -1,7 +1,7 @@
 import { ActivityIndicator, View } from 'react-native';
 import {
   EventlyIcon,
-  EventlyText,
+  AppText,
   GradientFill,
   PressableScale,
 } from '../../../Components';
@@ -160,15 +160,12 @@ export function NextStep({
           <EventlyIcon name={look.icon} size={20} color={colors.onPrimary} />
         </View>
         <View style={s.headText}>
-          <EventlyText
-            variant="subtitle"
-            style={[s.title, { color: look.ink }]}
-          >
+          <AppText variant="bodyLarge" style={[s.title, { color: look.ink }]}>
             {title}
-          </EventlyText>
-          <EventlyText variant="caption" style={s.note}>
+          </AppText>
+          <AppText variant="bodySmall" style={s.note}>
             {note}
-          </EventlyText>
+          </AppText>
         </View>
       </View>
 
@@ -176,14 +173,14 @@ export function NextStep({
         {/* The organizer's turn: the customer's own words, so they know what was asked. */}
         {stage === 'asked' && latest ? (
           <View style={s.quote}>
-            <EventlyText variant="caption" style={s.quoteLabel}>
+            <AppText variant="caption" style={s.quoteLabel}>
               {requests.length > 1
                 ? COPY.nextYouAskedMany(requests.length)
                 : COPY.nextYouAsked}
-            </EventlyText>
-            <EventlyText variant="body" style={s.quoteText} numberOfLines={3}>
+            </AppText>
+            <AppText variant="body" style={s.quoteText} numberOfLines={3}>
               {`“${latest.note}”`}
-            </EventlyText>
+            </AppText>
           </View>
         ) : null}
 
@@ -191,12 +188,12 @@ export function NextStep({
         {showProgress && guests ? (
           <View style={s.progress}>
             <View style={s.progressRow}>
-              <EventlyText variant="caption" style={s.progressText}>
+              <AppText variant="caption" style={s.progressText}>
                 {COPY.nextSentOf(guests.sent, guests.total)}
-              </EventlyText>
-              <EventlyText variant="caption" style={s.progressSub}>
+              </AppText>
+              <AppText variant="caption" style={s.progressSub}>
                 {COPY.nextOpened(guests.viewed)}
-              </EventlyText>
+              </AppText>
             </View>
             <View style={s.track}>
               <View style={[s.fill, { width: `${Math.max(sentPct, 3)}%` }]} />
@@ -214,9 +211,9 @@ export function NextStep({
           >
             <GradientFill colors={SHARE} direction="across" />
             <EventlyIcon name={share.icon} size={18} color={colors.onPrimary} />
-            <EventlyText variant="subtitle" style={s.primaryText}>
+            <AppText variant="bodyLarge" style={s.primaryText}>
               {share.label}
-            </EventlyText>
+            </AppText>
           </PressableScale>
         ) : stage !== 'asked' ? (
           <PressableScale
@@ -235,13 +232,13 @@ export function NextStep({
             ) : (
               <EventlyIcon name="check" size={18} color={colors.onPrimary} />
             )}
-            <EventlyText variant="subtitle" style={s.primaryText}>
+            <AppText variant="bodyLarge" style={s.primaryText}>
               {approving
                 ? COPY.artworkApproving
                 : stage === 'update'
                 ? COPY.artworkApproveUpdate
                 : COPY.nextApprove}
-            </EventlyText>
+            </AppText>
           </PressableScale>
         ) : null}
 
@@ -258,9 +255,9 @@ export function NextStep({
             {approving ? (
               <ActivityIndicator size="small" color={look.ink} />
             ) : null}
-            <EventlyText variant="caption" style={s.linkText}>
+            <AppText variant="buttonSmall" style={s.linkText}>
               {approving ? COPY.artworkApproving : COPY.nextApproveAnyway}
-            </EventlyText>
+            </AppText>
           </PressableScale>
         ) : null}
         <PressableScale
@@ -273,20 +270,20 @@ export function NextStep({
           testID="invitation-ask"
         >
           <EventlyIcon name="message-text-outline" size={15} color="#5d5873" />
-          <EventlyText variant="caption" style={s.linkText}>
+          <AppText variant="buttonSmall" style={s.linkText}>
             {stage === 'asked' ? COPY.nextAskMore : COPY.artworkAsk}
-          </EventlyText>
+          </AppText>
         </PressableScale>
 
         {error ? (
-          <EventlyText variant="caption" style={s.error}>
+          <AppText variant="caption" style={s.error}>
             {error}
-          </EventlyText>
+          </AppText>
         ) : null}
         {requestSent ? (
-          <EventlyText variant="caption" style={s.sent}>
+          <AppText variant="caption" style={s.sent}>
             {COPY.requestSent}
-          </EventlyText>
+          </AppText>
         ) : null}
       </View>
     </View>
@@ -323,9 +320,9 @@ export function MomentStrip({
       ) : (
         <EventlyIcon name="image-multiple-outline" size={16} color="#ffffff" />
       )}
-      <EventlyText variant="caption" style={s.stripText} numberOfLines={1}>
+      <AppText variant="bodySmall" style={s.stripText} numberOfLines={1}>
         {live ? COPY.momentLive : COPY.momentMemories}
-      </EventlyText>
+      </AppText>
       <EventlyIcon name="chevron-right" size={18} color="#ffffff" />
     </PressableScale>
   );

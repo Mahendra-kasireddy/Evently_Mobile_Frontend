@@ -1,4 +1,6 @@
 export { AppHeader } from './AppHeader';
+export { AppText, useTextScheme } from './AppText';
+export type { AppTextProps } from './AppText';
 export { EventlyText } from './EventlyText';
 export { EventlyButton } from './EventlyButton';
 export { EventlyTextInput } from './EventlyTextInput';

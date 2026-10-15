@@ -24,12 +24,12 @@ export const spacing = {
  * the same height as a header on another.
  */
 export const layout = {
-  /** Header bar, below the safe-area inset. */
-  headerHeight: 56,
+  /** Header bar, below the safe-area inset — a slim bar, not a banner. */
+  headerHeight: 48,
   headerPadding: 16,
   /** The back chevron itself. */
-  backIcon: 24,
-  /** Its touch target — the icon is 20, the tappable area is not. */
+  backIcon: 22,
+  /** Its touch target — the icon is 22, the tappable area is not. */
   backTouch: 44,
   /** Gap between the back button and the title. */
   headerGap: 8,

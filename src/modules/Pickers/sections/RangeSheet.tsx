@@ -1,5 +1,5 @@
 import { Modal, Pressable, View } from 'react-native';
-import { EventlyText } from '../../../Components';
+import { AppText } from '../../../Components';
 import { guestsSheetStyles as s } from '../styles';
 
 interface RangeSheetProps {
@@ -42,13 +42,13 @@ export function RangeSheet({
       >
         <Pressable style={s.sheet} onPress={() => undefined}>
           <View style={s.grabber} />
-          <EventlyText variant="h2" style={s.title}>
+          <AppText variant="h2" style={s.title}>
             {title}
-          </EventlyText>
+          </AppText>
           {subtitle ? (
-            <EventlyText variant="caption" style={s.subtitle}>
+            <AppText variant="caption" style={s.subtitle}>
               {subtitle}
-            </EventlyText>
+            </AppText>
           ) : null}
 
           <View style={s.chipRow}>
@@ -67,9 +67,12 @@ export function RangeSheet({
                   accessibilityLabel={option}
                   testID={`range-${option}`}
                 >
-                  <EventlyText style={[s.chipText, active && s.chipTextActive]}>
+                  <AppText
+                    variant="body"
+                    style={[s.chipText, active && s.chipTextActive]}
+                  >
                     {option}
-                  </EventlyText>
+                  </AppText>
                 </Pressable>
               );
             })}

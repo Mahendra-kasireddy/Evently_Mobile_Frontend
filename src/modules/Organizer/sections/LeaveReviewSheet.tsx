@@ -1,8 +1,20 @@
 import { useState } from 'react';
-import { Modal, Pressable, ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { EventlyIcon, AppText } from '../../../Components';
 import { colors } from '../../../theme';
-import { LEAVE_REVIEW_COPY as COPY, ORG_STAR, ORG_TRACK, STAR_LABEL } from '../constants';
+import {
+  LEAVE_REVIEW_COPY as COPY,
+  ORG_STAR,
+  ORG_TRACK,
+  STAR_LABEL,
+} from '../constants';
 import { usePostReview, useReviewTags } from '../hooks';
 import { leaveReviewStyles as s } from '../styles';
 
@@ -26,7 +38,12 @@ interface LeaveReviewSheetProps {
  * is a form that collects nothing. The tags come from the server so this
  * screen never hardcodes a vocabulary the counts are computed against.
  */
-export function LeaveReviewSheet({ visible, bookingId, onClose, onPosted }: LeaveReviewSheetProps) {
+export function LeaveReviewSheet({
+  visible,
+  bookingId,
+  onClose,
+  onPosted,
+}: LeaveReviewSheetProps) {
   const tags = useReviewTags();
   const post = usePostReview();
   const [rating, setRating] = useState(0);
@@ -35,8 +52,10 @@ export function LeaveReviewSheet({ visible, bookingId, onClose, onPosted }: Leav
   const [touched, setTouched] = useState(false);
 
   const toggleTag = (key: string) =>
-    setPicked((current) =>
-      current.includes(key) ? current.filter((k) => k !== key) : [...current, key],
+    setPicked(current =>
+      current.includes(key)
+        ? current.filter(k => k !== key)
+        : [...current, key],
     );
 
   const submit = () => {
@@ -53,49 +72,60 @@ export function LeaveReviewSheet({ visible, bookingId, onClose, onPosted }: Leav
   const missingRating = touched && rating < 1;
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+    >
       <Pressable style={s.backdrop} onPress={onClose}>
-        <Pressable style={s.sheet} onPress={(e) => e.stopPropagation()}>
+        <Pressable style={s.sheet} onPress={e => e.stopPropagation()}>
           <View style={s.grabber} />
           <ScrollView showsVerticalScrollIndicator={false}>
-            <EventlyText variant="h1" style={s.title}>
+            <AppText variant="h2" style={s.title}>
               {COPY.title}
-            </EventlyText>
-            <EventlyText variant="caption" style={s.subtitle}>
+            </AppText>
+            <AppText variant="bodySmall" style={s.subtitle}>
               {COPY.subtitle}
-            </EventlyText>
+            </AppText>
 
-            <EventlyText variant="caption" style={s.groupLabel}>
+            <AppText variant="overline" style={s.groupLabel}>
               {COPY.ratingLabel}
-            </EventlyText>
+            </AppText>
             <View style={s.starRow}>
-              {[1, 2, 3, 4, 5].map((n) => (
+              {[1, 2, 3, 4, 5].map(n => (
                 <TouchableOpacity
                   key={n}
                   style={s.starButton}
                   onPress={() => setRating(n)}
                   accessibilityRole="button"
                   accessibilityState={{ selected: rating === n }}
-                  accessibilityLabel={`${n} ${n === 1 ? 'star' : 'stars'}, ${STAR_LABEL[n]}`}
+                  accessibilityLabel={`${n} ${n === 1 ? 'star' : 'stars'}, ${
+                    STAR_LABEL[n]
+                  }`}
                 >
-                  <EventlyIcon name="star" size={34} color={n <= rating ? ORG_STAR : ORG_TRACK} />
+                  <EventlyIcon
+                    name="star"
+                    size={34}
+                    color={n <= rating ? ORG_STAR : ORG_TRACK}
+                  />
                 </TouchableOpacity>
               ))}
               {/* The word, so a rating is never just a count of shapes. */}
               {rating > 0 ? (
-                <EventlyText variant="body" style={s.starWord}>
+                <AppText variant="h3" style={s.starWord}>
                   {STAR_LABEL[rating]}
-                </EventlyText>
+                </AppText>
               ) : null}
             </View>
 
             {tags.data && tags.data.length > 0 ? (
               <>
-                <EventlyText variant="caption" style={s.groupLabel}>
+                <AppText variant="overline" style={s.groupLabel}>
                   {COPY.tagsLabel}
-                </EventlyText>
+                </AppText>
                 <View style={s.chips}>
-                  {tags.data.map((tag) => {
+                  {tags.data.map(tag => {
                     const on = picked.includes(tag.key);
                     return (
                       <TouchableOpacity
@@ -107,9 +137,12 @@ export function LeaveReviewSheet({ visible, bookingId, onClose, onPosted }: Leav
                         accessibilityState={{ selected: on }}
                         accessibilityLabel={tag.label}
                       >
-                        <EventlyText variant="caption" style={[s.chipText, on && s.chipTextOn]}>
+                        <AppText
+                          variant="bodySmall"
+                          style={[s.chipText, on && s.chipTextOn]}
+                        >
                           {tag.label}
-                        </EventlyText>
+                        </AppText>
                       </TouchableOpacity>
                     );
                   })}
@@ -117,9 +150,9 @@ export function LeaveReviewSheet({ visible, bookingId, onClose, onPosted }: Leav
               </>
             ) : null}
 
-            <EventlyText variant="caption" style={s.groupLabel}>
+            <AppText variant="overline" style={s.groupLabel}>
               {COPY.commentLabel}
-            </EventlyText>
+            </AppText>
             <TextInput
               style={s.input}
               value={comment}
@@ -132,32 +165,35 @@ export function LeaveReviewSheet({ visible, bookingId, onClose, onPosted }: Leav
             />
 
             {/* Said before posting, not after — a review cannot be edited. */}
-            <EventlyText variant="caption" style={s.permanence}>
+            <AppText variant="caption" style={s.permanence}>
               {COPY.permanenceNote}
-            </EventlyText>
+            </AppText>
 
             <TouchableOpacity
-              style={[s.submit, (post.loading || rating < 1) && s.submitDisabled]}
+              style={[
+                s.submit,
+                (post.loading || rating < 1) && s.submitDisabled,
+              ]}
               activeOpacity={0.85}
               disabled={post.loading}
               onPress={submit}
               accessibilityRole="button"
               accessibilityLabel={COPY.submit}
             >
-              <EventlyText variant="subtitle" style={s.submitText}>
+              <AppText variant="h3" style={s.submitText}>
                 {post.loading ? COPY.submitting : COPY.submit}
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
 
             {missingRating ? (
-              <EventlyText variant="caption" style={s.error}>
+              <AppText variant="caption" style={s.error}>
                 {COPY.needRating}
-              </EventlyText>
+              </AppText>
             ) : null}
             {post.error ? (
-              <EventlyText variant="caption" style={s.error}>
+              <AppText variant="caption" style={s.error}>
                 {COPY.failed}
-              </EventlyText>
+              </AppText>
             ) : null}
           </ScrollView>
         </Pressable>

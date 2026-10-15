@@ -1,12 +1,11 @@
 import { StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, spacing } from '../../theme';
+import { spacing, fontWeights, textColor, typography } from '../../theme';
 import {
   NOTIF_ACCENT,
   NOTIF_CANVAS,
   NOTIF_DIVIDER,
   NOTIF_HAIRLINE,
-  NOTIF_NAVY,
 } from './constants';
 
 export const styles = StyleSheet.create({
@@ -26,16 +25,21 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  loadingText: { color: colors.textMuted, marginTop: spacing.md },
-  emptyTitle: { color: NOTIF_NAVY, marginTop: spacing.md, textAlign: 'center' },
+  loadingText: { color: textColor.textSecondary, marginTop: spacing.md },
+  emptyTitle: {
+    ...typography.h2,
+    color: textColor.textPrimary,
+    marginTop: spacing.md,
+    textAlign: 'center',
+  },
   emptyBody: {
-    color: colors.textMuted,
+    ...typography.body,
+    color: textColor.textSecondary,
     marginTop: spacing.sm,
     textAlign: 'center',
-    lineHeight: 20,
   },
   errorText: {
-    color: colors.danger,
+    color: textColor.textError,
     textAlign: 'center',
     marginTop: spacing.sm,
   },
@@ -49,9 +53,13 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },
-  retryText: { color: NOTIF_ACCENT, fontWeight: '700' },
+  retryText: { color: NOTIF_ACCENT, ...fontWeights.bold },
 
-  markAllRead: { color: NOTIF_ACCENT, fontSize: 13, fontWeight: '600' },
+  markAllRead: {
+    color: NOTIF_ACCENT,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
   markAllReadDisabled: { opacity: 0.5 },
 });
 
@@ -80,10 +88,14 @@ export const notificationRowStyles = StyleSheet.create({
     flexShrink: 0,
   },
   content: { flex: 1 },
-  title: { color: NOTIF_NAVY, fontSize: 14, fontWeight: '700', lineHeight: 19 },
-  titleRead: { fontWeight: '500' },
-  body: { color: '#525c6c', fontSize: 12.5, marginTop: 2, lineHeight: 17 },
-  time: { color: colors.textMuted, fontSize: 11, marginTop: 4 },
+  title: {
+    color: textColor.textPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
+  titleRead: { ...fontWeights.medium },
+  body: { color: textColor.textSecondary, ...typography.caption, marginTop: 2 },
+  time: { color: textColor.textSecondary, ...typography.caption, marginTop: 4 },
   /** Top-aligned with the title, so it reads as a state and not a bullet. */
   unreadDot: {
     width: 8,

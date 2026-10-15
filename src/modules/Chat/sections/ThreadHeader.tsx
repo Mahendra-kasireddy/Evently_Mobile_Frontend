@@ -1,5 +1,5 @@
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { CHAT_COPY as COPY, CHAT_NAVY_DEEP } from '../constants';
 import { threadStyles as s } from '../styles';
 import type { ConversationItem } from '../types';
@@ -47,20 +47,20 @@ export function ThreadHeader({
         <View
           style={[s.headerAvatar, { backgroundColor: summary.withAvatarColor }]}
         >
-          <EventlyText variant="subtitle" style={s.headerAvatarText}>
+          <AppText variant="bodySmall" style={s.headerAvatarText}>
             {summary.withInitials}
-          </EventlyText>
+          </AppText>
         </View>
       ) : null}
 
       <View style={s.headerText}>
-        <EventlyText variant="subtitle" style={s.headerName} numberOfLines={1}>
+        <AppText variant="h3" style={s.headerName} numberOfLines={1}>
           {name}
-        </EventlyText>
+        </AppText>
         {summary?.replyLabel ? (
-          <EventlyText variant="caption" style={s.headerReply}>
+          <AppText variant="caption" style={s.headerReply}>
             {summary.replyLabel}
-          </EventlyText>
+          </AppText>
         ) : null}
       </View>
 
@@ -72,9 +72,9 @@ export function ThreadHeader({
           accessibilityRole="button"
           accessibilityLabel={`${COPY.quote} from ${name}`}
         >
-          <EventlyText variant="caption" style={s.quoteText}>
+          <AppText variant="bodySmall" style={s.quoteText}>
             {COPY.quote}
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
       ) : null}
     </View>

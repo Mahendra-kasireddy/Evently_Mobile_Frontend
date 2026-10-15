@@ -1,5 +1,5 @@
-import { Text, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { View } from 'react-native';
+import { EventlyIcon, AppText } from '../../../Components';
 import { OTP_COPY } from '../constants';
 import { AUTH_ACCENT, AUTH_NAVY, heroStyles } from '../styles';
 
@@ -25,19 +25,20 @@ export function OtpArt({ sentTo }: OtpArtProps) {
           <EventlyIcon name="leaf" size={22} color="#e9b49c" />
         </View>
       </View>
-      <Text
+      <AppText
+        variant="display"
         style={[heroStyles.title, heroStyles.titleGap]}
         accessibilityRole="header"
       >
         {OTP_COPY.title}
-      </Text>
-      <EventlyText variant="body" style={heroStyles.subtitle}>
+      </AppText>
+      <AppText variant="bodyLarge" style={heroStyles.subtitle}>
         {OTP_COPY.sentToPrefix}
         {'\n'}
-        <EventlyText variant="body" style={heroStyles.subtitleStrong}>
+        <AppText variant="body" style={heroStyles.subtitleStrong}>
           {sentTo}
-        </EventlyText>
-      </EventlyText>
+        </AppText>
+      </AppText>
     </View>
   );
 }

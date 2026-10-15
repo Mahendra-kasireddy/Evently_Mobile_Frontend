@@ -1,6 +1,13 @@
 import { Platform, StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, fontFor, spacing } from '../../theme';
+import {
+  colors,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+  inputTypography,
+} from '../../theme';
 import {
   INV_ACCENT,
   INV_ACCENT_SOFT,
@@ -40,12 +47,11 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
   },
   centeredBody: {
-    color: colors.textMuted,
+    color: textColor.textSecondary,
     marginTop: spacing.sm,
     textAlign: 'center',
-    lineHeight: 20,
   },
-  errorText: { color: colors.danger, textAlign: 'center' },
+  errorText: { color: textColor.textError, textAlign: 'center' },
   retryButton: {
     ...globalStyles.row,
     gap: spacing.xs,
@@ -56,7 +62,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },
-  retryText: { color: INV_ACCENT, fontWeight: '700' },
+  retryText: { color: INV_ACCENT, ...fontWeights.bold },
 });
 
 export const listStyles = StyleSheet.create({
@@ -70,7 +76,7 @@ export const listStyles = StyleSheet.create({
   },
   summaryAction: { backgroundColor: INV_ACCENT_SOFT },
   summaryDone: { backgroundColor: INV_GREEN_SOFT },
-  summaryText: { flex: 1, color: INV_NAVY, fontWeight: '700' },
+  summaryText: { flex: 1, color: INV_NAVY, ...fontWeights.bold },
 
   row: {
     ...globalStyles.card,
@@ -92,8 +98,8 @@ export const listStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   text: { flex: 1 },
-  title: { color: INV_NAVY, fontSize: 16, fontWeight: '700' },
-  ref: { color: colors.textMuted, marginTop: 1, letterSpacing: 0.4 },
+  title: { color: INV_NAVY, ...typography.h3 },
+  ref: { color: textColor.textSecondary, marginTop: 1 },
   statusChip: {
     borderRadius: 999,
     paddingHorizontal: spacing.sm,
@@ -101,7 +107,7 @@ export const listStyles = StyleSheet.create({
   },
   statusChipAction: { backgroundColor: INV_ACCENT_SOFT },
   statusChipDone: { backgroundColor: INV_GREEN_SOFT },
-  statusText: { fontWeight: '700', fontSize: 11 },
+  statusText: { ...typography.label },
 
   footer: {
     ...globalStyles.row,
@@ -112,9 +118,9 @@ export const listStyles = StyleSheet.create({
     borderTopColor: colors.border,
   },
   meta: { ...globalStyles.row, gap: spacing.xs },
-  metaText: { color: colors.textMuted },
+  metaText: { color: textColor.textSecondary },
   open: { ...globalStyles.row, gap: 2 },
-  openText: { color: INV_ACCENT, fontWeight: '700' },
+  openText: { color: INV_ACCENT, ...fontWeights.bold },
 });
 
 export const heroStyles = StyleSheet.create({
@@ -129,17 +135,14 @@ export const heroStyles = StyleSheet.create({
     // 11 with less tracking: this line carries the organizer's name, and in
     // Poppins — wider than the face this was set in — 12/0.8 pushed all but
     // the shortest names past the ellipsis.
-    fontSize: 11,
-    letterSpacing: 0.5,
-    fontWeight: '700',
+    ...typography.label,
   },
   heading: {
-    color: colors.onPrimary,
-    fontSize: 22,
-    fontWeight: '700',
+    color: textColor.textOnPrimary,
+    ...typography.h2,
     marginTop: spacing.sm,
   },
-  sub: { color: colors.onPrimaryMuted, marginTop: spacing.xs, lineHeight: 20 },
+  sub: { color: colors.onPrimaryMuted, marginTop: spacing.xs },
 
   statusRow: {
     ...globalStyles.row,
@@ -150,7 +153,7 @@ export const heroStyles = StyleSheet.create({
     borderTopColor: 'rgba(255,255,255,0.14)',
   },
   statusDot: { width: 8, height: 8, borderRadius: 4 },
-  statusText: { color: colors.onPrimary, fontWeight: '700', flex: 1 },
+  statusText: { color: textColor.textOnPrimary, ...fontWeights.bold, flex: 1 },
 });
 
 export const actionStyles = StyleSheet.create({
@@ -163,7 +166,7 @@ export const actionStyles = StyleSheet.create({
     borderRadius: 14,
     backgroundColor: INV_ACCENT,
   },
-  primaryText: { color: colors.onPrimary, fontSize: 16, fontWeight: '700' },
+  primaryText: { color: textColor.textOnPrimary, ...typography.h3 },
   approvedChip: {
     ...globalStyles.row,
     justifyContent: 'center',
@@ -172,7 +175,7 @@ export const actionStyles = StyleSheet.create({
     borderRadius: 14,
     backgroundColor: INV_GREEN_SOFT,
   },
-  approvedChipText: { color: INV_GREEN, fontWeight: '700' },
+  approvedChipText: { color: INV_GREEN, ...fontWeights.bold },
   secondaryRow: { flexDirection: 'row', gap: spacing.sm },
   secondary: {
     ...globalStyles.row,
@@ -184,11 +187,11 @@ export const actionStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  secondaryText: { color: INV_NAVY, fontWeight: '700' },
+  secondaryText: { color: INV_NAVY, ...fontWeights.bold },
   share: { backgroundColor: INV_GREEN, borderColor: INV_GREEN },
-  shareText: { color: colors.onPrimary, fontWeight: '700' },
-  errorText: { color: colors.danger, textAlign: 'center' },
-  sentText: { color: INV_GREEN, fontWeight: '700', textAlign: 'center' },
+  shareText: { color: textColor.textOnPrimary, ...fontWeights.bold },
+  errorText: { color: textColor.textError, textAlign: 'center' },
+  sentText: { color: INV_GREEN, ...fontWeights.bold, textAlign: 'center' },
 });
 
 export const bannerStyles = StyleSheet.create({
@@ -202,8 +205,8 @@ export const bannerStyles = StyleSheet.create({
     padding: spacing.md,
   },
   text: { flex: 1 },
-  title: { color: INV_NAVY, fontWeight: '700' },
-  body: { color: colors.textMuted, marginTop: 2, lineHeight: 19 },
+  title: { color: INV_NAVY, ...fontWeights.bold },
+  body: { color: textColor.textSecondary, marginTop: 2 },
 });
 
 export const sectionStyles = StyleSheet.create({
@@ -213,8 +216,8 @@ export const sectionStyles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     marginTop: spacing.lg,
   },
-  title: { color: INV_NAVY, fontSize: 17, fontWeight: '700' },
-  count: { color: colors.textMuted },
+  title: { color: INV_NAVY, ...typography.h3 },
+  count: { color: textColor.textSecondary },
 
   row: {
     ...globalStyles.card,
@@ -237,10 +240,10 @@ export const sectionStyles = StyleSheet.create({
   },
   iconChipCustomer: { backgroundColor: INV_ACCENT_SOFT },
   headText: { flex: 1 },
-  rowTitle: { color: INV_NAVY, fontWeight: '700' },
+  rowTitle: { color: INV_NAVY, ...fontWeights.bold },
   ownerBadge: { marginTop: 2 },
   ownerOrganizer: { color: colors.textMuted },
-  ownerCustomer: { color: INV_ACCENT, fontWeight: '700' },
+  ownerCustomer: { color: INV_ACCENT, ...fontWeights.bold },
   stateChip: {
     borderRadius: 999,
     paddingHorizontal: spacing.sm,
@@ -248,11 +251,11 @@ export const sectionStyles = StyleSheet.create({
   },
   stateReady: { backgroundColor: INV_GREEN_SOFT },
   stateHidden: { backgroundColor: colors.surface },
-  stateText: { fontWeight: '700', fontSize: 11 },
+  stateText: { ...typography.label },
   // Padded out to a comfortable tap target; the icon itself is only 18px.
   eyeButton: { padding: spacing.xs, marginLeft: 2 },
 
-  body: { color: colors.textMuted, marginTop: spacing.sm, lineHeight: 19 },
+  body: { color: textColor.textSecondary, marginTop: spacing.sm },
   pending: { ...globalStyles.row, gap: spacing.xs, marginTop: spacing.sm },
   pendingText: { color: colors.accent, flex: 1 },
 
@@ -267,8 +270,8 @@ export const sectionStyles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   actionPrimary: { borderColor: INV_ACCENT, backgroundColor: INV_ACCENT },
-  actionText: { color: INV_NAVY, fontWeight: '700' },
-  actionPrimaryText: { color: colors.onPrimary, fontWeight: '700' },
+  actionText: { color: INV_NAVY, ...fontWeights.bold },
+  actionPrimaryText: { color: textColor.textOnPrimary, ...fontWeights.bold },
 });
 
 /** The phone-framed render of what a guest opening the link would see. */
@@ -306,12 +309,12 @@ export const previewStyles = StyleSheet.create({
     borderTopColor: colors.border,
   },
   blockHead: { ...globalStyles.row, gap: spacing.sm },
-  blockTitle: { color: INV_NAVY, fontWeight: '700', flex: 1 },
-  blockBody: { color: colors.textMuted, marginTop: 2, lineHeight: 19 },
+  blockTitle: { color: INV_NAVY, ...fontWeights.bold, flex: 1 },
+  blockBody: { color: textColor.textSecondary, marginTop: 2 },
 
   scheduleTitle: {
     color: INV_NAVY,
-    fontWeight: '700',
+    ...fontWeights.bold,
     paddingHorizontal: spacing.md,
     paddingTop: spacing.md,
   },
@@ -322,14 +325,13 @@ export const previewStyles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   subEventBar: { width: 3, borderRadius: 2, backgroundColor: INV_ACCENT },
-  subEventName: { color: INV_NAVY, fontWeight: '700' },
-  subEventMeta: { color: colors.textMuted, marginTop: 1 },
+  subEventName: { color: INV_NAVY, ...fontWeights.bold },
+  subEventMeta: { color: textColor.textSecondary, marginTop: 1 },
 
   hiddenNote: {
-    color: colors.textMuted,
+    color: textColor.textSecondary,
     padding: spacing.md,
     textAlign: 'center',
-    lineHeight: 19,
   },
 });
 
@@ -337,10 +339,10 @@ export const previewStyles = StyleSheet.create({
 export const previewSheetStyles = StyleSheet.create({
   head: { ...globalStyles.row, gap: spacing.sm },
   headText: { flex: 1 },
-  title: { color: INV_NAVY, fontSize: 19, fontWeight: '700' },
+  title: { color: INV_NAVY, ...typography.h2 },
   meta: { ...globalStyles.row, gap: spacing.xs, marginTop: 2 },
-  metaText: { color: colors.textMuted },
-  ownerCustomer: { color: INV_ACCENT, fontWeight: '700' },
+  metaText: { color: textColor.textSecondary },
+  ownerCustomer: { color: INV_ACCENT, ...fontWeights.bold },
   close: {
     width: 36,
     height: 36,
@@ -359,9 +361,9 @@ export const previewSheetStyles = StyleSheet.create({
     backgroundColor: INV_GREEN,
     marginTop: spacing.lg,
   },
-  shareText: { color: colors.onPrimary, fontSize: 16, fontWeight: '700' },
+  shareText: { color: textColor.textOnPrimary, ...typography.h3 },
   blockedNote: { ...globalStyles.row, gap: spacing.xs, marginTop: spacing.lg },
-  blockedText: { color: colors.textMuted, flex: 1, lineHeight: 18 },
+  blockedText: { color: textColor.textSecondary, flex: 1 },
 });
 
 export const sheetStyles = StyleSheet.create({
@@ -386,8 +388,8 @@ export const sheetStyles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: spacing.sm,
   },
-  selectCount: { color: colors.textMuted },
-  selectAll: { color: INV_ACCENT, fontWeight: '600' },
+  selectCount: { color: textColor.textSecondary },
+  selectAll: { color: INV_ACCENT, ...fontWeights.semibold },
 
   /* A squircle, matching the guest-list screen's monograms. */
   guestAvatar: {
@@ -397,12 +399,12 @@ export const sheetStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  guestAvatarText: { color: colors.onPrimary, fontWeight: '700' },
+  guestAvatarText: { color: textColor.textOnPrimary, ...fontWeights.bold },
 
   primaryTextDisabled: { color: colors.textMuted },
 
   manageGuests: { alignItems: 'center', paddingVertical: spacing.s12 },
-  manageGuestsText: { color: INV_ACCENT, fontWeight: '600' },
+  manageGuestsText: { color: INV_ACCENT, ...fontWeights.semibold },
 
   backdrop: {
     flex: 1,
@@ -426,21 +428,21 @@ export const sheetStyles = StyleSheet.create({
     backgroundColor: colors.border,
     marginBottom: spacing.md,
   },
-  title: { color: INV_NAVY, fontSize: 19, fontWeight: '700' },
-  subtitle: { color: colors.textMuted, marginTop: spacing.xs, lineHeight: 19 },
+  title: { color: INV_NAVY, ...typography.h2 },
+  subtitle: { color: textColor.textSecondary, marginTop: spacing.xs },
 
-  label: { color: INV_NAVY, fontWeight: '700', marginTop: spacing.lg },
-  hint: { color: colors.textMuted, marginTop: 2 },
+  label: { color: INV_NAVY, ...fontWeights.bold, marginTop: spacing.lg },
+  hint: { color: textColor.textSecondary, marginTop: 2 },
   input: {
     borderRadius: 14,
     // A TextInput resolves no face of its own — see Components/EventlyText.
-    fontFamily: fontFor('400'),
+    ...fontWeights.regular,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surface,
     padding: spacing.md,
     marginTop: spacing.sm,
-    color: colors.text,
+    color: textColor.textPrimary,
   },
   inputMultiline: { minHeight: 100, textAlignVertical: 'top' },
 
@@ -455,7 +457,7 @@ export const sheetStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkboxOn: { backgroundColor: INV_ACCENT, borderColor: INV_ACCENT },
-  toggleLabel: { color: colors.text, flex: 1 },
+  toggleLabel: { color: textColor.textPrimary, flex: 1 },
 
   primary: {
     ...globalStyles.row,
@@ -473,7 +475,7 @@ export const sheetStyles = StyleSheet.create({
    * refuse, where a grey one reads as a step that is not ready.
    */
   primaryInert: { backgroundColor: '#e7e3da', opacity: 1 },
-  primaryText: { color: colors.onPrimary, fontSize: 16, fontWeight: '700' },
+  primaryText: { color: textColor.textOnPrimary, ...typography.h3 },
   secondary: {
     ...globalStyles.row,
     justifyContent: 'center',
@@ -483,10 +485,10 @@ export const sheetStyles = StyleSheet.create({
     borderColor: colors.border,
     marginTop: spacing.sm,
   },
-  secondaryText: { color: INV_NAVY, fontWeight: '700' },
-  errorText: { color: colors.danger, marginTop: spacing.sm },
+  secondaryText: { color: INV_NAVY, ...fontWeights.bold },
+  errorText: { color: textColor.textError, marginTop: spacing.sm },
   caveat: { ...globalStyles.row, gap: spacing.xs, marginTop: spacing.md },
-  caveatText: { color: colors.textMuted, flex: 1, lineHeight: 18 },
+  caveatText: { color: textColor.textSecondary, flex: 1 },
 
   // Guest list.
   /* A card each, not hairline-separated rows: every row here is a tap target
@@ -502,15 +504,15 @@ export const sheetStyles = StyleSheet.create({
     borderColor: colors.border,
   },
   guestText: { flex: 1 },
-  guestName: { color: INV_NAVY, fontWeight: '700' },
-  guestMeta: { color: colors.textMuted, marginTop: 1 },
-  guestSent: { color: INV_GREEN, fontWeight: '700' },
+  guestName: { color: INV_NAVY, ...fontWeights.bold },
+  guestMeta: { color: textColor.textSecondary, marginTop: 1 },
+  guestSent: { color: INV_GREEN, ...fontWeights.bold },
   emptyGuests: { color: colors.textMuted, marginTop: spacing.md },
   guestsLoading: { marginTop: spacing.md },
 
   outcomeRow: { ...globalStyles.row, gap: spacing.sm, marginTop: spacing.sm },
-  outcomeText: { flex: 1, color: colors.text },
-  outcomeLink: { color: INV_ACCENT, fontWeight: '700' },
+  outcomeText: { flex: 1, color: textColor.textPrimary },
+  outcomeLink: { color: INV_ACCENT, ...fontWeights.bold },
 });
 
 /* ---------------------------------------------------------------------------
@@ -549,13 +551,10 @@ export const shellStyles = StyleSheet.create({
   barTitle: {
     flex: 1,
     color: INV_NAVY_DEEP,
-    fontSize: 17,
-    lineHeight: 23,
-    fontWeight: '700',
-    letterSpacing: -0.3,
+    ...typography.h3,
   },
   barAction: { paddingHorizontal: 8, paddingVertical: 6 },
-  barActionText: { color: INV_ACCENT, fontSize: 12.5, fontWeight: '700' },
+  barActionText: { color: INV_ACCENT, ...typography.label },
 
   menuRow: {
     ...globalStyles.row,
@@ -577,14 +576,11 @@ export const shellStyles = StyleSheet.create({
   menuText: { flex: 1 },
   menuLabel: {
     color: INV_NAVY_DEEP,
-    fontSize: 14,
-    lineHeight: 19,
-    fontWeight: '700',
+    ...typography.label,
   },
   menuNote: {
-    color: colors.textMuted,
-    fontSize: 12,
-    lineHeight: 16,
+    color: textColor.textSecondary,
+    ...typography.caption,
     marginTop: 1,
   },
 
@@ -604,33 +600,26 @@ export const approveStyles = StyleSheet.create({
   },
   cardTitle: {
     color: INV_NAVY,
-    fontSize: 14,
-    lineHeight: 19,
-    fontWeight: '700',
+    ...typography.body,
+    ...fontWeights.semibold,
     flexShrink: 1,
   },
   head: { ...globalStyles.row, gap: 8, marginBottom: 6 },
   waiting: {
     color: INV_ACCENT,
-    fontSize: 10.5,
-    fontWeight: '700',
-    letterSpacing: 0.8,
+    ...typography.label,
     marginLeft: 'auto',
   },
   approvedChip: { ...globalStyles.row, gap: 5, marginLeft: 'auto' },
   approvedText: {
     color: INV_GREEN,
-    fontSize: 10.5,
-    fontWeight: '700',
-    letterSpacing: 0.8,
+    ...typography.label,
   },
   eyebrow: {
     color: INV_ACCENT,
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 1.2,
+    ...typography.label,
   },
-  body: { color: INV_NAVY, fontSize: 14, lineHeight: 20, marginTop: 6 },
+  body: { color: INV_NAVY, ...typography.body, marginTop: 6 },
   bodyEmpty: { color: colors.textMuted, fontStyle: 'italic' },
   actions: { ...globalStyles.row, gap: 8, marginTop: 12 },
   accept: {
@@ -642,7 +631,11 @@ export const approveStyles = StyleSheet.create({
     backgroundColor: INV_NAVY_DEEP,
     paddingVertical: 11,
   },
-  acceptText: { color: colors.onPrimary, fontSize: 13, fontWeight: '700' },
+  acceptText: {
+    color: textColor.textOnPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
   ask: {
     ...globalStyles.row,
     justifyContent: 'center',
@@ -653,7 +646,11 @@ export const approveStyles = StyleSheet.create({
     borderColor: INV_HAIRLINE,
     paddingVertical: 11,
   },
-  askText: { color: INV_NAVY, fontSize: 13, fontWeight: '700' },
+  askText: {
+    color: INV_NAVY,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
   share: {
     ...globalStyles.row,
     justifyContent: 'center',
@@ -663,7 +660,11 @@ export const approveStyles = StyleSheet.create({
     paddingVertical: 12,
     marginTop: 12,
   },
-  shareText: { color: colors.onPrimary, fontSize: 13, fontWeight: '700' },
+  shareText: {
+    color: textColor.textOnPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
   /* One tap for the lot, at the foot of the pass. */
   all: {
     ...globalStyles.row,
@@ -675,7 +676,11 @@ export const approveStyles = StyleSheet.create({
     marginTop: 16,
   },
   allBusy: { opacity: 0.6 },
-  allText: { color: colors.onPrimary, fontSize: 14.5, fontWeight: '700' },
+  allText: {
+    color: textColor.textOnPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
 });
 
 /* ---------------------------------------------------------------------------
@@ -712,18 +717,12 @@ export const overviewStyles = StyleSheet.create({
   },
   cardEyebrow: {
     color: INV_ACCENT,
-    fontSize: 10.5,
-    lineHeight: 15,
-    fontWeight: '700',
-    letterSpacing: 1.4,
+    ...typography.label,
     textAlign: 'center',
   },
   cardTitle: {
-    color: colors.onPrimary,
-    fontSize: 26,
-    lineHeight: 33,
-    fontWeight: '700',
-    letterSpacing: -0.6,
+    color: textColor.textOnPrimary,
+    ...typography.h1,
     textAlign: 'center',
     marginTop: 8,
   },
@@ -736,17 +735,15 @@ export const overviewStyles = StyleSheet.create({
     marginTop: 14,
   },
   cardLine: {
-    color: colors.onPrimary,
-    fontSize: 13.5,
-    lineHeight: 19,
-    fontWeight: '600',
+    color: textColor.textOnPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
     textAlign: 'center',
     marginTop: 14,
   },
   cardVenue: {
     color: 'rgba(255,255,255,0.78)',
-    fontSize: 12.5,
-    lineHeight: 17,
+    ...typography.caption,
     textAlign: 'center',
     marginTop: 3,
   },
@@ -762,7 +759,7 @@ export const overviewStyles = StyleSheet.create({
     paddingVertical: 8,
     marginTop: 18,
   },
-  cardOpenText: { color: colors.onPrimary, fontSize: 12.5, fontWeight: '700' },
+  cardOpenText: { color: textColor.textOnPrimary, ...typography.label },
 
   /* The one thing to do next. */
   cta: {
@@ -777,11 +774,10 @@ export const overviewStyles = StyleSheet.create({
   },
   ctaApprove: { backgroundColor: INV_NAVY_DEEP },
   ctaDisabled: { opacity: 0.45 },
-  ctaText: { color: colors.onPrimary, fontSize: 14.5, fontWeight: '700' },
+  ctaText: { color: textColor.textOnPrimary, ...typography.buttonSmall },
   ctaNote: {
-    color: colors.textMuted,
-    fontSize: 11.5,
-    lineHeight: 16,
+    color: textColor.textSecondary,
+    ...typography.buttonSmall,
     textAlign: 'center',
     marginTop: 7,
     paddingHorizontal: spacing.lg,
@@ -797,11 +793,9 @@ export const overviewStyles = StyleSheet.create({
   },
   insideTitle: {
     color: INV_NAVY_DEEP,
-    fontSize: 15,
-    lineHeight: 20,
-    fontWeight: '700',
+    ...typography.h3,
   },
-  insideCount: { color: colors.textMuted, fontSize: 11.5 },
+  insideCount: { color: textColor.textSecondary, ...typography.caption },
   /* One card holding the rows, rather than rows floating on the page: it is a
      contents page, and a contents page is a block, not a settings screen. */
   insideCard: {
@@ -833,13 +827,16 @@ export const overviewStyles = StyleSheet.create({
   insideName: {
     flex: 1,
     color: INV_NAVY_DEEP,
-    fontSize: 13.5,
-    lineHeight: 18,
-    fontWeight: '600',
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
   },
-  insideState: { color: colors.textMuted, fontSize: 11.5, flexShrink: 0 },
-  insideStateYours: { color: INV_ACCENT, fontWeight: '700' },
-  insideStateApproved: { color: INV_GREEN, fontWeight: '600' },
+  insideState: {
+    color: textColor.textSecondary,
+    ...typography.caption,
+    flexShrink: 0,
+  },
+  insideStateYours: { color: INV_ACCENT, ...fontWeights.bold },
+  insideStateApproved: { color: INV_GREEN, ...fontWeights.semibold },
 });
 
 /**
@@ -901,16 +898,12 @@ export const coverStyles = StyleSheet.create({
     alignItems: 'center',
   },
   eyebrow: {
-    fontSize: 10.5,
-    lineHeight: 15,
-    fontWeight: '700',
-    letterSpacing: 1.6,
+    ...typography.label,
     textAlign: 'center',
   },
   names: {
-    color: colors.onPrimary,
-    fontSize: 28,
-    lineHeight: 37,
+    color: textColor.textOnPrimary,
+    ...typography.h1,
     textAlign: 'center',
     marginTop: 10,
   },
@@ -922,25 +915,21 @@ export const coverStyles = StyleSheet.create({
     marginTop: 16,
   },
   when: {
-    color: colors.onPrimary,
-    fontSize: 13.5,
-    lineHeight: 19,
-    fontWeight: '600',
-    letterSpacing: 0.6,
+    color: textColor.textOnPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
     textAlign: 'center',
     marginTop: 14,
   },
   venue: {
     color: 'rgba(255,255,255,0.8)',
-    fontSize: 12.5,
-    lineHeight: 17,
+    ...typography.caption,
     textAlign: 'center',
     marginTop: 4,
   },
   message: {
     color: 'rgba(255,255,255,0.92)',
-    fontSize: 13,
-    lineHeight: 20,
+    ...typography.bodySmall,
     textAlign: 'center',
     marginTop: 16,
     paddingHorizontal: spacing.sm,
@@ -949,15 +938,12 @@ export const coverStyles = StyleSheet.create({
   scroll: { alignItems: 'center', gap: 2, marginTop: 20 },
   scrollText: {
     color: 'rgba(255,255,255,0.72)',
-    fontSize: 11,
-    letterSpacing: 1.2,
-    fontWeight: '600',
+    ...typography.label,
   },
   /* Said only in the editor, never over a guest's cover. */
   note: {
     color: 'rgba(255,255,255,0.78)',
-    fontSize: 11.5,
-    lineHeight: 16,
+    ...typography.caption,
     textAlign: 'center',
     marginTop: 12,
     paddingHorizontal: spacing.sm,
@@ -970,14 +956,11 @@ export const coverEditorStyles = StyleSheet.create({
   headText: { flex: 1 },
   title: {
     color: INV_NAVY_DEEP,
-    fontSize: 17,
-    lineHeight: 23,
-    fontWeight: '700',
+    ...typography.h3,
   },
   sub: {
-    color: colors.textMuted,
-    fontSize: 12.5,
-    lineHeight: 18,
+    color: textColor.textSecondary,
+    ...typography.caption,
     marginTop: 2,
   },
   close: {
@@ -994,13 +977,16 @@ export const coverEditorStyles = StyleSheet.create({
   group: { marginTop: spacing.md },
   groupTitle: {
     color: INV_NAVY_DEEP,
-    fontSize: 13,
-    fontWeight: '700',
-    letterSpacing: 0.4,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
     textTransform: 'uppercase',
     marginBottom: 8,
   },
-  label: { color: colors.textMuted, fontSize: 12, marginBottom: 4 },
+  label: {
+    color: textColor.textSecondary,
+    ...typography.label,
+    marginBottom: 4,
+  },
   field: {
     borderWidth: 1,
     borderColor: INV_HAIRLINE,
@@ -1008,9 +994,8 @@ export const coverEditorStyles = StyleSheet.create({
     backgroundColor: colors.background,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    color: colors.text,
-    fontSize: 14,
-    fontFamily: fontFor('400'),
+    color: textColor.textPrimary,
+    ...typography.body,
   },
   fieldMulti: { minHeight: 76, textAlignVertical: 'top' },
   row: { ...globalStyles.row, gap: spacing.sm },
@@ -1019,12 +1004,12 @@ export const coverEditorStyles = StyleSheet.create({
   gap: { marginTop: 8 },
   /* The counter the server's own cap drives — never a second number. */
   counter: {
-    color: colors.textMuted,
-    fontSize: 11,
+    color: textColor.textSecondary,
+    ...typography.caption,
     textAlign: 'right',
     marginTop: 4,
   },
-  counterFull: { color: INV_ACCENT, fontWeight: '700' },
+  counterFull: { color: INV_ACCENT, ...fontWeights.bold },
 
   /* Media */
   mediaRow: { ...globalStyles.row, gap: spacing.sm, marginTop: 4 },
@@ -1039,15 +1024,14 @@ export const coverEditorStyles = StyleSheet.create({
     backgroundColor: INV_PAPER,
     paddingVertical: 11,
   },
-  mediaButtonText: { color: INV_NAVY_DEEP, fontSize: 12.5, fontWeight: '700' },
+  mediaButtonText: { color: INV_NAVY_DEEP, ...typography.buttonSmall },
   mediaState: { ...globalStyles.row, gap: 6, marginTop: 8 },
   mediaStateText: {
     flex: 1,
-    color: colors.textMuted,
-    fontSize: 12,
-    lineHeight: 17,
+    color: textColor.textSecondary,
+    ...typography.caption,
   },
-  mediaRemove: { color: INV_ACCENT, fontSize: 12, fontWeight: '700' },
+  mediaRemove: { color: INV_ACCENT, ...typography.label },
 
   /* Theme and lettering: swatches and words, not a dropdown of ids. */
   swatches: { ...globalStyles.row, flexWrap: 'wrap', gap: spacing.sm },
@@ -1061,13 +1045,13 @@ export const coverEditorStyles = StyleSheet.create({
   swatchOn: { borderColor: INV_ACCENT },
   swatchArt: { height: 44, borderRadius: 9, overflow: 'hidden' },
   swatchLabel: {
-    color: colors.textMuted,
-    fontSize: 10.5,
+    color: textColor.textSecondary,
+    ...typography.label,
     textAlign: 'center',
     marginTop: 3,
     marginBottom: 2,
   },
-  swatchLabelOn: { color: INV_ACCENT, fontWeight: '700' },
+  swatchLabelOn: { color: INV_ACCENT, ...fontWeights.bold },
 
   fontChip: {
     borderRadius: 12,
@@ -1077,14 +1061,21 @@ export const coverEditorStyles = StyleSheet.create({
     paddingVertical: 9,
   },
   fontChipOn: { borderColor: INV_ACCENT, backgroundColor: INV_ACCENT_SOFT },
-  fontChipText: { color: INV_NAVY_DEEP, fontSize: 14 },
-  fontChipNote: { color: colors.textMuted, fontSize: 10.5, marginTop: 1 },
+  fontChipText: { color: INV_NAVY_DEEP, ...typography.body },
+  fontChipNote: {
+    color: textColor.textSecondary,
+    ...typography.label,
+    marginTop: 1,
+  },
 
-  errorText: { color: colors.danger, fontSize: 12, marginTop: spacing.sm },
+  errorText: {
+    color: textColor.textError,
+    ...typography.caption,
+    marginTop: spacing.sm,
+  },
   savedText: {
     color: INV_GREEN,
-    fontSize: 12,
-    fontWeight: '700',
+    ...typography.label,
     marginTop: spacing.sm,
   },
   save: {
@@ -1097,7 +1088,7 @@ export const coverEditorStyles = StyleSheet.create({
     marginTop: spacing.md,
   },
   saveDisabled: { opacity: 0.45 },
-  saveText: { color: colors.onPrimary, fontSize: 15, fontWeight: '700' },
+  saveText: { color: textColor.textOnPrimary, ...typography.h3 },
 });
 
 /**
@@ -1150,7 +1141,7 @@ export const artworkStyles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: 'rgba(10,8,30,0.55)',
   },
-  kindChipText: { color: '#ffffff', fontSize: 11.5, fontWeight: '700' },
+  kindChipText: { color: textColor.textOnPrimary, ...typography.label },
   expandChip: {
     position: 'absolute',
     right: 12,
@@ -1163,7 +1154,7 @@ export const artworkStyles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: 'rgba(10,8,30,0.55)',
   },
-  expandChipText: { color: '#ffffff', fontSize: 12, fontWeight: '700' },
+  expandChipText: { color: textColor.textOnPrimary, ...typography.label },
   media: { width: '100%', height: '100%' },
   unplayable: {
     alignItems: 'center',
@@ -1173,8 +1164,7 @@ export const artworkStyles = StyleSheet.create({
   },
   unplayableText: {
     color: colors.onPrimaryMuted,
-    fontSize: 12.5,
-    lineHeight: 18,
+    ...typography.caption,
     textAlign: 'center',
   },
 
@@ -1186,7 +1176,11 @@ export const artworkStyles = StyleSheet.create({
     paddingVertical: 8,
     marginTop: 10,
   },
-  viewText: { color: INV_ACCENT, fontSize: 13, fontWeight: '700' },
+  viewText: {
+    color: INV_ACCENT,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
 
   /* Full screen: the invitation, and a way out. */
   viewer: { flex: 1, backgroundColor: '#05070d', justifyContent: 'center' },
@@ -1237,16 +1231,12 @@ export const artworkStyles = StyleSheet.create({
   statusText: { flex: 1 },
   statusTitle: {
     color: INV_NAVY_DEEP,
-    fontSize: 16,
-    lineHeight: 20,
-    fontWeight: '700',
-    letterSpacing: -0.2,
+    ...typography.h3,
   },
   statusTitleDone: { color: INV_GREEN },
   statusNote: {
-    color: colors.textMuted,
-    fontSize: 12.5,
-    lineHeight: 17,
+    color: textColor.textSecondary,
+    ...typography.label,
     marginTop: 1,
   },
 
@@ -1262,7 +1252,7 @@ export const artworkStyles = StyleSheet.create({
     paddingVertical: 14,
   },
   approveDisabled: { opacity: 0.45 },
-  approveText: { color: colors.onPrimary, fontSize: 15, fontWeight: '700' },
+  approveText: { color: textColor.textOnPrimary, ...typography.h3 },
   share: { backgroundColor: INV_GREEN },
   ask: {
     ...globalStyles.row,
@@ -1275,24 +1265,26 @@ export const artworkStyles = StyleSheet.create({
     paddingVertical: 13,
     marginTop: spacing.sm,
   },
-  askText: { color: INV_NAVY_DEEP, fontSize: 14, fontWeight: '600' },
+  askText: {
+    color: INV_NAVY_DEEP,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
   askNote: {
-    color: colors.textMuted,
-    fontSize: 11.5,
-    lineHeight: 16,
+    color: textColor.textSecondary,
+    ...typography.caption,
     textAlign: 'center',
     marginTop: 8,
   },
   errorText: {
-    color: colors.danger,
-    fontSize: 12.5,
+    color: textColor.textError,
+    ...typography.caption,
     textAlign: 'center',
     marginTop: spacing.sm,
   },
   sentText: {
     color: INV_GREEN,
-    fontSize: 12.5,
-    fontWeight: '700',
+    ...typography.label,
     textAlign: 'center',
     marginTop: spacing.sm,
   },
@@ -1313,15 +1305,12 @@ export const artworkStyles = StyleSheet.create({
   },
   pendingTitle: {
     color: INV_NAVY_DEEP,
-    fontSize: 19,
-    lineHeight: 25,
-    fontWeight: '700',
+    ...typography.h2,
     marginTop: spacing.md,
   },
   pendingBody: {
-    color: colors.textMuted,
-    fontSize: 13.5,
-    lineHeight: 20,
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
     textAlign: 'center',
     marginTop: 6,
   },
@@ -1337,11 +1326,7 @@ export const storyStyles = StyleSheet.create({
   block: { marginTop: 28 },
   title: {
     color: INV_NAVY_DEEP,
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '700',
-    letterSpacing: 2,
-    textTransform: 'uppercase',
+    ...typography.overline,
     textAlign: 'center',
     marginBottom: 14,
     paddingHorizontal: spacing.md,
@@ -1359,9 +1344,8 @@ export const storyStyles = StyleSheet.create({
   },
   photo: { width: '100%', height: '100%' },
   caption: {
-    color: colors.textMuted,
-    fontSize: 13,
-    lineHeight: 19,
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
     textAlign: 'center',
     marginTop: 10,
     paddingHorizontal: 2,
@@ -1383,10 +1367,8 @@ export const storyStyles = StyleSheet.create({
   },
   dotOn: { width: 20, backgroundColor: INV_ACCENT },
   count: {
-    color: colors.textMuted,
-    fontSize: 11.5,
-    fontWeight: '600',
-    letterSpacing: 0.4,
+    color: textColor.textSecondary,
+    ...typography.label,
   },
 });
 
@@ -1425,19 +1407,13 @@ export const countdownStyles = StyleSheet.create({
   },
 
   eyebrow: {
-    color: colors.textMuted,
-    fontSize: 10.5,
-    lineHeight: 15,
-    fontWeight: '600',
-    letterSpacing: 2.4,
+    color: textColor.textSecondary,
+    ...typography.label,
     textAlign: 'center',
   },
   title: {
     color: INV_NAVY_DEEP,
-    fontSize: 24,
-    lineHeight: 31,
-    fontWeight: '600',
-    letterSpacing: -0.2,
+    ...typography.h1,
     textAlign: 'center',
     marginTop: 5,
   },
@@ -1461,19 +1437,13 @@ export const countdownStyles = StyleSheet.create({
   },
   value: {
     color: INV_NAVY_DEEP,
-    fontSize: 25,
-    lineHeight: 30,
-    fontWeight: '700',
+    ...typography.h1,
     /* Tabular figures, so the seconds do not shuffle the row every tick. */
     fontVariant: ['tabular-nums'],
   },
   unitLabel: {
-    color: colors.textMuted,
-    fontSize: 9,
-    lineHeight: 13,
-    fontWeight: '600',
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
+    color: textColor.textSecondary,
+    ...typography.overline,
     marginTop: 3,
   },
   /* The gold bead between the figures; it carries the row's spacing too. */
@@ -1490,16 +1460,13 @@ export const countdownStyles = StyleSheet.create({
   afterWrap: { alignItems: 'center', marginTop: 22 },
   afterHead: {
     color: INV_NAVY_DEEP,
-    fontSize: 23,
-    lineHeight: 30,
-    fontWeight: '600',
+    ...typography.h2,
     textAlign: 'center',
     marginTop: 8,
   },
   afterBody: {
-    color: colors.textMuted,
-    fontSize: 13.5,
-    lineHeight: 20,
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
     textAlign: 'center',
     marginTop: 4,
   },
@@ -1530,9 +1497,8 @@ export const countdownStyles = StyleSheet.create({
   },
   factText: {
     flexShrink: 1,
-    color: colors.text,
-    fontSize: 13.5,
-    lineHeight: 19,
+    color: textColor.textPrimary,
+    ...typography.bodySmall,
     textAlign: 'center',
   },
 });
@@ -1562,18 +1528,13 @@ export const saveTheDateStyles = StyleSheet.create({
     transform: [{ rotate: '45deg' }],
   },
   title: {
-    color: colors.textMuted,
-    fontSize: 10.5,
-    lineHeight: 15,
-    fontWeight: '600',
-    letterSpacing: 2.6,
+    color: textColor.textSecondary,
+    ...typography.label,
     textAlign: 'center',
   },
   lead: {
     color: INV_NAVY_DEEP,
-    fontSize: 20,
-    lineHeight: 27,
-    fontWeight: '600',
+    ...typography.h2,
     textAlign: 'center',
     marginTop: 6,
     paddingHorizontal: spacing.lg,
@@ -1600,7 +1561,7 @@ export const saveTheDateStyles = StyleSheet.create({
     opacity: 0.55,
   },
 
-  name: { fontSize: 21, lineHeight: 28, fontWeight: '600', marginBottom: 10 },
+  name: { ...typography.h2, marginBottom: 10 },
 
   fact: {
     ...globalStyles.row,
@@ -1610,22 +1571,17 @@ export const saveTheDateStyles = StyleSheet.create({
   },
   factText: { flex: 1 },
   factLabel: {
-    color: colors.textMuted,
-    fontSize: 10.5,
-    lineHeight: 15,
-    fontWeight: '600',
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
+    color: textColor.textSecondary,
+    ...typography.overline,
   },
-  factValue: { color: colors.text, fontSize: 13.5, lineHeight: 19 },
-  factStrong: { color: INV_NAVY_DEEP, fontWeight: '600' },
-  factSub: { color: colors.textMuted, fontSize: 12.5, lineHeight: 17 },
+  factValue: { color: textColor.textPrimary, ...typography.bodySmall },
+  factStrong: { color: INV_NAVY_DEEP, ...fontWeights.semibold },
+  factSub: { color: textColor.textSecondary, ...typography.caption },
 
   hair: { width: 44, height: 1, opacity: 0.25, marginVertical: 11 },
 
   note: {
-    fontSize: 13.5,
-    lineHeight: 20,
+    ...typography.bodySmall,
     fontStyle: 'italic',
     marginTop: 11,
     opacity: 0.9,
@@ -1642,10 +1598,14 @@ export const saveTheDateStyles = StyleSheet.create({
     marginTop: 16,
   },
   addOff: { opacity: 0.45 },
-  addText: { color: colors.onPrimary, fontSize: 14, fontWeight: '700' },
+  addText: {
+    color: textColor.textOnPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
   noDate: {
-    color: colors.textMuted,
-    fontSize: 11.5,
+    color: textColor.textSecondary,
+    ...typography.caption,
     textAlign: 'center',
     marginTop: 7,
   },
@@ -1686,9 +1646,7 @@ export const liveStyles = StyleSheet.create({
      set in a UI sans. */
   heading: {
     color: INV_NAVY_DEEP,
-    fontFamily: 'serif',
-    fontSize: 19,
-    fontWeight: '600',
+    ...typography.h2,
   },
 
   state: { ...globalStyles.row, alignItems: 'center', gap: 10, marginTop: 12 },
@@ -1710,25 +1668,18 @@ export const liveStyles = StyleSheet.create({
     backgroundColor: colors.onPrimary,
   },
   badgeText: {
-    color: colors.onPrimary,
-    fontSize: 10,
-    lineHeight: 13,
-    fontWeight: '700',
-    letterSpacing: 1.2,
+    color: textColor.textOnPrimary,
+    ...typography.label,
   },
 
   name: {
     color: INV_NAVY_DEEP,
-    fontFamily: 'serif',
-    fontSize: 24,
-    lineHeight: 32,
-    fontWeight: '600',
+    ...typography.h1,
     marginTop: 10,
   },
   lead: {
-    color: colors.textMuted,
-    fontSize: 12.5,
-    lineHeight: 18,
+    color: textColor.textSecondary,
+    ...typography.caption,
     marginTop: 3,
   },
 
@@ -1747,10 +1698,8 @@ export const liveStyles = StyleSheet.create({
   },
   modeOn: { borderColor: 'transparent', backgroundColor: INV_ACCENT },
   modeText: {
-    color: colors.text,
-    fontSize: 12.5,
-    lineHeight: 17,
-    fontWeight: '700',
+    color: textColor.textPrimary,
+    ...typography.label,
   },
   modeTextOn: { color: colors.onPrimary },
 
@@ -1775,11 +1724,14 @@ export const liveStyles = StyleSheet.create({
     borderRadius: 14,
     backgroundColor: INV_ACCENT,
   },
-  watchText: { color: colors.onPrimary, fontSize: 14, fontWeight: '700' },
+  watchText: {
+    color: textColor.textOnPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
   opens: {
-    color: colors.textMuted,
-    fontSize: 11,
-    lineHeight: 15,
+    color: textColor.textSecondary,
+    ...typography.caption,
     textAlign: 'center',
     marginTop: 7,
   },
@@ -1798,9 +1750,7 @@ export const liveStyles = StyleSheet.create({
   detailsBloom: { position: 'absolute', top: -12, right: -10 },
   detailsHead: {
     color: INV_NAVY_DEEP,
-    fontFamily: 'serif',
-    fontSize: 17,
-    fontWeight: '600',
+    ...typography.h3,
     marginBottom: 12,
   },
   fact: {
@@ -1820,13 +1770,10 @@ export const liveStyles = StyleSheet.create({
   },
   factBody: { flex: 1 },
   factLabel: {
-    color: colors.textMuted,
-    fontSize: 10.5,
-    lineHeight: 14,
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
+    color: textColor.textSecondary,
+    ...typography.overline,
   },
-  factText: { color: colors.text, fontSize: 13, lineHeight: 19 },
+  factText: { color: textColor.textPrimary, ...typography.bodySmall },
 });
 
 /* ---------- F6: Shared Memories ---------- */
@@ -1857,15 +1804,12 @@ export const memoriesStyles = StyleSheet.create({
   },
   heading: {
     color: INV_NAVY_DEEP,
-    fontFamily: 'serif',
-    fontSize: 19,
-    fontWeight: '600',
+    ...typography.h2,
   },
-  tally: { color: colors.textMuted, fontSize: 11.5 },
+  tally: { color: textColor.textSecondary, ...typography.caption },
   lead: {
-    color: colors.textMuted,
-    fontSize: 12.5,
-    lineHeight: 18,
+    color: textColor.textSecondary,
+    ...typography.caption,
     marginTop: 4,
   },
 
@@ -1886,10 +1830,8 @@ export const memoriesStyles = StyleSheet.create({
   },
   tabOn: { borderColor: 'transparent', backgroundColor: INV_ACCENT },
   tabText: {
-    color: colors.text,
-    fontSize: 12.5,
-    lineHeight: 17,
-    fontWeight: '700',
+    color: textColor.textPrimary,
+    ...typography.label,
   },
   tabTextOn: { color: colors.onPrimary },
   filters: { marginTop: 8 },
@@ -1902,7 +1844,7 @@ export const memoriesStyles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   filterOn: { borderColor: 'rgba(176,133,43,0.35)' },
-  filterText: { color: colors.textMuted, fontSize: 11.5, fontWeight: '700' },
+  filterText: { color: textColor.textSecondary, ...typography.label },
   filterTextOn: { color: INV_NAVY_DEEP },
 
   /* Two columns, square cells — the grid is a grid before a single image has
@@ -1934,7 +1876,7 @@ export const memoriesStyles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: 'rgba(15,17,22,0.6)',
   },
-  reelText: { color: '#fff', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
+  reelText: { color: textColor.textOnPrimary, ...typography.label },
   length: {
     position: 'absolute',
     right: 7,
@@ -1944,7 +1886,7 @@ export const memoriesStyles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: 'rgba(15,17,22,0.66)',
   },
-  lengthText: { color: '#fff', fontSize: 10.5 },
+  lengthText: { color: textColor.textOnPrimary, ...typography.caption },
   cellNote: {
     position: 'absolute',
     left: 6,
@@ -1955,12 +1897,11 @@ export const memoriesStyles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: 'rgba(255,253,250,0.94)',
   },
-  cellNoteText: { color: colors.text, fontSize: 10.5, lineHeight: 14 },
+  cellNoteText: { color: textColor.textPrimary, ...typography.caption },
 
   empty: {
-    color: colors.textMuted,
-    fontSize: 13,
-    lineHeight: 19,
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
     textAlign: 'center',
     marginTop: 18,
   },
@@ -1973,7 +1914,7 @@ export const memoriesStyles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
   },
-  moreText: { color: INV_NAVY_DEEP, fontSize: 12.5, fontWeight: '700' },
+  moreText: { color: INV_NAVY_DEEP, ...typography.label },
 
   /* The floating action, inside the card rather than over the whole screen —
      the invitation is one long scroll and a screen-level button would sit on
@@ -1988,7 +1929,11 @@ export const memoriesStyles = StyleSheet.create({
     borderRadius: 14,
     backgroundColor: INV_ACCENT,
   },
-  addText: { color: colors.onPrimary, fontSize: 14, fontWeight: '700' },
+  addText: {
+    color: textColor.textOnPrimary,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
   say: {
     marginTop: 10,
     paddingHorizontal: 11,
@@ -1997,20 +1942,18 @@ export const memoriesStyles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   sayWarn: { backgroundColor: '#fff7f3' },
-  sayText: { color: colors.text, fontSize: 12.5, lineHeight: 18 },
+  sayText: { color: textColor.textPrimary, ...typography.caption },
   sayTextWarn: { color: INV_ACCENT },
 
   /* ---- the sheets ---- */
   sheetTitle: {
     color: INV_NAVY_DEEP,
-    fontSize: 17,
-    fontWeight: '700',
+    ...typography.h3,
     marginBottom: 4,
   },
   sheetLead: {
-    color: colors.textMuted,
-    fontSize: 12.5,
-    lineHeight: 18,
+    color: textColor.textSecondary,
+    ...typography.caption,
     marginBottom: 14,
   },
   option: {
@@ -2033,11 +1976,14 @@ export const memoriesStyles = StyleSheet.create({
     backgroundColor: INV_BLUSH,
   },
   optionText: { flex: 1 },
-  optionName: { color: INV_NAVY_DEEP, fontSize: 14, fontWeight: '700' },
+  optionName: {
+    color: INV_NAVY_DEEP,
+    ...typography.body,
+    ...fontWeights.semibold,
+  },
   optionNote: {
-    color: colors.textMuted,
-    fontSize: 11.5,
-    lineHeight: 16,
+    color: textColor.textSecondary,
+    ...typography.caption,
     marginTop: 1,
   },
 
@@ -2049,11 +1995,8 @@ export const memoriesStyles = StyleSheet.create({
     marginBottom: 12,
   },
   fieldLabel: {
-    color: colors.textMuted,
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
+    color: textColor.textSecondary,
+    ...typography.overline,
     marginBottom: 6,
   },
   eventRow: { ...globalStyles.row, gap: 8, flexWrap: 'wrap', marginBottom: 14 },
@@ -2064,13 +2007,13 @@ export const memoriesStyles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     minHeight: 64,
-    color: colors.text,
-    fontSize: 13.5,
+    color: textColor.textPrimary,
+    ...inputTypography.body,
     textAlignVertical: 'top',
   },
   counter: {
-    color: colors.textMuted,
-    fontSize: 11,
+    color: textColor.textSecondary,
+    ...typography.caption,
     textAlign: 'right',
     marginTop: 4,
   },
@@ -2096,7 +2039,11 @@ export const memoriesStyles = StyleSheet.create({
     borderColor: INV_HAIRLINE,
     alignItems: 'center',
   },
-  sheetGhostText: { color: INV_NAVY_DEEP, fontSize: 13.5, fontWeight: '700' },
+  sheetGhostText: {
+    color: INV_NAVY_DEEP,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
   sheetPrimary: {
     flex: 2,
     paddingVertical: 13,
@@ -2105,9 +2052,9 @@ export const memoriesStyles = StyleSheet.create({
     alignItems: 'center',
   },
   sheetPrimaryText: {
-    color: colors.onPrimary,
-    fontSize: 13.5,
-    fontWeight: '700',
+    color: textColor.textOnPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
   },
 
   /* ---- the viewer ---- */
@@ -2121,9 +2068,8 @@ export const memoriesStyles = StyleSheet.create({
   },
   viewerCaption: {
     flex: 1,
-    color: '#fff',
-    fontSize: 13,
-    lineHeight: 18,
+    color: textColor.textOnPrimary,
+    ...typography.bodySmall,
     textAlign: 'center',
   },
   viewerPill: {
@@ -2135,7 +2081,7 @@ export const memoriesStyles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: 'rgba(255,255,255,0.14)',
   },
-  viewerPillText: { color: '#fff', fontSize: 12.5, fontWeight: '700' },
+  viewerPillText: { color: textColor.textOnPrimary, ...typography.label },
 });
 
 /* Invitation · Live stream · Memories, and the note that ties them to one link. */
@@ -2171,7 +2117,7 @@ export const switchStyles = StyleSheet.create({
       android: { elevation: 3 },
     }),
   },
-  label: { color: '#6b6488', fontSize: 12.5, fontFamily: fontFor('600') },
+  label: { color: textColor.textSecondary, ...typography.label },
   labelActive: { color: '#ffffff' },
   liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#e8433a' },
   liveDotActive: { backgroundColor: '#ffffff' },
@@ -2197,8 +2143,8 @@ export const switchStyles = StyleSheet.create({
     backgroundColor: '#ece5ff',
   },
   noteText: { flex: 1 },
-  noteTitle: { color: INV_NAVY_DEEP, fontSize: 14.5 },
-  noteBody: { color: '#5d5873', marginTop: 3, lineHeight: 18 },
+  noteTitle: { color: INV_NAVY_DEEP, ...typography.body },
+  noteBody: { color: textColor.textSecondary, marginTop: 3 },
   noteButton: {
     ...globalStyles.row,
     alignSelf: 'flex-start',
@@ -2211,7 +2157,7 @@ export const switchStyles = StyleSheet.create({
     borderColor: '#bfe8d0',
     backgroundColor: '#ffffff',
   },
-  noteButtonText: { color: '#128c4a', fontFamily: fontFor('600') },
+  noteButtonText: { color: '#128c4a', ...fontWeights.semibold },
 
   empty: {
     alignItems: 'center',
@@ -2233,12 +2179,12 @@ export const switchStyles = StyleSheet.create({
     backgroundColor: '#fff0f3',
     marginBottom: 12,
   },
-  emptyTitle: { color: INV_NAVY_DEEP, textAlign: 'center' },
+  emptyTitle: { ...typography.h2, color: INV_NAVY_DEEP, textAlign: 'center' },
   emptyBody: {
-    color: '#6f6a85',
+    ...typography.body,
+    color: textColor.textSecondary,
     textAlign: 'center',
     marginTop: 6,
-    lineHeight: 18,
   },
 });
 
@@ -2271,8 +2217,8 @@ export const nextStepStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   headText: { flex: 1 },
-  title: { fontSize: 16 },
-  note: { color: '#5d5873', marginTop: 2, lineHeight: 18 },
+  title: { ...typography.bodyLarge },
+  note: { color: textColor.textSecondary, marginTop: 2 },
   body: { paddingHorizontal: 14, paddingTop: 14, paddingBottom: 6 },
   quote: {
     borderLeftWidth: 3,
@@ -2283,16 +2229,16 @@ export const nextStepStyles = StyleSheet.create({
     paddingHorizontal: 12,
     marginBottom: 6,
   },
-  quoteLabel: { color: '#a8540a', fontFamily: fontFor('600') },
-  quoteText: { color: INV_NAVY_DEEP, marginTop: 3, lineHeight: 20 },
+  quoteLabel: { color: '#a8540a', ...fontWeights.semibold },
+  quoteText: { color: INV_NAVY_DEEP, marginTop: 3 },
   progress: { marginBottom: 14 },
   progressRow: {
     ...globalStyles.row,
     justifyContent: 'space-between',
     marginBottom: 7,
   },
-  progressText: { color: INV_NAVY_DEEP, fontFamily: fontFor('600') },
-  progressSub: { color: '#6f6a85' },
+  progressText: { color: INV_NAVY_DEEP, ...fontWeights.semibold },
+  progressSub: { color: textColor.textSecondary },
   track: {
     height: 6,
     borderRadius: 3,
@@ -2309,15 +2255,15 @@ export const nextStepStyles = StyleSheet.create({
     overflow: 'hidden',
   },
   primaryBusy: { opacity: 0.75 },
-  primaryText: { color: colors.onPrimary, fontSize: 15.5 },
+  primaryText: { color: textColor.textOnPrimary, ...typography.bodyLarge },
   link: {
     ...globalStyles.row,
     justifyContent: 'center',
     gap: 6,
     paddingVertical: 12,
   },
-  linkText: { color: '#5d5873', fontFamily: fontFor('600'), fontSize: 13.5 },
-  error: { color: '#c62828', textAlign: 'center', marginBottom: 8 },
+  linkText: { color: textColor.textSecondary, ...typography.buttonSmall },
+  error: { color: textColor.textError, textAlign: 'center', marginBottom: 8 },
   sent: { color: '#0e8a68', textAlign: 'center', marginBottom: 8 },
 
   strip: {
@@ -2339,8 +2285,7 @@ export const nextStepStyles = StyleSheet.create({
   },
   stripText: {
     flex: 1,
-    color: '#ffffff',
-    fontFamily: fontFor('600'),
-    fontSize: 13.5,
+    color: textColor.textOnPrimary,
+    ...typography.bodySmall,
   },
 });

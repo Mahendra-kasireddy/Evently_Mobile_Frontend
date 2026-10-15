@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Image, TouchableOpacity, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
-import { EventlyIcon, EventlyText, EventlyTextInput } from '../../../Components';
+import { EventlyIcon, AppText, EventlyTextInput } from '../../../Components';
 import { categoriesStepStyles } from '../styles';
 import {
   CATEGORY_ICON_COLOR,
@@ -31,10 +31,20 @@ interface TileProps {
 }
 
 /** One service in the 2-column grid: tinted icon, name, examples, radio. */
-function CategoryTile({ title, subtitle, iconName, iconColor, isSelected, onPress }: TileProps) {
+function CategoryTile({
+  title,
+  subtitle,
+  iconName,
+  iconColor,
+  isSelected,
+  onPress,
+}: TileProps) {
   return (
     <TouchableOpacity
-      style={[categoriesStepStyles.tile, isSelected && categoriesStepStyles.tileSelected]}
+      style={[
+        categoriesStepStyles.tile,
+        isSelected && categoriesStepStyles.tileSelected,
+      ]}
       activeOpacity={0.8}
       onPress={onPress}
       accessibilityRole="checkbox"
@@ -42,30 +52,53 @@ function CategoryTile({ title, subtitle, iconName, iconColor, isSelected, onPres
       accessibilityLabel={`${title}. ${subtitle}`}
     >
       <View style={categoriesStepStyles.tileTop}>
-        <View style={[categoriesStepStyles.icon, { backgroundColor: iconColor }]}>
+        <View
+          style={[categoriesStepStyles.icon, { backgroundColor: iconColor }]}
+        >
           <EventlyIcon name={iconName} size={18} color={colors.onPrimary} />
         </View>
-        <View style={[categoriesStepStyles.radio, isSelected && categoriesStepStyles.radioOn]}>
-          {isSelected ? <EventlyIcon name="check" size={11} color={colors.onPrimary} /> : null}
+        <View
+          style={[
+            categoriesStepStyles.radio,
+            isSelected && categoriesStepStyles.radioOn,
+          ]}
+        >
+          {isSelected ? (
+            <EventlyIcon name="check" size={11} color={colors.onPrimary} />
+          ) : null}
         </View>
       </View>
-      <EventlyText variant="body" style={categoriesStepStyles.tileTitle} numberOfLines={1}>
+      <AppText
+        variant="bodySmall"
+        style={categoriesStepStyles.tileTitle}
+        numberOfLines={1}
+      >
         {title}
-      </EventlyText>
-      <EventlyText variant="caption" style={categoriesStepStyles.tileSubtitle} numberOfLines={1}>
+      </AppText>
+      <AppText
+        variant="caption"
+        style={categoriesStepStyles.tileSubtitle}
+        numberOfLines={1}
+      >
         {subtitle}
-      </EventlyText>
+      </AppText>
     </TouchableOpacity>
   );
 }
 
-export function CategoriesStep({ categories, selected, onToggle }: CategoriesStepProps) {
+export function CategoriesStep({
+  categories,
+  selected,
+  onToggle,
+}: CategoriesStepProps) {
   const [customInput, setCustomInput] = useState('');
 
   // Anything selected that isn't one of the preset categories is a service the
   // customer typed in themselves — rendered as its own tile using the typed
   // text as both id and label, removable the same way as any preset tile.
-  const customCategories = selected.filter((id) => !categories.some((c) => c.id === id));
+  const customCategories = selected.filter(
+    id => !categories.some(c => c.id === id),
+  );
 
   const addCustom = () => {
     const trimmed = customInput.trim();
@@ -80,34 +113,70 @@ export function CategoriesStep({ categories, selected, onToggle }: CategoriesSte
         {/* A sprig of the same bouquet as the details hero, faded in from the
             left so it only peeks over the top-right corner. */}
         <View style={categoriesStepStyles.bannerArt} pointerEvents="none">
-          <Image source={BANNER_FLOWERS} style={categoriesStepStyles.bannerArtImage} resizeMode="cover" />
-          <Svg style={categoriesStepStyles.bannerArtFade} width="100%" height="100%">
+          <Image
+            source={BANNER_FLOWERS}
+            style={categoriesStepStyles.bannerArtImage}
+            resizeMode="cover"
+          />
+          <Svg
+            style={categoriesStepStyles.bannerArtFade}
+            width="100%"
+            height="100%"
+          >
             <Defs>
               <LinearGradient id="checklistFade" x1="0" y1="0" x2="1" y2="0">
-                <Stop offset="0" stopColor={PLAN_CHECKLIST_BG} stopOpacity={1} />
-                <Stop offset="0.7" stopColor={PLAN_CHECKLIST_BG} stopOpacity={0} />
+                <Stop
+                  offset="0"
+                  stopColor={PLAN_CHECKLIST_BG}
+                  stopOpacity={1}
+                />
+                <Stop
+                  offset="0.7"
+                  stopColor={PLAN_CHECKLIST_BG}
+                  stopOpacity={0}
+                />
               </LinearGradient>
             </Defs>
-            <Rect x={0} y={0} width="100%" height="100%" fill="url(#checklistFade)" />
+            <Rect
+              x={0}
+              y={0}
+              width="100%"
+              height="100%"
+              fill="url(#checklistFade)"
+            />
           </Svg>
         </View>
 
         <View style={categoriesStepStyles.bannerIcon}>
-          <EventlyIcon name="clipboard-check-outline" size={22} color={PLAN_ACCENT} />
+          <EventlyIcon
+            name="clipboard-check-outline"
+            size={22}
+            color={PLAN_ACCENT}
+          />
         </View>
         <View style={categoriesStepStyles.bannerText}>
-          <EventlyText variant="subtitle" style={categoriesStepStyles.bannerTitle}>
+          <AppText
+            variant="body"
+            weight="medium"
+            style={categoriesStepStyles.bannerTitle}
+          >
             What&rsquo;s on your checklist?
-          </EventlyText>
-          <EventlyText variant="caption" style={categoriesStepStyles.bannerSubtitle}>
-            Choose the services you need. Organizers quote only for what you select — nothing extra.
-          </EventlyText>
+          </AppText>
+          <AppText
+            variant="caption"
+            style={categoriesStepStyles.bannerSubtitle}
+          >
+            Choose the services you need. Organizers quote only for what you
+            select — nothing extra.
+          </AppText>
         </View>
-        <EventlyText style={categoriesStepStyles.bannerScript}>{'Make it\nhappen ♥'}</EventlyText>
+        <AppText style={categoriesStepStyles.bannerScript}>
+          {'Make it\nhappen ♥'}
+        </AppText>
       </View>
 
       <View style={categoriesStepStyles.grid}>
-        {categories.map((category) => (
+        {categories.map(category => (
           <CategoryTile
             key={category.id}
             title={category.title}
@@ -119,7 +188,7 @@ export function CategoriesStep({ categories, selected, onToggle }: CategoriesSte
           />
         ))}
 
-        {customCategories.map((label) => (
+        {customCategories.map(label => (
           <CategoryTile
             key={label}
             title={label}
@@ -144,7 +213,11 @@ export function CategoriesStep({ categories, selected, onToggle }: CategoriesSte
           returnKeyType="done"
         />
         {customInput.trim() ? (
-          <TouchableOpacity style={categoriesStepStyles.addButton} onPress={addCustom} accessibilityLabel="Add service">
+          <TouchableOpacity
+            style={categoriesStepStyles.addButton}
+            onPress={addCustom}
+            accessibilityLabel="Add service"
+          >
             <EventlyIcon name="arrow-up" size={16} color={colors.onPrimary} />
           </TouchableOpacity>
         ) : null}

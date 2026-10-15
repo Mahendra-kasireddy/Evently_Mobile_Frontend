@@ -1,5 +1,5 @@
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { ORG_GREEN, ORGANIZER_COPY as COPY } from '../constants';
 import { availabilityStyles as s } from '../styles';
 import type { AvailabilityViewModel } from '../types';
@@ -19,19 +19,22 @@ interface AvailabilityCardProps {
  * date filled in, which is the only thing that actually puts a claim on it:
  * a request they can accept.
  */
-export function AvailabilityCard({ availability, onHoldDate }: AvailabilityCardProps) {
+export function AvailabilityCard({
+  availability,
+  onHoldDate,
+}: AvailabilityCardProps) {
   return (
     <View style={s.card}>
       <EventlyIcon name="calendar-check-outline" size={20} color={ORG_GREEN} />
 
       <View style={s.text}>
-        <EventlyText variant="cardTitle" style={s.title}>
+        <AppText variant="h2" style={s.title}>
           {COPY.freeOn(availability.dateLabel)}
-        </EventlyText>
+        </AppText>
         {availability.detail ? (
-          <EventlyText variant="small" style={s.detail}>
+          <AppText variant="bodySmall" style={s.detail}>
             {availability.detail}
-          </EventlyText>
+          </AppText>
         ) : null}
       </View>
 
@@ -42,9 +45,9 @@ export function AvailabilityCard({ availability, onHoldDate }: AvailabilityCardP
         accessibilityRole="button"
         accessibilityLabel={`${COPY.holdDate} — ${availability.dateLabel}`}
       >
-        <EventlyText variant="label" style={s.holdText}>
+        <AppText variant="label" style={s.holdText}>
           {COPY.holdDate}
-        </EventlyText>
+        </AppText>
       </TouchableOpacity>
     </View>
   );

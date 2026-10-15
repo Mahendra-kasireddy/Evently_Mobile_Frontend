@@ -7,8 +7,9 @@ import Svg, {
   Path,
   Stop,
 } from 'react-native-svg';
-import { EventlyIcon, EventlyText } from '../Components';
+import { EventlyIcon, AppText } from '../Components';
 
+import { textColor, typography } from '../theme';
 /*
  * The + menu's bubbles, made of liquid.
  *
@@ -202,13 +203,13 @@ export function GooeyBubbles({
                 <EventlyIcon name={action.icon} size={24} color="#ffffff" />
               </View>
             </Pressable>
-            <EventlyText
-              variant="caption"
+            <AppText
+              variant="label"
               style={[s.label, { opacity: settle }]}
               numberOfLines={1}
             >
               {action.label}
-            </EventlyText>
+            </AppText>
           </View>
         );
       })}
@@ -227,5 +228,5 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  label: { marginTop: 6, color: '#ffffff', fontSize: 12, fontWeight: '600' },
+  label: { marginTop: 6, color: textColor.textOnPrimary, ...typography.label },
 });

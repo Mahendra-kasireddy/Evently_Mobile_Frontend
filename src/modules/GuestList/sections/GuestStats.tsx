@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { EventlyText, GradientFill } from '../../../Components';
+import { AppText, GradientFill } from '../../../Components';
 import { GUEST_COPY as COPY } from '../constants';
 import { statsStyles as s } from '../styles';
 import type { GuestStats as Stats } from '../types';
@@ -18,10 +18,12 @@ export function GuestStats({ stats }: { stats: Stats }) {
     <View style={s.card}>
       <GradientFill colors={CARD_GRADIENT} direction="diagonal" />
       <View style={s.topRow}>
-        <EventlyText style={s.total}>{stats.total}</EventlyText>
-        <EventlyText style={s.totalLabel}>
+        <AppText variant="display" style={s.total}>
+          {stats.total}
+        </AppText>
+        <AppText variant="bodyLarge" style={s.totalLabel}>
           {COPY.statTotal.toLowerCase()}
-        </EventlyText>
+        </AppText>
       </View>
 
       <View style={s.bar}>
@@ -39,24 +41,26 @@ export function GuestStats({ stats }: { stats: Stats }) {
       <View style={s.legend}>
         <View style={s.legendItem}>
           <View style={[s.legendDot, s.dotOpened]} />
-          <EventlyText style={s.legendText}>
+          <AppText variant="bodySmall" style={s.legendText}>
             {stats.opened} {COPY.statOpened.toLowerCase()}
-          </EventlyText>
+          </AppText>
         </View>
         <View style={s.legendItem}>
           <View style={[s.legendDot, s.dotInvited]} />
-          <EventlyText style={s.legendText}>
+          <AppText variant="bodySmall" style={s.legendText}>
             {stats.invited} {COPY.statInvited.toLowerCase()}
-          </EventlyText>
+          </AppText>
         </View>
         <View style={s.legendItem}>
           <View style={[s.legendDot, s.dotNotSent]} />
-          <EventlyText style={s.legendText}>
+          <AppText variant="bodySmall" style={s.legendText}>
             {stats.notSent} {COPY.statNotSent.toLowerCase()}
-          </EventlyText>
+          </AppText>
         </View>
       </View>
-      <EventlyText style={s.note}>{COPY.statsNote(stats.notSent)}</EventlyText>
+      <AppText variant="caption" style={s.note}>
+        {COPY.statsNote(stats.notSent)}
+      </AppText>
     </View>
   );
 }

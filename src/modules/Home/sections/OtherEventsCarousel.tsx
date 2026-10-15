@@ -10,7 +10,7 @@ import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import {
   EventlyIcon,
-  EventlyText,
+  AppText,
   GradientFill,
   OccasionArt,
 } from '../../../Components';
@@ -81,9 +81,9 @@ function Meta({ icon, label }: { icon: string; label: string }) {
   return (
     <View style={s.metaItem}>
       <EventlyIcon name={icon} size={14} color={HERO_ACCENT_COLOR} />
-      <EventlyText variant="caption" style={s.metaText} numberOfLines={1}>
+      <AppText variant="caption" style={s.metaText} numberOfLines={1}>
         {label}
-      </EventlyText>
+      </AppText>
     </View>
   );
 }
@@ -198,26 +198,26 @@ function EventCard({
         <View style={s.pillRow}>
           <View style={s.pill}>
             <View style={[s.pillDot, { backgroundColor: look.dot }]} />
-            <EventlyText
-              variant="caption"
+            <AppText
+              variant="label"
               style={[s.pillText, { color: look.ink }]}
               numberOfLines={1}
             >
               {event.stageLabel || 'Upcoming'}
-            </EventlyText>
+            </AppText>
           </View>
           {countdown ? (
             <View style={s.countdown}>
-              <EventlyText variant="caption" style={s.countdownText}>
+              <AppText variant="label" style={s.countdownText}>
                 {countdown}
-              </EventlyText>
+              </AppText>
             </View>
           ) : null}
         </View>
 
-        <EventlyText variant="h2" style={s.title} numberOfLines={1}>
+        <AppText variant="h3" style={s.title} numberOfLines={2}>
           {event.title}
-        </EventlyText>
+        </AppText>
 
         <View style={s.metaRow}>
           <Meta icon="calendar-month-outline" label={shortDate(event.when)} />
@@ -232,9 +232,9 @@ function EventCard({
             card opens. */}
         <View style={s.cta}>
           <GradientFill colors={CTA_GRADIENT} direction="across" />
-          <EventlyText variant="caption" style={s.ctaText}>
+          <AppText variant="buttonSmall" style={s.ctaText}>
             {event.ctaLabel || 'View plan'}
-          </EventlyText>
+          </AppText>
           <EventlyIcon name="arrow-right" size={14} color="#ffffff" />
         </View>
       </View>

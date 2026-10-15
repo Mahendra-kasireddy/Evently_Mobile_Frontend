@@ -9,7 +9,7 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import {
   EventlyIcon,
   EventlyImage,
-  EventlyText,
+  AppText,
   GradientFill,
   OccasionArt,
   PressableScale,
@@ -208,46 +208,42 @@ function PackageCard({
               <GradientFill colors={tone.gradient} direction="diagonal" />
               <EventlyIcon name={tone.icon} size={11} color="#ffffff" />
             </View>
-            <EventlyText
-              variant="caption"
-              style={s.badgeText}
-              numberOfLines={1}
-            >
+            <AppText variant="label" style={s.badgeText} numberOfLines={1}>
               {item.badge}
-            </EventlyText>
+            </AppText>
           </View>
         ) : null}
 
         <View style={s.content}>
-          <EventlyText variant="h2" style={s.title} numberOfLines={2}>
+          <AppText variant="h3" style={s.title} numberOfLines={2}>
             {item.title}
-          </EventlyText>
+          </AppText>
           {subtitle ? (
-            <EventlyText variant="caption" style={s.subtitle} numberOfLines={1}>
+            <AppText variant="caption" style={s.subtitle} numberOfLines={1}>
               {subtitle}
-            </EventlyText>
+            </AppText>
           ) : null}
 
           {/* What it includes, as one line: "Decor • Cake • 50–100 guests". */}
           {features.length > 0 ? (
-            <EventlyText variant="caption" style={s.meta} numberOfLines={1}>
+            <AppText variant="caption" style={s.meta} numberOfLines={1}>
               {features.map(f => f.label).join('  •  ')}
-            </EventlyText>
+            </AppText>
           ) : null}
 
           <View style={s.priceLine}>
-            <EventlyText variant="caption" style={s.priceCaption}>
+            <AppText variant="caption" style={s.priceCaption}>
               Starting at
-            </EventlyText>
-            <EventlyText variant="h2" style={s.price} numberOfLines={1}>
+            </AppText>
+            <AppText variant="h3" style={s.price} numberOfLines={1}>
               {item.priceLabel || item.budget}
-            </EventlyText>
+            </AppText>
             {/* Only a genuine reduction; the server refuses a "was" figure
                 that is not above the current price. */}
             {item.listPriceLabel ? (
-              <EventlyText variant="caption" style={s.listPrice}>
+              <AppText variant="caption" style={s.listPrice}>
                 {item.listPriceLabel}
-              </EventlyText>
+              </AppText>
             ) : null}
           </View>
 
@@ -255,9 +251,9 @@ function PackageCard({
               it is the heart, a control of its own (below). */}
           <View style={s.cta}>
             <EventlyIcon name="arrow-right-circle" size={16} color="#ffffff" />
-            <EventlyText variant="body" style={s.ctaText}>
+            <AppText variant="buttonSmall" style={s.ctaText}>
               View Package
-            </EventlyText>
+            </AppText>
           </View>
         </View>
       </PressableScale>

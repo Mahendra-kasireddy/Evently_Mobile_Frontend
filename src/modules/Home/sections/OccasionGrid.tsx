@@ -1,6 +1,6 @@
 import { ScrollView, View } from 'react-native';
 import {
-  EventlyText,
+  AppText,
   GradientFill,
   OccasionArt,
   PressableScale,
@@ -88,9 +88,9 @@ function Tile({ tile, onPress }: { tile: OccasionTile; onPress: () => void }) {
         quarter of a phone on one line, and ellipsising them to "Naming…"
         leaves the customer guessing at half the grid.
       */}
-      <EventlyText variant="small" style={s.tileLabel} numberOfLines={2}>
+      <AppText variant="label" style={s.tileLabel} numberOfLines={2}>
         {tile.label}
-      </EventlyText>
+      </AppText>
     </PressableScale>
   );
 }

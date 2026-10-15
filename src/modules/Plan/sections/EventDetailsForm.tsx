@@ -1,11 +1,7 @@
 import { useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
-import {
-  EventlyIcon,
-  EventlyText,
-  EventlyTextInput,
-} from '../../../Components';
+import { EventlyIcon, AppText, EventlyTextInput } from '../../../Components';
 import { PLAN_TEXT_MUTED } from '../constants';
 import { eventDetailsStyles } from '../styles';
 import { formatEventDate, todayIsoDate } from '../utils';
@@ -72,15 +68,15 @@ function DetailRow({
         <EventlyIcon name={icon} size={20} color={tint.fg} />
       </View>
       <View style={eventDetailsStyles.rowBody}>
-        <EventlyText
+        <AppText
           variant="caption"
           style={eventDetailsStyles.rowCaption}
           numberOfLines={1}
         >
           {caption}
-        </EventlyText>
+        </AppText>
         {children ?? (
-          <EventlyText
+          <AppText
             variant="body"
             style={
               value
@@ -90,7 +86,7 @@ function DetailRow({
             numberOfLines={1}
           >
             {value || placeholder}
-          </EventlyText>
+          </AppText>
         )}
       </View>
       <EventlyIcon name="chevron-right" size={22} color={PLAN_TEXT_MUTED} />

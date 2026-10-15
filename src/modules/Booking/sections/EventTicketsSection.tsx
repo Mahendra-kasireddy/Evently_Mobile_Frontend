@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Image, ScrollView, View } from 'react-native';
 import {
   EventlyIcon,
-  EventlyText,
+  AppText,
   GradientFill,
   PressableScale,
 } from '../../../Components';
@@ -136,12 +136,12 @@ export function EventTicketsSection({
                 />
                 {date ? (
                   <View style={s.thumbDate}>
-                    <EventlyText variant="caption" style={s.thumbDay}>
+                    <AppText variant="h3" style={s.thumbDay}>
                       {date.day}
-                    </EventlyText>
-                    <EventlyText variant="caption" style={s.thumbMonth}>
+                    </AppText>
+                    <AppText variant="label" style={s.thumbMonth}>
                       {date.month}
-                    </EventlyText>
+                    </AppText>
                   </View>
                 ) : null}
               </View>
@@ -153,37 +153,33 @@ export function EventTicketsSection({
                     size={11}
                     color="#e2477a"
                   />
-                  <EventlyText variant="caption" style={s.kindChipText}>
+                  <AppText variant="label" style={s.kindChipText}>
                     Event ticket
-                  </EventlyText>
+                  </AppText>
                 </View>
-                <EventlyText
-                  variant="body"
-                  style={s.rowTitle}
-                  numberOfLines={1}
-                >
+                <AppText variant="h3" style={s.rowTitle} numberOfLines={1}>
                   {ticket.eventTitle}
-                </EventlyText>
+                </AppText>
                 <View style={s.line}>
                   <EventlyIcon name="clock-outline" size={15} color="#e2552f" />
-                  <EventlyText
-                    variant="caption"
+                  <AppText
+                    variant="bodySmall"
                     style={s.lineText}
                     numberOfLines={1}
                   >
                     {formatEventWhen(ticket.startDateTime, ticket.timezone)}
-                  </EventlyText>
+                  </AppText>
                 </View>
                 {where ? (
                   <View style={s.line}>
                     <EventlyIcon name="map-marker" size={15} color="#6d4df2" />
-                    <EventlyText
-                      variant="caption"
+                    <AppText
+                      variant="bodySmall"
                       style={s.lineText}
                       numberOfLines={2}
                     >
                       {where}
-                    </EventlyText>
+                    </AppText>
                   </View>
                 ) : null}
                 <ScrollView
@@ -194,21 +190,21 @@ export function EventTicketsSection({
                 >
                   {ticket.ticketTypeName ? (
                     <View style={[s.pill, s.typePill]}>
-                      <EventlyText
-                        variant="caption"
+                      <AppText
+                        variant="label"
                         style={[s.pillText, s.typePillText]}
                       >
                         {ticket.ticketTypeName}
-                      </EventlyText>
+                      </AppText>
                     </View>
                   ) : null}
                   <View style={[s.pill, { backgroundColor: tint.bg }]}>
-                    <EventlyText
-                      variant="caption"
+                    <AppText
+                      variant="label"
                       style={[s.pillText, { color: tint.fg }]}
                     >
                       {TICKET_STATE_LABEL[ticket.state]}
-                    </EventlyText>
+                    </AppText>
                   </View>
                 </ScrollView>
               </View>
@@ -228,9 +224,9 @@ export function EventTicketsSection({
                   <GradientFill colors={stub} direction="diagonal" />
                   <EventlyIcon name="qrcode" size={26} color="#ffffff" />
                 </View>
-                <EventlyText variant="caption" style={s.stubText}>
+                <AppText variant="label" style={s.stubText}>
                   QR
-                </EventlyText>
+                </AppText>
               </View>
 
               <View style={s.more}>
@@ -260,7 +256,9 @@ export function EventTicketsSection({
                     accessibilityRole="button"
                   >
                     <EventlyIcon name="qrcode" size={16} color="#1b1438" />
-                    <EventlyText style={s.menuText}>Open ticket</EventlyText>
+                    <AppText variant="bodySmall" style={s.menuText}>
+                      Open ticket
+                    </AppText>
                   </PressableScale>
                   {onDetails ? (
                     <PressableScale
@@ -276,9 +274,9 @@ export function EventTicketsSection({
                         size={16}
                         color="#1b1438"
                       />
-                      <EventlyText style={s.menuText}>
+                      <AppText variant="bodySmall" style={s.menuText}>
                         Event details
-                      </EventlyText>
+                      </AppText>
                     </PressableScale>
                   ) : null}
                 </View>

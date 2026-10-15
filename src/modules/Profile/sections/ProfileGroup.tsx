@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText, GradientFill } from '../../../Components';
+import { EventlyIcon, AppText, GradientFill } from '../../../Components';
 import { colors } from '../../../theme';
 import { PROFILE_ROW_GRADIENT } from '../constants';
 import { groupStyles as g, rowStyles as s } from '../styles';
@@ -22,9 +22,9 @@ interface ProfileGroupProps {
 export function ProfileGroup({ group, badgeFor, onPress }: ProfileGroupProps) {
   return (
     <View style={g.group}>
-      <EventlyText variant="caption" style={g.title}>
+      <AppText variant="overline" style={g.title}>
         {group.title}
-      </EventlyText>
+      </AppText>
 
       <View style={g.card}>
         {group.rows.map((row, index) => {
@@ -37,7 +37,9 @@ export function ProfileGroup({ group, badgeFor, onPress }: ProfileGroupProps) {
                 activeOpacity={0.7}
                 onPress={() => onPress(row.action)}
                 accessibilityRole="button"
-                accessibilityLabel={badge ? `${row.label}, ${badge}` : row.label}
+                accessibilityLabel={
+                  badge ? `${row.label}, ${badge}` : row.label
+                }
               >
                 {/* Each row's icon on its own gradient tile, so the menu is
                     found by colour as much as by word. */}
@@ -48,21 +50,25 @@ export function ProfileGroup({ group, badgeFor, onPress }: ProfileGroupProps) {
                   />
                   <EventlyIcon name={row.icon} size={17} color="#ffffff" />
                 </View>
-                <EventlyText
-                  variant="body"
+                <AppText
+                  variant="label"
                   style={[s.label, row.action === 'signOut' && s.labelDanger]}
                   numberOfLines={1}
                 >
                   {row.label}
-                </EventlyText>
+                </AppText>
                 {badge ? (
                   <View style={s.badge}>
-                    <EventlyText variant="caption" style={s.badgeText}>
+                    <AppText variant="label" style={s.badgeText}>
                       {badge}
-                    </EventlyText>
+                    </AppText>
                   </View>
                 ) : null}
-                <EventlyIcon name="chevron-right" size={18} color={colors.textMuted} />
+                <EventlyIcon
+                  name="chevron-right"
+                  size={18}
+                  color={colors.textMuted}
+                />
               </TouchableOpacity>
             </Fragment>
           );

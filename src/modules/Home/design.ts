@@ -1,5 +1,6 @@
-import { Platform, type TextStyle } from 'react-native';
+import type { TextStyle } from 'react-native';
 
+import { typography } from '../../theme';
 /**
  * "Marigold Hour" — Home's visual identity.
  *
@@ -61,34 +62,21 @@ export const HOME_ORB_COLORS: [string, string, string] = [
 ];
 
 /**
- * The editorial face.
- *
- * The platform's own serif — Noto Serif on Android, Georgia on iOS — so the
- * display type costs no bundled font, no native relink and no download, and
- * is guaranteed on every low-end Android. Poppins stays the UI face.
+ * Display headings on Home. Inter only — the serif face is retired so Home
+ * reads as the same app as every other screen. Sizes snap to the type scale.
  */
-export const SERIF = Platform.select({
-  ios: 'Georgia',
-  android: 'serif',
-  default: 'serif',
-}) as string;
-
-/** Display headings on Home: serif, tight, a little negative tracking. */
-export const displayType = (size: number): TextStyle => ({
-  fontFamily: SERIF,
-  fontSize: size,
-  lineHeight: Math.round(size * 1.18),
-  letterSpacing: -0.4,
-  fontWeight: '700',
-});
+export const displayType = (size: number): TextStyle =>
+  size >= 30
+    ? typography.display
+    : size >= 24
+    ? typography.h1
+    : size >= 19
+    ? typography.h2
+    : typography.h3;
 
 /** The small uppercase line above a heading. */
 export const EYEBROW: TextStyle = {
-  fontSize: 10.5,
-  lineHeight: 14,
-  letterSpacing: 1.6,
-  textTransform: 'uppercase',
-  fontWeight: '600',
+  ...typography.overline,
 };
 
 /** A greeting for the hour, so the hero speaks to now. */

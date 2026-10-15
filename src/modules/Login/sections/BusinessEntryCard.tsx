@@ -1,5 +1,5 @@
 import { Pressable } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { BUSINESS_ENTRY_COPY } from '../constants';
 import { AUTH_ACCENT, businessEntryStyles as s } from '../styles';
 
@@ -20,12 +20,12 @@ export function BusinessEntryCard({ onPress }: BusinessEntryCardProps) {
       accessibilityLabel={BUSINESS_ENTRY_COPY.a11y}
       testID="business-entry-card"
     >
-      <EventlyText variant="caption" style={s.lead}>
+      <AppText variant="bodySmall" style={s.lead}>
         {BUSINESS_ENTRY_COPY.lead}
-      </EventlyText>
-      <EventlyText variant="caption" style={s.action}>
+      </AppText>
+      <AppText variant="bodySmall" style={s.action}>
         {BUSINESS_ENTRY_COPY.action}
-      </EventlyText>
+      </AppText>
       <EventlyIcon name="chevron-right" size={16} color={AUTH_ACCENT} />
     </Pressable>
   );

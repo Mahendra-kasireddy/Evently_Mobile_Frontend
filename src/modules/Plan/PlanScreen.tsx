@@ -8,7 +8,7 @@ import {
   AppHeader,
   EventlyButton,
   EventlyIcon,
-  EventlyText,
+  AppText,
   KeyboardAvoider,
 } from '../../Components';
 import type { MainTabParamList } from '../../navigation/types';
@@ -25,6 +25,7 @@ import { ReviewStep } from './sections/ReviewStep';
 import { StepPills } from './sections/StepPills';
 import { eventDetailsStyles, styles } from './styles';
 import { splitBannerSentence } from './utils';
+import { useScrollTopOnBlur } from '../../hooks/useScrollTopOnBlur';
 
 /**
  * The soft edge under the fixed header.
@@ -57,6 +58,8 @@ function HeaderFade() {
 }
 
 export function PlanScreen() {
+  /* Leaving the tab puts it back at the top for next time. */
+  const scrollRef = useScrollTopOnBlur();
   const route = useRoute<RouteProp<MainTabParamList, 'Plan'>>();
   const navigation = useNavigation();
   const container = usePlanContainer(
@@ -93,9 +96,9 @@ export function PlanScreen() {
     return (
       <SafeAreaView style={styles.centered} edges={['top']}>
         <ActivityIndicator size="large" color={PLAN_ACCENT} />
-        <EventlyText variant="body" style={styles.loadingText}>
+        <AppText variant="body" style={styles.loadingText}>
           Setting up your plan…
-        </EventlyText>
+        </AppText>
       </SafeAreaView>
     );
   }
@@ -103,9 +106,9 @@ export function PlanScreen() {
   if (container.isScreenError) {
     return (
       <SafeAreaView style={styles.centered} edges={['top']}>
-        <EventlyText variant="body" style={styles.errorText}>
+        <AppText variant="body" style={styles.errorText}>
           {container.screenErrorMessage ?? 'Something went wrong.'}
-        </EventlyText>
+        </AppText>
         <EventlyButton
           title="Retry"
           onPress={container.refetchScreen}
@@ -125,17 +128,17 @@ export function PlanScreen() {
       <SafeAreaView style={styles.centered} edges={['top']}>
         <View style={styles.successCard}>
           <EventlyIcon name="check-circle" size={48} color={PLAN_GREEN} />
-          <EventlyText variant="h2" style={styles.successTitle}>
+          <AppText variant="h2" style={styles.successTitle}>
             {container.isEditingBrief ? 'Brief updated!' : 'Quote requested!'}
-          </EventlyText>
-          <EventlyText variant="body" style={styles.successSubtitle}>
+          </AppText>
+          <AppText variant="body" style={styles.successSubtitle}>
             {container.isEditingBrief
               ? /* Said plainly, because it is the cost of editing: a quote
                    priced against the old brief is not a quote for this event
                    any more, and the customer should not go looking for it. */
                 'The organizers you asked have your new brief. Any quote they had already sent no longer applies, so they will send a fresh one.'
               : 'Your plan is saved and the quote request is on its way. You’ll hear back within a day.'}
-          </EventlyText>
+          </AppText>
         </View>
         <EventlyButton
           title="Start another plan"
@@ -194,6 +197,7 @@ export function PlanScreen() {
       <KeyboardAvoider style={styles.body}>
         <HeaderFade />
         <ScrollView
+          ref={scrollRef as never}
           style={styles.scroll}
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
@@ -289,20 +293,17 @@ export function PlanScreen() {
                       color={colors.onPrimary}
                     />
                   </View>
-                  <EventlyText
-                    variant="body"
-                    style={eventDetailsStyles.bannerText}
-                  >
+                  <AppText variant="body" style={eventDetailsStyles.bannerText}>
                     {banner.bold ? (
-                      <EventlyText
+                      <AppText
                         variant="body"
                         style={eventDetailsStyles.bannerBold}
                       >
                         {banner.bold}
-                      </EventlyText>
+                      </AppText>
                     ) : null}
                     {banner.rest}
-                  </EventlyText>
+                  </AppText>
                   {/* A small green sprout, as in the design: budget as
                       something that grows into a plan, not a gate. */}
                   <EventlyIcon
@@ -367,17 +368,18 @@ export function PlanScreen() {
         {isOrganizersStep && selectedOrganizerCount > 0 ? (
           <View style={[styles.footerBar, styles.shortlistFooter]}>
             <View style={styles.shortlistFooterText}>
-              <EventlyText
-                variant="subtitle"
+              <AppText
+                variant="body"
+                weight="medium"
                 style={styles.shortlistFooterCount}
               >
                 {selectedOrganizerCount === 1
                   ? '1 organizer selected'
                   : `${selectedOrganizerCount} organizers selected`}
-              </EventlyText>
-              <EventlyText variant="caption" style={styles.shortlistFooterHint}>
+              </AppText>
+              <AppText variant="caption" style={styles.shortlistFooterHint}>
                 Each sends their own quote to compare
-              </EventlyText>
+              </AppText>
             </View>
             <EventlyButton
               title={

@@ -1,5 +1,5 @@
 import { Share, TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyImage, EventlyText } from '../../../Components';
+import { EventlyIcon, EventlyImage, AppText } from '../../../Components';
 import { brand } from '../../../theme';
 import { COVER_NAVY, COVER_PLUM, ORGANIZER_COPY as COPY } from '../constants';
 import { COVER_HEIGHT, coverStyles as s } from '../styles';
@@ -26,7 +26,12 @@ interface CoverBannerProps {
  * nothing in the API stores a saved organizer, and a heart that forgets what
  * it was told the moment the screen closes is worse than no heart.
  */
-export function CoverBanner({ name, coverUrl, verification, onBack }: CoverBannerProps) {
+export function CoverBanner({
+  name,
+  coverUrl,
+  verification,
+  onBack,
+}: CoverBannerProps) {
   const share = () => {
     // The native sheet: nothing here decides where it goes, so there is no
     // list of apps to keep up to date.
@@ -37,7 +42,11 @@ export function CoverBanner({ name, coverUrl, verification, onBack }: CoverBanne
     <View style={s.wrap}>
       {coverUrl ? (
         <>
-          <EventlyImage source={{ uri: coverUrl }} style={s.photo} resizeMode="cover" />
+          <EventlyImage
+            source={{ uri: coverUrl }}
+            style={s.photo}
+            resizeMode="cover"
+          />
           <View style={s.scrim} />
         </>
       ) : (
@@ -67,7 +76,11 @@ export function CoverBanner({ name, coverUrl, verification, onBack }: CoverBanne
             accessibilityRole="button"
             accessibilityLabel={COPY.share}
           >
-            <EventlyIcon name="share-variant-outline" size={18} color={brand.onNavy} />
+            <EventlyIcon
+              name="share-variant-outline"
+              size={18}
+              color={brand.onNavy}
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -76,11 +89,11 @@ export function CoverBanner({ name, coverUrl, verification, onBack }: CoverBanne
       {verification ? (
         <View style={s.badge}>
           <EventlyIcon name="check-decagram" size={14} color={brand.mint} />
-          <EventlyText variant="label" style={s.badgeText}>
+          <AppText variant="label" style={s.badgeText}>
             {verification.detail
               ? `${verification.title} · ${verification.detail}`
               : verification.title}
-          </EventlyText>
+          </AppText>
         </View>
       ) : null}
     </View>

@@ -1,6 +1,13 @@
 import { StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, fontFor, spacing } from '../../theme';
+import {
+  colors,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+  inputTypography,
+} from '../../theme';
 import {
   SEARCH_ACCENT,
   SEARCH_CANVAS,
@@ -29,18 +36,19 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   emptyTitle: {
-    color: SEARCH_NAVY,
+    ...typography.h2,
+    color: textColor.textPrimary,
     marginTop: spacing.md,
     textAlign: 'center',
   },
   emptyBody: {
-    color: colors.textMuted,
+    ...typography.body,
+    color: textColor.textSecondary,
     marginTop: spacing.sm,
     textAlign: 'center',
-    lineHeight: 20,
   },
   errorText: {
-    color: colors.danger,
+    color: textColor.textError,
     textAlign: 'center',
     marginTop: spacing.sm,
   },
@@ -54,7 +62,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },
-  retryText: { color: SEARCH_ACCENT, fontWeight: '700' },
+  retryText: { color: SEARCH_ACCENT, ...fontWeights.bold },
 
   bar: {
     ...globalStyles.row,
@@ -76,9 +84,8 @@ export const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    color: colors.text,
-    fontSize: 13.5,
-    fontFamily: fontFor('400'),
+    color: textColor.textPrimary,
+    ...inputTypography.body,
     padding: 0,
   },
   filterButton: {
@@ -101,10 +108,8 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   filterBadgeText: {
-    color: colors.onPrimary,
-    fontSize: 10,
-    fontWeight: '700',
-    lineHeight: 13,
+    color: textColor.textOnPrimary,
+    ...typography.label,
   },
 
   tabs: {
@@ -120,7 +125,11 @@ export const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   tabOn: { backgroundColor: SEARCH_NAVY },
-  tabText: { color: '#6f6a66', fontSize: 13.5, fontWeight: '600' },
+  tabText: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
   tabTextOn: { color: colors.onPrimary },
 
   /* Clear air between the packages and the organizers. */
@@ -154,15 +163,12 @@ export const filterSheetStyles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingTop: spacing.md,
   },
-  title: { color: SEARCH_NAVY, fontSize: 20, fontWeight: '700' },
-  clear: { color: SEARCH_ACCENT, fontSize: 14.5, fontWeight: '600' },
+  title: { color: textColor.textPrimary, ...typography.h2 },
+  clear: { color: SEARCH_ACCENT, ...typography.body, ...fontWeights.semibold },
   group: { paddingHorizontal: spacing.md, marginTop: spacing.lg },
   groupTitle: {
-    color: '#7b8595',
-    fontSize: 12.5,
-    fontWeight: '700',
-    letterSpacing: 0.9,
-    textTransform: 'uppercase',
+    color: textColor.textSecondary,
+    ...typography.overline,
     marginBottom: 10,
   },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
@@ -175,7 +181,11 @@ export const filterSheetStyles = StyleSheet.create({
     paddingVertical: 8,
   },
   chipOn: { backgroundColor: SEARCH_NAVY, borderColor: SEARCH_NAVY },
-  chipText: { color: '#414b5c', fontSize: 13.5, fontWeight: '500' },
+  chipText: {
+    color: textColor.textSecondary,
+    ...typography.bodySmall,
+    ...fontWeights.medium,
+  },
   chipTextOn: { color: colors.onPrimary },
   apply: {
     alignItems: 'center',
@@ -186,5 +196,5 @@ export const filterSheetStyles = StyleSheet.create({
     marginHorizontal: spacing.md,
     marginTop: spacing.lg,
   },
-  applyText: { color: colors.onPrimary, fontSize: 16, fontWeight: '600' },
+  applyText: { color: textColor.textOnPrimary, ...typography.h3 },
 });

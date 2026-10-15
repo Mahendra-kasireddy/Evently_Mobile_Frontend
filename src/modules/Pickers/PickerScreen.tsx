@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { FlatList, Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { EventlyIcon, EventlyText, EventlyTextInput } from '../../Components';
+import { EventlyIcon, AppText, EventlyTextInput } from '../../Components';
 import { brand } from '../../theme';
 import { PICKER_COPY, type RecentKind } from './constants';
 import { useRecents } from './hooks';
@@ -151,9 +151,9 @@ export function PickerScreen({
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) =>
           item.kind === 'heading' ? (
-            <EventlyText variant="subtitle" style={s.sectionHeading}>
+            <AppText variant="h2" style={s.sectionHeading}>
               {item.label}
-            </EventlyText>
+            </AppText>
           ) : (
             <PickerRow
               label={item.option.label}
@@ -170,9 +170,9 @@ export function PickerScreen({
           )
         }
         ListEmptyComponent={
-          <EventlyText variant="body" style={s.empty}>
+          <AppText variant="body" style={s.empty}>
             {copy.empty}
-          </EventlyText>
+          </AppText>
         }
       />
     </SafeAreaView>

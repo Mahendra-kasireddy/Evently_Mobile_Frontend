@@ -1,5 +1,5 @@
 import { Modal, Pressable, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { couponSheetStyles as s } from '../styles';
 import { HOME_NAVY } from '../constants';
 import type { CouponOffer } from '../types';
@@ -44,12 +44,12 @@ export function CouponSheet({ coupon, onClose }: CouponSheetProps) {
 
           <View style={s.head}>
             <View style={s.headText}>
-              <EventlyText variant="caption" style={s.code}>
+              <AppText variant="label" style={s.code}>
                 {coupon.code}
-              </EventlyText>
-              <EventlyText variant="h2" style={s.title} numberOfLines={2}>
+              </AppText>
+              <AppText variant="h2" style={s.title} numberOfLines={2}>
                 {coupon.title}
-              </EventlyText>
+              </AppText>
             </View>
             <Pressable
               style={s.close}
@@ -64,20 +64,20 @@ export function CouponSheet({ coupon, onClose }: CouponSheetProps) {
           {/* Only when the admin wrote one — an empty paragraph is worse than
               no paragraph. */}
           {coupon.description ? (
-            <EventlyText variant="body" style={s.description}>
+            <AppText variant="body" style={s.description}>
               {coupon.description}
-            </EventlyText>
+            </AppText>
           ) : null}
 
           <View style={s.rows}>
             {coupon.details.map(row => (
               <View key={row.label} style={s.row}>
-                <EventlyText variant="body" style={s.rowLabel}>
+                <AppText variant="label" style={s.rowLabel}>
                   {row.label}
-                </EventlyText>
-                <EventlyText variant="body" style={s.rowValue}>
+                </AppText>
+                <AppText variant="body" style={s.rowValue}>
                   {row.value}
-                </EventlyText>
+                </AppText>
               </View>
             ))}
           </View>
@@ -86,10 +86,10 @@ export function CouponSheet({ coupon, onClose }: CouponSheetProps) {
               cannot use it from here. */}
           <View style={s.note}>
             <EventlyIcon name="information-outline" size={16} color="#5b6470" />
-            <EventlyText variant="caption" style={s.noteText}>
+            <AppText variant="bodySmall" style={s.noteText}>
               Enter this code when you confirm a booking. We will check it
               applies before anything is charged.
-            </EventlyText>
+            </AppText>
           </View>
         </View>
       ) : null}

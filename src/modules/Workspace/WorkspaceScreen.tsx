@@ -10,12 +10,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  AppHeader,
-  EventlyIcon,
-  EventlyText,
-  FadeInUp,
-} from '../../Components';
+import { AppHeader, EventlyIcon, AppText, FadeInUp } from '../../Components';
 import { useOpenWithOrganizer } from '../Chat';
 import { colors } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
@@ -104,9 +99,9 @@ export function WorkspaceScreen() {
         {header}
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={colors.primary} />
-          <EventlyText variant="body" style={styles.loadingText}>
+          <AppText variant="body" style={styles.loadingText}>
             {WORKSPACE_COPY.loading}
-          </EventlyText>
+          </AppText>
         </View>
       </SafeAreaView>
     );
@@ -117,9 +112,9 @@ export function WorkspaceScreen() {
       <SafeAreaView style={styles.container} edges={['top']}>
         {header}
         <View style={styles.centered}>
-          <EventlyText variant="body" style={styles.errorText}>
+          <AppText variant="body" style={styles.errorText}>
             {errorMessage ?? 'Something went wrong.'}
-          </EventlyText>
+          </AppText>
           <TouchableOpacity
             style={styles.retryButton}
             activeOpacity={0.8}
@@ -127,9 +122,9 @@ export function WorkspaceScreen() {
             accessibilityRole="button"
           >
             <EventlyIcon name="refresh" size={16} color={WORKSPACE_ACCENT} />
-            <EventlyText variant="caption" style={styles.retryText}>
+            <AppText variant="caption" style={styles.retryText}>
               {WORKSPACE_COPY.retry}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -159,7 +154,10 @@ export function WorkspaceScreen() {
   };
 
   const openGuests = () =>
-    navigation.navigate('GuestList', { bookingId: workspace.id, title: workspace.title });
+    navigation.navigate('GuestList', {
+      bookingId: workspace.id,
+      title: workspace.title,
+    });
 
   const openInvitation = () =>
     navigation.navigate('Invitations', {
@@ -179,13 +177,18 @@ export function WorkspaceScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
-        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
-          useNativeDriver: true,
-          listener: (e: { nativeEvent: { contentOffset: { y: number } } }) => {
-            const next = e.nativeEvent.contentOffset.y >= pinAt;
-            if (next !== pinned) setPinned(next);
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          {
+            useNativeDriver: true,
+            listener: (e: {
+              nativeEvent: { contentOffset: { y: number } };
+            }) => {
+              const next = e.nativeEvent.contentOffset.y >= pinAt;
+              if (next !== pinned) setPinned(next);
+            },
           },
-        })}
+        )}
         refreshControl={
           <RefreshControl refreshing={isLoading} onRefresh={refetch} />
         }
@@ -196,7 +199,10 @@ export function WorkspaceScreen() {
           onMessage={workspace.organizerId ? messageOrganizer : undefined}
           isOpeningMessage={openThread.loading}
         />
-        <View style={tabsWrap.wrap} onLayout={e => setTabsY(e.nativeEvent.layout.y)}>
+        <View
+          style={tabsWrap.wrap}
+          onLayout={e => setTabsY(e.nativeEvent.layout.y)}
+        >
           <WorkspaceTabs tabs={WORKSPACE_TABS} tab={tab} onSelectTab={setTab} />
         </View>
 

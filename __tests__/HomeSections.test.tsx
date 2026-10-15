@@ -1221,7 +1221,8 @@ describe('render dump', () => {
                     Your other events
                   </EventlyTextForDump>
                   <EventlyTextForDump
-                    variant="subtitle"
+                    variant="body"
+                    weight="medium"
                     style={
                       require('../src/modules/Home/styles').sectionStyles.action
                     }

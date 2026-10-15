@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   AppHeader,
   EventlyIcon,
-  EventlyText,
+  AppText,
   FadeInUp,
   GradientFill,
 } from '../../Components';
@@ -29,6 +29,7 @@ import { EventTabs } from './sections/EventTabs';
 import { JumpToGrid } from './sections/JumpToGrid';
 import { bookingStateStyles as st, styles } from './styles';
 import type { BookingItem, JumpKey } from './types';
+import { useScrollTopOnBlur } from '../../hooks/useScrollTopOnBlur';
 
 type EventsNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -49,6 +50,8 @@ const TICKETS_TAB_GRADIENT: [string, string] = ['#ff8a5c', '#e8433a'];
  * that a customer whose only event has finished can find out where it went.
  */
 export function BookingScreen() {
+  /* Leaving the tab puts it back at the top for next time. */
+  const scrollRef = useScrollTopOnBlur();
   const navigation = useNavigation<EventsNavigationProp>();
 
   const {
@@ -140,9 +143,9 @@ export function BookingScreen() {
         {header}
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={BOOKING_ACCENT} />
-          <EventlyText variant="body" style={styles.loadingText}>
+          <AppText variant="body" style={styles.loadingText}>
             {COPY.loading}
-          </EventlyText>
+          </AppText>
         </View>
       </SafeAreaView>
     );
@@ -153,12 +156,12 @@ export function BookingScreen() {
       <SafeAreaView style={styles.container} edges={['top']}>
         {header}
         <View style={styles.centered}>
-          <EventlyText variant="h2" style={styles.emptyTitle}>
+          <AppText variant="h2" style={styles.emptyTitle}>
             {COPY.errorTitle}
-          </EventlyText>
-          <EventlyText variant="body" style={styles.errorText}>
+          </AppText>
+          <AppText variant="body" style={styles.errorText}>
             {errorMessage ?? 'Something went wrong.'}
-          </EventlyText>
+          </AppText>
           <TouchableOpacity
             style={styles.retryButton}
             activeOpacity={0.8}
@@ -166,9 +169,9 @@ export function BookingScreen() {
             accessibilityRole="button"
           >
             <EventlyIcon name="refresh" size={16} color={BOOKING_ACCENT} />
-            <EventlyText variant="caption" style={styles.retryText}>
+            <AppText variant="caption" style={styles.retryText}>
               {COPY.retry}
-            </EventlyText>
+            </AppText>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -193,13 +196,13 @@ export function BookingScreen() {
               <GradientFill colors={PLANNED_GRADIENT} direction="diagonal" />
               <EventlyIcon name="calendar-heart" size={30} color="#ffffff" />
             </View>
-            <EventlyText variant="h2" style={styles.emptyTitle}>
+            <AppText variant="h2" style={styles.emptyTitle}>
               No bookings yet
-            </EventlyText>
-            <EventlyText variant="body" style={styles.emptySubtitle}>
+            </AppText>
+            <AppText variant="body" style={styles.emptySubtitle}>
               Book tickets to an event, or plan your own celebration with an
               organizer. Everything you book shows up here.
-            </EventlyText>
+            </AppText>
             <View style={st.emptyActions}>
               <TouchableOpacity
                 style={st.primary}
@@ -216,9 +219,9 @@ export function BookingScreen() {
                   size={18}
                   color={colors.onPrimary}
                 />
-                <EventlyText variant="body" style={st.primaryText}>
+                <AppText variant="h3" style={st.primaryText}>
                   Explore events
-                </EventlyText>
+                </AppText>
               </TouchableOpacity>
               <TouchableOpacity
                 style={st.secondary}
@@ -232,9 +235,9 @@ export function BookingScreen() {
                   size={18}
                   color={BOOKING_ACCENT}
                 />
-                <EventlyText variant="body" style={st.secondaryText}>
+                <AppText variant="h3" style={st.secondaryText}>
                   {COPY.emptyCta}
-                </EventlyText>
+                </AppText>
               </TouchableOpacity>
             </View>
           </View>
@@ -248,6 +251,7 @@ export function BookingScreen() {
       <SafeAreaView style={styles.container} edges={['top']}>
         {header}
         <ScrollView
+          ref={scrollRef as never}
           contentContainerStyle={st.scroll}
           refreshControl={
             <RefreshControl refreshing={isLoading} onRefresh={refreshAll} />
@@ -307,20 +311,20 @@ export function BookingScreen() {
                   size={15}
                   color={on ? '#ffffff' : t.gradient[1]}
                 />
-                <EventlyText
-                  variant="caption"
+                <AppText
+                  variant="label"
                   style={[st.segText, on && st.segTextOn]}
                   numberOfLines={1}
                 >
                   {t.label}
-                </EventlyText>
+                </AppText>
                 <View style={[st.segCount, on && st.segCountOn]}>
-                  <EventlyText
-                    variant="caption"
+                  <AppText
+                    variant="label"
                     style={[st.segCountText, on && st.segCountTextOn]}
                   >
                     {t.count}
-                  </EventlyText>
+                  </AppText>
                 </View>
               </TouchableOpacity>
             );
@@ -330,6 +334,7 @@ export function BookingScreen() {
 
       {showTickets ? (
         <ScrollView
+          ref={scrollRef as never}
           contentContainerStyle={st.scroll}
           refreshControl={
             <RefreshControl refreshing={isLoading} onRefresh={refreshAll} />
@@ -340,6 +345,7 @@ export function BookingScreen() {
         </ScrollView>
       ) : (
         <FlatList
+          ref={scrollRef as never}
           ListHeaderComponent={
             /* Out to the screen edges, as they sat before they moved into the
              list: the list's own side padding is for the cards below. */
@@ -367,16 +373,16 @@ export function BookingScreen() {
           )}
           ListEmptyComponent={
             <View style={styles.emptyPanel}>
-              <EventlyText variant="h2" style={styles.emptyTitle}>
+              <AppText variant="h2" style={styles.emptyTitle}>
                 {emptyForTab === 'emptyActive'
                   ? COPY.emptyActiveTitle
                   : COPY.emptyPastTitle}
-              </EventlyText>
-              <EventlyText variant="body" style={styles.emptySubtitle}>
+              </AppText>
+              <AppText variant="body" style={styles.emptySubtitle}>
                 {emptyForTab === 'emptyActive'
                   ? COPY.emptyActiveBody
                   : COPY.emptyPastBody}
-              </EventlyText>
+              </AppText>
             </View>
           }
           /* The tiles act on one event — the soonest active one — so they belong

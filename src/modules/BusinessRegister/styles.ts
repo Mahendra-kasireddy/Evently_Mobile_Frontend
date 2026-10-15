@@ -1,12 +1,18 @@
 import { Platform, StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, spacing } from '../../theme';
+import {
+  colors,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+  inputTypography,
+} from '../../theme';
 import {
   REG_ACCENT,
   REG_ACCENT_SOFT,
   REG_BG,
   REG_BORDER,
-  REG_GREEN_DARK,
   REG_GREEN_SOFT,
   REG_NAVY,
   REG_TEXT_MUTED,
@@ -21,7 +27,7 @@ export const screenStyles = StyleSheet.create({
     gap: spacing.sm,
     padding: spacing.xl,
   },
-  centerText: { color: REG_TEXT_MUTED, textAlign: 'center' },
+  centerText: { color: textColor.textSecondary, textAlign: 'center' },
   web: { flex: 1 },
 });
 
@@ -82,9 +88,7 @@ export const authGateStyles = StyleSheet.create({
   },
   stepText: {
     color: REG_ACCENT,
-    fontSize: 11.5,
-    fontWeight: '800',
-    letterSpacing: 1.2,
+    ...typography.label,
   },
   /* On the hero: light chip, white title. */
   heroStepChip: {
@@ -97,9 +101,7 @@ export const authGateStyles = StyleSheet.create({
   },
   heroStepText: {
     color: '#ffb59a',
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 1.4,
+    ...typography.label,
   },
   /* At the head of the card, beside its first line. */
   badge: {
@@ -111,11 +113,10 @@ export const authGateStyles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: spacing.md,
   },
-  title: { color: '#ffffff', fontSize: 28, lineHeight: 34 },
+  title: { color: textColor.textOnPrimary, ...typography.h1 },
   subtitle: {
     color: 'rgba(255,255,255,0.78)',
     marginTop: spacing.xs,
-    lineHeight: 21,
   },
   infoCard: {
     flexDirection: 'row',
@@ -126,9 +127,9 @@ export const authGateStyles = StyleSheet.create({
     borderRadius: 14,
     backgroundColor: '#f1efff',
   },
-  infoText: { flex: 1, color: '#3b2f8f', lineHeight: 18 },
+  infoText: { flex: 1, color: '#3b2f8f' },
   form: { gap: spacing.md },
-  label: { color: REG_NAVY },
+  label: { color: textColor.textPrimary },
   phoneRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -148,10 +149,8 @@ export const authGateStyles = StyleSheet.create({
   },
   phoneInput: {
     flex: 1,
-    color: REG_NAVY,
-    fontSize: 17,
-    fontWeight: '600',
-    letterSpacing: 0.5,
+    color: textColor.textPrimary,
+    ...inputTypography.bodyLarge,
     borderWidth: 0,
     backgroundColor: 'transparent',
     paddingHorizontal: 0,
@@ -171,14 +170,13 @@ export const authGateStyles = StyleSheet.create({
     borderColor: REG_BORDER,
     borderRadius: 14,
     textAlign: 'center',
-    fontSize: 20,
-    fontWeight: '700',
-    color: REG_NAVY,
+    ...typography.h2,
+    color: textColor.textPrimary,
     backgroundColor: colors.surface,
   },
   otpBoxFilled: { borderColor: REG_ACCENT, backgroundColor: colors.background },
-  devHint: { color: REG_TEXT_MUTED, textAlign: 'center' },
-  error: { color: colors.danger },
+  devHint: { color: textColor.textSecondary, textAlign: 'center' },
+  error: { color: textColor.textError },
   button: {
     borderRadius: 999,
     ...Platform.select({
@@ -191,8 +189,8 @@ export const authGateStyles = StyleSheet.create({
       android: { elevation: 3 },
     }),
   },
-  resendMuted: { color: REG_TEXT_MUTED, textAlign: 'center' },
-  resendActive: { textAlign: 'center', fontWeight: '700' },
+  resendMuted: { color: textColor.textSecondary, textAlign: 'center' },
+  resendActive: { textAlign: 'center', ...fontWeights.bold },
 });
 
 export const signupStyles = StyleSheet.create({
@@ -202,12 +200,12 @@ export const signupStyles = StyleSheet.create({
     paddingBottom: spacing.xl * 1.5,
     gap: spacing.lg,
   },
-  title: { color: REG_NAVY },
-  subtitle: { color: REG_TEXT_MUTED, marginTop: -spacing.sm },
+  title: { color: textColor.textPrimary },
+  subtitle: { color: textColor.textSecondary, marginTop: -spacing.sm },
   row: { flexDirection: 'row', gap: spacing.sm },
   half: { flex: 1 },
   field: { gap: spacing.xs },
-  label: { color: REG_NAVY },
+  label: { color: textColor.textPrimary },
   input: {
     borderColor: REG_BORDER,
     backgroundColor: colors.surface,
@@ -223,8 +221,8 @@ export const signupStyles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   chipOn: { borderColor: REG_ACCENT, backgroundColor: REG_ACCENT_SOFT },
-  chipText: { color: REG_NAVY },
-  chipTextOn: { color: REG_ACCENT, fontWeight: '700' },
+  chipText: { color: textColor.textPrimary },
+  chipTextOn: { color: REG_ACCENT, ...fontWeights.bold },
   note: {
     ...globalStyles.row,
     alignItems: 'flex-start',
@@ -233,7 +231,7 @@ export const signupStyles = StyleSheet.create({
     borderRadius: 14,
     padding: spacing.md,
   },
-  noteText: { color: REG_GREEN_DARK, flex: 1 },
-  error: { color: colors.danger },
+  noteText: { color: textColor.textPrimary, flex: 1 },
+  error: { color: textColor.textError },
   button: { borderRadius: 999 },
 });

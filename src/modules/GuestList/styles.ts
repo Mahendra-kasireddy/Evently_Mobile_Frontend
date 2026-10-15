@@ -1,6 +1,14 @@
 import { Platform, StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { brand, colors, spacing } from '../../theme';
+import {
+  brand,
+  colors,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+  inputTypography,
+} from '../../theme';
 import {
   GUEST_ACCENT,
   GUEST_CANVAS,
@@ -53,7 +61,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },
-  retryText: { color: GUEST_ACCENT, fontWeight: '700' },
+  retryText: { color: GUEST_ACCENT, ...fontWeights.bold },
 
   /* Said after an import — what went in, and what could not. */
   notice: {
@@ -84,7 +92,7 @@ export const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     color: GUEST_NAVY,
-    fontSize: 15,
+    ...inputTypography.bodyLarge,
     paddingVertical: 0,
     borderWidth: 0,
     minHeight: 0,
@@ -105,10 +113,10 @@ export const statsStyles = StyleSheet.create({
     overflow: 'hidden',
   },
   topRow: { ...globalStyles.row, alignItems: 'flex-end', gap: 8 },
-  total: { color: '#ffffff', fontSize: 40, lineHeight: 46, fontWeight: '800' },
+  total: { color: textColor.textOnPrimary, ...typography.display },
   totalLabel: {
     color: 'rgba(255,255,255,0.85)',
-    fontSize: 15,
+    ...typography.bodyLarge,
     marginBottom: 8,
   },
   bar: {
@@ -127,8 +135,12 @@ export const statsStyles = StyleSheet.create({
   dotOpened: { backgroundColor: '#ffffff' },
   dotInvited: { backgroundColor: 'rgba(255,255,255,0.6)' },
   dotNotSent: { backgroundColor: 'rgba(255,255,255,0.25)' },
-  legendText: { color: '#ffffff', fontSize: 13, fontWeight: '600' },
-  note: { color: 'rgba(255,255,255,0.9)', fontSize: 12.5, marginTop: 8 },
+  legendText: {
+    color: textColor.textOnPrimary,
+    ...typography.bodySmall,
+    ...fontWeights.semibold,
+  },
+  note: { color: 'rgba(255,255,255,0.9)', ...typography.caption, marginTop: 8 },
 });
 
 export const filterStyles = StyleSheet.create({
@@ -159,7 +171,7 @@ export const filterStyles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   chipOn: { backgroundColor: GUEST_NAVY, borderColor: GUEST_NAVY },
-  chipText: { color: GUEST_NAVY, fontWeight: '600' },
+  chipText: { color: GUEST_NAVY, ...fontWeights.semibold },
   chipTextOn: { color: brand.onNavy },
   count: {
     minWidth: 22,
@@ -171,7 +183,7 @@ export const filterStyles = StyleSheet.create({
     backgroundColor: '#f1eef6',
   },
   countOn: { backgroundColor: 'rgba(255,255,255,0.2)' },
-  countText: { color: GUEST_MUTED, fontSize: 11.5, fontWeight: '700' },
+  countText: { color: GUEST_MUTED, ...typography.label },
   countTextOn: { color: '#ffffff' },
 });
 
@@ -194,7 +206,7 @@ export const rowStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { color: brand.onNavy, fontWeight: '700', fontSize: 16 },
+  avatarText: { color: textColor.textOnPrimary, ...typography.h3 },
   text: { flex: 1, gap: 2 },
   name: { color: GUEST_NAVY },
   meta: { color: GUEST_MUTED },
@@ -205,7 +217,7 @@ export const rowStyles = StyleSheet.create({
     paddingHorizontal: 9,
     borderRadius: 999,
   },
-  statusText: { fontSize: 11.5, fontWeight: '700' },
+  statusText: { ...typography.label },
   /* Kept for the edit affordance on wider layouts and the render dump. */
   edit: {
     width: 32,
@@ -239,7 +251,7 @@ export const footerStyles = StyleSheet.create({
     borderColor: GUEST_NAVY,
     backgroundColor: colors.background,
   },
-  contactsText: { color: GUEST_NAVY, fontWeight: '700', fontSize: 15 },
+  contactsText: { color: GUEST_NAVY, ...typography.h3 },
   cta: {
     flex: 1,
     ...globalStyles.row,
@@ -252,10 +264,8 @@ export const footerStyles = StyleSheet.create({
   },
   ctaBusy: { opacity: 0.7 },
   ctaText: {
-    color: brand.onAccent,
-    fontSize: 16,
-    lineHeight: 22,
-    fontWeight: '700',
+    color: textColor.textOnPrimary,
+    ...typography.button,
   },
 });
 
@@ -272,16 +282,13 @@ export const emptyStyles = StyleSheet.create({
   },
   title: {
     color: GUEST_NAVY,
-    fontSize: 22,
-    lineHeight: 28,
-    fontWeight: '800',
+    ...typography.h2,
     marginTop: spacing.md,
   },
   body: {
     color: GUEST_MUTED,
     textAlign: 'center',
     marginTop: 6,
-    lineHeight: 20,
     paddingHorizontal: spacing.md,
   },
   actions: {
@@ -309,11 +316,10 @@ export const emptyStyles = StyleSheet.create({
   },
   actionTitle: {
     color: GUEST_NAVY,
-    fontSize: 15.5,
-    fontWeight: '700',
+    ...typography.h3,
     marginTop: spacing.s12,
   },
-  actionBody: { color: GUEST_MUTED, fontSize: 12.5, marginTop: 2 },
+  actionBody: { color: GUEST_MUTED, ...typography.caption, marginTop: 2 },
 });
 
 export const sheetStyles = StyleSheet.create({
@@ -343,7 +349,7 @@ export const sheetStyles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: spacing.md,
   },
-  title: { color: GUEST_NAVY, fontSize: 21, lineHeight: 27, fontWeight: '700' },
+  title: { color: GUEST_NAVY, ...typography.h2 },
   sub: { color: GUEST_MUTED, marginTop: 2 },
   close: {
     width: 34,
@@ -372,11 +378,15 @@ export const sheetStyles = StyleSheet.create({
   },
   previewAvatarEmpty: { backgroundColor: '#d9d4e0' },
   previewText: { flex: 1 },
-  previewInitials: { color: '#ffffff', fontSize: 18, fontWeight: '800' },
-  previewName: { color: GUEST_NAVY, fontSize: 16, fontWeight: '700' },
-  previewMeta: { color: GUEST_MUTED, fontSize: 13, marginTop: 2 },
+  previewInitials: { color: textColor.textOnPrimary, ...typography.h3 },
+  previewName: { color: GUEST_NAVY, ...typography.h3 },
+  previewMeta: { color: GUEST_MUTED, ...typography.bodySmall, marginTop: 2 },
 
-  label: { color: GUEST_NAVY, marginBottom: spacing.xs, fontWeight: '600' },
+  label: {
+    color: GUEST_NAVY,
+    marginBottom: spacing.xs,
+    ...fontWeights.semibold,
+  },
   inputBox: {
     ...globalStyles.row,
     gap: spacing.sm,
@@ -397,12 +407,12 @@ export const sheetStyles = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: GUEST_HAIRLINE,
   },
-  dialText: { color: GUEST_NAVY, fontWeight: '700', fontSize: 15 },
+  dialText: { color: GUEST_NAVY, ...typography.h3 },
   /* Inside the box, so it carries no frame of its own. */
   field: {
     flex: 1,
     color: GUEST_NAVY,
-    fontSize: 16,
+    ...typography.bodyLarge,
     borderWidth: 0,
     minHeight: 0,
     paddingVertical: 0,
@@ -421,8 +431,8 @@ export const sheetStyles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   groupOn: { borderColor: GUEST_ACCENT, backgroundColor: '#fff4ef' },
-  groupText: { color: GUEST_NAVY, fontWeight: '600' },
-  groupTextOn: { color: GUEST_ACCENT, fontWeight: '700' },
+  groupText: { color: GUEST_NAVY, ...fontWeights.semibold },
+  groupTextOn: { color: GUEST_ACCENT, ...fontWeights.bold },
 
   added: {
     ...globalStyles.row,
@@ -432,7 +442,7 @@ export const sheetStyles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#e9f7ef',
   },
-  addedText: { color: '#13744f', flex: 1, fontWeight: '600' },
+  addedText: { color: '#13744f', flex: 1, ...fontWeights.semibold },
 
   save: {
     ...globalStyles.row,
@@ -445,14 +455,12 @@ export const sheetStyles = StyleSheet.create({
   },
   saveBusy: { opacity: 0.7 },
   saveText: {
-    color: brand.onAccent,
-    fontSize: 16,
-    lineHeight: 22,
-    fontWeight: '700',
+    color: textColor.textOnPrimary,
+    ...typography.h3,
   },
   another: { alignItems: 'center', paddingVertical: spacing.s12 },
-  anotherText: { color: GUEST_NAVY, fontWeight: '700' },
-  error: { color: colors.danger, marginBottom: spacing.sm },
+  anotherText: { color: GUEST_NAVY, ...fontWeights.bold },
+  error: { color: textColor.textError, marginBottom: spacing.sm },
 });
 
 /* Choosing an event, when the screen was opened without one. */
@@ -478,23 +486,19 @@ export const pickerStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   tileDay: {
-    color: '#ffffff',
-    fontSize: 22,
-    lineHeight: 26,
-    fontWeight: '800',
+    color: textColor.textOnPrimary,
+    ...typography.h2,
   },
   tileMonth: {
     color: 'rgba(255,255,255,0.9)',
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 1,
+    ...typography.label,
   },
   text: { flex: 1, gap: 3 },
   title: { color: GUEST_NAVY },
   meta: { color: GUEST_MUTED },
   status: { ...globalStyles.row, gap: 5, marginTop: 2 },
   statusDot: { width: 7, height: 7, borderRadius: 4 },
-  statusText: { fontSize: 12, fontWeight: '700' },
+  statusText: { ...typography.label },
   go: {
     width: 34,
     height: 34,
@@ -532,6 +536,6 @@ export const contactsSheetStyles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: GUEST_HAIRLINE,
     color: GUEST_NAVY,
-    fontSize: 15,
+    ...typography.bodyLarge,
   },
 });

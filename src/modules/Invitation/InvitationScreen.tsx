@@ -13,7 +13,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AppHeader, EventlyIcon, EventlyText } from '../../Components';
+import { AppHeader, EventlyIcon, AppText } from '../../Components';
 import { colors } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
 import {
@@ -105,9 +105,9 @@ function InvitationList() {
   if (error && items.length === 0) {
     return (
       <View style={styles.centered}>
-        <EventlyText variant="body" style={styles.errorText}>
+        <AppText variant="caption" style={styles.errorText}>
           {error.message}
-        </EventlyText>
+        </AppText>
       </View>
     );
   }
@@ -122,12 +122,12 @@ function InvitationList() {
             color={INV_ACCENT}
           />
         </View>
-        <EventlyText variant="h2" style={styles.centeredTitle}>
+        <AppText variant="h2" style={styles.centeredTitle}>
           {COPY.emptyTitle}
-        </EventlyText>
-        <EventlyText variant="body" style={styles.centeredBody}>
+        </AppText>
+        <AppText variant="body" style={styles.centeredBody}>
           {COPY.emptyBody}
-        </EventlyText>
+        </AppText>
       </View>
     );
   }
@@ -150,9 +150,9 @@ function InvitationList() {
             size={18}
             color={needsYou > 0 ? INV_ACCENT : INV_GREEN}
           />
-          <EventlyText variant="caption" style={l.summaryText}>
+          <AppText variant="caption" style={l.summaryText}>
             {needsYou > 0 ? COPY.listNeedsYou(needsYou) : COPY.listAllApproved}
-          </EventlyText>
+          </AppText>
         </View>
       }
       renderItem={({ item }) => (
@@ -174,13 +174,13 @@ function InvitationList() {
               />
             </View>
             <View style={l.text}>
-              <EventlyText variant="subtitle" style={l.title} numberOfLines={2}>
+              <AppText variant="h3" style={l.title} numberOfLines={2}>
                 {item.title}
-              </EventlyText>
+              </AppText>
               {item.ref ? (
-                <EventlyText variant="caption" style={l.ref}>
+                <AppText variant="caption" style={l.ref}>
                   {item.ref}
-                </EventlyText>
+                </AppText>
               ) : null}
             </View>
             <View
@@ -189,8 +189,8 @@ function InvitationList() {
                 item.needsYou ? l.statusChipAction : l.statusChipDone,
               ]}
             >
-              <EventlyText
-                variant="caption"
+              <AppText
+                variant="label"
                 style={[
                   l.statusText,
                   { color: item.needsYou ? INV_ACCENT : INV_GREEN },
@@ -198,7 +198,7 @@ function InvitationList() {
                 numberOfLines={1}
               >
                 {item.statusLabel}
-              </EventlyText>
+              </AppText>
             </View>
           </View>
 
@@ -210,17 +210,17 @@ function InvitationList() {
                   size={14}
                   color={colors.textMuted}
                 />
-                <EventlyText variant="caption" style={l.metaText}>
+                <AppText variant="caption" style={l.metaText}>
                   {item.dateLabel}
-                </EventlyText>
+                </AppText>
               </View>
             ) : (
               <View />
             )}
             <View style={l.open}>
-              <EventlyText variant="caption" style={l.openText}>
+              <AppText variant="caption" style={l.openText}>
                 {item.needsYou ? COPY.listReview : COPY.listView}
-              </EventlyText>
+              </AppText>
               <EventlyIcon name="chevron-right" size={15} color={INV_ACCENT} />
             </View>
           </View>
@@ -250,9 +250,9 @@ function InvitationBar({
       >
         <EventlyIcon name="chevron-left" size={22} color={INV_NAVY_DEEP} />
       </TouchableOpacity>
-      <EventlyText variant="subtitle" style={sh.barTitle} numberOfLines={1}>
+      <AppText variant="h3" style={sh.barTitle} numberOfLines={1}>
         {COPY.artworkTitle}
-      </EventlyText>
+      </AppText>
       {/* Only once there is something to send: a guest list on an invitation
           nobody has approved is a list with nothing to do. */}
       {onGuests ? (
@@ -264,9 +264,9 @@ function InvitationBar({
           accessibilityLabel={COPY.artworkGuests}
           testID="invitation-guests"
         >
-          <EventlyText variant="caption" style={sh.barActionText}>
+          <AppText variant="label" style={sh.barActionText}>
             {COPY.artworkGuests}
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
       ) : null}
     </View>
@@ -397,9 +397,9 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color={colors.primary} />
-        <EventlyText variant="body" style={styles.centeredBody}>
+        <AppText variant="body" style={styles.centeredBody}>
           {COPY.loading}
-        </EventlyText>
+        </AppText>
       </View>
     );
   }
@@ -407,12 +407,12 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
   if (error && !invitation) {
     return (
       <View style={styles.centered}>
-        <EventlyText variant="h2" style={styles.centeredTitle}>
+        <AppText variant="h2" style={styles.centeredTitle}>
           {COPY.errorTitle}
-        </EventlyText>
-        <EventlyText variant="body" style={styles.centeredBody}>
+        </AppText>
+        <AppText variant="body" style={styles.centeredBody}>
           {error.message}
-        </EventlyText>
+        </AppText>
         <TouchableOpacity
           style={styles.retryButton}
           activeOpacity={0.8}
@@ -420,9 +420,9 @@ function InvitationDetail({ bookingId }: { bookingId: string }) {
           accessibilityRole="button"
         >
           <EventlyIcon name="refresh" size={16} color={INV_ACCENT} />
-          <EventlyText variant="caption" style={styles.retryText}>
+          <AppText variant="caption" style={styles.retryText}>
             {COPY.retry}
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
       </View>
     );

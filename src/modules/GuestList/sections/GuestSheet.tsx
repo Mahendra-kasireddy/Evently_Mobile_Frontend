@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import {
   EventlyIcon,
-  EventlyText,
+  AppText,
   EventlyTextInput,
   GradientFill,
   KeyboardAvoider,
@@ -138,12 +138,12 @@ export function GuestSheet({
 
             <View style={s.head}>
               <View>
-                <EventlyText style={s.title}>
+                <AppText variant="h2" style={s.title}>
                   {isEdit ? COPY.sheetEditTitle : COPY.sheetAddTitle}
-                </EventlyText>
-                <EventlyText variant="small" style={s.sub}>
+                </AppText>
+                <AppText variant="bodySmall" style={s.sub}>
                   {isEdit ? COPY.sheetEditSub : COPY.sheetAddSub}
-                </EventlyText>
+                </AppText>
               </View>
               <TouchableOpacity
                 style={s.close}
@@ -166,9 +166,9 @@ export function GuestSheet({
                 ]}
               >
                 {previewName ? (
-                  <EventlyText style={s.previewInitials}>
+                  <AppText variant="h3" style={s.previewInitials}>
                     {initialsOf(previewName)}
-                  </EventlyText>
+                  </AppText>
                 ) : (
                   <EventlyIcon
                     name="account-plus-outline"
@@ -178,32 +178,34 @@ export function GuestSheet({
                 )}
               </View>
               <View style={s.previewText}>
-                <EventlyText style={s.previewName} numberOfLines={1}>
+                <AppText variant="h3" style={s.previewName} numberOfLines={1}>
                   {previewName || COPY.namePlaceholder}
-                </EventlyText>
-                <EventlyText style={s.previewMeta} numberOfLines={1}>
+                </AppText>
+                <AppText
+                  variant="bodySmall"
+                  style={s.previewMeta}
+                  numberOfLines={1}
+                >
                   {[
                     draft.phone.trim() ? `+91 ${draft.phone.trim()}` : '',
                     GROUP_LABEL[draft.group],
                   ]
                     .filter(Boolean)
                     .join(' · ')}
-                </EventlyText>
+                </AppText>
               </View>
             </View>
 
             {addedName ? (
               <View style={s.added}>
                 <EventlyIcon name="check-circle" size={18} color="#13a06f" />
-                <EventlyText style={s.addedText}>
-                  {COPY.added(addedName)}
-                </EventlyText>
+                <AppText style={s.addedText}>{COPY.added(addedName)}</AppText>
               </View>
             ) : null}
 
-            <EventlyText variant="label" style={s.label}>
+            <AppText variant="label" style={s.label}>
               {COPY.name}
-            </EventlyText>
+            </AppText>
             <View style={[s.inputBox, focus === 'name' && s.inputBoxFocus]}>
               <EventlyIcon
                 name="account-outline"
@@ -226,12 +228,14 @@ export function GuestSheet({
               />
             </View>
 
-            <EventlyText variant="label" style={s.label}>
+            <AppText variant="label" style={s.label}>
               {COPY.phone}
-            </EventlyText>
+            </AppText>
             <View style={[s.inputBox, focus === 'phone' && s.inputBoxFocus]}>
               <View style={s.dial}>
-                <EventlyText style={s.dialText}>🇮🇳 +91</EventlyText>
+                <AppText variant="h3" style={s.dialText}>
+                  🇮🇳 +91
+                </AppText>
               </View>
               <EventlyTextInput
                 ref={phoneRef}
@@ -247,9 +251,9 @@ export function GuestSheet({
               />
             </View>
 
-            <EventlyText variant="label" style={s.label}>
+            <AppText variant="label" style={s.label}>
               {COPY.group}
-            </EventlyText>
+            </AppText>
             <View style={s.groupRow}>
               {GUEST_GROUPS.map((group: GuestGroup) => {
                 const on = draft.group === group;
@@ -268,21 +272,22 @@ export function GuestSheet({
                       size={22}
                       color={on ? GUEST_ACCENT : GUEST_NAVY}
                     />
-                    <EventlyText
-                      variant="bodyMedium"
+                    <AppText
+                      variant="body"
+                      weight="medium"
                       style={on ? s.groupTextOn : s.groupText}
                     >
                       {GROUP_LABEL[group]}
-                    </EventlyText>
+                    </AppText>
                   </TouchableOpacity>
                 );
               })}
             </View>
 
             {localError || errorMessage ? (
-              <EventlyText variant="small" style={s.error}>
+              <AppText variant="bodySmall" style={s.error}>
                 {localError ?? errorMessage}
-              </EventlyText>
+              </AppText>
             ) : null}
 
             <TouchableOpacity
@@ -295,9 +300,9 @@ export function GuestSheet({
             >
               <GradientFill colors={SAVE_GRADIENT} direction="across" />
               <EventlyIcon name="check" size={18} color="#ffffff" />
-              <EventlyText style={s.saveText}>
+              <AppText variant="h3" style={s.saveText}>
                 {isSaving ? COPY.saving : isEdit ? COPY.saveChanges : COPY.save}
-              </EventlyText>
+              </AppText>
             </TouchableOpacity>
 
             {/* Adding a family's worth one after another, without reopening. */}
@@ -310,9 +315,7 @@ export function GuestSheet({
                 accessibilityRole="button"
                 accessibilityLabel={COPY.saveAnother}
               >
-                <EventlyText style={s.anotherText}>
-                  {COPY.saveAnother}
-                </EventlyText>
+                <AppText style={s.anotherText}>{COPY.saveAnother}</AppText>
               </TouchableOpacity>
             )}
           </Pressable>

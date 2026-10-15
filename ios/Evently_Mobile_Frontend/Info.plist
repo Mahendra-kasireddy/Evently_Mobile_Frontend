@@ -32,21 +32,6 @@
 		<false/>
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
-		<!--
-			The development API is plain HTTP on localhost, and App Transport
-			Security blocks cleartext by default.
-
-			NSAllowsLocalNetworking alone was not enough. React Native's own
-			networking is exempt in a debug build, so every API call succeeded
-			and the screens filled with text - but <Image> loads go through
-			NSURLSession and are not exempt, so every photo served from
-			http://localhost:3000/api/upload/file/... was refused before it left
-			the device. The result was a grey placeholder on every image in the
-			app while the data around it looked perfectly healthy.
-
-			This exempts loopback only. Arbitrary loads stay off, so a release
-			build still refuses cleartext to any real host.
-		-->
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>localhost</key>
@@ -81,6 +66,10 @@
 		<string>Poppins-Regular.ttf</string>
 		<string>Poppins-Bold.ttf</string>
 		<string>Poppins-SemiBold.ttf</string>
+		<string>Inter_600SemiBold.ttf</string>
+		<string>Inter_500Medium.ttf</string>
+		<string>Inter_400Regular.ttf</string>
+		<string>Inter_700Bold.ttf</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

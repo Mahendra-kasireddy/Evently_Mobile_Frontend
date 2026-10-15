@@ -1,5 +1,5 @@
 import { TouchableOpacity, View } from 'react-native';
-import { EventlyIcon, EventlyText } from '../../../Components';
+import { EventlyIcon, AppText } from '../../../Components';
 import { HOME_ACCENT, HOME_INK } from '../design';
 import { homeHeaderStyles as s } from '../styles';
 
@@ -25,9 +25,9 @@ function Badge({ count }: { count: number }) {
   if (count <= 0) return null;
   return (
     <View style={s.badge}>
-      <EventlyText variant="caption" style={s.badgeText}>
+      <AppText variant="label" style={s.badgeText}>
         {count > 9 ? '9+' : count}
-      </EventlyText>
+      </AppText>
     </View>
   );
 }
@@ -81,21 +81,23 @@ export function HomeHeader({
                 color={onPhoto ? HOME_ACCENT.marigold : HOME_ACCENT.saffron}
               />
             </View>
-            <EventlyText
+            <AppText
+              variant="h3"
               style={[s.locationTitle, onPhoto && s.onPhotoText]}
               numberOfLines={1}
             >
               {title}
-            </EventlyText>
+            </AppText>
             <EventlyIcon name="chevron-down" size={18} color={tint} />
           </View>
           {locationSubtitle ? (
-            <EventlyText
+            <AppText
+              variant="caption"
               style={[s.locationSub, onPhoto && s.onPhotoSub]}
               numberOfLines={1}
             >
               {locationSubtitle}
-            </EventlyText>
+            </AppText>
           ) : null}
         </TouchableOpacity>
 

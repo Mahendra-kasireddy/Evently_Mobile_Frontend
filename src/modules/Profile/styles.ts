@@ -1,7 +1,13 @@
 import { StyleSheet } from 'react-native';
 import { globalStyles } from '../../styles/globalStyles';
-import { colors, spacing } from '../../theme';
-import { PROFILE_ACCENT, PROFILE_CANVAS, PROFILE_NAVY } from './constants';
+import {
+  colors,
+  spacing,
+  fontWeights,
+  textColor,
+  typography,
+} from '../../theme';
+import { PROFILE_ACCENT, PROFILE_CANVAS } from './constants';
 
 /** The hairline used for card edges and row dividers — warm, to sit on the canvas. */
 const HAIRLINE = '#efe9e5';
@@ -9,10 +15,23 @@ const HAIRLINE = '#efe9e5';
 export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: PROFILE_CANVAS },
   content: { paddingBottom: spacing.xl },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
-  loadingText: { color: colors.textMuted, marginTop: spacing.md },
-  errorTitle: { color: PROFILE_NAVY, marginTop: spacing.md, textAlign: 'center' },
-  errorText: { color: colors.danger, textAlign: 'center', marginTop: spacing.sm },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.lg,
+  },
+  loadingText: { color: textColor.textSecondary, marginTop: spacing.md },
+  errorTitle: {
+    color: textColor.textPrimary,
+    marginTop: spacing.md,
+    textAlign: 'center',
+  },
+  errorText: {
+    color: textColor.textError,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+  },
   retryButton: {
     ...globalStyles.row,
     gap: spacing.xs,
@@ -23,7 +42,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },
-  retryText: { color: PROFILE_ACCENT, fontWeight: '700' },
+  retryText: { color: PROFILE_ACCENT, ...fontWeights.bold },
 });
 
 export const identityStyles = StyleSheet.create({
@@ -36,7 +55,11 @@ export const identityStyles = StyleSheet.create({
     overflow: 'hidden',
     padding: spacing.md,
   },
-  blob: { position: 'absolute', borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.12)' },
+  blob: {
+    position: 'absolute',
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+  },
   blobOne: { width: 140, height: 140, top: -60, right: -30 },
   blobTwo: { width: 90, height: 90, bottom: -40, left: 90 },
   row: { ...globalStyles.row, gap: spacing.s12 },
@@ -59,13 +82,17 @@ export const identityStyles = StyleSheet.create({
     overflow: 'hidden',
   },
   avatarImage: { width: '100%', height: '100%' },
-  avatarText: { color: PROFILE_NAVY, fontSize: 17, fontWeight: '800', letterSpacing: 0.3 },
+  avatarText: { color: textColor.textPrimary, ...typography.h3 },
   text: { flex: 1, gap: 3 },
-  name: { color: '#ffffff', fontSize: 17, fontWeight: '700', lineHeight: 22 },
+  name: { color: textColor.textOnPrimary, ...typography.h3 },
   /** The prompt an account with no name gets, set apart from a real one. */
-  namePrompt: { color: 'rgba(255,255,255,0.85)', fontStyle: 'italic', fontWeight: '600' },
+  namePrompt: {
+    color: 'rgba(255,255,255,0.85)',
+    fontStyle: 'italic',
+    ...fontWeights.semibold,
+  },
   phoneRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  phone: { color: 'rgba(255,255,255,0.9)', fontSize: 12.5, lineHeight: 17, letterSpacing: 0.3 },
+  phone: { color: 'rgba(255,255,255,0.9)', ...typography.caption },
   edit: {
     flexShrink: 0,
     flexDirection: 'row',
@@ -78,7 +105,7 @@ export const identityStyles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
   },
-  editText: { color: '#ffffff', fontSize: 12, lineHeight: 16, fontWeight: '700' },
+  editText: { color: textColor.textOnPrimary, ...typography.label },
 });
 
 export const groupStyles = StyleSheet.create({
@@ -88,12 +115,8 @@ export const groupStyles = StyleSheet.create({
    * group heading can be mistaken for one of the rows inside it.
    */
   title: {
-    color: '#8a93a3',
-    fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 0.9,
-    textTransform: 'uppercase',
-    lineHeight: 15,
+    color: textColor.textDisabled,
+    ...typography.overline,
     marginHorizontal: spacing.md,
     marginBottom: 8,
   },
@@ -108,7 +131,12 @@ export const groupStyles = StyleSheet.create({
 });
 
 export const rowStyles = StyleSheet.create({
-  row: { ...globalStyles.row, gap: spacing.s12, paddingHorizontal: spacing.s12, minHeight: 52 },
+  row: {
+    ...globalStyles.row,
+    gap: spacing.s12,
+    paddingHorizontal: spacing.s12,
+    minHeight: 52,
+  },
   /** Inset past the icon tile, so the list reads as one column. */
   divider: { height: 1, backgroundColor: HAIRLINE, marginLeft: 58 },
   iconTile: {
@@ -119,8 +147,8 @@ export const rowStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  label: { color: '#141c2b', fontSize: 14, lineHeight: 19, fontWeight: '500', flex: 1 },
-  labelDanger: { color: '#d93b3b', fontWeight: '600' },
+  label: { color: textColor.textPrimary, ...typography.label, flex: 1 },
+  labelDanger: { color: '#d93b3b', ...fontWeights.semibold },
   badge: {
     flexShrink: 0,
     borderRadius: 999,
@@ -128,5 +156,5 @@ export const rowStyles = StyleSheet.create({
     paddingHorizontal: 9,
     paddingVertical: 3,
   },
-  badgeText: { color: PROFILE_ACCENT, fontSize: 11, lineHeight: 15, fontWeight: '700' },
+  badgeText: { color: PROFILE_ACCENT, ...typography.label },
 });

@@ -1,5 +1,9 @@
 import { useCallback } from 'react';
-import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BackHandler, ScrollView, TouchableOpacity, View } from 'react-native';
@@ -7,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Confetti,
   EventlyIcon,
-  EventlyText,
+  AppText,
   FadeInUp,
   GradientFill,
   PopIn,
@@ -39,7 +43,9 @@ function dateLabel(iso: string | null | undefined, withTime = false): string {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
-    ...(withTime ? { hour: 'numeric', minute: '2-digit' } : { year: 'numeric' }),
+    ...(withTime
+      ? { hour: 'numeric', minute: '2-digit' }
+      : { year: 'numeric' }),
   }).format(at);
 }
 
@@ -60,18 +66,26 @@ function ReceiptRow({
       <View style={s.rowIcon}>
         <EventlyIcon name={icon} size={16} color="#7c5cdb" />
       </View>
-      <EventlyText variant="body" style={s.rowLabel}>
+      <AppText variant="label" style={s.rowLabel}>
         {label}
-      </EventlyText>
+      </AppText>
       <View style={s.rowRight}>
-        <EventlyText variant="subtitle" style={s.rowValue} numberOfLines={1}>
+        <AppText variant="body" style={s.rowValue} numberOfLines={1}>
           {value}
-        </EventlyText>
+        </AppText>
         {badge ? (
-          <View style={[s.badge, badge.tone === 'paid' ? s.badgePaid : s.badgeCash]}>
-            <EventlyText variant="caption" style={[s.badgeText, badge.tone === 'paid' ? s.badgeTextPaid : s.badgeTextCash]}>
+          <View
+            style={[s.badge, badge.tone === 'paid' ? s.badgePaid : s.badgeCash]}
+          >
+            <AppText
+              variant="label"
+              style={[
+                s.badgeText,
+                badge.tone === 'paid' ? s.badgeTextPaid : s.badgeTextCash,
+              ]}
+            >
               {badge.text}
-            </EventlyText>
+            </AppText>
           </View>
         ) : null}
       </View>
@@ -109,10 +123,13 @@ export function PaymentSuccessScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
-        goHome();
-        return true;
-      });
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        () => {
+          goHome();
+          return true;
+        },
+      );
       return () => subscription.remove();
     }, [goHome]),
   );
@@ -122,7 +139,10 @@ export function PaymentSuccessScreen() {
        workspace should land on Home, not on a paid-for payment form. */
     navigation.reset({
       index: 1,
-      routes: [{ name: 'Main' }, { name: 'Workspace', params: { bookingId: params.bookingId } }],
+      routes: [
+        { name: 'Main' },
+        { name: 'Workspace', params: { bookingId: params.bookingId } },
+      ],
     });
   };
 
@@ -135,7 +155,9 @@ export function PaymentSuccessScreen() {
   const steps = inCash
     ? COPY.next.cash(organizer, advance, respondBy)
     : COPY.next.online(organizer, balance, respondBy);
-  const hasReceipt = Boolean(params.title || eventDate || params.location || advance || balance);
+  const hasReceipt = Boolean(
+    params.title || eventDate || params.location || advance || balance,
+  );
 
   return (
     <SafeAreaView style={s.container} edges={['top']}>
@@ -151,29 +173,43 @@ export function PaymentSuccessScreen() {
         <Confetti />
       </View>
 
-      <ScrollView contentContainerStyle={s.body} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={s.body}
+        showsVerticalScrollIndicator={false}
+      >
         <PopIn>
           <View style={s.badgeRing}>
             <View style={s.tick}>
-              <GradientFill colors={inCash ? SUCCESS_CASH_GRADIENT : SUCCESS_PAID_GRADIENT} direction="diagonal" />
-              <EventlyIcon name={inCash ? 'cash-check' : 'check-bold'} size={44} color="#ffffff" />
+              <GradientFill
+                colors={inCash ? SUCCESS_CASH_GRADIENT : SUCCESS_PAID_GRADIENT}
+                direction="diagonal"
+              />
+              <EventlyIcon
+                name={inCash ? 'cash-check' : 'check-bold'}
+                size={44}
+                color="#ffffff"
+              />
             </View>
           </View>
         </PopIn>
 
         <FadeInUp delay={120}>
-          <EventlyText variant="h1" style={s.heading} accessibilityRole="header">
+          <AppText variant="h1" style={s.heading} accessibilityRole="header">
             {inCash ? COPY.cashHeading : COPY.heading}
-          </EventlyText>
-          <EventlyText variant="body" style={s.text}>
+          </AppText>
+          <AppText variant="body" style={s.text}>
             {inCash ? COPY.cashBody(organizer) : COPY.body(organizer)}
-          </EventlyText>
+          </AppText>
           {params.ref ? (
             <View style={s.refChip}>
-              <EventlyIcon name="ticket-confirmation-outline" size={14} color="#7c5cdb" />
-              <EventlyText variant="caption" style={s.refText}>
+              <EventlyIcon
+                name="ticket-confirmation-outline"
+                size={14}
+                color="#7c5cdb"
+              />
+              <AppText variant="label" style={s.refText}>
                 {params.ref}
-              </EventlyText>
+              </AppText>
             </View>
           ) : null}
         </FadeInUp>
@@ -181,46 +217,69 @@ export function PaymentSuccessScreen() {
         {hasReceipt ? (
           <FadeInUp delay={220} style={s.receipt}>
             {params.title ? (
-              <EventlyText variant="subtitle" style={s.receiptTitle} numberOfLines={2}>
+              <AppText variant="h3" style={s.receiptTitle} numberOfLines={2}>
                 {params.title}
-              </EventlyText>
+              </AppText>
             ) : null}
-            {eventDate ? <ReceiptRow icon="calendar-blank-outline" label={COPY.date} value={eventDate} /> : null}
+            {eventDate ? (
+              <ReceiptRow
+                icon="calendar-blank-outline"
+                label={COPY.date}
+                value={eventDate}
+              />
+            ) : null}
             {params.location ? (
-              <ReceiptRow icon="map-marker-outline" label={COPY.venue} value={params.location} />
+              <ReceiptRow
+                icon="map-marker-outline"
+                label={COPY.venue}
+                value={params.location}
+              />
             ) : null}
             {advance ? (
               <ReceiptRow
                 icon={inCash ? 'cash' : 'credit-card-check-outline'}
                 label={COPY.advance}
                 value={advance}
-                badge={inCash ? { text: COPY.payInCash, tone: 'cash' } : { text: COPY.paid, tone: 'paid' }}
+                badge={
+                  inCash
+                    ? { text: COPY.payInCash, tone: 'cash' }
+                    : { text: COPY.paid, tone: 'paid' }
+                }
               />
             ) : null}
-            {balance ? <ReceiptRow icon="wallet-outline" label={COPY.balance} value={balance} /> : null}
+            {balance ? (
+              <ReceiptRow
+                icon="wallet-outline"
+                label={COPY.balance}
+                value={balance}
+              />
+            ) : null}
           </FadeInUp>
         ) : null}
 
         <FadeInUp delay={320} style={s.next}>
-          <EventlyText variant="subtitle" style={s.nextTitle}>
+          <AppText variant="h3" style={s.nextTitle}>
             {COPY.nextTitle}
-          </EventlyText>
+          </AppText>
           {steps.map((step, i) => (
             <View key={step.title} style={s.step}>
               <View style={s.stepRail}>
                 <View style={s.stepDot}>
-                  <GradientFill colors={SUCCESS_CTA_GRADIENT} direction="diagonal" />
+                  <GradientFill
+                    colors={SUCCESS_CTA_GRADIENT}
+                    direction="diagonal"
+                  />
                   <EventlyIcon name={step.icon} size={14} color="#ffffff" />
                 </View>
                 {i < steps.length - 1 ? <View style={s.stepLine} /> : null}
               </View>
               <View style={s.stepText}>
-                <EventlyText variant="subtitle" style={s.stepTitle}>
+                <AppText variant="body" style={s.stepTitle}>
                   {step.title}
-                </EventlyText>
-                <EventlyText variant="caption" style={s.stepBody}>
+                </AppText>
+                <AppText variant="bodySmall" style={s.stepBody}>
                   {step.body}
-                </EventlyText>
+                </AppText>
               </View>
             </View>
           ))}
@@ -236,17 +295,21 @@ export function PaymentSuccessScreen() {
           accessibilityLabel={COPY.cta}
         >
           <GradientFill colors={SUCCESS_CTA_GRADIENT} direction="across" />
-          <EventlyText variant="subtitle" style={s.ctaText}>
+          <AppText variant="button" style={s.ctaText}>
             {COPY.cta}
-          </EventlyText>
+          </AppText>
           <View style={s.ctaArrow}>
             <EventlyIcon name="arrow-right" size={18} color="#ffffff" />
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={s.secondary} onPress={goHome} accessibilityRole="button">
-          <EventlyText variant="body" style={s.secondaryText}>
+        <TouchableOpacity
+          style={s.secondary}
+          onPress={goHome}
+          accessibilityRole="button"
+        >
+          <AppText variant="body" style={s.secondaryText}>
             {COPY.home}
-          </EventlyText>
+          </AppText>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
