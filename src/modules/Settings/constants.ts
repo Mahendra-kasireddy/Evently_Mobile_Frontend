@@ -83,7 +83,8 @@ export const SETTINGS_COPY = {
   notificationsSection: 'Notifications',
   notificationsNote:
     'Booking and payment updates always come through — they are the record of your event, not a preference.',
-  prefSaveError: "That preference didn't save. Check your connection and try again.",
+  prefSaveError:
+    "That preference didn't save. Check your connection and try again.",
 
   dangerSection: 'Account',
   closeAccount: 'Close my account',
@@ -98,4 +99,19 @@ export const SETTINGS_COPY = {
   loading: 'Loading your details…',
   errorTitle: "We couldn't load your details",
   retry: 'Try again',
+};
+
+/** The profile editor, opened from Settings and from the Profile card. */
+export const EDIT_PROFILE_COPY = {
+  title: 'Edit profile',
+  rowSubtitle: 'Name, photo, email and city',
+  noName: 'Add your name',
+  addPhoto: 'Add a photo',
+  changePhoto: 'Change photo',
+  uploading: 'Saving your photo…',
+  photoHint: 'Organizers see this next to your requests.',
+  photoSheetTitle: 'Profile photo',
+  takePhoto: 'Take a photo',
+  chooseFromLibrary: 'Choose from library',
+  cancel: 'Cancel',
 };

@@ -6,13 +6,18 @@ export interface ProfileDetails {
 }
 
 /** PATCH /user/updateProfile — only the fields the customer owns. */
-export type UpdateProfileBody = Partial<ProfileDetails>;
+export type UpdateProfileBody = Partial<ProfileDetails> & {
+  /** An Evently upload's URL (from POST /upload); the server checks the host. */
+  photoUrl?: string;
+};
 
 export interface UserDetailsDTO {
   id: string;
   name: string;
   phone: string;
   email?: string;
+  /** '' or absent until the customer adds one. */
+  photoUrl?: string;
   phoneVerified: boolean;
   city: string;
   roles: string[];

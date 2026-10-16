@@ -1,4 +1,9 @@
-import type { BusinessView, ProfileAction, ProfileGroupSpec, ProfileRowSpec } from './types';
+import type {
+  BusinessView,
+  ProfileAction,
+  ProfileGroupSpec,
+  ProfileRowSpec,
+} from './types';
 
 export const GET_USER_DETAILS_ENDPOINT = '/user/getUserDetails';
 export const LOGOUT_ENDPOINT = '/auth/logoutUser';
@@ -26,6 +31,7 @@ export const PROFILE_ROW_GRADIENT: Record<ProfileAction, [string, string]> = {
   payments: ['#5b9bff', '#2554b8'],
   location: ['#ffb547', '#e8791a'],
   notifications: ['#f472b6', '#be185d'],
+  editProfile: ['#ff8a5c', '#7c5cdb'],
   settings: ['#8a9ab3', '#4a5872'],
   listBusiness: ['#2fb894', '#0e7358'],
   switchOrganizer: ['#ff8a5c', '#7c5cdb'],
@@ -55,11 +61,23 @@ export const PROFILE_GROUPS: ProfileGroupSpec[] = [
     title: 'Your events',
     rows: [
       { action: 'bookings', icon: 'clipboard-text-outline', label: 'Bookings' },
-      { action: 'savedPackages', icon: 'heart-outline', label: 'Saved packages' },
-      { action: 'invitations', icon: 'card-account-details-outline', label: 'Invitations' },
+      {
+        action: 'savedPackages',
+        icon: 'heart-outline',
+        label: 'Saved packages',
+      },
+      {
+        action: 'invitations',
+        icon: 'card-account-details-outline',
+        label: 'Invitations',
+      },
       // Separate from Invitations on purpose: that is the card itself, and
       // this is who receives it — work a host does long before anything is sent.
-      { action: 'guestList', icon: 'account-multiple-outline', label: 'Guest list' },
+      {
+        action: 'guestList',
+        icon: 'account-multiple-outline',
+        label: 'Guest list',
+      },
       { action: 'payments', icon: 'credit-card-outline', label: 'Payments' },
     ],
   },
@@ -67,6 +85,12 @@ export const PROFILE_GROUPS: ProfileGroupSpec[] = [
     key: 'account',
     title: 'Account',
     rows: [
+      // Name, photo, email and city — the same editor the card's Edit opens.
+      {
+        action: 'editProfile',
+        icon: 'account-edit-outline',
+        label: 'Edit profile',
+      },
       // "Location", not "Saved locations": what this opens is the one current
       // location the app reads from the device. There is no stored address book.
       { action: 'location', icon: 'map-marker-outline', label: 'Location' },
@@ -78,7 +102,11 @@ export const PROFILE_GROUPS: ProfileGroupSpec[] = [
     key: 'more',
     title: 'More',
     rows: [
-      { action: 'listBusiness', icon: 'storefront-outline', label: 'List your business' },
+      {
+        action: 'listBusiness',
+        icon: 'storefront-outline',
+        label: 'List your business',
+      },
       { action: 'help', icon: 'help-circle-outline', label: 'Help & support' },
       { action: 'signOut', icon: 'logout', label: 'Log out' },
     ],
@@ -91,8 +119,16 @@ export const PROFILE_GROUPS: ProfileGroupSpec[] = [
  * business roles the account actually holds.
  */
 export const SWITCH_ROWS: Record<BusinessView, ProfileRowSpec> = {
-  organizer: { action: 'switchOrganizer', icon: 'briefcase-outline', label: 'Switch to organizer dashboard' },
-  vendor: { action: 'switchVendor', icon: 'account-switch-outline', label: 'Switch to sub-vendor dashboard' },
+  organizer: {
+    action: 'switchOrganizer',
+    icon: 'briefcase-outline',
+    label: 'Switch to organizer dashboard',
+  },
+  vendor: {
+    action: 'switchVendor',
+    icon: 'account-switch-outline',
+    label: 'Switch to sub-vendor dashboard',
+  },
 };
 
 export const BUSINESS_GROUP_TITLE = 'Your business';

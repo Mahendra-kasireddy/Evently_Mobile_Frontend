@@ -5,10 +5,16 @@ import {
   PREFERENCES_ENDPOINT,
   UPDATE_PROFILE_ENDPOINT,
 } from './constants';
-import type { NotificationPrefs, UpdateProfileBody, UserDetailsDTO } from './types';
+import type {
+  NotificationPrefs,
+  UpdateProfileBody,
+  UserDetailsDTO,
+} from './types';
 
 export async function getUserDetails(): Promise<UserDetailsDTO> {
-  const { data } = await apiClient.get<UserDetailsDTO>(GET_USER_DETAILS_ENDPOINT);
+  const { data } = await apiClient.get<UserDetailsDTO>(
+    GET_USER_DETAILS_ENDPOINT,
+  );
   return data;
 }
 
@@ -19,8 +25,13 @@ export async function getUserDetails(): Promise<UserDetailsDTO> {
  * on the server's self-service DTO — their absence there is the access
  * control — and this client has no business naming them either.
  */
-export async function updateProfile(body: UpdateProfileBody): Promise<UserDetailsDTO> {
-  const { data } = await apiClient.patch<UserDetailsDTO>(UPDATE_PROFILE_ENDPOINT, body);
+export async function updateProfile(
+  body: UpdateProfileBody,
+): Promise<UserDetailsDTO> {
+  const { data } = await apiClient.patch<UserDetailsDTO>(
+    UPDATE_PROFILE_ENDPOINT,
+    body,
+  );
   return data;
 }
 
@@ -30,7 +41,9 @@ export async function getNotificationPrefs(): Promise<NotificationPrefs> {
 }
 
 /** Sends the one flag that changed, not the whole set. */
-export async function updateNotificationPrefs(patch: Partial<NotificationPrefs>): Promise<void> {
+export async function updateNotificationPrefs(
+  patch: Partial<NotificationPrefs>,
+): Promise<void> {
   await apiClient.patch(PREFERENCES_ENDPOINT, patch);
 }
 

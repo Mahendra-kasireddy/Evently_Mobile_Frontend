@@ -20,7 +20,7 @@ import { PaymentsScreen } from '../modules/Payments';
 import { OnboardingScreen } from '../modules/Onboarding';
 import { SavedPackagesScreen } from '../modules/SavedPackages';
 import { SearchScreen } from '../modules/Search';
-import { SettingsScreen } from '../modules/Settings';
+import { EditProfileScreen, SettingsScreen } from '../modules/Settings';
 import { SplashScreen } from '../modules/Splash';
 import { BusinessHomeScreen } from '../modules/BusinessHome';
 import { BusinessRegisterScreen } from '../modules/BusinessRegister';
@@ -136,6 +136,7 @@ export function RootNavigator() {
           <Stack.Screen name="Conversation" component={ConversationScreen} />
           <Stack.Screen name="Payments" component={PaymentsScreen} />
           <Stack.Screen name="Settings" component={SettingsScreen} />
+          <Stack.Screen name="EditProfile" component={EditProfileScreen} />
           <Stack.Screen name="LegalSupport" component={LegalSupportScreen} />
           <Stack.Screen name="Contact" component={ContactScreen} />
           {/* "List your business" from Profile: the same role picker a

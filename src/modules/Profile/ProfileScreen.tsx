@@ -47,6 +47,8 @@ export function ProfileScreen() {
   } = useProfileContainer();
 
   const openSettings = () => navigation.navigate('Settings');
+  // The card's Edit opens the profile editor; the Settings row opens Settings.
+  const openEditProfile = () => navigation.navigate('EditProfile');
 
   const go = (action: ProfileAction) => {
     switch (action) {
@@ -65,6 +67,8 @@ export function ProfileScreen() {
         return navigation.navigate('Location');
       case 'notifications':
         return navigation.navigate('Notification');
+      case 'editProfile':
+        return openEditProfile();
       case 'settings':
         return openSettings();
       case 'listBusiness':
@@ -155,7 +159,7 @@ export function ProfileScreen() {
         showsVerticalScrollIndicator={false}
       >
         <FadeInUp>
-          <ProfileIdentity profile={profile} onEdit={openSettings} />
+          <ProfileIdentity profile={profile} onEdit={openEditProfile} />
         </FadeInUp>
         {groups.map((group, index) => (
           <FadeInUp key={group.key} delay={90 * (index + 1)}>

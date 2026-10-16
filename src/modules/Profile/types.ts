@@ -29,6 +29,7 @@ export type ProfileAction =
   | 'payments'
   | 'location'
   | 'notifications'
+  | 'editProfile'
   | 'settings'
   | 'listBusiness'
   | 'switchOrganizer'

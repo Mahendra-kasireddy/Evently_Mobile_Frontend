@@ -205,6 +205,8 @@ export type RootStackParamList = {
   /** Every event's agreed amount, what has been paid and what is still owed. */
   Payments: undefined;
   Settings: undefined;
+  /** Name, photo, email and city — opened from Settings and the Profile card. */
+  EditProfile: undefined;
   LegalSupport: undefined;
   /** Contact the Evently team — a real message, not a mailto. */
   Contact: undefined;
