@@ -398,6 +398,24 @@ export const listUi = StyleSheet.create({
     paddingVertical: spacing.xl,
     gap: spacing.s12,
   },
+  /* The page when nothing is on sale at all: the message, centred. */
+  listCentered: { flexGrow: 1 },
+  emptyCentered: { flex: 1, justifyContent: 'center', paddingBottom: 120 },
+  emptyIcon: {
+    width: 72,
+    height: 72,
+    borderRadius: 24,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyTitle: { color: textColor.textPrimary, ...typography.h2 },
+  emptyBody: {
+    color: textColor.textSecondary,
+    ...typography.body,
+    textAlign: 'center',
+    paddingHorizontal: spacing.lg,
+  },
 });
 
 /** 3 — the event. */

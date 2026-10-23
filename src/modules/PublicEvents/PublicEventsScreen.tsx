@@ -272,6 +272,13 @@ export function PublicEventsScreen() {
   });
   const events = data ?? [];
   const filtered = Boolean(query || category || filters.city);
+  /*
+   * Nothing on sale at all — not "nothing matched". Search, filters, category
+   * chips and My Tickets are tools for browsing a catalogue; with no catalogue
+   * they are just clutter around an empty page. A search or filter that finds
+   * nothing keeps them, so it can be changed or cleared.
+   */
+  const nothingOnSale = !loading && !error && events.length === 0 && !filtered;
 
   return (
     <View style={ui.screen}>
@@ -287,79 +294,83 @@ export function PublicEventsScreen() {
           }
           rightElement={
             /* What you have already bought, beside the catalogue it was
-               bought from. */
-            <TouchableOpacity
-              onPress={() => navigation.navigate('MyTickets')}
-              hitSlop={8}
-              accessibilityRole="button"
-              accessibilityLabel={PUBLIC_EVENTS_COPY.ticketsTitle}
-              testID="open-my-tickets"
-              style={s.ticketsButton}
-            >
-              <EventlyIcon
-                name="ticket-confirmation-outline"
-                size={15}
-                color={PE_ACCENT}
-              />
-              <AppText variant="buttonSmall" style={s.ticketsButtonText}>
-                My Tickets
-              </AppText>
-            </TouchableOpacity>
+               bought from. Bought tickets also live under Bookings. */
+            nothingOnSale ? undefined : (
+              <TouchableOpacity
+                onPress={() => navigation.navigate('MyTickets')}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={PUBLIC_EVENTS_COPY.ticketsTitle}
+                testID="open-my-tickets"
+                style={s.ticketsButton}
+              >
+                <EventlyIcon
+                  name="ticket-confirmation-outline"
+                  size={15}
+                  color={PE_ACCENT}
+                />
+                <AppText variant="buttonSmall" style={s.ticketsButtonText}>
+                  My Tickets
+                </AppText>
+              </TouchableOpacity>
+            )
           }
         />
 
-        <View style={s.searchRow}>
-          <View style={s.searchField}>
-            <EventlyIcon name="magnify" size={18} color={PE_MUTED} />
-            <TextInput
-              style={s.searchInput}
-              value={search}
-              onChangeText={setSearch}
-              placeholder="Search events, artists or cities"
-              placeholderTextColor={PE_MUTED}
-              returnKeyType="search"
-              accessibilityLabel="Search public events"
-            />
-            {search ? (
-              <TouchableOpacity
-                onPress={() => setSearch('')}
-                hitSlop={8}
-                accessibilityLabel="Clear search"
-              >
-                <EventlyIcon name="close-circle" size={16} color={PE_MUTED} />
-              </TouchableOpacity>
-            ) : null}
+        {nothingOnSale ? null : (
+          <View style={s.searchRow}>
+            <View style={s.searchField}>
+              <EventlyIcon name="magnify" size={18} color={PE_MUTED} />
+              <TextInput
+                style={s.searchInput}
+                value={search}
+                onChangeText={setSearch}
+                placeholder="Search events, artists or cities"
+                placeholderTextColor={PE_MUTED}
+                returnKeyType="search"
+                accessibilityLabel="Search public events"
+              />
+              {search ? (
+                <TouchableOpacity
+                  onPress={() => setSearch('')}
+                  hitSlop={8}
+                  accessibilityLabel="Clear search"
+                >
+                  <EventlyIcon name="close-circle" size={16} color={PE_MUTED} />
+                </TouchableOpacity>
+              ) : null}
+            </View>
+            <TouchableOpacity
+              style={[s.filterButton, filterCount > 0 && s.filterButtonOn]}
+              onPress={() => setFiltersOpen(true)}
+              accessibilityRole="button"
+              accessibilityLabel={
+                filterCount > 0 ? `Filters, ${filterCount} applied` : 'Filters'
+              }
+              testID="open-filters"
+            >
+              {filterCount > 0 ? (
+                <GradientFill colors={HERO_GRADIENT} direction="diagonal" />
+              ) : null}
+              <EventlyIcon
+                name="tune-variant"
+                size={20}
+                color={filterCount > 0 ? '#ffffff' : PE_NAVY}
+              />
+              {filterCount > 0 ? (
+                <View style={s.filterBadge}>
+                  <AppText variant="label" style={s.filterBadgeText}>
+                    {filterCount}
+                  </AppText>
+                </View>
+              ) : null}
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            style={[s.filterButton, filterCount > 0 && s.filterButtonOn]}
-            onPress={() => setFiltersOpen(true)}
-            accessibilityRole="button"
-            accessibilityLabel={
-              filterCount > 0 ? `Filters, ${filterCount} applied` : 'Filters'
-            }
-            testID="open-filters"
-          >
-            {filterCount > 0 ? (
-              <GradientFill colors={HERO_GRADIENT} direction="diagonal" />
-            ) : null}
-            <EventlyIcon
-              name="tune-variant"
-              size={20}
-              color={filterCount > 0 ? '#ffffff' : PE_NAVY}
-            />
-            {filterCount > 0 ? (
-              <View style={s.filterBadge}>
-                <AppText variant="label" style={s.filterBadgeText}>
-                  {filterCount}
-                </AppText>
-              </View>
-            ) : null}
-          </TouchableOpacity>
-        </View>
+        )}
       </View>
 
       {/* What is applied, each removable on its own. */}
-      {filterCount > 0 ? (
+      {filterCount > 0 && !nothingOnSale ? (
         <View style={s.applied}>
           {filters.city ? (
             <TouchableOpacity
@@ -394,42 +405,44 @@ export function PublicEventsScreen() {
         </View>
       ) : null}
 
-      <View>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={s.chips}
-        >
-          {EVENT_CATEGORIES.map(c => {
-            const on = c.value === category;
-            const look = CATEGORY_LOOK[c.label] ?? CATEGORY_LOOK.All;
-            return (
-              <TouchableOpacity
-                key={c.label}
-                style={[s.chip, on && s.chipOn]}
-                onPress={() => setCategory(c.value)}
-                accessibilityRole="button"
-                accessibilityState={{ selected: on }}
-              >
-                {on ? (
-                  <GradientFill colors={look.gradient} direction="across" />
-                ) : null}
-                <EventlyIcon
-                  name={look.icon}
-                  size={15}
-                  color={on ? '#ffffff' : look.gradient[1]}
-                />
-                <AppText
-                  variant="label"
-                  style={[s.chipText, on && s.chipTextOn]}
+      {nothingOnSale ? null : (
+        <View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={s.chips}
+          >
+            {EVENT_CATEGORIES.map(c => {
+              const on = c.value === category;
+              const look = CATEGORY_LOOK[c.label] ?? CATEGORY_LOOK.All;
+              return (
+                <TouchableOpacity
+                  key={c.label}
+                  style={[s.chip, on && s.chipOn]}
+                  onPress={() => setCategory(c.value)}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: on }}
                 >
-                  {c.label}
-                </AppText>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-      </View>
+                  {on ? (
+                    <GradientFill colors={look.gradient} direction="across" />
+                  ) : null}
+                  <EventlyIcon
+                    name={look.icon}
+                    size={15}
+                    color={on ? '#ffffff' : look.gradient[1]}
+                  />
+                  <AppText
+                    variant="label"
+                    style={[s.chipText, on && s.chipTextOn]}
+                  >
+                    {c.label}
+                  </AppText>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+      )}
 
       <FlatList
         ref={scrollRef as never}
@@ -446,7 +459,7 @@ export function PublicEventsScreen() {
             />
           </FadeInUp>
         )}
-        contentContainerStyle={s.list}
+        contentContainerStyle={[s.list, nothingOnSale && s.listCentered]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         refreshControl={
@@ -456,7 +469,7 @@ export function PublicEventsScreen() {
           />
         }
         ListEmptyComponent={
-          <View style={s.empty}>
+          <View style={[s.empty, nothingOnSale && s.emptyCentered]}>
             {loading ? (
               <>
                 <ActivityIndicator color={PE_ACCENT} />
@@ -464,13 +477,22 @@ export function PublicEventsScreen() {
                   {PUBLIC_EVENTS_COPY.loading}
                 </AppText>
               </>
+            ) : nothingOnSale ? (
+              <>
+                <View style={s.emptyIcon}>
+                  <GradientFill colors={HERO_GRADIENT} direction="diagonal" />
+                  <EventlyIcon name="calendar-star" size={30} color="#ffffff" />
+                </View>
+                <AppText style={s.emptyTitle}>
+                  {PUBLIC_EVENTS_COPY.emptyTitle}
+                </AppText>
+                <AppText style={s.emptyBody}>
+                  {PUBLIC_EVENTS_COPY.empty}
+                </AppText>
+              </>
             ) : (
               <AppText variant="body" style={ui.muted}>
-                {error
-                  ? error.message
-                  : filtered
-                  ? PUBLIC_EVENTS_COPY.emptySearch
-                  : PUBLIC_EVENTS_COPY.empty}
+                {error ? error.message : PUBLIC_EVENTS_COPY.emptySearch}
               </AppText>
             )}
           </View>

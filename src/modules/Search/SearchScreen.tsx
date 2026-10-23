@@ -50,6 +50,22 @@ export function SearchScreen() {
 
   const { results, isIdle, isLoading, errorMessage } = container;
 
+  /*
+   * A blank search with no filters is "show me everything" — so when that
+   * comes back empty, there is nothing on the platform yet, not nothing that
+   * matched. The search field, filters and tabs would only be tools for an
+   * empty page, so they step aside. A typed search or a filter that finds
+   * nothing keeps them, so it can be changed.
+   */
+  const nothingYet =
+    !isIdle &&
+    !isLoading &&
+    !errorMessage &&
+    results.total === 0 &&
+    !container.query.trim() &&
+    container.activeFilterCount === 0 &&
+    container.kind === 'all';
+
   // The mappers read a home payload; only these fields are consulted, and
   // giving them the search response keeps one set of card-building rules.
   const asFeed = {
@@ -70,41 +86,53 @@ export function SearchScreen() {
         <EventlyIcon name="chevron-left" size={26} color={colors.text} />
       </TouchableOpacity>
 
-      <View style={s.field}>
-        <EventlyIcon name="magnify" size={17} color={colors.textMuted} />
-        <TextInput
-          style={s.input}
-          value={container.query}
-          onChangeText={container.setQuery}
-          onSubmitEditing={container.runSearch}
-          placeholder={COPY.placeholder}
-          placeholderTextColor={colors.textMuted}
-          returnKeyType="search"
-          autoFocus={!params?.openFilters}
-          accessibilityLabel={COPY.placeholder}
-        />
-      </View>
-
-      <TouchableOpacity
-        style={s.filterButton}
-        activeOpacity={0.85}
-        onPress={() => setFiltersOpen(true)}
-        accessibilityRole="button"
-        accessibilityLabel={
-          container.activeFilterCount > 0
-            ? `${COPY.filters}, ${container.activeFilterCount} set`
-            : COPY.filters
-        }
-      >
-        <EventlyIcon name="tune-variant" size={18} color={colors.onPrimary} />
-        {container.activeFilterCount > 0 ? (
-          <View style={s.filterBadge}>
-            <AppText variant="label" style={s.filterBadgeText}>
-              {container.activeFilterCount}
-            </AppText>
+      {nothingYet ? (
+        <AppText variant="h3" style={s.barTitle}>
+          {COPY.title}
+        </AppText>
+      ) : (
+        <>
+          <View style={s.field}>
+            <EventlyIcon name="magnify" size={17} color={colors.textMuted} />
+            <TextInput
+              style={s.input}
+              value={container.query}
+              onChangeText={container.setQuery}
+              onSubmitEditing={container.runSearch}
+              placeholder={COPY.placeholder}
+              placeholderTextColor={colors.textMuted}
+              returnKeyType="search"
+              autoFocus={!params?.openFilters}
+              accessibilityLabel={COPY.placeholder}
+            />
           </View>
-        ) : null}
-      </TouchableOpacity>
+
+          <TouchableOpacity
+            style={s.filterButton}
+            activeOpacity={0.85}
+            onPress={() => setFiltersOpen(true)}
+            accessibilityRole="button"
+            accessibilityLabel={
+              container.activeFilterCount > 0
+                ? `${COPY.filters}, ${container.activeFilterCount} set`
+                : COPY.filters
+            }
+          >
+            <EventlyIcon
+              name="tune-variant"
+              size={18}
+              color={colors.onPrimary}
+            />
+            {container.activeFilterCount > 0 ? (
+              <View style={s.filterBadge}>
+                <AppText variant="label" style={s.filterBadgeText}>
+                  {container.activeFilterCount}
+                </AppText>
+              </View>
+            ) : null}
+          </TouchableOpacity>
+        </>
+      )}
     </View>
   );
 
@@ -183,6 +211,26 @@ export function SearchScreen() {
       );
     }
 
+    if (nothingYet) {
+      return (
+        <View style={[s.centered, s.centeredLifted]}>
+          <View style={s.centeredIcon}>
+            <EventlyIcon
+              name="storefront-outline"
+              size={28}
+              color={SEARCH_ACCENT}
+            />
+          </View>
+          <AppText variant="h2" style={s.emptyTitle}>
+            {COPY.nothingYetTitle}
+          </AppText>
+          <AppText variant="body" style={s.emptyBody}>
+            {COPY.nothingYetBody}
+          </AppText>
+        </View>
+      );
+    }
+
     if (results.total === 0) {
       return (
         <View style={s.centered}>
@@ -238,7 +286,7 @@ export function SearchScreen() {
   return (
     <SafeAreaView style={s.container} edges={['top']}>
       {bar}
-      {tabs}
+      {nothingYet ? null : tabs}
       {body()}
       <FilterSheet
         visible={filtersOpen}

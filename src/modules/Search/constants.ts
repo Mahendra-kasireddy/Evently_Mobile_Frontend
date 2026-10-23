@@ -51,6 +51,9 @@ export const SEARCH_COPY = {
   idleTitle: 'What are you planning?',
   idleBody:
     'Search by occasion, an organizer’s name, or what you need — decor, catering, photography.',
+  nothingYetTitle: 'Nothing here yet',
+  nothingYetBody:
+    'Packages and organizers will show up here as they join. Check back soon.',
   emptyTitle: 'Nothing matched',
   emptyBody: 'Try a shorter search, or clear a filter.',
   errorTitle: "We couldn't run that search",

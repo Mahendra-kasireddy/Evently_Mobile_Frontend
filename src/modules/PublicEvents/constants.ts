@@ -12,6 +12,7 @@ export const PUBLIC_EVENTS_COPY = {
   from: 'From',
   sectionHint: 'Shows, workshops and nights out you can book a seat at',
   screenTitle: 'Public events',
+  emptyTitle: 'No events yet',
   empty: 'No public events are on sale right now. Check back soon.',
   emptySearch: 'Nothing matched that. Try a different word.',
   soldOut: 'Sold out',
@@ -249,14 +250,20 @@ export function saleNote(
 /* ------------------------------------------------------------ Poster list */
 
 /** Each category's chip and pill: an icon and a gradient. */
-export const CATEGORY_LOOK: Record<string, { icon: string; gradient: [string, string] }> = {
+export const CATEGORY_LOOK: Record<
+  string,
+  { icon: string; gradient: [string, string] }
+> = {
   All: { icon: 'view-grid-outline', gradient: ['#ff8a5c', '#e8433a'] },
   Music: { icon: 'music-note', gradient: ['#a084ff', '#5a35e0'] },
   Concert: { icon: 'microphone-variant', gradient: ['#ff6f9f', '#c2416b'] },
   Workshop: { icon: 'palette-outline', gradient: ['#3cc9a1', '#0e8a68'] },
   Comedy: { icon: 'emoticon-happy-outline', gradient: ['#ffb547', '#e8791a'] },
   Festival: { icon: 'party-popper', gradient: ['#f472b6', '#be185d'] },
-  Conference: { icon: 'account-group-outline', gradient: ['#5b9bff', '#2554b8'] },
+  Conference: {
+    icon: 'account-group-outline',
+    gradient: ['#5b9bff', '#2554b8'],
+  },
 };
 
 /** A category's gradient, read off its words when it is not one of the chips. */
@@ -266,10 +273,12 @@ export function categoryGradient(category: string): [string, string] {
   const c = (category ?? '').toLowerCase();
   if (/concert|gig|launch/.test(c)) return CATEGORY_LOOK.Concert.gradient;
   if (/music|dj|band/.test(c)) return CATEGORY_LOOK.Music.gradient;
-  if (/workshop|class|course|art/.test(c)) return CATEGORY_LOOK.Workshop.gradient;
+  if (/workshop|class|course|art/.test(c))
+    return CATEGORY_LOOK.Workshop.gradient;
   if (/comedy|stand/.test(c)) return CATEGORY_LOOK.Comedy.gradient;
   if (/festival|fest|fair/.test(c)) return CATEGORY_LOOK.Festival.gradient;
-  if (/conference|talk|summit|meetup/.test(c)) return CATEGORY_LOOK.Conference.gradient;
+  if (/conference|talk|summit|meetup/.test(c))
+    return CATEGORY_LOOK.Conference.gradient;
   return CATEGORY_LOOK.All.gradient;
 }
 
@@ -283,27 +292,42 @@ export function dateBlock(
   if (Number.isNaN(at.getTime())) return null;
   const part = (opts: Intl.DateTimeFormatOptions) => {
     try {
-      return new Intl.DateTimeFormat('en-US', { ...opts, timeZone: timezone || undefined }).format(at);
+      return new Intl.DateTimeFormat('en-US', {
+        ...opts,
+        timeZone: timezone || undefined,
+      }).format(at);
     } catch {
       return new Intl.DateTimeFormat('en-US', opts).format(at);
     }
   };
-  return { day: part({ day: 'numeric' }), month: part({ month: 'short' }).toUpperCase() };
+  return {
+    day: part({ day: 'numeric' }),
+    month: part({ month: 'short' }).toUpperCase(),
+  };
 }
 
 /** "Thu · 6:29 PM" — the time line on a poster, beside the date block. */
-export function weekdayTime(iso: string | null | undefined, timezone: string): string {
+export function weekdayTime(
+  iso: string | null | undefined,
+  timezone: string,
+): string {
   if (!iso) return '';
   const at = new Date(iso);
   if (Number.isNaN(at.getTime())) return '';
   const fmt = (opts: Intl.DateTimeFormatOptions) => {
     try {
-      return new Intl.DateTimeFormat('en-US', { ...opts, timeZone: timezone || undefined }).format(at);
+      return new Intl.DateTimeFormat('en-US', {
+        ...opts,
+        timeZone: timezone || undefined,
+      }).format(at);
     } catch {
       return new Intl.DateTimeFormat('en-US', opts).format(at);
     }
   };
-  return `${fmt({ weekday: 'short' })} · ${fmt({ hour: 'numeric', minute: '2-digit' })}`;
+  return `${fmt({ weekday: 'short' })} · ${fmt({
+    hour: 'numeric',
+    minute: '2-digit',
+  })}`;
 }
 
 /** The featured banner on Home (sections/FeaturedEvents). */
@@ -326,18 +350,26 @@ export function formatDateSpan(
     if (Number.isNaN(at.getTime())) return null;
     const fmt = (opts: Intl.DateTimeFormatOptions) => {
       try {
-        return new Intl.DateTimeFormat('en-IN', { ...opts, timeZone: timezone || undefined }).format(at);
+        return new Intl.DateTimeFormat('en-IN', {
+          ...opts,
+          timeZone: timezone || undefined,
+        }).format(at);
       } catch {
         return new Intl.DateTimeFormat('en-IN', opts).format(at);
       }
     };
-    return { month: fmt({ month: 'short' }), day: fmt({ day: 'numeric' }), key: fmt({ year: 'numeric', month: 'numeric', day: 'numeric' }) };
+    return {
+      month: fmt({ month: 'short' }),
+      day: fmt({ day: 'numeric' }),
+      key: fmt({ year: 'numeric', month: 'numeric', day: 'numeric' }),
+    };
   };
   const start = startIso ? parts(startIso) : null;
   if (!start) return '';
   const end = endIso ? parts(endIso) : null;
   if (!end || end.key === start.key) return `${start.month} ${start.day}`;
-  if (end.month === start.month) return `${start.month} ${start.day} – ${end.day}`;
+  if (end.month === start.month)
+    return `${start.month} ${start.day} – ${end.day}`;
   return `${start.month} ${start.day} – ${end.month} ${end.day}`;
 }
 

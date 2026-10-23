@@ -27,6 +27,8 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: spacing.lg,
   },
+  /* Optically centred: a little above the middle of the page. */
+  centeredLifted: { paddingBottom: 80 },
   centeredIcon: {
     width: 64,
     height: 64,
@@ -71,6 +73,7 @@ export const styles = StyleSheet.create({
     paddingBottom: spacing.sm,
   },
   back: { padding: 4, marginLeft: -4 },
+  barTitle: { ...typography.h3, color: textColor.textPrimary, flex: 1 },
   field: {
     ...globalStyles.row,
     flex: 1,
