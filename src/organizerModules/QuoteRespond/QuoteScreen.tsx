@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Alert, Pressable, ScrollView, StatusBar, View } from 'react-native';
 import {
   useNavigation,
@@ -32,6 +32,7 @@ import { EnquiryCard } from './sections/EnquiryCard';
 import { LineCard } from './sections/LineCard';
 import { PreviewModal } from './sections/PreviewModal';
 import { QuotePreview } from './sections/QuotePreview';
+import { ServiceChips } from './sections/ServiceChips';
 import { SummaryFooter } from './sections/SummaryFooter';
 import { TermsCard } from './sections/TermsCard';
 import { styles as s } from './styles';
@@ -77,6 +78,45 @@ export function QuoteScreen() {
     useRoute<RouteProp<RootStackParamList, 'OrganizerQuote'>>();
   const q = useQuoteContainer(params.requestId);
   const [previewOpen, setPreviewOpen] = useState(false);
+
+  // Which service's card is open under the chips. Falls back to the first
+  // service, so there is always one open while any exist.
+  const [activeUid, setActiveUid] = useState<string | null>(null);
+  const lines = q.form?.lines ?? [];
+  const lineUids = lines.map(l => l.uid).join('|');
+  const knownUids = useRef<string[] | null>(null);
+
+  // A newly added service opens straight away. The first fill (the form
+  // hydrating from the enquiry or a saved quote) is not an "add".
+  useEffect(() => {
+    const uids = lineUids ? lineUids.split('|') : [];
+    const before = knownUids.current;
+    if (before && before.length < uids.length) {
+      const added = uids.find(u => !before.includes(u));
+      if (added) setActiveUid(added);
+    }
+    knownUids.current = q.form ? uids : null;
+  }, [lineUids, q.form]);
+
+  // Send / save found a problem on a card that is not open: open it.
+  const lineErrors = q.errors.lines;
+  useEffect(() => {
+    const bad = lineUids.split('|').filter(u => u && lineErrors[u]);
+    if (bad.length && !(activeUid && lineErrors[activeUid])) {
+      setActiveUid(bad[0]);
+    }
+    // Only when the errors change, not on every chip tap.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lineErrors]);
+
+  const activeLine = lines.find(l => l.uid === activeUid) ?? lines[0] ?? null;
+
+  const removeActive = (uid: string) => {
+    const index = lines.findIndex(l => l.uid === uid);
+    const next = lines[index + 1] ?? lines[index - 1] ?? null;
+    setActiveUid(next ? next.uid : null);
+    q.removeLine(uid);
+  };
 
   // Back with unsaved edits — arrow, swipe or Android back — asks first.
   useEffect(
@@ -275,16 +315,24 @@ export function QuoteScreen() {
               {COPY.noServices}
             </AppText>
           )}
-          {form.lines.map(line => (
+          <ServiceChips
+            lines={form.lines}
+            activeUid={activeLine?.uid ?? null}
+            errors={q.errors.lines}
+            onSelect={setActiveUid}
+          />
+          {activeLine ? (
             <LineCard
-              key={line.uid}
-              line={line}
-              error={q.errors.lines[line.uid]}
-              onChange={patch => q.updateLine(line.uid, patch)}
-              onField={(label, value) => q.setLineField(line.uid, label, value)}
-              onRemove={() => q.removeLine(line.uid)}
+              key={activeLine.uid}
+              line={activeLine}
+              error={q.errors.lines[activeLine.uid]}
+              onChange={patch => q.updateLine(activeLine.uid, patch)}
+              onField={(label, value) =>
+                q.setLineField(activeLine.uid, label, value)
+              }
+              onRemove={() => removeActive(activeLine.uid)}
             />
-          ))}
+          ) : null}
           <AddService onAdd={q.addLine} />
         </Section>
 

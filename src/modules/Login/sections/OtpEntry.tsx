@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { InteractionManager, Pressable, View } from 'react-native';
 import { AppText, EventlyTextInput } from '../../../Components';
 import type { TextInput } from 'react-native';
 import { OTP_COPY, OTP_LENGTH } from '../constants';
@@ -46,6 +46,20 @@ export function OtpEntry({
   const digits = otpDigits(code);
   const active = activeOtpIndex(code);
 
+  // Open the keyboard on the first cell as soon as the code step appears.
+  // Wait for the step's fade-in (220ms in LoginScreen) to finish first:
+  // focusing mid-animation is ignored on Android and can jump the layout on iOS.
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const task = InteractionManager.runAfterInteractions(() => {
+      timer = setTimeout(() => inputRef.current?.focus(), 250);
+    });
+    return () => {
+      task.cancel();
+      if (timer) clearTimeout(timer);
+    };
+  }, []);
+
   return (
     <View>
       <Pressable
@@ -84,6 +98,7 @@ export function OtpEntry({
           autoComplete="sms-otp"
           textContentType="oneTimeCode"
           caretHidden
+          showSoftInputOnFocus
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           accessibilityLabel={

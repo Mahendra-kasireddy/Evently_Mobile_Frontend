@@ -9,7 +9,7 @@ import Svg, {
 } from 'react-native-svg';
 import { EventlyIcon, AppText } from '../Components';
 
-import { textColor, typography } from '../theme';
+import { typography } from '../theme';
 /*
  * The + menu's bubbles, made of liquid.
  *
@@ -228,5 +228,16 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  label: { marginTop: 6, color: textColor.textOnPrimary, ...typography.label },
+  // A small white pill, so the label reads over any screen now that the
+  // menu no longer dims what is behind it.
+  label: {
+    marginTop: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 999,
+    overflow: 'hidden',
+    backgroundColor: '#ffffff',
+    color: '#1c1326',
+    ...typography.label,
+  },
 });

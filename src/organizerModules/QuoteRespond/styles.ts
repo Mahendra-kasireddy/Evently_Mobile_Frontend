@@ -423,3 +423,17 @@ export const previewStyles = StyleSheet.create({
   },
   calloutText: { flex: 1, color: ORG_INK.ink, ...typography.bodySmall },
 });
+
+export const chipStyles = StyleSheet.create({
+  row: { gap: spacing.sm, paddingBottom: spacing.sm, paddingRight: spacing.md },
+  chip: { ...chip, gap: 6, maxWidth: 240 },
+  chipOn: {
+    borderColor: ORG_ACCENT.saffron,
+    backgroundColor: ORG_ACCENT.marigoldSoft,
+  },
+  chipError: { borderColor: DANGER },
+  text: { color: ORG_INK.ink, ...typography.bodySmall, flexShrink: 1 },
+  textOn: { color: AMBER_INK, ...fontWeights.semibold },
+  amount: { color: ORG_INK.inkSoft, ...typography.caption },
+  dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: DANGER },
+});

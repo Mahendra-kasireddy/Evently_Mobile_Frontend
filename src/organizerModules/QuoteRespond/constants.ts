@@ -155,7 +155,7 @@ export const QUOTE_COPY = {
 
   // Sections
   servicesTitle: 'Services & prices',
-  servicesHint: 'One card per service. Prices are in rupees, before tax.',
+  servicesHint: 'Tap a service to edit it. Prices are in rupees, before tax.',
   noServices: 'Add the services you’ll provide.',
   addService: 'Add a service',
   addServiceTitle: 'Which service?',

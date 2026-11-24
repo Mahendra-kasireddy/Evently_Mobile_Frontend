@@ -7,7 +7,7 @@ import { ChatScreen } from '../modules/Chat';
 import { HomeScreen } from '../modules/Home';
 import { PlanScreen } from '../modules/Plan';
 import { ProfileScreen } from '../modules/Profile';
-import { PublicEventsScreen } from '../modules/PublicEvents';
+import { PublicEventsEntry } from '../modules/PublicEvents/PublicEventsEntry';
 import { EventlyTabBar } from './EventlyTabBar';
 import type { MainTabParamList } from './types';
 
@@ -37,7 +37,7 @@ export function MainTabNavigator() {
       {/* Public events — shows, workshops and nights out with tickets. The
           customer's own bookings, and the tickets bought here, are on the
           Bookings screen, reached from the menu. */}
-      <Tab.Screen name="Events" component={PublicEventsScreen} />
+      <Tab.Screen name="Events" component={PublicEventsEntry} />
       <Tab.Screen name="ProfileTab" component={ProfileScreen} />
       {/* Chat is off the bar — the + menu's "Chat" and every organizer's
           "Message" lead to it — but stays a tab screen so they still can. */}

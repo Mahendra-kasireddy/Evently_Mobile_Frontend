@@ -656,7 +656,9 @@ const s = StyleSheet.create({
     overflow: 'hidden',
   },
 
-  backdrop: { backgroundColor: 'rgba(28, 19, 38, 0.76)' },
+  // No dim: the screen behind the + menu stays exactly as it is. The layer
+  // only catches the tap-outside that closes the menu.
+  backdrop: { backgroundColor: 'transparent' },
 });
 
 export default EventlyTabBar;
