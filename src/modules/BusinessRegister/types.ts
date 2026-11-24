@@ -21,7 +21,12 @@ export interface OrganizerSignupDetails {
   businessName: string;
   primaryCategory: string;
   city: string;
+  /** 'individual' for a freelancer; omitted for a business, which picks its legal structure at verification. */
+  businessType?: string;
 }
+
+/** Freelancer or business — decides whether a business name is asked for. */
+export type WorkStyle = 'freelancer' | 'business';
 
 export interface ConfigOptionDTO {
   key: string;
@@ -30,6 +35,7 @@ export interface ConfigOptionDTO {
 
 /** `GET /organizer/onboarding-config`, as far as sign-up reads it. */
 export interface OnboardingConfigDTO {
+  businessTypes?: ConfigOptionDTO[];
   categories: ConfigOptionDTO[];
   cities: string[];
 }

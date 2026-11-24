@@ -16,6 +16,7 @@ import {
   REG_GREEN_SOFT,
   REG_NAVY,
   REG_TEXT_MUTED,
+  VERIFY_TAGLINE,
 } from './constants';
 
 export const screenStyles = StyleSheet.create({
@@ -34,49 +35,10 @@ export const screenStyles = StyleSheet.create({
 export const authGateStyles = StyleSheet.create({
   flex: { flex: 1 },
   content: { flexGrow: 1, paddingBottom: spacing.xl },
-  hero: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl * 2,
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
-    overflow: 'hidden',
-    backgroundColor: REG_NAVY,
-  },
-  heroGlow: {
-    position: 'absolute',
-    top: -60,
-    right: -70,
-    width: 220,
-    height: 220,
-    borderRadius: 110,
-    backgroundColor: 'rgba(244,123,77,0.16)',
-  },
-  heroBack: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    marginBottom: spacing.md,
-  },
-  /* The form, on a white card lifted over the hero's foot. */
+  /* The form, straight on the page under the hero. */
   sheet: {
-    marginTop: -spacing.xl,
-    marginHorizontal: spacing.md,
-    padding: spacing.lg,
+    paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
-    borderRadius: 26,
-    backgroundColor: colors.background,
-    ...Platform.select({
-      ios: {
-        shadowColor: REG_NAVY,
-        shadowOpacity: 0.1,
-        shadowRadius: 18,
-        shadowOffset: { width: 0, height: 8 },
-      },
-      android: { elevation: 4 },
-    }),
   },
   stepChip: {
     alignSelf: 'flex-start',
@@ -90,44 +52,6 @@ export const authGateStyles = StyleSheet.create({
     color: REG_ACCENT,
     ...typography.label,
   },
-  /* On the hero: light chip, white title. */
-  heroStepChip: {
-    alignSelf: 'flex-start',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    marginBottom: spacing.sm,
-  },
-  heroStepText: {
-    color: '#ffb59a',
-    ...typography.label,
-  },
-  /* At the head of the card, beside its first line. */
-  badge: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.md,
-  },
-  title: { color: textColor.textOnPrimary, ...typography.h1 },
-  subtitle: {
-    color: 'rgba(255,255,255,0.78)',
-    marginTop: spacing.xs,
-  },
-  infoCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 10,
-    padding: spacing.s12,
-    marginBottom: spacing.lg,
-    borderRadius: 14,
-    backgroundColor: '#f1efff',
-  },
-  infoText: { flex: 1, color: '#3b2f8f' },
   form: { gap: spacing.md },
   label: { color: textColor.textPrimary },
   phoneRow: {
@@ -155,9 +79,18 @@ export const authGateStyles = StyleSheet.create({
     backgroundColor: 'transparent',
     paddingHorizontal: 0,
   },
-  backRow: { ...globalStyles.row, gap: spacing.xs, marginBottom: spacing.xs },
-  backText: { color: REG_ACCENT },
-  sentTo: { color: REG_TEXT_MUTED, marginBottom: spacing.xs },
+  sentRow: { ...globalStyles.row, gap: spacing.sm },
+  sentLabel: { color: REG_TEXT_MUTED },
+  sentNumber: { color: REG_NAVY, marginTop: 2 },
+  editButton: {
+    ...globalStyles.row,
+    gap: 4,
+    paddingVertical: 7,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+    backgroundColor: REG_ACCENT_SOFT,
+  },
+  editText: { color: REG_ACCENT, ...fontWeights.semibold },
   otpRow: {
     flexDirection: 'row',
     gap: spacing.sm,
@@ -189,8 +122,32 @@ export const authGateStyles = StyleSheet.create({
       android: { elevation: 3 },
     }),
   },
-  resendMuted: { color: textColor.textSecondary, textAlign: 'center' },
-  resendActive: { textAlign: 'center', ...fontWeights.bold },
+  resendRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  resendMuted: { color: textColor.textSecondary },
+  resendWait: { color: REG_NAVY, ...fontWeights.semibold },
+  registeredCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    padding: spacing.s12,
+    borderRadius: 14,
+    backgroundColor: REG_ACCENT_SOFT,
+  },
+  registeredText: { flex: 1, color: REG_NAVY },
+  signInRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  signInMuted: { color: textColor.textSecondary },
+  signInLink: { color: REG_ACCENT, ...fontWeights.bold },
+  resendActive: { color: REG_ACCENT, ...fontWeights.bold },
 });
 
 export const signupStyles = StyleSheet.create({
@@ -211,6 +168,32 @@ export const signupStyles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: 14,
   },
+  hint: { color: textColor.textSecondary },
+  /* "How do you work?" — two tiles side by side. */
+  styleTile: {
+    flex: 1,
+    padding: spacing.md,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: REG_BORDER,
+    backgroundColor: colors.surface,
+    gap: 4,
+  },
+  styleTileOn: { borderColor: REG_ACCENT, backgroundColor: REG_ACCENT_SOFT },
+  styleIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: REG_ACCENT_SOFT,
+    marginBottom: spacing.xs,
+  },
+  styleIconOn: { backgroundColor: REG_ACCENT },
+  styleTitle: { color: textColor.textPrimary, ...fontWeights.bold },
+  styleTitleOn: { color: REG_ACCENT },
+  styleBody: { color: textColor.textSecondary },
+  styleCheck: { position: 'absolute', top: spacing.s12, right: spacing.s12 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   chip: {
     paddingVertical: 9,
@@ -234,4 +217,105 @@ export const signupStyles = StyleSheet.create({
   noteText: { color: textColor.textPrimary, flex: 1 },
   error: { color: textColor.textError },
   button: { borderRadius: 999 },
+});
+
+/** The light verification hero: copy on the left, illustration on the right. */
+const ART_COLUMN = 150;
+const BADGE = 46;
+const heroShadow = Platform.select({
+  ios: {
+    shadowColor: '#7b4a8c',
+    shadowOpacity: 0.14,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+  },
+  android: { elevation: 4 },
+});
+
+export const verifyHeroStyles = StyleSheet.create({
+  hero: {
+    paddingLeft: spacing.lg,
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+    overflow: 'hidden',
+    backgroundColor: '#fff3f1',
+  },
+  blob: {
+    position: 'absolute',
+    top: 60,
+    right: -70,
+    width: 260,
+    height: 260,
+    borderRadius: 130,
+    backgroundColor: 'rgba(244,143,177,0.22)',
+  },
+  confetti: {
+    position: 'absolute',
+    width: 12,
+    height: 5,
+    borderRadius: 3,
+  },
+  back: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.background,
+    marginBottom: spacing.md,
+    ...heroShadow,
+  },
+  /* Two columns that share the width, so nothing can sit on the copy. */
+  row: { flexDirection: 'row', alignItems: 'stretch' },
+  copy: { flex: 1, paddingBottom: spacing.xl, paddingRight: spacing.xs },
+  artColumn: {
+    width: ART_COLUMN,
+    minHeight: ART_COLUMN * 1.45,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+  },
+  art: { width: ART_COLUMN - 12, height: (ART_COLUMN - 12) * 1.5 },
+  badge: {
+    position: 'absolute',
+    left: -6,
+    width: BADGE,
+    height: BADGE,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.background,
+    ...heroShadow,
+  },
+  badgeTop: { top: 30 },
+  badgeBottom: { top: 30 + BADGE + spacing.s12 },
+  badgeInner: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  brandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  logo: { width: 40, height: 40 },
+  wordmark: { color: REG_NAVY, ...fontWeights.bold },
+  taglineRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
+  tagline: {
+    color: VERIFY_TAGLINE,
+    fontStyle: 'italic',
+    ...fontWeights.semibold,
+  },
+  titleLead: {
+    color: REG_NAVY,
+    ...typography.h1,
+    fontSize: 26,
+    lineHeight: 32,
+  },
+  titleAccent: { ...typography.h1, fontSize: 26, lineHeight: 32 },
+  subtitle: { color: REG_TEXT_MUTED, marginTop: spacing.sm },
 });

@@ -205,10 +205,16 @@ describe('routeFor', () => {
     });
   });
 
+  it('opens an organizer dashboard page in the organizer app', () => {
+    expect(routeFor('/organizer/quotes')).toEqual({
+      screen: 'OrganizerWebPage',
+      path: '/organizer/quotes',
+    });
+  });
+
   it('refuses a web path this app has no screen for', () => {
-    // "/organizer/quotes" is a console page. Landing a customer on a screen
-    // the notification was not about is worse than landing them nowhere.
-    expect(routeFor('/organizer/quotes')).toBeNull();
+    // Landing someone on a screen the notification was not about is worse
+    // than landing them nowhere.
     expect(routeFor('/bookings/64b7f2c1a9e4d3b201f5c8a7')).toBeNull();
     expect(routeFor('')).toBeNull();
     expect(routeFor(undefined as any)).toBeNull();

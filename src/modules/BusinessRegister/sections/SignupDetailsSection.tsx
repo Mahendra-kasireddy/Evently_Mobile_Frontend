@@ -8,13 +8,18 @@ import {
   KeyboardAvoider,
 } from '../../../Components';
 import {
+  FREELANCER_BUSINESS_TYPE,
   REG_ACCENT,
   REG_GREEN_DARK,
   REGISTER_COPY,
   SIGNUP_COPY as COPY,
 } from '../constants';
 import { authGateStyles, screenStyles, signupStyles as s } from '../styles';
-import type { OnboardingConfigDTO, OrganizerSignupDetails } from '../types';
+import type {
+  OnboardingConfigDTO,
+  OrganizerSignupDetails,
+  WorkStyle,
+} from '../types';
 
 interface SignupDetailsSectionProps {
   config: OnboardingConfigDTO | null;
@@ -52,22 +57,39 @@ export function SignupDetailsSection({
   onSubmit,
 }: SignupDetailsSectionProps) {
   const [details, setDetails] = useState<OrganizerSignupDetails>(EMPTY);
+  const [workStyle, setWorkStyle] = useState<WorkStyle | null>(null);
   const [showRequired, setShowRequired] = useState(false);
+  const isFreelancer = workStyle === 'freelancer';
   const set = (key: keyof OrganizerSignupDetails) => (value: string) => {
     setDetails(prev => ({ ...prev, [key]: value }));
     setShowRequired(false);
   };
 
+  const firstName = details.firstName.trim();
+  const lastName = details.lastName.trim();
+  const businessName = details.businessName.trim();
+  // A freelancer needs no business: with no brand name, they trade under
+  // their own. Tagged 'individual' only where the admin offers that type.
+  const offersIndividual = (config?.businessTypes ?? []).some(
+    t => t.key === FREELANCER_BUSINESS_TYPE,
+  );
   const trimmed: OrganizerSignupDetails = {
-    firstName: details.firstName.trim(),
-    lastName: details.lastName.trim(),
-    businessName: details.businessName.trim(),
+    firstName,
+    lastName,
+    businessName:
+      isFreelancer && businessName.length < 2
+        ? `${firstName} ${lastName}`
+        : businessName,
     primaryCategory: details.primaryCategory,
     city: details.city,
+    ...(isFreelancer && offersIndividual
+      ? { businessType: FREELANCER_BUSINESS_TYPE }
+      : null),
   };
   const isComplete =
-    trimmed.firstName.length > 0 &&
-    trimmed.lastName.length > 0 &&
+    workStyle !== null &&
+    firstName.length > 0 &&
+    lastName.length > 0 &&
     trimmed.businessName.length >= 2 &&
     trimmed.primaryCategory !== '' &&
     trimmed.city !== '';
@@ -111,7 +133,7 @@ export function SignupDetailsSection({
       >
         <View style={authGateStyles.stepChip}>
           <AppText variant="label" style={authGateStyles.stepText}>
-            STEP 2 OF 2 · YOUR BUSINESS
+            {COPY.step}
           </AppText>
         </View>
         <AppText variant="h1" style={s.title}>
@@ -120,6 +142,59 @@ export function SignupDetailsSection({
         <AppText variant="body" style={s.subtitle}>
           {COPY.subtitle}
         </AppText>
+
+        <View style={s.field}>
+          <AppText variant="body" weight="medium" style={s.label}>
+            {COPY.workStyle}
+          </AppText>
+          <View
+            style={s.row}
+            accessibilityRole="radiogroup"
+            accessibilityLabel={COPY.workStyle}
+          >
+            {COPY.workStyles.map(option => {
+              const on = option.key === workStyle;
+              return (
+                <Pressable
+                  key={option.key}
+                  style={[s.styleTile, on && s.styleTileOn]}
+                  onPress={() => {
+                    setWorkStyle(option.key);
+                    setShowRequired(false);
+                  }}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: on }}
+                >
+                  <View style={[s.styleIcon, on && s.styleIconOn]}>
+                    <EventlyIcon
+                      name={option.icon}
+                      size={20}
+                      color={on ? '#ffffff' : REG_ACCENT}
+                    />
+                  </View>
+                  <AppText
+                    variant="body"
+                    style={[s.styleTitle, on && s.styleTitleOn]}
+                  >
+                    {option.title}
+                  </AppText>
+                  <AppText variant="caption" style={s.styleBody}>
+                    {option.body}
+                  </AppText>
+                  {on ? (
+                    <View style={s.styleCheck}>
+                      <EventlyIcon
+                        name="check-circle"
+                        size={18}
+                        color={REG_ACCENT}
+                      />
+                    </View>
+                  ) : null}
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
 
         <View style={s.row}>
           <View style={[s.field, s.half]}>
@@ -130,6 +205,7 @@ export function SignupDetailsSection({
               style={s.input}
               value={details.firstName}
               onChangeText={set('firstName')}
+              placeholder={COPY.firstNamePlaceholder}
               autoCapitalize="words"
               textContentType="givenName"
               maxLength={60}
@@ -143,6 +219,7 @@ export function SignupDetailsSection({
               style={s.input}
               value={details.lastName}
               onChangeText={set('lastName')}
+              placeholder={COPY.lastNamePlaceholder}
               autoCapitalize="words"
               textContentType="familyName"
               maxLength={60}
@@ -150,20 +227,31 @@ export function SignupDetailsSection({
           </View>
         </View>
 
-        <View style={s.field}>
-          <AppText variant="body" weight="medium" style={s.label}>
-            {COPY.businessName}
-          </AppText>
-          <EventlyTextInput
-            style={s.input}
-            value={details.businessName}
-            onChangeText={set('businessName')}
-            placeholder={COPY.businessPlaceholder}
-            autoCapitalize="words"
-            textContentType="organizationName"
-            maxLength={120}
-          />
-        </View>
+        {/* Shown once they've said how they work: a business names
+            itself; a freelancer may add a brand, or go by their own name. */}
+        {workStyle ? (
+          <View style={s.field}>
+            <AppText variant="body" weight="medium" style={s.label}>
+              {isFreelancer ? COPY.brandName : COPY.businessName}
+            </AppText>
+            <EventlyTextInput
+              style={s.input}
+              value={details.businessName}
+              onChangeText={set('businessName')}
+              placeholder={
+                isFreelancer ? COPY.brandPlaceholder : COPY.businessPlaceholder
+              }
+              autoCapitalize="words"
+              textContentType="organizationName"
+              maxLength={120}
+            />
+            {isFreelancer ? (
+              <AppText variant="caption" style={s.hint}>
+                {COPY.brandHint}
+              </AppText>
+            ) : null}
+          </View>
+        ) : null}
 
         <ChipGroup
           label={COPY.category}

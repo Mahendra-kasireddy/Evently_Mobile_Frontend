@@ -263,9 +263,17 @@ describe('the routes the app can reach', () => {
         used.add(m[1]);
     }
 
+    // The organizer tabs are registered from a table, not one <Tab.Screen> each.
+    const organizerTabs = [
+      ...read('organizerModules', 'Navigation', 'constants.ts').matchAll(
+        /name: '([A-Z][A-Za-z]*)'/g,
+      ),
+    ].map(m => m[1]);
+
     const registered = new Set([
       ...routeNamesIn(read('navigation', 'MainTabNavigator.tsx')),
       ...routeNamesIn(read('navigation', 'RootNavigator.tsx')),
+      ...organizerTabs,
     ]);
 
     expect([...used].filter(name => !registered.has(name))).toEqual([]);

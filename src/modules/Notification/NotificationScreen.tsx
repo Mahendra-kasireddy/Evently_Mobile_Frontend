@@ -15,6 +15,9 @@ import { useNotificationContainer } from './container';
 import { NotificationRow } from './sections/NotificationRow';
 import { styles as s } from './styles';
 import { routeFor } from './utils';
+import { selectIsOrganizerView } from '../../store/authSlice';
+import { useAppSelector } from '../../store/hooks';
+import { nativeRouteForPath } from '../../organizerModules/Navigation/constants';
 import type { NotificationItem } from './types';
 
 type NotificationNavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -32,6 +35,7 @@ type NotificationNavigationProp = NativeStackNavigationProp<RootStackParamList>;
  */
 export function NotificationScreen() {
   const navigation = useNavigation<NotificationNavigationProp>();
+  const isOrganizer = useAppSelector(selectIsOrganizerView);
   const {
     items,
     hasUnread,
@@ -47,10 +51,32 @@ export function NotificationScreen() {
   const open = (item: NotificationItem) => {
     if (!item.read) markRead(item.id);
     const route = routeFor(item.link);
-    if (route?.screen === 'Conversation') {
+    // Each side opens only what it has screens for: the customer app its
+    // chats, the organizer app its dashboard pages.
+    if (route?.screen === 'Conversation' && !isOrganizer) {
       navigation.navigate('Conversation', {
         conversationId: route.conversationId,
       });
+    } else if (route?.screen === 'OrganizerWebPage' && isOrganizer) {
+      const native = nativeRouteForPath(route.path);
+      if (native?.name === 'OrganizerQuote')
+        navigation.navigate('OrganizerQuote', native.params);
+      else if (native?.name === 'OrganizerSetup')
+        navigation.navigate('OrganizerSetup', native.params);
+      else if (native?.name === 'OrganizerEvent')
+        navigation.navigate('OrganizerEvent', native.params);
+      else if (native?.name === 'OrganizerIdeas')
+        navigation.navigate('OrganizerIdeas', native.params);
+      else if (native?.name === 'OrganizerPublicEvent')
+        navigation.navigate('OrganizerPublicEvent', native.params);
+      else if (native?.name === 'OrganizerInvitation')
+        navigation.navigate('OrganizerInvitation', native.params);
+      else if (native) navigation.navigate(native.name);
+      else
+        navigation.navigate('OrganizerWebPage', {
+          path: route.path,
+          title: COPY.title,
+        });
     }
   };
 

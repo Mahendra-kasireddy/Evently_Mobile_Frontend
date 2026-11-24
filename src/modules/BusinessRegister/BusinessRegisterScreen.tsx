@@ -56,9 +56,16 @@ export function BusinessRegisterScreen() {
   const view = useAppSelector(selectEffectiveView);
   const copy = AUTH_COPY[role];
 
+  // Organizers land on the native organizer app; sub-vendors on their web dashboard.
   const openDashboard = useCallback(
-    () => navigation.reset({ index: 0, routes: [{ name: 'BusinessHome' }] }),
-    [navigation],
+    () =>
+      navigation.reset({
+        index: 0,
+        routes: [
+          { name: role === 'organizer' ? 'OrganizerTabs' : 'BusinessHome' },
+        ],
+      }),
+    [navigation, role],
   );
 
   const organizer = useOrganizerSignup(role === 'organizer');
@@ -88,11 +95,15 @@ export function BusinessRegisterScreen() {
     return (
       <View style={s.container}>
         <StatusBar
-          barStyle="light-content"
+          barStyle="dark-content"
           backgroundColor="transparent"
           translucent
         />
-        <AuthGateSection copy={copy} onBack={() => navigation.goBack()} />
+        <AuthGateSection
+          copy={copy}
+          onBack={() => navigation.goBack()}
+          onSignIn={() => navigation.navigate('Login')}
+        />
       </View>
     );
   }
@@ -112,6 +123,7 @@ export function BusinessRegisterScreen() {
   if (organizer.needsDetails && !organizer.done) {
     return (
       <SafeAreaView style={s.container} edges={['top']}>
+        <StatusBar barStyle="dark-content" />
         <AppHeader title={SIGNUP_COPY.header} />
         <SignupDetailsSection
           config={organizer.config}

@@ -1,0 +1,255 @@
+import { Platform, StyleSheet } from 'react-native';
+import { fontWeights, spacing, typography } from '../../theme';
+import { ORG_ACCENT, ORG_INK, ORG_PAPER, STAGE_TINT } from './design';
+
+const cardShadow = Platform.select({
+  ios: {
+    shadowColor: ORG_INK.night,
+    shadowOpacity: 0.07,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 6 },
+  },
+  android: { elevation: 2 },
+  default: {},
+}) as object;
+
+export const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: ORG_PAPER.canvas },
+  content: { padding: spacing.md, paddingBottom: spacing.xl, gap: spacing.md },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    padding: spacing.xl,
+  },
+  title: { color: ORG_INK.ink, ...typography.h3, textAlign: 'center' },
+  muted: { color: ORG_INK.inkSoft, ...typography.body, textAlign: 'center' },
+  notice: {
+    padding: spacing.s12,
+    borderRadius: 12,
+    backgroundColor: '#fde4df',
+  },
+  noticeText: { color: '#a3301c', ...typography.caption },
+});
+
+export const heroStyles = StyleSheet.create({
+  card: {
+    borderRadius: 24,
+    padding: spacing.lg,
+    overflow: 'hidden',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  glow: {
+    position: 'absolute',
+    bottom: -70,
+    left: -40,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(143,224,189,0.18)',
+  },
+  text: { flex: 1, minWidth: 0, gap: 6 },
+  tag: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+  },
+  tagText: { color: '#ffffff', ...typography.label, ...fontWeights.semibold },
+  title: { color: '#ffffff', ...typography.h2 },
+  body: { color: 'rgba(255,255,255,0.82)', ...typography.caption },
+  stage: { color: '#8fe0bd', ...typography.label, ...fontWeights.semibold },
+  ring: { alignItems: 'center', justifyContent: 'center' },
+  ringCenter: { position: 'absolute', alignItems: 'center' },
+  ringValue: { color: '#ffffff', ...typography.h2 },
+  ringLabel: { color: 'rgba(255,255,255,0.75)', ...typography.label },
+});
+
+export const stageStyles = StyleSheet.create({
+  card: {
+    backgroundColor: ORG_PAPER.card,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: ORG_PAPER.hairline,
+    overflow: 'hidden',
+    ...cardShadow,
+  },
+  cardLocked: { opacity: 0.72 },
+  head: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.s12,
+    padding: spacing.md,
+  },
+  badge: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeLocked: { backgroundColor: ORG_PAPER.well },
+  badgeText: { color: '#ffffff', ...typography.h3 },
+  headText: { flex: 1, minWidth: 0, gap: 2 },
+  stageRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  stageLabel: {
+    color: ORG_INK.inkSoft,
+    ...typography.label,
+    ...fontWeights.semibold,
+  },
+  tag: { paddingHorizontal: 7, paddingVertical: 1, borderRadius: 6 },
+  tagText: { ...typography.label, ...fontWeights.semibold },
+  title: { color: ORG_INK.ink, ...typography.h3 },
+  subtitle: { color: ORG_INK.inkSoft, ...typography.caption },
+  progressWrap: {
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.s12,
+    gap: 6,
+  },
+  progressText: { color: ORG_INK.inkSoft, ...typography.caption },
+  track: {
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: ORG_PAPER.well,
+    overflow: 'hidden',
+  },
+  fill: { height: '100%', borderRadius: 3 },
+  locked: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.md,
+    padding: spacing.s12,
+    borderRadius: 12,
+    backgroundColor: ORG_PAPER.well,
+  },
+  lockedText: {
+    color: ORG_INK.inkSoft,
+    ...typography.caption,
+    ...fontWeights.semibold,
+  },
+  empty: {
+    color: ORG_INK.inkSoft,
+    ...typography.caption,
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.md,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.s12,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.s12,
+    borderTopWidth: 1,
+    borderTopColor: ORG_PAPER.hairline,
+  },
+  rowNext: { backgroundColor: '#fffaf4' },
+  rowIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: ORG_PAPER.well,
+  },
+  rowIconDone: { backgroundColor: ORG_ACCENT.jadeSoft },
+  rowText: { flex: 1, minWidth: 0, gap: 2 },
+  rowTitle: { color: ORG_INK.ink, ...typography.body },
+  rowTitleDone: { color: ORG_INK.inkSoft },
+  rowMeta: { color: ORG_INK.inkSoft, ...typography.caption },
+  button: {
+    minWidth: 76,
+    height: 34,
+    paddingHorizontal: 12,
+    borderRadius: 17,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonGhost: {
+    borderWidth: 1.5,
+    borderColor: ORG_PAPER.hairline,
+    backgroundColor: ORG_PAPER.card,
+  },
+  buttonText: {
+    color: '#ffffff',
+    ...typography.bodySmall,
+    ...fontWeights.bold,
+  },
+  buttonTextGhost: { color: ORG_INK.ink },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
+    backgroundColor: ORG_ACCENT.jadeSoft,
+  },
+  chipText: {
+    color: ORG_ACCENT.jade,
+    ...typography.label,
+    ...fontWeights.semibold,
+  },
+});
+
+export const helpStyles = StyleSheet.create({
+  card: {
+    backgroundColor: ORG_PAPER.card,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: ORG_PAPER.hairline,
+    padding: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.s12,
+    ...cardShadow,
+  },
+  icon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: ORG_ACCENT.jadeSoft,
+  },
+  body: { flex: 1, minWidth: 0 },
+  title: { color: ORG_INK.ink, ...typography.body, ...fontWeights.semibold },
+  sub: { color: ORG_INK.inkSoft, ...typography.caption },
+  cta: {
+    paddingHorizontal: 14,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    backgroundColor: ORG_ACCENT.jade,
+  },
+  ctaText: { color: '#ffffff', ...typography.bodySmall, ...fontWeights.bold },
+});
+
+/** Each stage's tag and progress colours. */
+export const stageTintStyles = {
+  1: StyleSheet.create({
+    tag: { backgroundColor: STAGE_TINT[1].soft },
+    tagText: { color: STAGE_TINT[1].ink },
+    fill: { backgroundColor: STAGE_TINT[1].ink },
+  }),
+  2: StyleSheet.create({
+    tag: { backgroundColor: STAGE_TINT[2].soft },
+    tagText: { color: STAGE_TINT[2].ink },
+    fill: { backgroundColor: STAGE_TINT[2].ink },
+  }),
+  3: StyleSheet.create({
+    tag: { backgroundColor: STAGE_TINT[3].soft },
+    tagText: { color: STAGE_TINT[3].ink },
+    fill: { backgroundColor: STAGE_TINT[3].ink },
+  }),
+};

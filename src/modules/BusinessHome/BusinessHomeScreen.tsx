@@ -35,7 +35,12 @@ export function BusinessHomeScreen() {
 function BusinessPortal({ role }: { role: BusinessRole }) {
   // The dashboard itself, whatever stage the organizer is at: until they are
   // verified it leads with their go-live checklist.
-  return <BusinessWebView role={role} path={resumeUrlFor(role) ?? BUSINESS_HOME_PATH[role]} />;
+  return (
+    <BusinessWebView
+      role={role}
+      path={resumeUrlFor(role) ?? BUSINESS_HOME_PATH[role]}
+    />
+  );
 }
 
 export default BusinessHomeScreen;

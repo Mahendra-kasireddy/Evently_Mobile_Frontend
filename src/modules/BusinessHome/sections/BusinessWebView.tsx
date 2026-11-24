@@ -42,6 +42,7 @@ import { logoutOnServer } from '../services';
 import { styles } from '../styles';
 import type { BusinessRole } from '../types';
 import {
+  type EmbedMode,
   buildInjectedScript,
   isWebAppUrl,
   parseAppMessage,
@@ -70,6 +71,12 @@ interface BusinessWebViewProps {
   role: BusinessRole;
   /** Path on the web app ("/organizer/home") or an absolute web-app URL to open. */
   path: string;
+  /**
+   * Shown inside a native organizer screen (its header and tab bar are
+   * native): the page hides its own, and this page is not remembered as the
+   * portal's resume point.
+   */
+  embedded?: EmbedMode | false;
 }
 
 /**
@@ -80,7 +87,11 @@ interface BusinessWebViewProps {
  * run. Everything the page cannot do for itself comes back as a message —
  * see `AppMessage` — and is handled here.
  */
-export function BusinessWebView({ role, path }: BusinessWebViewProps) {
+export function BusinessWebView({
+  role,
+  path,
+  embedded = false,
+}: BusinessWebViewProps) {
   const dispatch = useAppDispatch();
   const storeToken = useAppSelector(selectAuthToken);
   const storeTokenRef = useRef(storeToken);
@@ -206,9 +217,9 @@ export function BusinessWebView({ role, path }: BusinessWebViewProps) {
         return;
       }
       currentUrl.current = nav.url;
-      lastUrlByRole[role] = nav.url;
+      if (!embedded) lastUrlByRole[role] = nav.url;
     },
-    [dispatch, handleExpired, role],
+    [dispatch, embedded, handleExpired, role],
   );
 
   /** Keeps the dashboard in the WebView; anything off-site opens in the system browser or app. */
@@ -265,6 +276,7 @@ export function BusinessWebView({ role, path }: BusinessWebViewProps) {
           injectedJavaScriptBeforeContentLoaded={buildInjectedScript(
             pageToken,
             Platform.OS,
+            embedded,
           )}
           onMessage={handleMessage}
           onNavigationStateChange={handleNavigationChange}

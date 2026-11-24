@@ -16,33 +16,55 @@ export const REG_GREEN_DARK = '#0f6b4f';
 
 export interface AuthGateCopy {
   header: string;
-  /** "Step 1 of 2" — the whole sign-up is two screens, and saying so keeps people going. */
-  step: string;
-  title: string;
-  subtitle: string;
-  /** The one-account rule, said where it matters: before the number is typed. */
-  sameNumber: string;
+  /** The hero heading, in two lines: plain, then the gradient word. */
+  titleLead: string;
+  titleAccent: string;
+  /** Under the heading — what this step is for. */
+  heroSubtitle: string;
 }
 
 /** The OTP step, per role. Same sign-in as customers — said outright so nobody registers twice. */
 export const AUTH_COPY: Record<JoinRole, AuthGateCopy> = {
   organizer: {
     header: 'Become an organizer',
-    step: 'STEP 1 OF 2 · VERIFY',
-    title: 'Verify your mobile',
-    subtitle: 'Use the number customers should reach your business on.',
-    sameNumber:
-      'Already use Hypie as a customer? Use that same number — your organizer profile is added to the same account.',
+    titleLead: 'Organizer',
+    titleAccent: 'Verification',
+    heroSubtitle:
+      'Help us verify your identity to become a trusted event organizer.',
   },
   subvendor: {
     header: 'Become a sub-vendor',
-    step: 'STEP 1 OF 2 · VERIFY',
-    title: 'Verify your mobile',
-    subtitle: 'Use the number organizers already know you by.',
-    sameNumber:
-      'Already use Hypie as a customer? Use that same number — your sub-vendor profile is added to the same account.',
+    titleLead: 'Sub-vendor',
+    titleAccent: 'Verification',
+    heroSubtitle:
+      'Help us verify your identity to become a trusted event partner.',
   },
 };
+
+/** The phone step: registration is for new numbers; existing ones sign in. */
+export const GATE_COPY = {
+  alreadyRegistered:
+    'This number is already registered with Hypie. Sign in to continue.',
+  haveAccount: 'Already registered?',
+  signIn: 'Sign in',
+} as const;
+
+/** The brand lockup in the verification hero. */
+export const VERIFY_HERO_COPY = {
+  wordmark: 'Hypie',
+  tagline: 'Moments Made Special',
+  otpLead: 'Enter your',
+  otpAccent: '6-digit code',
+  otpSubtitle: 'Check your messages and enter the code to verify your number.',
+  sentBySms: 'We sent it by SMS to',
+  noCode: "Didn't get the code?",
+} as const;
+
+/** Hero palette: blush wash, navy heading, violet→pink accent word. */
+export const VERIFY_HERO_BG: [string, string] = ['#fff7f2', '#fde6ee'];
+export const VERIFY_TITLE_GRADIENT = ['#5b3bd6', '#a33ad6', '#e8457f'] as const;
+export const VERIFY_TAGLINE = '#d6336c';
+export const VERIFY_BADGE_GRADIENT: [string, string] = ['#7b5cf0', '#e8457f'];
 
 export const REGISTER_COPY = {
   settingUp: 'Setting up your dashboard…',
@@ -52,20 +74,44 @@ export const REGISTER_COPY = {
   subvendorHeader: 'Become a sub-vendor',
 } as const;
 
-/** The one-screen organizer sign-up. */
+/** The one-screen organizer sign-up — for freelancers and businesses alike. */
 export const SIGNUP_COPY = {
   header: 'Become an organizer',
-  title: 'Tell us about your business',
+  step: 'STEP 2 OF 2 · ABOUT YOU',
+  title: 'Tell us about your work',
   subtitle:
-    'Just the basics to open your dashboard. Documents and bank details can wait.',
+    'Freelancer or full team — just the basics to open your dashboard. Documents and bank details can wait.',
+  workStyle: 'How do you work?',
+  workStyles: [
+    {
+      key: 'freelancer',
+      icon: 'account-outline',
+      title: 'Freelancer',
+      body: 'Just me, under my own name',
+    },
+    {
+      key: 'business',
+      icon: 'storefront-outline',
+      title: 'Business',
+      body: 'A team, studio or company',
+    },
+  ],
   firstName: 'First name',
-  lastName: 'Last name',
+  firstNamePlaceholder: 'Enter first name',
+  lastName: 'Surname',
+  lastNamePlaceholder: 'Enter surname',
   businessName: 'Business name',
   businessPlaceholder: 'e.g. Sri Lakshmi Events',
-  category: 'What do you organize?',
-  city: 'Your city',
-  cta: 'Open my dashboard',
+  brandName: 'Brand name (optional)',
+  brandPlaceholder: 'e.g. Clicks by Ravi',
+  brandHint: 'Leave it blank and customers will see your own name.',
+  category: 'What do you do?',
+  city: 'Where do you work?',
+  cta: 'Continue',
   laterNote:
     'Next, from your dashboard: add your services and portfolio, verify your documents, and go live. Bank details are only needed before your first payout.',
   required: 'Fill in every field to continue.',
 } as const;
+
+/** The business-type key the server uses for a freelancer. */
+export const FREELANCER_BUSINESS_TYPE = 'individual';

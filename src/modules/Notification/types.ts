@@ -36,7 +36,8 @@ export interface NotificationGroup {
 }
 
 /** Where a notification leads, when the app has somewhere to send it. */
-export type NotificationRoute = {
-  screen: 'Conversation';
-  conversationId: string;
-} | null;
+export type NotificationRoute =
+  | { screen: 'Conversation'; conversationId: string }
+  /** An organizer dashboard page ("/organizer/quotes"), opened in the organizer app. */
+  | { screen: 'OrganizerWebPage'; path: string }
+  | null;

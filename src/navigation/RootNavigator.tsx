@@ -24,6 +24,25 @@ import { EditProfileScreen, SettingsScreen } from '../modules/Settings';
 import { SplashScreen } from '../modules/Splash';
 import { BusinessHomeScreen } from '../modules/BusinessHome';
 import { BusinessRegisterScreen } from '../modules/BusinessRegister';
+import {
+  OrganizerTabNavigator,
+  OrganizerWebPageScreen,
+} from '../organizerModules/Navigation';
+import { EditProfileScreen as OrganizerEditProfileScreen } from '../organizerModules/Profile';
+import { BadgesScreen as OrganizerBadgesScreen } from '../organizerModules/Badges';
+import { AcademyScreen as OrganizerAcademyScreen } from '../organizerModules/Academy';
+import { CouponsScreen as OrganizerCouponsScreen } from '../organizerModules/Coupons';
+import { SubVendorsScreen as OrganizerSubVendorsScreen } from '../organizerModules/SubVendors';
+import { CalendarScreen as OrganizerCalendarScreen } from '../organizerModules/Calendar';
+import { QuoteScreen as OrganizerQuoteScreen } from '../organizerModules/QuoteRespond';
+import { SetupScreen as OrganizerSetupScreen } from '../organizerModules/GoLiveSetup';
+import { EventScreen as OrganizerEventScreen } from '../organizerModules/EventWorkspace';
+import { IdeasScreen as OrganizerIdeasScreen } from '../organizerModules/IdeasBoard';
+import {
+  PublicEventScreen as OrganizerPublicEventScreen,
+  PublicEventsScreen as OrganizerPublicEventsScreen,
+} from '../organizerModules/PublicEvents';
+import { InvitationEditorScreen as OrganizerInvitationScreen } from '../organizerModules/Invitation';
 import { UseChoiceScreen } from '../modules/UseChoice';
 import { IdeaBoardScreen, WorkspaceScreen } from '../modules/Workspace';
 import {
@@ -38,8 +57,8 @@ import {
 } from '../modules/PublicEvents';
 import {
   selectAuthToken,
+  selectEffectiveView,
   selectIsAuthHydrated,
-  selectIsBusinessView,
 } from '../store/authSlice';
 import {
   selectHasSeenOnboarding,
@@ -56,7 +75,7 @@ export function RootNavigator() {
   const isAuthHydrated = useAppSelector(selectIsAuthHydrated);
   const hasSeenOnboarding = useAppSelector(selectHasSeenOnboarding);
   const isOnboardingHydrated = useAppSelector(selectIsOnboardingHydrated);
-  const isBusinessView = useAppSelector(selectIsBusinessView);
+  const view = useAppSelector(selectEffectiveView);
 
   // The intro plays once per cold start, even when loading is instant.
   const [introDone, setIntroDone] = useState(false);
@@ -68,11 +87,86 @@ export function RootNavigator() {
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {token && isBusinessView ? (
+      {token && view === 'organizer' ? (
         /*
-         * An organizer or sub-vendor account: the web dashboard and nothing of
-         * the customer app. Switching to the customer side (from inside the
-         * dashboard) swaps this branch out for the one below.
+         * An organizer: the native organizer app. Screens not rebuilt natively
+         * yet open their web page under a native header (OrganizerWebPage).
+         */
+        <>
+          <Stack.Screen
+            name="OrganizerTabs"
+            component={OrganizerTabNavigator}
+          />
+          <Stack.Screen
+            name="OrganizerWebPage"
+            component={OrganizerWebPageScreen}
+          />
+          <Stack.Screen
+            name="OrganizerEditProfile"
+            component={OrganizerEditProfileScreen}
+          />
+          <Stack.Screen
+            name="OrganizerBadges"
+            component={OrganizerBadgesScreen}
+          />
+          <Stack.Screen
+            name="OrganizerAcademy"
+            component={OrganizerAcademyScreen}
+          />
+          <Stack.Screen
+            name="OrganizerCoupons"
+            component={OrganizerCouponsScreen}
+          />
+          <Stack.Screen
+            name="OrganizerSubVendors"
+            component={OrganizerSubVendorsScreen}
+          />
+          <Stack.Screen
+            name="OrganizerCalendar"
+            component={OrganizerCalendarScreen}
+          />
+          <Stack.Screen
+            name="OrganizerQuote"
+            component={OrganizerQuoteScreen}
+          />
+          <Stack.Screen
+            name="OrganizerSetup"
+            component={OrganizerSetupScreen}
+          />
+          <Stack.Screen
+            name="OrganizerEvent"
+            component={OrganizerEventScreen}
+          />
+          <Stack.Screen
+            name="OrganizerIdeas"
+            component={OrganizerIdeasScreen}
+          />
+          <Stack.Screen
+            name="OrganizerPublicEvents"
+            component={OrganizerPublicEventsScreen}
+          />
+          <Stack.Screen
+            name="OrganizerPublicEvent"
+            component={OrganizerPublicEventScreen}
+          />
+          <Stack.Screen
+            name="OrganizerInvitation"
+            component={OrganizerInvitationScreen}
+          />
+          <Stack.Screen name="Notification" component={NotificationScreen} />
+          <Stack.Screen name="Location" component={LocationScreen} />
+          <Stack.Screen name="LegalSupport" component={LegalSupportScreen} />
+          <Stack.Screen name="Contact" component={ContactScreen} />
+          <Stack.Screen
+            name="BusinessRegister"
+            component={BusinessRegisterScreen}
+          />
+        </>
+      ) : token && view === 'vendor' ? (
+        /*
+         * A sub-vendor: the web dashboard and nothing of the customer app.
+         * Switching to the customer side (from inside the dashboard) swaps
+         * this branch out for the one below.
          */
         <>
           <Stack.Screen name="BusinessHome" component={BusinessHomeScreen} />

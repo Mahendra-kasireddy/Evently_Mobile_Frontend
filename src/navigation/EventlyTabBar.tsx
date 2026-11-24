@@ -28,17 +28,17 @@ import { tabBarLabel, textColor } from '../theme';
  * colour softly on the icon alone.
  */
 
-/** Each tab's look: its gradient, and its icon filled and outlined. */
-const TAB_LOOK: Record<
-  string,
-  {
-    gradient: [string, string];
-    ink: string;
-    on: string;
-    off: string;
-    label: string;
-  }
-> = {
+/** A tab's look: its gradient, and its icon filled and outlined. */
+export interface TabLook {
+  gradient: [string, string];
+  ink: string;
+  on: string;
+  off: string;
+  label: string;
+}
+
+/** Each tab's look. */
+const TAB_LOOK: Record<string, TabLook> = {
   Home: {
     gradient: ['#ff8a5c', '#e8433a'],
     ink: '#e2552f',
@@ -145,20 +145,26 @@ function barPath(w: number): string {
   ].join(' ');
 }
 
-function TabButton({
+/**
+ * One tab: its icon in a glass drop of the tab's colour when current. Shared
+ * with the organizer's bar, which passes its own `look`.
+ */
+export function TabButton({
   routeName,
   label,
   focused,
   onPress,
   onLongPress,
+  look: lookOverride,
 }: {
   routeName: string;
   label: string;
   focused: boolean;
   onPress: () => void;
   onLongPress: () => void;
+  look?: TabLook;
 }) {
-  const look = TAB_LOOK[routeName] ?? FALLBACK;
+  const look = lookOverride ?? TAB_LOOK[routeName] ?? FALLBACK;
   /* The gradient pill springs in on the tab that becomes current. */
   const grow = useRef(new Animated.Value(focused ? 1 : 0)).current;
 

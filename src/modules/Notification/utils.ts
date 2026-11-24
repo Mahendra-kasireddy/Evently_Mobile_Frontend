@@ -109,6 +109,11 @@ export function groupByDay(items: NotificationItem[]): NotificationGroup[] {
  * was about is worse than sending them nowhere.
  */
 export function routeFor(link: string): NotificationRoute {
-  const match = /^\/chat\/([a-f0-9]{24})$/i.exec((link ?? '').trim());
-  return match ? { screen: 'Conversation', conversationId: match[1] } : null;
+  const path = (link ?? '').trim();
+  const match = /^\/chat\/([a-f0-9]{24})$/i.exec(path);
+  if (match) return { screen: 'Conversation', conversationId: match[1] };
+  // Organizer pages — honoured in the organizer app, which can show them.
+  if (/^\/organizer\/[\w\-/?=&%.]*$/i.test(path))
+    return { screen: 'OrganizerWebPage', path };
+  return null;
 }

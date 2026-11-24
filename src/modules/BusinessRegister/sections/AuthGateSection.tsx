@@ -5,20 +5,27 @@ import {
   EventlyIcon,
   AppText,
   EventlyTextInput,
-  GradientFill,
   KeyboardAvoider,
 } from '../../../Components';
-import { formatSentTo, isValidMobile, isValidOtpCode } from '../../Login/utils';
+import { isValidMobile, isValidOtpCode } from '../../Login/utils';
 import { useSendOtp, useVerifyOtp } from '../../Login/hooks';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { setSession } from '../../../store/authSlice';
 import { useAppDispatch } from '../../../store/hooks';
 import { setHasSeenOnboarding } from '../../../store/onboardingSlice';
-import { REG_ACCENT, REG_GREEN, type AuthGateCopy } from '../constants';
+import {
+  REG_ACCENT,
+  GATE_COPY,
+  VERIFY_HERO_COPY,
+  type AuthGateCopy,
+} from '../constants';
 import { TermsNote } from '../../Login/sections/TermsNote';
-
-const HERO_GRADIENT: [string, string] = ['#141d3a', '#3a1f5c'];
 import { authGateStyles } from '../styles';
+import { VerifyHero } from './VerifyHero';
+
+/** The number as typed, so a mistake is easy to spot: "+91 98765 43210". */
+function formatFullNumber(phone: string) {
+  return `+91 ${phone.slice(0, 5)} ${phone.slice(5)}`;
+}
 
 /**
  * Inline OTP gate for business registration, mirroring web's OnboardingGate:
@@ -29,12 +36,14 @@ import { authGateStyles } from '../styles';
 export function AuthGateSection({
   copy,
   onBack,
+  onSignIn,
 }: {
   copy: AuthGateCopy;
   /** Leaves the sign-up — the hero carries the back arrow now. */
   onBack: () => void;
+  /** To the ordinary sign-in, for a number that already has an account. */
+  onSignIn: () => void;
 }) {
-  const insets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
   const sendOtpCall = useSendOtp();
   const verifyOtpCall = useVerifyOtp();
@@ -43,14 +52,20 @@ export function AuthGateSection({
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
   const [requestId, setRequestId] = useState<string | null>(null);
-  const [sentTo, setSentTo] = useState<string | null>(null);
   const [devCode, setDevCode] = useState<string | null>(null);
   const [resendSeconds, setResendSeconds] = useState(0);
 
   const isPhoneValid = isValidMobile(phone);
   const isCodeValid = isValidOtpCode(code);
-  const errorMessage =
-    sendOtpCall.error?.message ?? verifyOtpCall.error?.message ?? null;
+  // Registration is for new numbers only; the server answers 409 for one
+  // that already has an account, and that number belongs on the sign-in.
+  // Editing the number clears it, so a different one can be tried.
+  const [checkedPhone, setCheckedPhone] = useState('');
+  const alreadyRegistered =
+    sendOtpCall.error?.status === 409 && phone === checkedPhone;
+  const errorMessage = alreadyRegistered
+    ? null
+    : sendOtpCall.error?.message ?? verifyOtpCall.error?.message ?? null;
 
   useEffect(() => {
     if (step !== 'otp' || resendSeconds <= 0) return undefined;
@@ -59,15 +74,15 @@ export function AuthGateSection({
   }, [step, resendSeconds]);
 
   const requestOtp = () =>
-    sendOtpCall.execute(phone).then(response => {
+    sendOtpCall.execute(phone, 'register').then(response => {
       setRequestId(response.requestId);
-      setSentTo(response.sentTo);
       setDevCode(response.devCode ?? null);
       setResendSeconds(30);
     });
 
   const submitPhone = () => {
     if (!isPhoneValid) return;
+    setCheckedPhone(phone);
     requestOtp()
       .then(() => {
         setCode('');
@@ -105,7 +120,6 @@ export function AuthGateSection({
     setStep('phone');
     setCode('');
     setRequestId(null);
-    setSentTo(null);
     setDevCode(null);
     setResendSeconds(0);
   };
@@ -126,56 +140,22 @@ export function AuthGateSection({
         contentContainerStyle={authGateStyles.content}
         keyboardShouldPersistTaps="handled"
       >
-        {/* The same night-sky hero as the business picker — one flow. */}
-        <View style={[authGateStyles.hero, { paddingTop: insets.top + 8 }]}>
-          <GradientFill colors={HERO_GRADIENT} direction="diagonal" />
-          <View style={authGateStyles.heroGlow} pointerEvents="none" />
-          <TouchableOpacity
-            style={authGateStyles.heroBack}
-            onPress={step === 'otp' ? changeNumber : onBack}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-          >
-            <EventlyIcon name="arrow-left" size={20} color="#ffffff" />
-          </TouchableOpacity>
-          <View style={authGateStyles.heroStepChip}>
-            <AppText variant="label" style={authGateStyles.heroStepText}>
-              {copy.step}
-            </AppText>
-          </View>
-          <AppText variant="h1" style={authGateStyles.title}>
-            {step === 'phone' ? copy.title : 'Enter the 6-digit code'}
-          </AppText>
-          <AppText variant="body" style={authGateStyles.subtitle}>
-            {step === 'phone'
-              ? copy.subtitle
-              : `We sent it by SMS to ${formatSentTo(sentTo, phone)}.`}
-          </AppText>
-        </View>
+        <VerifyHero
+          titleLead={
+            step === 'phone' ? copy.titleLead : VERIFY_HERO_COPY.otpLead
+          }
+          titleAccent={
+            step === 'phone' ? copy.titleAccent : VERIFY_HERO_COPY.otpAccent
+          }
+          subtitle={
+            step === 'phone' ? copy.heroSubtitle : VERIFY_HERO_COPY.otpSubtitle
+          }
+          onBack={step === 'otp' ? changeNumber : onBack}
+        />
 
         <View style={authGateStyles.sheet}>
           {step === 'phone' ? (
-            <View style={authGateStyles.infoCard}>
-              <EventlyIcon
-                name="account-sync-outline"
-                size={18}
-                color="#4b3bd6"
-              />
-              <AppText variant="caption" style={authGateStyles.infoText}>
-                {copy.sameNumber}
-              </AppText>
-            </View>
-          ) : null}
-
-          {step === 'phone' ? (
             <View style={authGateStyles.form}>
-              <AppText
-                variant="body"
-                weight="medium"
-                style={authGateStyles.label}
-              >
-                Mobile number
-              </AppText>
               <View style={authGateStyles.phoneRow}>
                 <AppText
                   variant="body"
@@ -199,30 +179,90 @@ export function AuthGateSection({
                   {errorMessage}
                 </AppText>
               ) : null}
-              <EventlyButton
-                title={
-                  isPhoneValid ? 'Send code' : 'Enter your 10-digit number'
-                }
-                onPress={submitPhone}
-                disabled={!isPhoneValid}
-                loading={sendOtpCall.loading}
-                accentColor={REG_ACCENT}
-                style={authGateStyles.button}
-              />
+              {alreadyRegistered ? (
+                <View style={authGateStyles.registeredCard}>
+                  <EventlyIcon
+                    name="account-check-outline"
+                    size={20}
+                    color={REG_ACCENT}
+                  />
+                  <AppText variant="body" style={authGateStyles.registeredText}>
+                    {GATE_COPY.alreadyRegistered}
+                  </AppText>
+                </View>
+              ) : null}
+              {alreadyRegistered ? (
+                <EventlyButton
+                  title={GATE_COPY.signIn}
+                  onPress={onSignIn}
+                  accentColor={REG_ACCENT}
+                  style={authGateStyles.button}
+                />
+              ) : (
+                <EventlyButton
+                  title={
+                    isPhoneValid ? 'Send code' : 'Enter your 10-digit number'
+                  }
+                  onPress={submitPhone}
+                  disabled={!isPhoneValid}
+                  loading={sendOtpCall.loading}
+                  accentColor={REG_ACCENT}
+                  style={authGateStyles.button}
+                />
+              )}
               <TermsNote />
+              {alreadyRegistered ? null : (
+                <View style={authGateStyles.signInRow}>
+                  <AppText variant="body" style={authGateStyles.signInMuted}>
+                    {GATE_COPY.haveAccount}
+                  </AppText>
+                  <TouchableOpacity
+                    onPress={onSignIn}
+                    accessibilityRole="button"
+                    accessibilityLabel={GATE_COPY.signIn}
+                    hitSlop={8}
+                  >
+                    <AppText variant="body" style={authGateStyles.signInLink}>
+                      {GATE_COPY.signIn}
+                    </AppText>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           ) : (
             <View style={authGateStyles.form}>
-              <TouchableOpacity
-                onPress={changeNumber}
-                style={authGateStyles.backRow}
-                accessibilityLabel="Change mobile number"
-              >
-                <EventlyIcon name="arrow-left" size={15} color={REG_ACCENT} />
-                <AppText variant="body" style={authGateStyles.backText}>
-                  Change number
-                </AppText>
-              </TouchableOpacity>
+              {/* Where the code went, with the way to fix a mistyped number
+                  right beside it. */}
+              <View style={authGateStyles.sentRow}>
+                <View style={authGateStyles.flex}>
+                  <AppText variant="caption" style={authGateStyles.sentLabel}>
+                    {VERIFY_HERO_COPY.sentBySms}
+                  </AppText>
+                  <AppText
+                    variant="h3"
+                    style={authGateStyles.sentNumber}
+                    numberOfLines={1}
+                  >
+                    {formatFullNumber(phone)}
+                  </AppText>
+                </View>
+                <TouchableOpacity
+                  onPress={changeNumber}
+                  style={authGateStyles.editButton}
+                  accessibilityRole="button"
+                  accessibilityLabel="Edit mobile number"
+                  hitSlop={8}
+                >
+                  <EventlyIcon
+                    name="pencil-outline"
+                    size={16}
+                    color={REG_ACCENT}
+                  />
+                  <AppText variant="body" style={authGateStyles.editText}>
+                    Edit
+                  </AppText>
+                </TouchableOpacity>
+              </View>
 
               <View style={authGateStyles.otpRow}>
                 {digits.map((digit, index) => (
@@ -265,23 +305,27 @@ export function AuthGateSection({
                 style={authGateStyles.button}
               />
 
-              {resendSeconds > 0 ? (
+              <View style={authGateStyles.resendRow}>
                 <AppText variant="body" style={authGateStyles.resendMuted}>
-                  Resend code in 0:{String(resendSeconds).padStart(2, '0')}
+                  {VERIFY_HERO_COPY.noCode}
                 </AppText>
-              ) : (
-                <TouchableOpacity
-                  onPress={resendCode}
-                  accessibilityLabel="Resend code"
-                >
-                  <AppText
-                    variant="body"
-                    style={[authGateStyles.resendActive, { color: REG_GREEN }]}
-                  >
-                    Resend code
+                {resendSeconds > 0 ? (
+                  <AppText variant="body" style={authGateStyles.resendWait}>
+                    Resend in {resendSeconds}s
                   </AppText>
-                </TouchableOpacity>
-              )}
+                ) : (
+                  <TouchableOpacity
+                    onPress={resendCode}
+                    accessibilityRole="button"
+                    accessibilityLabel="Resend code"
+                    hitSlop={8}
+                  >
+                    <AppText variant="body" style={authGateStyles.resendActive}>
+                      Resend code
+                    </AppText>
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
           )}
         </View>

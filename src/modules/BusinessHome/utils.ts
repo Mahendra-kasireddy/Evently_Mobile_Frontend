@@ -10,7 +10,11 @@ export function webUrl(pathOrUrl: string): string {
 
 /** True for a URL served by the web app itself — the only pages the WebView keeps. */
 export function isWebAppUrl(url: string): boolean {
-  return url === env.webAppUrl || url.startsWith(`${env.webAppUrl}/`) || url.startsWith(`${env.webAppUrl}?`);
+  return (
+    url === env.webAppUrl ||
+    url.startsWith(`${env.webAppUrl}/`) ||
+    url.startsWith(`${env.webAppUrl}?`)
+  );
 }
 
 /** The path of a web-app URL ("/organizer/home"), or '' for anything else. */
@@ -29,8 +33,27 @@ export function webPathOf(url: string): string {
  * signed in. The token never goes in the URL — it would land in history,
  * server logs and any referrer.
  */
-export function buildInjectedScript(token: string, platform: string): string {
-  return `(function(){try{window.__EVENTLY_APP__={platform:${JSON.stringify(platform)}};window.localStorage.setItem(${JSON.stringify(
+/**
+ * How a page sits inside a native organizer screen: 'tab' under the native top
+ * bar and tab bar (keeps its own back-arrow bar for drill-ins), 'page' under a
+ * native header with its own back arrow (drops the web one).
+ */
+export type EmbedMode = 'tab' | 'page';
+
+export function buildInjectedScript(
+  token: string,
+  platform: string,
+  embedded: EmbedMode | false = false,
+): string {
+  // `embedded`: the page sits inside a native screen that draws its own header
+  // and tab bar, so the web layout drops its app bar and bottom tabs ('tab'),
+  // and its back-arrow bar too under a native header ('page').
+  const app = embedded
+    ? `{platform:${JSON.stringify(platform)},embedded:${JSON.stringify(
+        embedded,
+      )}}`
+    : `{platform:${JSON.stringify(platform)}}`;
+  return `(function(){try{window.__EVENTLY_APP__=${app};window.localStorage.setItem(${JSON.stringify(
     WEB_TOKEN_STORAGE_KEY,
   )},${JSON.stringify(token)});}catch(e){}})();true;`;
 }
@@ -50,11 +73,14 @@ export function parseAppMessage(raw: string): AppMessage | null {
     case 'sessionExpired':
       return { type: msg.type };
     case 'session':
-      return typeof msg.token === 'string' && typeof msg.refreshToken === 'string'
+      return typeof msg.token === 'string' &&
+        typeof msg.refreshToken === 'string'
         ? { type: 'session', token: msg.token, refreshToken: msg.refreshToken }
         : null;
     case 'switchRole':
-      return msg.role === 'customer' || msg.role === 'organizer' || msg.role === 'vendor'
+      return msg.role === 'customer' ||
+        msg.role === 'organizer' ||
+        msg.role === 'vendor'
         ? { type: 'switchRole', role: msg.role }
         : null;
     default:

@@ -33,6 +33,19 @@ export type MainTabParamList = {
   ProfileTab: undefined;
 };
 
+/**
+ * The organizer's tabs — the native organizer app. Each tab is native once its
+ * screen is built; until then it shows that page of the web dashboard inside
+ * the native shell (see organizerModules/Navigation).
+ */
+export type OrganizerTabParamList = {
+  OrgHome: undefined;
+  OrgEnquiries: undefined;
+  OrgEvents: undefined;
+  OrgEarnings: undefined;
+  OrgProfile: undefined;
+};
+
 export type JoinRole = 'organizer' | 'subvendor';
 
 export type RootStackParamList = {
@@ -47,10 +60,43 @@ export type RootStackParamList = {
    */
   BusinessRegister: { role: JoinRole };
   /**
-   * An organizer's or sub-vendor's home: the web dashboard, in place of the
-   * customer tabs. The portal follows the active view, so it takes no params.
+   * A sub-vendor's home: the web dashboard, in place of the customer tabs.
+   * Organizers have the native `OrganizerTabs` instead.
    */
   BusinessHome: undefined;
+  /** The native organizer app's tabs. */
+  OrganizerTabs: NavigatorScreenParams<OrganizerTabParamList> | undefined;
+  /**
+   * One page of the web organizer dashboard under a native header — for the
+   * organizer screens not rebuilt natively yet. `path` is a web path.
+   */
+  OrganizerWebPage: { path: string; title: string };
+  /** The organizer's business profile editor (names, tagline, about, services). */
+  OrganizerEditProfile: undefined;
+  /** The organizer's tier, the path to the next one, and what it unlocks. */
+  OrganizerBadges: undefined;
+  /** Evently Academy: training stages, lessons and workshops. */
+  OrganizerAcademy: undefined;
+  /** The organizer's discount coupons: list, create, enable/disable, usage. */
+  OrganizerCoupons: undefined;
+  /** The organizer's sub-vendor team: list, invite, remove. */
+  OrganizerSubVendors: undefined;
+  /** Booked, blocked and free days; block or unblock dates. */
+  OrganizerCalendar: undefined;
+  /** The go-live checklist, opened at a step ('basic', 'services', 'portfolio', 'verification', 'bank'). */
+  OrganizerSetup: { step?: string } | undefined;
+  /** Writing, editing or withdrawing the quote for one enquiry. */
+  OrganizerQuote: { requestId: string };
+  /** One booking's workspace: accept or decline, and the task board. `title` is only for the first render. */
+  OrganizerEvent: { bookingId: string; title?: string };
+  /** One booking's ideas & planning board, from the organizer's side. */
+  OrganizerIdeas: { bookingId: string; title?: string };
+  /** The organizer's ticketed public events, and creating a new one. */
+  OrganizerPublicEvents: undefined;
+  /** One public event's workspace: dashboard, details, tickets, attendees, check-in. */
+  OrganizerPublicEvent: { eventId: string; title?: string };
+  /** One booking's guest invitation, built by the organizer. */
+  OrganizerInvitation: { bookingId: string; title?: string };
   /**
    * Typed with the tab list so a screen can name a tab — `navigate('Main', {
    * screen: 'Plan' })` — from either side of the boundary: from a tab it
